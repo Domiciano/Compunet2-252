@@ -127,7 +127,7 @@ El siguiente paso es desarrollar el código interno de proceseSolicitud(). Prime
 private void proceseSolicitud() throws Exception
 {
         // Referencia al stream de salida del socket.
-        DataOutputStream os = ?;
+        BufferedWriter os = ?;
 
         // Referencia y filtros (InputStreamReader y BufferedReader)para el stream de entrada.
         BufferedReader br = ?;
