@@ -30,7 +30,7 @@ Bienvenido al curso de Computación en Internet II. Para mantenernos en contacto
       <p>Overview del curso. Calificaciones, reglas, actividades del curso y asignaciones. Ejercicio de servidor web simple</p>
     </td>
     <td style="vertical-align: middle;">
-      4 de febrero de 2025
+      4/2/2025
     </td>
   </tr>
   <tr>
@@ -41,7 +41,7 @@ Bienvenido al curso de Computación en Internet II. Para mantenernos en contacto
       Continuación del ejercicio. Servidor multihilos
     </td>
     <td style="vertical-align: middle;">
-      10 de febrero de 2025
+      6/2/2025
     </td>
   </tr>
 </table>
