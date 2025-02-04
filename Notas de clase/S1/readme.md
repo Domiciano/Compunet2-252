@@ -127,10 +127,10 @@ El siguiente paso es desarrollar el código interno de proceseSolicitud(). Prime
 private void proceseSolicitud() throws Exception
 {
         // Referencia al stream de salida del socket.
-        BufferedWriter os = ?;
+        BufferedWriter out = ?;
 
         // Referencia y filtros (InputStreamReader y BufferedReader)para el stream de entrada.
-        BufferedReader br = ?;
+        BufferedReader in = ?;
         . . .
 }
 ```
@@ -160,14 +160,14 @@ while ((line = inputStream.readLine()) != null && !line.isEmpty()) {
 Por ahora no se requiere más de las líneas del header: sólo que sean mostradas en la pantalla, esto se puede hacer utilizando una variable tipo String, lineaDelHeader, para tener una referencia a los valores de estas líneas. El ciclo termina cuando la expresión
 
 ```java
-(lineaDelHeader = br.readLine()).length()
+(lineaDelHeader = in.readLine()).length()
 ```
 
 evalua un cero, que ocurrirá cuando la variable lineaDelHeader tenga una longitud cero. Esto sucederá cuando la línea quede vacia, terminando la lectura de las líneas de header. Faltaría colocar las siguientes líneas de código para cerrar los streams y el socket de conexión.
 
 ```java
 // Cierra los streams y el socket.
-os.close();
-br.close();
+out.close();
+in.close();
 socket.close();
 ```
