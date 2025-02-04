@@ -48,7 +48,7 @@ Luego, se abre un socket y se espera a que se solicite una conexión TCP. Debido
 
 ```java
 // Estableciendo el socket de escucha.
-       ?
+?
 
 // Procesando las solicitudes HTTP en un ciclo infinito.
 while (true) {
