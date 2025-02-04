@@ -120,7 +120,7 @@ public void run()
 
 El siguiente paso es desarrollar el código interno de proceseSolicitud(). Primero se obtiene una referencia al stream de salida del socket. Luego se obtiene una referencia al stream de entrada del socket y se envuelven los filtros InputStreamReader y BufferedReader alrededor del stream de entrada ( no se debe envolver ningún filtro alrededor del stream de salida, ya que se escribirá directamente en el stream de salida).
 
-```
+```java
 private void proceseSolicitud() throws Exception
 {
         // Referencia al stream de salida del socket.
