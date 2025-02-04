@@ -27,7 +27,8 @@ Bienvenido al curso de Computación en Internet II. Para mantenernos en contacto
     </td>
     <td>
       Presentación del curso
-      <p>Overview del curso. Calificaciones, reglas, actividades del curso y asignaciones. Ejercicio de servidor web simple</p>
+      <p><a href="https://github.com/Domiciano/Compunet2-251/blob/main/Programa.pdf">Overview del curso</a>. Calificaciones, reglas, actividades del curso y asignaciones.</p>
+      <p><a href="https://github.com/Domiciano/Compunet2-251/tree/main/Notas%20de%20clase/S1">Ejercicio de servidor web simple</a></p>
     </td>
     <td style="vertical-align: middle;">
       4/2/2025
