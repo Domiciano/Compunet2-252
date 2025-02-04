@@ -23,7 +23,7 @@ Bienvenido al curso de Computación en Internet II. Para mantenernos en contacto
 <table style="border-collapse: collapse; border: none;" border="0">
   <tr>
     <td>
-      Sesión 1
+      S1
     </td>
     <td>
       Presentación del curso
@@ -35,7 +35,7 @@ Bienvenido al curso de Computación en Internet II. Para mantenernos en contacto
   </tr>
   <tr>
     <td>
-      Sesión 2
+      S2
     </td>
     <td>
       Continuación del ejercicio. Servidor multihilos
