@@ -3,32 +3,8 @@
 En esta práctica usted debe completar el código, en lenguaje Java, para construir un servidor web. Al final se tendrá un servidor web multi-hilos (multi-threaded) con la capacidad de procesar solicitudes simultáneas en paralelo. Se considerará que la práctica ha sido concluida con éxito cuando su servidor web pueda atender las solicitudes de un browser para web. Puede utilizar como referencia el código:
 
 ```java
-/**
-Este ejemplo permite consolidar los conocimientos sobre Cliente/Servidor y 
-el protocolo HTTP. Tomado de Computer Networking de Kurose & Ross, segunda 
-edición, páginas 151-155.
-
-Este "servidor web":
-1. Manipula sólo una solicitud HTTP
-2. Acepta y analiza sintácticamente (parse) la solicitud HTTP
-3. Busca el archivo solicitado en el sistema de archivos del servidor
-4. Crea un mensaje de respuesta HTTP consistente de líneas de encabezado y luego el archivo solicitado
-5. Envia la respuesta directamente al cliente
-
-Si lo desea probar este código primero debe cambiar el nombre a ServidorWebSimple.java
-y luego compilar el código:
-
-	c:\>javac ServidorWebSimple.java
-
-luego debe ejecutar el servidor
-
-	c:\>java ServidorWebSimple
-
-y, desde un browser instalado en el mismo equipo debe escribir el URL como:
-
-	http://127.0.0.1:6789/miarchivo.html
-
-NOTA: asegurese que miarchivo.html esté en el mismo directorio que el ServidorWebSimple
+/*
+Tomado de Computer Networking de Kurose & Ross, segunda edición, páginas 151-155.
 */
 
 // Se importan los paquetes java.io y java.net
