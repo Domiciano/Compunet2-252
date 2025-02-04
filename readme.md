@@ -23,23 +23,22 @@ Bienvenido al curso de Computación en Internet II. Para mantenernos en contacto
 <table style="border-collapse: collapse; border: none;" border="0">
   <tr>
     <td>
-      S1
+      Sesión 1
     </td>
     <td>
       Presentación del curso
-      <p>Calificaciones, reglas, actividades del curso y asignaciones. Overview del mundo de desarrollo móvil. Alistamiento y configuración del ambiente de desarrollo. Selección de equipos</p>
+      <p>Overview del curso. Calificaciones, reglas, actividades del curso y asignaciones. Ejercicio de servidor web simple</p>
     </td>
     <td style="vertical-align: middle;">
-      3 de febrero de 2025
+      4 de febrero de 2025
     </td>
   </tr>
   <tr>
     <td>
-      S2
+      Sesión 2
     </td>
     <td>
-      Creación de pantallas y componentes
-      <p>Laboratorio 1. En el que practicaremos el tema de construcción de vistas. Aboradremos el tema de funciones en Kotlin y hablaremos de variables de estado, explicando el funcionamiento del TextField</p>
+      Continuación del ejercicio. Servidor multihilos
     </td>
     <td style="vertical-align: middle;">
       10 de febrero de 2025
