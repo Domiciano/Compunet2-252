@@ -23,16 +23,13 @@ import java.io.* ;
 import java.net.* ;
 import java.util.* ;
 
-public final class ServidorWeb
-{
-        public static void main(String argv[]) throws Exception
-        {
+public final class ServidorWeb {
+        public static void main(String argv[]) throws Exception {
                 . . .
         }
 }
 
-final class SolicitudHttp implements Runnable
-{
+final class SolicitudHttp implements Runnable {
         . . .
 }
 ```
@@ -40,8 +37,7 @@ final class SolicitudHttp implements Runnable
 Normalmente, los servidores web atienden las solicitudes que ellos reciben a través del puerto 80. Para este práctica usted puede escoger cualquier número de puerto superior a 1024 (pero recuerde utilizar este mismo número cuando haga la solicitud desde el browser). En el siguiente trozo de código se utiliza el número 6789 para el puerto.
 
 ```java
-public static void main(String argv[]) throws Exception
-{
+public static void main(String argv[]) throws Exception {
         // Establece el número de puerto.
         int puerto = 6789;
 
@@ -81,8 +77,7 @@ Esto completa el código del método main(). Para el resto de la primera parte d
 Se declararán dos variables para la clase SolicitudHttp: CRLF y socket. De acuerdo con la especificación del protocolo HTTP, debemos terminar cada línea de los mensajes de respuesta del servidor con un carriage return (CR) y un line feed (LF), por esto es conveniente definir CRLF. La variable socket será utilizada para guardar una referencia al socket de conexión, con el cual se invocó el constructor de esta clase. La estructura de la clase SolicitudHttp es mostrada a continuación:
 
 ```java
-final class SolicitudHttp implements Runnable
-{
+final class SolicitudHttp implements Runnable {
         final static String CRLF = "\r\n";
         Socket socket;
 
@@ -111,8 +106,7 @@ Hasta este punto se ha venido permitiendo lanzar excepciones, sin manejarlas. Si
 
 ```java
 // Implementa el método run() de la interface Runnable.
-public void run()
-{
+public void run() {
         try {
                 proceseSolicitud();
         } catch (Exception e) {
@@ -124,8 +118,7 @@ public void run()
 El siguiente paso es desarrollar el código interno de proceseSolicitud(). Primero se obtiene una referencia al stream de salida del socket. Luego se obtiene una referencia al stream de entrada del socket y se envuelven los filtros InputStreamReader y BufferedReader alrededor del stream de entrada ( no se debe envolver ningún filtro alrededor del stream de salida, ya que se escribirá directamente en el stream de salida).
 
 ```java
-private void proceseSolicitud() throws Exception
-{
+private void proceseSolicitud() throws Exception {
         // Referencia al stream de salida del socket.
         BufferedWriter out = ?;
 
