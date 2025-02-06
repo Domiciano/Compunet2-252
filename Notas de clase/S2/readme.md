@@ -6,6 +6,8 @@ En lugar de terminar el hilo después de mostrar en pantalla el mensaje de solic
 
 De hecho, se asume que el mensaje de solicitud HTTP siempre utilizará el método GET, e ignorará que el cliente puede enviar otros métodos HTTP, como HEAD ó POST. En los lugares donde usted encuentre un signo de interrogación, ?, usted debe completar el código que hace falta.
 
+Realice el server para que sea capaz de enviar `index.html`, `image1.png`, `image2.gif`
+
 
 # Request
 El nombre del archivo de la línea de solicitud HTTP se extraerá con la ayuda de la clase java `StringTokenizer`. Primero se creará un objeto StringTokenizer que contendrá la cadena de caracteres de la línea de solicitud. Después no se tendrá en cuenta qué metodo se especificó en la solicitud HTTP, pues se asumirá que sólo puede ser el método GET. Finalmente se extraerá el nombre del archivo.
@@ -128,8 +130,3 @@ out.flush();
 La pieza final de código que se necesita para completar el servidor Web es un método que examinará la extensión del nombre del archivo y retornará una cadena que representa su tipo MIME. Si la extensión del archivo es desconocida, se retornará el tipo `application/octet-stream`.
 
 
-```
-
-En el trozo de código anterior faltan incluir nuevos tipos de archivos, como GIF y JPEG. Usted puede agregar los tipos de archivos que desee, de tal forma que los componentes de su página web sean enviados con el tipo de contenido correctamente especificado en la línea content type del header. Para el formato GIF el tipo MIME es `image/gif` y para el formatoJPEG es `image/jpeg`.
-
-Esto completaría el código de la segunda parte de la práctica para desarrollar el servidor Web multi-hilos. Intente ejecutar el servidor desde el directorio donde su página está localizada y trate de ver la página con un browser. Recuerde específicar el puerto dentro del URL, para que el browser no intente conectarse al puerto 80. Cuando se conecte, examine en la pantalla las solicitudes que el servidor recibe del browser.
