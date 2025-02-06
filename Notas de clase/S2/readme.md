@@ -1,6 +1,6 @@
 # Construcción de un servidor web multi-hilos
 
-<img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image2.png" width="512">
+<img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image2.png">
 
 En esta seguna parte, afinaremos el servidor web, permitiendo que sea capaz de responder a la petición de diversos recursos: HTML (`text/html`) y archivos como imágenes (`image/jpeg` y `image/gif`)
 
@@ -137,3 +137,9 @@ out.flush();
 La pieza final de código que se necesita para completar el servidor Web es un método que examinará la extensión del nombre del archivo y retornará una cadena que representa su tipo MIME. Si la extensión del archivo es desconocida, se retornará el tipo `application/octet-stream`.
 
 
+
+# Ejemplo de Request
+<img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image3.png">
+
+# Ejemplo de Response
+<img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image4.png">
