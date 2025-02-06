@@ -1,5 +1,7 @@
 # Construcción de un servidor web multi-hilos
 
+<img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image2.png">
+
 En esta seguna parte, afinaremos el servidor web, permitiendo que sea capaz de responder a la petición de diversos recursos: HTML (`text/html`) y archivos como imágenes (`image/jpeg` y `image/gif`)
 
 En lugar de terminar el hilo después de mostrar en pantalla el mensaje de solicitud HTTP enviado por el browser, se analizará el mensaje de solicitud HTTP y se enviará una respuesta HTTP apropiada al browser. Se ignorará la información de las líneas de header y se se utilizará sólo el nombre del archivo que viene en la línea de solicitud. 
