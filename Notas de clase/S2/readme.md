@@ -97,7 +97,7 @@ if ( ? ) {
 }
 // Si no existe el archivo
 else {
-        lineaDeEstado = ?;
+        lineaDeEstado = "HTTP/1.0 404 Not Found\r\n";
         lineaHeader = ?;
         //Enviar linea de estado
         ?
