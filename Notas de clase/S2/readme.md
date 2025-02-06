@@ -5,7 +5,7 @@ El nombre del archivo de la línea de solicitud HTTP se extraerá con la ayuda d
 
 ```java
 // Extrae el nombre del archivo de la línea de solicitud.
-StringTokenizer partesLinea = new StringTokenizer(lineaDeSolicitud);
+StringTokenizer partesLinea = new StringTokenizer(linea);
 partesLinea.nextToken();  // "salta" sobre el método, se supone que debe ser "GET"
 String nombreArchivo = partesLinea.nextToken();
 
