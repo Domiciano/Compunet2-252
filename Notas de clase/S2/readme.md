@@ -1,6 +1,6 @@
 # Construcción de un servidor web multi-hilos
 
-En esta seguna parte, afinaremos el servidor web, permitiendo que sea capaz de responder a la petición de diversos recursos: HTML (text/html) y archivos como imágenes (image/jpeg y image/gif)
+En esta seguna parte, afinaremos el servidor web, permitiendo que sea capaz de responder a la petición de diversos recursos: HTML (`text/html`) y archivos como imágenes (`image/jpeg` y `image/gif`)
 
 En lugar de terminar el hilo después de mostrar en pantalla el mensaje de solicitud HTTP enviado por el browser, se analizará el mensaje de solicitud HTTP y se enviará una respuesta HTTP apropiada al browser. Se ignorará la información de las líneas de header y se se utilizará sólo el nombre del archivo que viene en la línea de solicitud. De hecho, se asume que el mensaje de solicitud HTTP siempre utilizará el método GET, e ignorará que el cliente puede enviar otros métodos HTTP, como HEAD ó POST. En los lugares donde usted encuentre un signo de interrogación, ?, usted debe completar el código que hace falta.
 El nombre del archivo de la línea de solicitud HTTP se extraerá con la ayuda de la clase java `StringTokenizer`. Primero se creará un objeto StringTokenizer que contendrá la cadena de caracteres de la línea de solicitud. Después no se tendrá en cuenta qué metodo se especificó en la solicitud HTTP, pues se asumirá que sólo puede ser el método GET. Finalmente se extraerá el nombre del archivo.
