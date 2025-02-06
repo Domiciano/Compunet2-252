@@ -79,20 +79,26 @@ String cuerpoMensaje = null;
 if ( ? ) {
         lineaDeEstado = ?; 
         lineaHeader = "Content-type: " + contentType( nombreArchivo ) + CRLF;
-        //Enviar el archivo
+        //Enviar linea de estado
         ?
-        //Hacer flush
+        //Enviar linea de header
+        ?
+        //Enviar el archivo
         ?
 }
 // Si no existe el archivo
 else {
         lineaDeEstado = ?;
         lineaHeader = ?;
+        //Enviar linea de estado
+        ?
+        //Enviar linea de header
+        ?
         //Enviar archivo 404.html
-        ?
-        //Hacer flush
-        ?
+        ?        
 }
+//Hacer flush
+?
 ```
 
 Cuando el archivo existe, se debe determinar el tipo de archivo MIME y enviar el especificador de tipo MIME apropiado. Esta determinación de tipo se realiza a través de un método privado y separado llamado `contentType()`, que retorna una cadena que puede incluirse en la línea de tipo de contenido (content type) que se está construyendo.
