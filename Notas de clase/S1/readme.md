@@ -1,6 +1,6 @@
 # Construcción de un servidor web multi-hilos
 
-<img src="https://raw.githubusercontent.com/Domiciano/Compunet2-251/refs/heads/main/image1.png">
+<img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image1.png">
 
 
 En esta práctica usted debe completar el código, en lenguaje Java, para construir un servidor web. Al final se tendrá un servidor web multi-hilos (multi-threaded) con la capacidad de procesar solicitudes simultáneas en paralelo. Se considerará que la práctica ha sido concluida con éxito cuando su servidor web pueda atender las solicitudes de un browser para web. Puede utilizar como referencia el <a href="https://github.com/Domiciano/Compunet2-251/blob/main/Notas%20de%20clase/S1/example.md">código</a>.
