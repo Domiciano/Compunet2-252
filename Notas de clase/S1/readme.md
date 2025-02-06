@@ -145,7 +145,7 @@ Después de obtener la línea de solicitud del mensaje, se deben recoger las lí
 ```java
 // recoge y muestra las líneas de header.
 String linea = "";
-while ((line = inputStream.readLine()) != null && !line.isEmpty()) {
+while ((linea = inputStream.readLine()) != null && !linea.isEmpty()) {
   System.out.println(linea);
 }
 ```
