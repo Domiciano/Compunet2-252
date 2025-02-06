@@ -1,6 +1,6 @@
 # Construcción de un servidor web multi-hilos
 
-<img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image2.png">
+<img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image2.png" width="512">
 
 En esta seguna parte, afinaremos el servidor web, permitiendo que sea capaz de responder a la petición de diversos recursos: HTML (`text/html`) y archivos como imágenes (`image/jpeg` y `image/gif`)
 
