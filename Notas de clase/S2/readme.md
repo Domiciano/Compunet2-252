@@ -40,6 +40,7 @@ BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
 ```
 
 Para enviar `Strings`
+
 ```java
 private static void enviarString(String line, OutputStream os) throws Exception {
         os.write(line.getBytes(StandardCharsets.UTF_8));
@@ -47,6 +48,7 @@ private static void enviarString(String line, OutputStream os) throws Exception 
 ```
 
 Para enviar `Bytes`
+
 ```java
 private static void enviarBytes(InputStream fis, OutputStream os) throws Exception {
         // Construye un buffer de 1KB para guardar los bytes cuando van hacia el socket.
