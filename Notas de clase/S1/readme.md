@@ -133,11 +133,9 @@ El primer elemento disponible en el stream de entrada será la línea del mensaj
 
 ```java
 // Recoge la línea de solicitud HTTP del mensaje.
-String lineaDeSolicitud = ?;
-
+String linea = ?;
 // Muestra la línea de solicitud en la pantalla.
-System.out.println();
-System.out.println(lineaDeSolicitud);
+System.out.println(linea);
 ```
 
 Después de obtener la línea de solicitud del mensaje, se deben recoger las líneas del header. Ya que no se sabe con anticipación cuántas líneas de header enviará el cliente, estas se deben recoger mediante un ciclo.
