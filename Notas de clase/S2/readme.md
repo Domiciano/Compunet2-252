@@ -33,6 +33,7 @@ Ya que el browser precede el nombre del archivo con un slash, "/", se colocará 
 
 Ahora que se tiene el nombre del archivo, éste se puede abrir para enviarlo al cliente. Si el archivo solicitado no existe debe verificar que exista. Use los métodos de File.
 
+Los archivos del servidor pueden estar en la carpeta `resources`
 ```java
 InputStream inputStream = ClassLoader.getSystemResourceAsStream(nombreArchivo);
 File file = new File(ClassLoader.getSystemResource(nombreArchivo).toURI());
