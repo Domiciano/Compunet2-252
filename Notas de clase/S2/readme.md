@@ -6,7 +6,7 @@ En lugar de terminar el hilo después de mostrar en pantalla el mensaje de solic
 
 De hecho, se asume que el mensaje de solicitud HTTP siempre utilizará el método GET, e ignorará que el cliente puede enviar otros métodos HTTP, como HEAD ó POST. En los lugares donde usted encuentre un signo de interrogación, ?, usted debe completar el código que hace falta.
 
-Realice el server para que sea capaz de enviar `index.html`, `image1.png`, `image2.gif`
+🎯 Desarrolle el web server para que sea capaz de enviar `index.html`, `image1.png`, `image2.gif`
 
 
 # Request
