@@ -103,9 +103,6 @@ else {
 
 Cuando el archivo existe, se debe determinar el tipo de archivo MIME y enviar el especificador de tipo MIME apropiado. Esta determinación de tipo se realiza a través de un método privado y separado llamado `contentType()`, que retorna una cadena que puede incluirse en la línea de tipo de contenido (content type) que se está construyendo.
 
-
-
-```
 ```java
 private static String contentType(String nombreArchivo) {
         if(nombreArchivo.endsWith(".htm") || nombreArchivo.endsWith(".html")) {
@@ -122,10 +119,8 @@ private static String contentType(String nombreArchivo) {
 ```
 
 
-
-
 Cuando termine de generar el mensaje, no olvide usar `flush()`
-```
+```java
 out.flush();
 ```
 
