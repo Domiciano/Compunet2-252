@@ -19,7 +19,7 @@ public class Main {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
         String line = "";
-        while ((line = in.readLine()) != null || !line.isEmpty()) {
+        while ((line = in.readLine()) != null && !line.isEmpty()) {
             System.out.println(line);
         }
 
