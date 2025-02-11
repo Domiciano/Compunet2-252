@@ -151,13 +151,25 @@ Ya con el `.war`, vaya a la carpeta donde descomprimió Tomcat y ponga el `.war`
 # 11. Ejecutar el servidor
 Vaya a la carpeta `bin` de Tomcat y ejecute
 
+En Linux/MacOS
 ```sh
 ./startup.sh
 ```
 
+En Windows
+```sh
+./startup.bat
+```
+
 Puede detener el server usando
+En Linux/MacOS
 ```sh
 ./shutdown.sh
+```
+
+En Windows
+```sh
+./shutdown.bat
 ```
 
 # 12. Ingresar al sitio
