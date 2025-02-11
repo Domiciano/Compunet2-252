@@ -1,5 +1,9 @@
 # Servidor de Aplicaciones
 
+<p align="center">
+        <img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image5.png" width="512">
+</p>
+
 En esta clase trabajaremos con el servidor de Aplicaciones Tomcat y lo configuraremos manualmente para verificar su funcionamiento usando como base nuestros conocimientos previos de Servidores Web.
 
 El propósito observar las principales características de un servidor de aplicaciones y qué provee que el servidor web no.
