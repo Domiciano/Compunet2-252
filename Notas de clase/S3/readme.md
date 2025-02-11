@@ -129,12 +129,30 @@ public class ServletExample extends HttpServlet {
 </html>
 ```
 
+9. Empaquetar el proyecto
 
-5. mvn clear package para generar el WAR
+Para empaquetar el proyecto, vaya a `Maven > Excecute Maven Goal` y ejecute
+```sh
+mvn clean package
+```
 
-6. Mover el war al servidor de aplicaciones
+Esto generará su `.war` en el folder `./target`
 
-7. Ejecutar el ./startup.sh
+# 10. Usar el WAR
+
+Ya con el `.war`, vaya a la carpeta donde descomprimió Tomcat y ponga el `.war` en el folder `webapps`
+
+# 11. Ejecutar el servidor
+Vaya a la carpeta `bin` de Tomcat y ejecute
+
+```sh
+./startup.sh
+```
+
+Puede detener el server usando
+```sh
+./shutdown.sh
+```
 
 
 # Automatizar el proceso
