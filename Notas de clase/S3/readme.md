@@ -92,6 +92,8 @@ Debe crear un carpeta llamada webapp en la carpeta main. Dentro, puede crear su 
 
 # 7. Cree su primer Servlet
 
+Cree el primer servlet. De momento con el método `doGet`
+
 ```java
 package com.icesi.webappexample.servlet;
 
@@ -114,6 +116,18 @@ public class ServletExample extends HttpServlet {
 ```
 
 # 8. Cree su primer JSP
+
+```xml
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+  <head>
+      <title>Title</title>
+  </head>
+  <body>
+    <h1>Beta Gamma Alfa Delta</h1>
+  </body>
+</html>
+```
 
 
 5. mvn clear package para generar el WAR
