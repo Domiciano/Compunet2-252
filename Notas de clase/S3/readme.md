@@ -44,7 +44,7 @@ En el `pom.xml`
 ...
 ```
 
-4. Definir packing
+# 4. Definir packing
 
 Vamos a requerir crear un artefacto distribuible del proyecto. Eso se hace por medio de Maven. Por defecto hace el packing en el formato `.jar`. Sin embargo, vamos a hacerlo con `.war` ya que Tomcat es capaz de usar este formato.
 
@@ -56,7 +56,7 @@ Vamos a requerir crear un artefacto distribuible del proyecto. Eso se hace por m
 </project>
 ```
 
-5. Verificar versión de Java
+# 5. Verificar versión de Java
 Debe verificar que esté usando la misma versión de Java tanto en su sistema como en IntelliJ. Esto es porque quien compila el proyecto es IntelliJ, pero Tomcat usará el Java JDK o JRE de su sistema.
 
 Para verificar la versión de Java de su sistema, en consola escriba
@@ -133,7 +133,7 @@ public class ServletExample extends HttpServlet {
 </html>
 ```
 
-9. Empaquetar el proyecto
+# 9. Empaquetar el proyecto
 
 Para empaquetar el proyecto, vaya a `Maven > Excecute Maven Goal` y ejecute
 ```sh
