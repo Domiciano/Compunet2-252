@@ -157,3 +157,13 @@ Puede detener el server usando
 
 # Automatizar el proceso
 
+Vaya a `Run > Run... > Edit Configurations`. Use `+`. Busque `Tomcat Server/Local`.
+
+En la pestaña `Server`, en Application Server vaya a Configure y añada el servidor de Tomcat
+
+Vaya a la pestaña de Deployment y use `+ > Artifact` y seleccione `App:war exploded`. Donde App es el nombre de su proyecto.
+
+Verifique que el Application Context quedó como `/App_war_exploded`. Puede libremente alterar el contexto.
+
+Dele al Run y disfrute 😎
+
