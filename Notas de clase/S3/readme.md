@@ -146,7 +146,7 @@ Esto generará su `.war` en el folder `./target`
 
 # 10. Usar el WAR
 
-Ya con el `.war`, vaya a la carpeta donde descomprimió Tomcat y ponga el `.war` en el folder `webapps`
+Ya con el `.war`, vaya a la carpeta donde descomprimió Tomcat y ponga el `.war` en el folder `webapps`. Renómbrelo para que sea un nombre sencillo
 
 # 11. Ejecutar el servidor
 Vaya a la carpeta `bin` de Tomcat y ejecute
@@ -159,6 +159,21 @@ Puede detener el server usando
 ```sh
 ./shutdown.sh
 ```
+
+# 12. Ingresar al sitio
+La URL de ingreso es 
+```
+http://localhost:8080/<nombre>
+```
+
+Esto carga el index.jsp.
+```
+http://localhost:8080/<nombre>/hello
+```
+
+Esto carga la respuesta desde el Servlet.
+
+Donde <nombre> es el nombre del war
 
 
 # Automatizar el proceso
