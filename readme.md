@@ -57,3 +57,33 @@ Bienvenido al curso de Computación en Internet II. Para mantenernos en contacto
     </td>
   </tr>
 </table>
+
+# Proyectos
+
+<table style="border-collapse: collapse; border: none;" border="0">
+  <tr>
+    <td>
+      JugandoAndo Ecommerce
+    </td>
+    <td>
+      <a href="https://docs.google.com/document/d/1Ly68QpH8758l2E75kFY4Y8gvdb80GI2e_rSYKl_yuaI/edit?usp=sharing">Enunciado</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Clínica OncoLogic
+    </td>
+    <td>
+      <a href="https://docs.google.com/document/d/17OJN6mMgojOpLGuiJnoHWtnlaGuPqdgOVLURCL0jTck/edit?usp=sharing">Enunciado</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Icesi Trade
+    </td>
+    <td>
+      <a href="https://docs.google.com/document/d/1Fg4nFzLBtSaOK7Rmn8kRuIUHuO65des1K24Dt66UWgI/edit?usp=sharing">Enunciado</a>
+    </td>
+  </tr>
+
+</table>
