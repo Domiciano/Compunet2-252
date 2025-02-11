@@ -171,3 +171,6 @@ Verifique que el Application Context quedó como `/App_war_exploded`. Puede libr
 
 Dele al Run y disfrute 😎
 
+# Enlaces
+
+[Presentación sobre Aplicaciones](https://docs.google.com/presentation/d/1i5aWGAKXkE5JuCLipIYfmWFbq11-xHZY/edit?usp=sharing&ouid=117897710133227559254&rtpof=true&sd=true)
