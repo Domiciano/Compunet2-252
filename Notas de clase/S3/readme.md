@@ -29,7 +29,7 @@ Debemos instalar el Jakarta Servlet API. Esta API permite crear servlets para pr
 
 En el `pom.xml`
 
-```
+```xml
 ...
 <dependency>
   <groupId>jakarta.servlet</groupId>
@@ -40,21 +40,46 @@ En el `pom.xml`
 ...
 ```
 
+4. Definir packing
+
+Vamos a requerir crear un artefacto distribuible del proyecto. Eso se hace por medio de Maven. Por defecto hace el packing en el formato `.jar`. Sin embargo, vamos a hacerlo con `.war` ya que Tomcat es capaz de usar este formato.
+
+```xml
+<project ...>
+  ...
+  <packaging>war</packaging>
+  ...
+</project>
+```
+
+3. Verificar versión de Java
+Debe verificar que esté usando la misma versión de Java tanto en su sistema como en IntelliJ. Esto es porque quien compila el proyecto es IntelliJ, pero Tomcat usará el Java JDK o JRE de su sistema.
+
+Para verificar la versión de Java de su sistema, en consola escriba
+```sh
+java -version
+```
+
+Debería concordar o ser inferior la versión de compilación. Esto lo puede cambiar en IntelliJ. Vaya a `File > Project Structure`. En la sección de `Project` podrá elegir el SDK. 
+
+Finalmente, si debe cambiar el SDK, edite el `pom.xml`
+
+```xml
+<properties>
+  <maven.compiler.source>18</maven.compiler.source>
+  <maven.compiler.target>18</maven.compiler.target>
+  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+</properties>
+```
 
 
 
 
+5. mvn clear package para generar el WAR
 
+6. Mover el war al servidor de aplicaciones
 
-3. Cambiar la packing por war
-
-3. Verificar versión del compilador en IntelliJ
-
-4. mvn clear package para generar el WAR
-
-5. Mover el war al servidor de aplicaciones
-
-6. Ejecutar el ./startup.sh
+7. Ejecutar el ./startup.sh
 
 
 # Automatizar el proceso
