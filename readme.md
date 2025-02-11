@@ -47,7 +47,7 @@ Bienvenido al curso de Computación en Internet II. Para mantenernos en contacto
   </tr>
   <tr>
     <td>
-      S2
+      S3
     </td>
     <td>
       Servidor de Aplicaciones. Usaremos Tomcat y crearemos una aplicación basada en Servlet. Sin framework. El objetivo es entender qué hace un servidor de aplicaciones previo a ahondar en un framework como Springboot
