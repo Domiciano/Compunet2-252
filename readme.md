@@ -45,4 +45,15 @@ Bienvenido al curso de Computación en Internet II. Para mantenernos en contacto
       6/2/2025
     </td>
   </tr>
+  <tr>
+    <td>
+      S2
+    </td>
+    <td>
+      Servidor de Aplicaciones. Usaremos Tomcat y crearemos una aplicación basada en Servlet. Sin framework. El objetivo es entender qué hace un servidor de aplicaciones previo a ahondar en un framework como Springboot
+    </td>
+    <td style="vertical-align: middle;">
+    11/2/2025
+    </td>
+  </tr>
 </table>
