@@ -52,7 +52,7 @@ Vamos a requerir crear un artefacto distribuible del proyecto. Eso se hace por m
 </project>
 ```
 
-3. Verificar versión de Java
+5. Verificar versión de Java
 Debe verificar que esté usando la misma versión de Java tanto en su sistema como en IntelliJ. Esto es porque quien compila el proyecto es IntelliJ, pero Tomcat usará el Java JDK o JRE de su sistema.
 
 Para verificar la versión de Java de su sistema, en consola escriba
@@ -72,7 +72,48 @@ Finalmente, si debe cambiar el SDK, edite el `pom.xml`
 </properties>
 ```
 
+# 6. Verificar estructura de carpetas
 
+Debe crear un carpeta llamada webapp en la carpeta main. Dentro, puede crear su index.jsp
+
+```
+📦 project
+ ┣ 📂 src
+ ┃ ┗ 📂 main
+ ┃   ┣ 📂 java
+ ┃   ┃  ┗ 📂 com.icesi.webappexample
+ ┃   ┃    ┗ 📂 servlet
+ ┃   ┃       ┗ 📜 ServletExample.java
+ ┃   ┣ 📂 resources              
+ ┃   ┗ 📂 webapp
+ ┃      ┗ 📜 index.jsp
+ ┗ 📜 pom.xml 
+```
+
+# 7. Cree su primer Servlet
+
+```java
+package com.icesi.webappexample.servlet;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+
+@WebServlet("/hello")
+public class ServletExample extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html");
+        resp.getWriter().println("<h1>Este es un servlet<h1>");
+    }
+}
+```
+
+# 8. Cree su primer JSP
 
 
 5. mvn clear package para generar el WAR
