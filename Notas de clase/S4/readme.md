@@ -17,4 +17,4 @@ La instancia del servlet es inicializada una sola vez mediante el método init()
         <img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image6.png" width="512">
 </p>
 
-
+Finalmente, `destroy()` se ejecuta una sola vez, justo antes de que el servlet sea eliminado, lo que ocurre cuando el servidor se apaga o el servlet es descargado.
