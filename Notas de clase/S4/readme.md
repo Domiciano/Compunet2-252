@@ -62,6 +62,8 @@ public class MessageService {
 }
 ```
 
+Observer que es una clase común y corriente
+
 # 4. Registro del Bean en el IoC Container
 
 En resurces, cree un archivo llamado `applicationContext.xml`, cuyo contenido es el siguiente
@@ -77,3 +79,24 @@ En resurces, cree un archivo llamado `applicationContext.xml`, cuyo contenido es
     
 </beans>
 ```
+
+# 5. Creación del IoC Container
+
+Aquí lo que va a hacer es crear un contexto para la aplicación de modo que el IoC Container podrá ser accedido en cualquier parte de la aplicación.
+
+```java
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Application {
+
+    private static final ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+
+    public static ApplicationContext getContext() {
+        return context;
+    }
+
+}
+```
+
+Note que él creará el IoC Container con los beans que estén declarados en el xml
