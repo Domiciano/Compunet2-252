@@ -7,12 +7,14 @@ Antes, vamos a explorar el uso de páginas en JSP.
 
 # Ciclo de vida de un Servlet
 
-Todo servidor de aplicaciones de Java tiene por dentro un Servlet Container, que es el componente del servidor de aplicaciones (como Tomcat) que gestiona el ciclo de vida de los servlets y maneja las solicitudes HTTP, facilitando la comunicación entre el cliente y la aplicación web. El servlet container de Tomcat se llama Catalina.
+Todo servidor de aplicaciones Java contiene un Servlet Container, que es el componente encargado de gestionar el ciclo de vida de los servlets, manejar las solicitudes HTTP y facilitar la comunicación entre el cliente y la aplicación web. En el caso de Tomcat, su Servlet Container se llama Catalina.
 
-Catalina genera una única instancia de cada Servlet, reutilizándolo. Por cada request del cliente, se genera un nuevo hilo a partir del servlet. 
+Catalina crea una única instancia de cada Servlet y la reutiliza. Para cada solicitud del cliente, el Servlet Container genera un nuevo hilo que ejecuta el método service(), el cual redirige a doGet(), doPost(), u otro método según el tipo de petición.
+
+La instancia del servlet es inicializada una sola vez mediante el método init().
 
 <p align="center">
         <img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image6.png" width="512">
 </p>
 
-Esta única instancia es inicializada por medio del método `init()` 
+
