@@ -20,3 +20,31 @@ La instancia del servlet es inicializada una sola vez mediante el método init()
 Finalmente, `destroy()` se ejecuta una sola vez, justo antes de que el servlet sea eliminado, lo que ocurre cuando el servidor se apaga o el servlet es descargado.
 
 Asimismo, un archivo JSP es convertido en un servlet en tiempo de ejecución por el Servlet Container. Cuando se solicita un JSP, este se traduce a una clase Java que extiende HttpServlet, se compila y luego se ejecuta para generar y entregar la respuesta al cliente.
+
+# Ejemplo de Bean
+La aplicación tendrá una lista de mensajes que se llenará en la medida que clientes envien los mensajes. Tenga en cuenta que no tenemos persistencia. Por lo cual una vez el servidor haya terminado su ejecución, la información se perderá
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class MessageService {
+    private List<String> messages = new ArrayList<>();
+
+    public void addMessage(String message) {
+        messages.add(message);
+    }
+
+    public List<String> getMessages() {
+        return messages;
+    }
+}
+```
+
+Registro del Bean en el IoC Container
+
+```xml
+<beans xmlns="http://www.springframework.org/schema/beans">
+    <bean id="messageService" class="com.example.service.MessageService" scope="singleton" />
+</beans>
+```
