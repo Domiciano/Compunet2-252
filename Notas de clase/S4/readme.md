@@ -58,7 +58,9 @@ public class MessageService {
 }
 ```
 
-Registro del Bean en el IoC Container
+# Registro del Bean en el IoC Container
+
+En resurces, cree un archivo llamado `applicationContext.xml`, cuyo contenido es el siguiente
 
 ```xml
 <beans xmlns="http://www.springframework.org/schema/beans">
