@@ -21,6 +21,22 @@ Finalmente, `destroy()` se ejecuta una sola vez, justo antes de que el servlet s
 
 Asimismo, un archivo JSP es convertido en un servlet en tiempo de ejecución por el Servlet Container. Cuando se solicita un JSP, este se traduce a una clase Java que extiende HttpServlet, se compila y luego se ejecuta para generar y entregar la respuesta al cliente.
 
+
+# Spring IoC Container
+
+El IoC Container es un componente de Spring que gestiona instancias de objetos llamados beans. Un bean es cualquier clase de la aplicación que se registra en el contenedor, ya sea de forma explícita o automática. El IoC Container se encarga de crear, configurar y administrar estos beans, permitiendo su uso en diferentes partes de la aplicación sin necesidad de instanciarlos manualmente.
+
+Inicialmente vamos a registrarlos de forma explícta. Para eso necesitamos primero el IoC Container.
+
+# Instalación del IoC Container
+
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-context</artifactId>
+    <version>6.2.2</version>
+</dependency>
+
+
 # Ejemplo de Bean
 La aplicación tendrá una lista de mensajes que se llenará en la medida que clientes envien los mensajes. Tenga en cuenta que no tenemos persistencia. Por lo cual una vez el servidor haya terminado su ejecución, la información se perderá
 
