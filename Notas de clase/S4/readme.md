@@ -30,12 +30,13 @@ Inicialmente vamos a registrarlos de forma explícta. Para eso necesitamos prime
 
 # Instalación del IoC Container
 
+```xml
 <dependency>
     <groupId>org.springframework</groupId>
     <artifactId>spring-context</artifactId>
     <version>6.2.2</version>
 </dependency>
-
+```
 
 # Ejemplo de Bean
 La aplicación tendrá una lista de mensajes que se llenará en la medida que clientes envien los mensajes. Tenga en cuenta que no tenemos persistencia. Por lo cual una vez el servidor haya terminado su ejecución, la información se perderá
