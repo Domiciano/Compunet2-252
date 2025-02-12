@@ -100,3 +100,69 @@ public class Application {
 ```
 
 Note que él creará el IoC Container con los beans que estén declarados en el xml
+
+# 6. Uso del bean
+
+Cree un Servlet que permita el uso del bean. Tendrá un método POST que recibirá un parámetro llamado `message` que se agregará al arreglo del Bean
+
+```java
+import java.io.IOException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.example.tests32.Application;
+import org.example.tests32.service.MessageService;
+
+@WebServlet("/messageServlet")
+public class MessageServlet extends HttpServlet {
+
+    private MessageService messageService;
+
+    @Override
+    public void init() {
+        messageService = (MessageService) Application.getContext().getBean("myService");
+    }
+
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String newMessage = req.getParameter("message");
+        if (newMessage != null && !newMessage.trim().isEmpty()) {
+            messageService.addMessage(newMessage);
+        }
+        resp.sendRedirect("./");
+    }
+    
+}
+```
+
+# 7. Rederizado y envío de mensajes
+
+```xml
+<%@ page import="org.springframework.context.support.ClassPathXmlApplicationContext" %>
+<%@ page import="org.example.tests32.service.MessageService" %>
+<%@ page import="org.example.tests32.Application" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JSP - Hello World</title>
+</head>
+<body>
+    <%
+        MessageService messageService = (MessageService) Application.getContext().getBean("myService");
+        for(String message : messageService.getMessages()){
+            out.println(message);
+        }
+    %>
+
+    <form action="messageServlet" method="post">
+        <input type="text" name="message">
+        <input type="submit">
+    </form>
+
+</body>
+</html>
+```
