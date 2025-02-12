@@ -2,7 +2,7 @@
 
 Luego de tener una configuración simple con el servidor de aplicaciones Tomcat, vamos a integrar el Spring Framework al proyecto.
 
-Antes, vamos a explorar el uso de páginas en JSP.
+Antes, vamos a poner los puntos sobre las ies, conceptualmente
 
 
 # Ciclo de vida de un Servlet
@@ -18,3 +18,5 @@ La instancia del servlet es inicializada una sola vez mediante el método init()
 </p>
 
 Finalmente, `destroy()` se ejecuta una sola vez, justo antes de que el servlet sea eliminado, lo que ocurre cuando el servidor se apaga o el servlet es descargado.
+
+Asimismo, un archivo JSP es convertido en un servlet en tiempo de ejecución por el Servlet Container. Cuando se solicita un JSP, este se traduce a una clase Java que extiende HttpServlet, se compila y luego se ejecuta para generar y entregar la respuesta al cliente.
