@@ -2,7 +2,7 @@
 
 Luego de tener una configuración simple con el servidor de aplicaciones Tomcat, vamos a integrar el Spring Framework al proyecto.
 
-Antes, vamos a poner los puntos sobre las ies, conceptualmente
+Antes, vamos a poner los puntos sobre las íes, conceptualmente
 
 
 # Ciclo de vida de un Servlet
