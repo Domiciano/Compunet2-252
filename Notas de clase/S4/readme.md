@@ -24,7 +24,7 @@ Asimismo, un archivo JSP es convertido en un servlet en tiempo de ejecución por
 
 # Spring IoC Container
 
-El IoC Container es un componente de Spring que gestiona instancias de objetos llamados beans. Un bean es cualquier clase de la aplicación que se registra en el contenedor, ya sea de forma explícita o automática. El IoC Container se encarga de crear, configurar y administrar estos beans, permitiendo su uso en diferentes partes de la aplicación sin necesidad de instanciarlos manualmente.
+El IoC Container es un componente de Spring que gestiona instancias de objetos llamados beans. Un bean es cualquier clase de la aplicación que se registra en el contenedor, ya sea de forma explícita o automática. El IoC Container se encarga de crear, configurar y administrar sus instancias, permitiendo su uso en diferentes partes de la aplicación sin necesidad de instanciarlos manualmente.
 
 Inicialmente vamos a registrarlos de forma explícta. Para eso necesitamos primero el IoC Container.
 
