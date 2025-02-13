@@ -147,8 +147,6 @@ public class MessageServlet extends HttpServlet {
 
 ```xml
 <%@ page import="org.springframework.context.support.ClassPathXmlApplicationContext" %>
-<%@ page import="org.example.tests32.service.MessageService" %>
-<%@ page import="org.example.tests32.Application" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html>
