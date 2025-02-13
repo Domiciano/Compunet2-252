@@ -2,7 +2,14 @@
 
 Luego de tener una configuración simple con el servidor de aplicaciones Tomcat, vamos a integrar el Spring Framework al proyecto.
 
+Si por azares del destino, no completó la sesión S3, puede clonar este repositorio
+
+```
+https://github.com/Domiciano/Compu2EjemploServlet
+```
+
 Antes, vamos a poner los puntos sobre las íes, conceptualmente
+
 
 
 # Ciclo de vida de un Servlet
