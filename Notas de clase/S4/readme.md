@@ -119,8 +119,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.tests32.Application;
-import org.example.tests32.service.MessageService;
 
 @WebServlet("/messageServlet")
 public class MessageServlet extends HttpServlet {
@@ -129,7 +127,7 @@ public class MessageServlet extends HttpServlet {
 
     @Override
     public void init() {
-        messageService = (MessageService) Application.getContext().getBean("myService");
+        messageService = (MessageService) Application.getContext().getBean("messageService");
     }
 
 
