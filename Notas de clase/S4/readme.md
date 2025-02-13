@@ -82,7 +82,7 @@ En resurces, cree un archivo llamado `applicationContext.xml`, cuyo contenido es
 
 # 5. Creación del IoC Container
 
-Aquí lo que va a hacer es crear un contexto para la aplicación de modo que el IoC Container podrá ser accedido en cualquier parte de la aplicación.
+Aquí lo que va a hacer es crear un contexto para la aplicación de modo que el IoC Container podrá ser accedido en cualquier parte de la aplicación. El IoC Container contendrá los beans dentro del XML
 
 ```java
 import org.springframework.context.ApplicationContext;
