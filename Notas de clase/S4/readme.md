@@ -82,7 +82,7 @@ En resurces, cree un archivo llamado `applicationContext.xml`, cuyo contenido es
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans.xsd">
     
-    <bean id="myService" class="org.example.yourproject.service.MessageService" />
+    <bean id="messageService" class="org.example.yourproject.service.MessageService" />
     
 </beans>
 ```
