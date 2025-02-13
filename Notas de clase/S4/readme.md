@@ -155,7 +155,7 @@ public class MessageServlet extends HttpServlet {
 </head>
 <body>
     <%
-        MessageService messageService = (MessageService) Application.getContext().getBean("myService");
+        MessageService messageService = (MessageService) Application.getContext().getBean("messageService");
         for(String message : messageService.getMessages()){
             out.println(message);
         }
