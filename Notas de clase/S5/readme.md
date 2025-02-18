@@ -147,7 +147,8 @@ Vamos a generar adicionalmente un **bean** de **service** que nos ayude a orques
 import java.util.List;
 
 public class StudentService {
-    private StudentRepository studentRepository;
+
+    ...
 
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
