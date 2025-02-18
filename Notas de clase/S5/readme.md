@@ -131,8 +131,8 @@ public class CourseRepository {
         return courses;
     }
 
-    public void save(Student student) {
-        users.add(user);
+    public void save(Course course) {
+        courses.add(user);
     }
 }
 ```
