@@ -8,7 +8,7 @@
 En **Spring Boot**, la **inyección de dependencias** es el mecanismo mediante el cual el framework administra y proporciona instancias de objetos (**beans**) a otras clases sin que estas tengan que crearlas manualmente. Este proceso, conocido como **wiring de beans**, permite definir cómo se relacionan y comunican los componentes dentro de la aplicación, asegurando un código más modular, reutilizable y fácil de mantener al reducir el acoplamiento entre las dependencias.
 
 
-<img src="https://blog.tier1app.com/wp-content/uploads/2013/05/original_bean_tree.png">
+<img src="https://raw.githubusercontent.com/Domiciano/Compunet2-251/refs/heads/main/Images/image8.png">
 
 
 ## Capa Repository
