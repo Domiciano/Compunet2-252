@@ -171,12 +171,12 @@ Pongamos todos los beans para definir nuestro contexto.
            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <!--Repositorios-->
-    <bean id="studentRepository" class="StudentRepository"/>
+    <bean id="studentRepository" class="paquete.de.tu.proyecto.repositories.StudentRepository"/>
 
-    <bean id="courseRepository" class="CourseRepository"/>
+    <bean id="courseRepository" class="paquete.de.tu.proyecto.repositories.CourseRepository"/>
 
     <!--Service-->
-    <bean id="studentService" class="StudentService"/>
+    <bean id="studentService" class="paquete.de.tu.proyecto.services.StudentService"/>
 
 
 </beans>
