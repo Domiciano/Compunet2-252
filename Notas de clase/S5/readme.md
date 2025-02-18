@@ -246,7 +246,15 @@ En el XML ahora se inyecta por medio de `property`
 
 # 6. Inicializar y probar
 
-Vamos a hacer uso del ciclo de vida del Bean
+Vamos a hacer uso de métodos de inicialización
+
+```xml
+<bean id="objetoA" class="MiClaseA" init-method="initializeBean">
+    <constructor-arg ref="objetoB"/>
+</bean>
+```
+
+Aquí se ejecuta el método `initializeBean()` luego de que Spring Framework instancia los beans y hace el wiring
 
 <img src="https://miro.medium.com/v2/resize:fit:1400/0*_D0yYUddRl-BOLiq">
 
@@ -315,3 +323,5 @@ Estudiante 3
 ```
 
 Al final de las inserciones, deben quedar 3 estudiantes y 4 materias
+
+
