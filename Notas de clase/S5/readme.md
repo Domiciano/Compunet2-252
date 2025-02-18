@@ -111,7 +111,8 @@ public class StudentRepository {
     }
 
     public void save(Student student) {
-        // Queremos que se guarde el estudiante con todos sus cursos
+        // Queremos que se guarde el estudiante en su repositorio y todos sus cursos en otro repositorio
+        // Separe los elementos a la entrada y guarde casa objeto en su lugar
         // Aquí vamos a requerir el uso de CourseRepository.
     }
 }
