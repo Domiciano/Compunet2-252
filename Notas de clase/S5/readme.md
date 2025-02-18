@@ -55,6 +55,8 @@ Vamos a aplicar el wiring de beans para trabajar en una aplicación que gestione
 
 
 ```java
+import java.util.List;
+
 public class Student {
 
     private String code;
