@@ -154,7 +154,7 @@ public class StudentService {
     }
 
     public void addStudent(Student student) {
-        studentRepository.save(user);
+        studentRepository.save(student);
     }
 }
 ```
