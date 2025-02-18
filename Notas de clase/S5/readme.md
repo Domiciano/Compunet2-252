@@ -42,7 +42,7 @@ Llamadas a otros servicios: Integrar información de otras fuentes o microservic
 💡 Es como el cerebro de la aplicación, que decide qué hacer antes de interactuar con los datos.
 
 
-<img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi2AhVprdVRpPtCOQWpdDlxEQRdD-lBTVYI7c1ZPw98SAkZ18lyHYIjTBiMjk5EFk2zm5DVhQLTuxW-_Ql1__cAG7EFAgx7VC9XTbUbSAnBuPACx2z8mEEHqKiwFGY_T6tuGOxwYiW1xEA/s1600/Screenshot+06-27-2020+22.27.59.png">
+<img src="https://raw.githubusercontent.com/Domiciano/Compunet2-251/refs/heads/main/Images/image9.png">
 
 
 
