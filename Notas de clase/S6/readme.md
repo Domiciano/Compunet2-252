@@ -2,6 +2,8 @@
 
 Para este punto, sabemos las definiciones de cada capa. Usamos en la sesión pasada el Service como punto de entrada para generar los datos iniciales.
 
+<img src="https://raw.githubusercontent.com/Domiciano/Compunet2-251/refs/heads/main/Images/image10.png">
+
 Ahora vamos a generar los datos desde un `Servlet` que use el ApplicationContext
 
 Vamos a poner cada función en su lugar.
