@@ -74,9 +74,9 @@ public class AppConfig {
 }
 ```
 
-Usar `@Bean`
+Usar `@Bean` dentro de `AppConfig`
 
-```
+```java
 @Bean("miBean")
 @Scope("singleton") 
 public MiClase miObjeto() {
