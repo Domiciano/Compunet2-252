@@ -47,7 +47,9 @@ En la capa de servlets, desarrollemos:
 Desde un **Servlet** podemos acceder al `ApplicationContext` de forma estática
 
 
-# Archivo de configuración
+# Por medio de @Configuration
+
+Vamos a refactorizar (o bien puede clonar su base de código) de modo que trabajemos con las anotaciones @Configuration y @Bean
 
 ```java
 import org.springframework.context.ApplicationContext;
@@ -86,6 +88,7 @@ public MiClase miObjeto() {
 Donde `miBean` es el nombre del bean. Si no especificamos nombre, el bean quedaría llamado `miObjeto` que corresponde al nombre el método
 
 # Anotaciones
+Vamos a volver a factorizar el código de modo que usemos ahora `@Component`. `@Service` y `@Repository` son sólo nombres o alias que recibe @Component, para ser más específico en la semántica
 
 ```java
 import org.springframework.context.ApplicationContext;
