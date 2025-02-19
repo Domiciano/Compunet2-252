@@ -46,6 +46,57 @@ En la capa de servlets, desarrollemos:
 
 Desde un **Servlet** podemos acceder al `ApplicationContext` de forma estática
 
-# Anotaciones
 
 # Archivo de configuración
+
+```java
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+public class Application {
+
+    private static final ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+
+    public static ApplicationContext getContext() {
+        return context;
+    }
+}
+```
+
+```java
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ComponentScan(basePackages = "paquete.de.mi.proyecto")
+public class AppConfig {
+    ...
+}
+```
+
+Usar `@Bean`
+
+```
+@Bean("miBean")
+@Scope("singleton") 
+public MiClase miObjeto() {
+    return new MiClase();
+}
+```
+Donde `miBean` es el nombre del bean. Si no especificamos nombre, el bean quedaría llamado `miObjeto` que corresponde al nombre el método
+
+# Anotaciones
+
+```java
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+public class Application {
+    private static final ApplicationContext context = new AnnotationConfigApplicationContext("org.example.app");
+
+    public static ApplicationContext getContext() {
+        return context;
+    }
+}
+```
+
