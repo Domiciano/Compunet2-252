@@ -94,6 +94,7 @@ Vamos a volver a factorizar el código de modo que usemos ahora `@Component`. `@
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+@ComponentScan(basePackages = "paquete.de.mi.proyecto")
 public class Application {
     private static final ApplicationContext context = new AnnotationConfigApplicationContext("org.example.app");
 
