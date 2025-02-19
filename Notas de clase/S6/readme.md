@@ -15,6 +15,10 @@ Vamos a poner cada función en su lugar.
 ### CAPA SERVICE
 > En sus clases de tipo Service, haga las validaciones necesarias antes de usar las funciones brutas de acceso a datos
 
+### SERVLET/JSP
+> Como estudiante quiero registrarme en el sistema proporcionando mi información personal, para poder utilizar la plataforma de matrícula.
+> Como estudiante quiero agregarme a un curso proporcionando su información para gestionar mi matrícula.
+> Como estudiante quiero ver todos mis cursos matriculados buscando por mi código para verificar mi inscripción y hacer seguimiento a mis materias.
 
 Nos falta aún la clase `CourseService`
 
