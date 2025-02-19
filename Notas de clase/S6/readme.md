@@ -2,7 +2,7 @@
 
 Para este punto, sabemos las definiciones de cada capa. Usamos en la sesión pasada el Service como punto de entrada para generar los datos iniciales.
 
-<img src="https://raw.githubusercontent.com/Domiciano/Compunet2-251/refs/heads/main/Images/image10.png">
+
 
 Ahora vamos a generar los datos desde un `Servlet` que use el ApplicationContext
 
@@ -15,12 +15,7 @@ Vamos a poner cada función en su lugar.
 ### CAPA SERVICE
 > En sus clases de tipo Service, haga las validaciones necesarias antes de usar las funciones brutas de acceso a datos
 
-### SERVLET/JSP
-> Como estudiante quiero registrarme en el sistema proporcionando mi información personal, para poder utilizar la plataforma de matrícula.
-
-> Como estudiante quiero agregarme a un curso proporcionando su información para gestionar mi matrícula.
-
-> Como estudiante quiero ver todos mis cursos matriculados buscando por mi código para verificar mi inscripción y hacer seguimiento a mis materias.
+# Reestructuración del proyecto
 
 Nos falta aún la clase `CourseService`
 
@@ -31,6 +26,24 @@ public class CourseService {
 
 }
 ```
+Una vez la tenga construya este esquema
+
+<p align="center">
+    <img src="https://raw.githubusercontent.com/Domiciano/Compunet2-251/refs/heads/main/Images/image10.png" width="512">
+</p>
+
+
+
+
+
+
+### SERVLET/JSP
+> Como estudiante quiero registrarme en el sistema proporcionando mi información personal, para poder utilizar la plataforma de matrícula.
+
+> Como estudiante quiero agregarme a un curso proporcionando su información para gestionar mi matrícula.
+
+> Como estudiante quiero ver todos mis cursos matriculados buscando por mi código para verificar mi inscripción y hacer seguimiento a mis materias.
+
 
 Desde un **Servlet** podemos acceder al `ApplicationContext`
 
