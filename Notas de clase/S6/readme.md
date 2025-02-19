@@ -33,11 +33,10 @@ Una vez la tenga construya este esquema
 </p>
 
 
-
-
-
-
 ### SERVLET/JSP
+
+En la capa de servlets, desarrollemos:
+
 > Como estudiante quiero registrarme en el sistema proporcionando mi información personal, para poder utilizar la plataforma de matrícula.
 
 > Como estudiante quiero agregarme a un curso proporcionando su información para gestionar mi matrícula.
@@ -45,7 +44,7 @@ Una vez la tenga construya este esquema
 > Como estudiante quiero ver todos mis cursos matriculados buscando por mi código para verificar mi inscripción y hacer seguimiento a mis materias.
 
 
-Desde un **Servlet** podemos acceder al `ApplicationContext`
+Desde un **Servlet** podemos acceder al `ApplicationContext` de forma estática
 
 # Anotaciones
 
