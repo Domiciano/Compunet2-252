@@ -147,15 +147,33 @@ Vamos a volver a factorizar el código de modo que usemos ahora `@Component`. `@
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-@ComponentScan(basePackages = "paquete.de.mi.proyecto")
 public class Application {
-    private static final ApplicationContext context = new AnnotationConfigApplicationContext("org.example.app");
+    private static final ApplicationContext context = new AnnotationConfigApplicationContext("org.example"); //Paquete raiz
 
     public static ApplicationContext getContext() {
         return context;
     }
 }
 ```
+
+
+### Inicialización
+El equivalente a init-method en esta forma de declaración de beans es por medio de un método marcado con @PostConstruct
+```
+@PostConstruct
+public void initializeData(){
+
+}
+```
+
+```xml
+<dependency>
+    <groupId>jakarta.annotation</groupId>
+    <artifactId>jakarta.annotation-api</artifactId>
+    <version>2.1.1</version>
+</dependency>
+```
+
 
 # Funcionalidades
 
