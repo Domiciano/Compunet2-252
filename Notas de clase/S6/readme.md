@@ -71,6 +71,7 @@ public class StudentServlet extends HttpServlet {
 }
 ```
 
+
 En la capa de servlets, desarrollemos:
 
 > Como estudiante quiero registrarme en el sistema proporcionando mi información personal, para poder utilizar la plataforma de matrícula.
