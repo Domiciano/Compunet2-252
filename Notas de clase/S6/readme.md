@@ -39,6 +39,30 @@ Una vez la tenga construya este esquema
 
 ### SERVLET/JSP
 
+Construya el Servlet de Course
+
+```java
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+
+@WebServlet("/course")
+public class CourseServlet extends HttpServlet {
+    
+}
+```
+
+Construya el Servlet de Student
+
+```java
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+
+@WebServlet("/student")
+public class StudentServlet extends HttpServlet {
+    
+}
+```
+
 En la capa de servlets, desarrollemos:
 
 > Como estudiante quiero registrarme en el sistema proporcionando mi información personal, para poder utilizar la plataforma de matrícula.
