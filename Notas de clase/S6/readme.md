@@ -140,6 +140,16 @@ public class Application {
 }
 ```
 
+### Inicialización
+Si requiere algún método de inicialización de un bean, puede usar la propiedad `initMethod` de la etiquieta `@Bean`
+
+```
+@Bean(initMethod="intialize")
+public StudentRepository studentRepository() {
+    return new StudentRepository();
+}
+```
+
 # Anotaciones
 Vamos a volver a factorizar el código de modo que usemos ahora `@Component`. `@Service` y `@Repository` son sólo nombres o alias que recibe @Component, para ser más específico en la semántica
 
