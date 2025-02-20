@@ -22,7 +22,11 @@ Nos falta aún la clase `CourseService`
 ```
 public class CourseService {
 
-    ...
+    private CourseRepository courseRepository;
+
+    public CourseService(CourseRepository courseRepository) {
+        this.courseRepository = courseRepository;
+    }
 
 }
 ```
