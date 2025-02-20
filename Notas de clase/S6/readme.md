@@ -27,7 +27,7 @@ Métodos típicos que podemos encontrar en esta capa `getAll()`, `getById(id)`, 
 
 Nos falta aún la clase `CourseService`
 
-```
+```java
 public class CourseService {
 
     private CourseRepository courseRepository;
