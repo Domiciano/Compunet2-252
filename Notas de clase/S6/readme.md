@@ -67,23 +67,11 @@ public class StudentServlet extends HttpServlet {
 
 
 
-# Por medio de @Configuration
+# @Configuration
 
-Vamos a refactorizar (o bien puede clonar su base de código) de modo que trabajemos con las anotaciones @Configuration y @Bean
+Vamos a explorar las forma en las que se pueden generar los beans y el wiring. Esta primera forma es por medio de `@Configuration`.
 
-```java
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-public class Application {
-
-    private static final ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
-
-    public static ApplicationContext getContext() {
-        return context;
-    }
-}
-```
+Básicamente es una clase marcada con esta anotación en donde vamos a listar todos los Beans y a conectarlos.
 
 ```java
 import org.springframework.context.annotation.ComponentScan;
@@ -106,6 +94,23 @@ public MiClase miObjeto() {
 }
 ```
 Donde `miBean` es el nombre del bean. Si no especificamos nombre, el bean quedaría llamado `miObjeto` que corresponde al nombre el método
+
+
+Debemos también cambiar la forma en la que definimos el contexto
+
+```java
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+public class Application {
+
+    private static final ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+
+    public static ApplicationContext getContext() {
+        return context;
+    }
+}
+```
 
 # Anotaciones
 Vamos a volver a factorizar el código de modo que usemos ahora `@Component`. `@Service` y `@Repository` son sólo nombres o alias que recibe @Component, para ser más específico en la semántica
