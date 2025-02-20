@@ -78,34 +78,48 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ComponentScan(basePackages = "paquete.de.mi.proyecto")
 public class AppConfig {
     ...
 }
 ```
 
+
+### Definición de Beans
+
 Usar `@Bean` dentro de `AppConfig`
 
 ```java
-@Bean("miBean")
-@Scope("singleton") 
-public MiClase miObjeto() {
-    return new MiClase();
+@Configuration
+public class AppConfig {
+    
+    @Bean("miBean")
+    @Scope("singleton") 
+    public MiClase miObjeto() {
+        return new MiClase();
+    }
+
 }
 ```
 Donde `miBean` es el nombre del bean. Si no especificamos nombre, el bean quedaría llamado `miObjeto` que corresponde al nombre el método
 
+### Wiring
+
 Podemos hacer un Wiring de los beans por medio de entradas en el método de declaración de Bean
 
 ```java
-@Bean
-public StudentRepository studentRepository() {
-    return new StudentRepository();
-}
+@Configuration
+public class AppConfig {
 
-@Bean
-public StudentService studentService(StudentRepository studentRepository) {
-    return new StudentService(studentRepository);
+    @Bean
+    public StudentRepository studentRepository() {
+        return new StudentRepository();
+    }
+    
+    @Bean
+    public StudentService studentService(StudentRepository studentRepository) {
+        return new StudentService(studentRepository);
+    }
+
 }
 ```
 
