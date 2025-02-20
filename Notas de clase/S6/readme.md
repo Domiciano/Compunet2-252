@@ -12,8 +12,16 @@ Vamos a poner cada función en su lugar.
 ### CAPA REPOSITORY
 > Asegúrese de que su clase de tipo Repository tenga acceso bruto a los datos, tanto para funciones de almacenar como para funciones de obtener.
 
+En esta capa, vamos a evitar hacer validaciones. Métodos típicos que podemos encontrar en esta capa `findAll()`, `findById()`, `save()`
+
 ### CAPA SERVICE
 > En sus clases de tipo Service, haga las validaciones necesarias antes de usar las funciones brutas de acceso a datos
+
+En esta capa, vamos a hacer validaciones de negocio, previas a modificar u obtener datos de la capa de Repository. Por ejemplo, si llega una petición de eliminación de alguna entidad NO AUTORIZADA, entonces la capa de service contiene el intento y emite un error.
+
+Métodos típicos que podemos encontrar en esta capa `getAll()`, `getById(id)`, `create(entity)`, `update(id, entity)`, `delete(id)`.
+
+
 
 # Reestructuración del proyecto
 
