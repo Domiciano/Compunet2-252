@@ -95,6 +95,20 @@ public MiClase miObjeto() {
 ```
 Donde `miBean` es el nombre del bean. Si no especificamos nombre, el bean quedaría llamado `miObjeto` que corresponde al nombre el método
 
+Podemos hacer un Wiring de los beans por medio de entradas en el método de declaración de Bean
+
+```java
+@Bean
+public StudentRepository studentRepository() {
+    return new StudentRepository();
+}
+
+@Bean
+public StudentService studentService(StudentRepository studentRepository) {
+    return new StudentService(studentRepository);
+}
+```
+
 
 Debemos también cambiar la forma en la que definimos el contexto
 
