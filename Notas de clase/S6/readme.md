@@ -1,13 +1,30 @@
 # Separación de responsabilidades
 
-Para este punto, sabemos las definiciones de cada capa. Usamos en la sesión pasada el Service como punto de entrada para generar los datos iniciales.
-
-
-
-Ahora vamos a generar los datos desde un `Servlet` que use el ApplicationContext
+Para este punto, sabemos crear beans y conectarlos entre sí con la finalidad de hacer una aplicación. Vamos a reestructurar el proyecto, de modo que ahora podamos aplicar los conceptos de las capas **Service** y  **Repository**
 
 Vamos a poner cada función en su lugar.
 
+# Reestructuración del proyecto
+
+Construye este esquema
+
+<p align="center">
+    <img src="https://raw.githubusercontent.com/Domiciano/Compunet2-251/refs/heads/main/Images/image10.png" width="512">
+</p>
+
+Nos falta aún la clase `CourseService`
+
+```java
+public class CourseService {
+    
+    private CourseRepository courseRepository;
+    
+    public CourseService(CourseRepository courseRepository) {
+        this.courseRepository = courseRepository;
+    }
+    
+}
+```
 
 ### CAPA REPOSITORY
 > Asegúrese de que su clase de tipo Repository tenga acceso bruto a los datos, tanto para funciones de almacenar como para funciones de obtener.
@@ -20,29 +37,6 @@ En esta capa, vamos a evitar hacer validaciones. Métodos típicos que podemos e
 En esta capa, vamos a hacer validaciones de negocio, previas a modificar u obtener datos de la capa de Repository. Por ejemplo, si llega una petición de eliminación de alguna entidad NO AUTORIZADA, entonces la capa de service contiene el intento y emite un error.
 
 Métodos típicos que podemos encontrar en esta capa `getAll()`, `getById(id)`, `create(entity)`, `update(id, entity)`, `delete(id)`.
-
-
-
-# Reestructuración del proyecto
-
-Nos falta aún la clase `CourseService`
-
-```java
-public class CourseService {
-
-    private CourseRepository courseRepository;
-
-    public CourseService(CourseRepository courseRepository) {
-        this.courseRepository = courseRepository;
-    }
-
-}
-```
-Una vez la tenga construya este esquema
-
-<p align="center">
-    <img src="https://raw.githubusercontent.com/Domiciano/Compunet2-251/refs/heads/main/Images/image10.png" width="512">
-</p>
 
 
 ### SERVLET/JSP
