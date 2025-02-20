@@ -66,17 +66,6 @@ public class StudentServlet extends HttpServlet {
 ```
 
 
-En la capa de servlets, desarrollemos:
-
-> Como estudiante quiero registrarme en el sistema proporcionando mi información personal, para poder utilizar la plataforma de matrícula.
-
-> Como estudiante quiero agregarme a un curso proporcionando su información para gestionar mi matrícula.
-
-> Como estudiante quiero ver todos mis cursos matriculados buscando por mi código para verificar mi inscripción y hacer seguimiento a mis materias.
-
-
-Desde un **Servlet** podemos acceder al `ApplicationContext` de forma estática
-
 
 # Por medio de @Configuration
 
@@ -134,4 +123,17 @@ public class Application {
     }
 }
 ```
+
+# Funcionalidades
+
+En la capa de servlets, desarrollemos:
+
+> Como estudiante quiero registrarme en el sistema proporcionando mi información personal, para poder utilizar la plataforma de matrícula.
+
+> Como estudiante quiero agregarme a un curso proporcionando su información para gestionar mi matrícula.
+
+> Como estudiante quiero ver todos mis cursos matriculados buscando por mi código para verificar mi inscripción y hacer seguimiento a mis materias.
+
+
+Desde un **Servlet** podemos acceder al `ApplicationContext` de forma estática
 
