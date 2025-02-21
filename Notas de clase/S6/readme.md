@@ -216,12 +216,13 @@ En este caso, como courseRepository es un `Bean` que está siendo inyectado, aut
 
 ### Inicialización
 El equivalente a init-method en esta forma de declaración de beans es por medio de un método marcado con @PostConstruct
-```
+```java
 @PostConstruct
 public void initializeData(){
 
 }
 ```
+Necesitará la dependencia
 
 ```xml
 <dependency>
