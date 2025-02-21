@@ -168,7 +168,7 @@ public class Application {
 
 Luego de esto puede definiri cualquier bean, por medio de la anotación `@Component` sobre la clase
 
-```
+```java
 @Component
 public class MiClaseA {
     ...
