@@ -143,7 +143,7 @@ public class Application {
 ### Inicialización
 Si requiere algún método de inicialización de un bean, puede usar la propiedad `initMethod` de la etiquieta `@Bean`
 
-```
+```java
 @Bean(initMethod="intialize")
 public StudentRepository studentRepository() {
     return new StudentRepository();
@@ -165,6 +165,53 @@ public class Application {
     }
 }
 ```
+
+Luego de esto puede definiri cualquier bean, por medio de la anotación `@Component` sobre la clase
+
+```
+@Component
+public class MiClaseA {
+    ...
+}
+```
+
+Hay `@Component` con alias específicos para las capas como `@Repository` y `@Service`
+
+```java
+@Repository
+public class CourseRepository {
+    ...
+}
+```
+
+```java
+@Service
+public class CourseService {
+    ...
+}
+```
+
+### Wiring
+Automáticamente con las anotaciones se hará wiring siempre y cuando tenga definida la inyección de dependencias por medio de constructor
+
+```java
+@Repository
+public class CourseRepository {
+    ...
+}
+
+@Service
+public class CourseService{
+
+    private final CourseRepository courseRepository;
+
+    public CourseService(CourseRepository courseRepository) {
+        this.courseRepository = courseRepository;
+    }
+
+}
+```
+En este caso, como courseRepository es un `Bean` que está siendo inyectado, automáticamente el spring context lo creará y lo inyectará
 
 
 ### Inicialización
