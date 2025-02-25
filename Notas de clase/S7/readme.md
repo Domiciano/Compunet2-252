@@ -18,6 +18,27 @@ Usemos Maven en la sección de type.
 
 Vamos a agregar las dependencias por nuestra cuenta usando el `pom.xml`, así que le damos a **Create**
 
+# Verificación de la clase principal
+
+En la clase principal puede ver la anotación `@SpringBootApplication`, que combina `@SpringBootConfiguration`, `@EnableAutoConfiguration` y `@ComponentScan`. 
+
+@SpringBootConfiguration: Indica que la clase es una fuente de configuración para la aplicación (similar a @Configuration en Spring).
+
+@EnableAutoConfiguration: Activa la configuración automática basada en las dependencias presentes en el classpath. Crea los beans necesarios que de otro modo habría que configurar manualmente como el servidor web, el acceso a bases de datos, el manejo de seguridad, etc.
+
+@ComponentScan: escanea los beans presentes en el paquete principal y los crea
+
+```java
+@SpringBootApplication
+public class IntroSpringApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(IntroSpringApplication.class, args);
+    }
+    
+}
+```
+
 # Dependencia de Web
 
 Vamos a agregar la dependencia web en el `pom.xml`
