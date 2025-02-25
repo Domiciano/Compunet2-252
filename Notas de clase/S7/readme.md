@@ -167,6 +167,26 @@ Si no quiere usar el constructor, también puede hacer el wiring de los beans us
 private StudentService studentService;
 ```
 
+Con la segunda por ejemplo, la capa controller quedaría
 
+```java
+
+@Controller
+@RequestMapping("/students")
+public class StudentController {
+
+    @Autowired
+    @Qualifier("studentServiceImpl")
+    private StudentService studentService;
+
+
+    @GetMapping("/all")
+    @ResponseBody
+    public String index() {
+        return "Aqui hay unos estudiantes";
+    }
+
+}
+```
 
 
