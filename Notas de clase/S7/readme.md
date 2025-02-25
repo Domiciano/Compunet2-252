@@ -284,4 +284,4 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
 
 }
 ```
-En <A,B> A corresponde a la `Entity`y B corresponde al tipo de la llave foránea, en este caso `Integer`
+En <A,B> A corresponde a la `Entity`y B corresponde al tipo de la llave primaria, en este caso `Integer`
