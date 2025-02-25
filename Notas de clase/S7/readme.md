@@ -22,11 +22,13 @@ Vamos a agregar las dependencias por nuestra cuenta usando el `pom.xml`, así qu
 
 En la clase principal puede ver la anotación `@SpringBootApplication`, que combina `@SpringBootConfiguration`, `@EnableAutoConfiguration` y `@ComponentScan`. 
 
-@SpringBootConfiguration: Indica que la clase es una fuente de configuración para la aplicación (similar a @Configuration en Spring).
+`@SpringBootConfiguration` Indica que la clase es una fuente de configuración para la aplicación (similar a @Configuration en Spring).
 
-@EnableAutoConfiguration: Activa la configuración automática basada en las dependencias presentes en el classpath. Crea los beans necesarios que de otro modo habría que configurar manualmente como el servidor web, el acceso a bases de datos, el manejo de seguridad, etc.
+`@EnableAutoConfiguration` Activa la configuración automática basada en las dependencias presentes en el classpath. Crea los beans necesarios que de otro modo habría que configurar manualmente como el servidor web, el acceso a bases de datos, el manejo de seguridad, etc.
 
-@ComponentScan: escanea los beans presentes en el paquete principal y los crea
+`@ComponentScan` escanea los beans presentes en el paquete principal y los crea
+
+El código de inicio es
 
 ```java
 @SpringBootApplication
@@ -36,6 +38,24 @@ public class IntroSpringApplication {
         SpringApplication.run(IntroSpringApplication.class, args);
     }
     
+}
+```
+
+Usted puede también usar `@PostConstruct` en esta clase para generar un método inicial de toda la aplicación
+
+```java
+@SpringBootApplication
+public class IntroSpringApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(IntroSpringApplication.class, args);
+    }
+    
+    @PostConstruct
+    public void init() {
+        
+    }
+
 }
 ```
 
