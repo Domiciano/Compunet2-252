@@ -101,6 +101,11 @@ Con `@RequestMapping` configuramos la ruta del controller que será prefijo para
 
 Luego, por medio de `@GetMapping` se configura tanto la ruta al endpoint como el `HTTP Verb` con el que se podrá acceder.
 
+Este endpoint se podrá acceder por medio de
+
+```
+http://localhost:8080/students/all
+```
 
 
 
