@@ -147,7 +147,7 @@ De esta manera entonces
 
 En este caso nuestro `Controller` tiene una dependencia con `Service`. Así que nuestro controller puede recibirlo en su constructor
 
-> [!IMPORTANT]  
+> [!IMPORTANTE]  
 > Note que se usa `@Qualifer` para especificar cuál es el bean de implementación del servicio
 
 ```java
