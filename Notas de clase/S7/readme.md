@@ -189,4 +189,21 @@ public class StudentController {
 }
 ```
 
+# Subamos a la capa de Repository
 
+Vamos a ir con un ejemplo simple. Usaremos una base de datos en memoria llamada H2.
+
+Para hacerlo necesitamos 2 dependencias
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>runtime</scope>
+</dependency>
+```
