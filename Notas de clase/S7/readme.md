@@ -17,3 +17,14 @@ Usemos Maven en la sección de type.
 </p>
 
 Vamos a agregar las dependencias por nuestra cuenta usando el `pom.xml`, así que le damos a **Create**
+
+# Dependencia de Web
+
+Vamos a agregar la dependencia web en el `pom.xml`
+
+```xml
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+```
