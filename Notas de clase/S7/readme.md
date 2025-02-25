@@ -107,6 +107,41 @@ Este endpoint se podrá acceder por medio de
 http://localhost:8080/students/all
 ```
 
+# Desacoplando las capas
+
+Para desacoplar las capas `Controller`, `Service` y `Repository` hará falta el uso de interfaces.
+
+Por ejemplo entre Controller y Service, será una buena práctica que Controller acceda únicamente a la definición (una interfaz) y el programador elija la implementación (clase que implementa la interfaz).
+
+### Definición de StudentService
+```java
+public interface StudentService {
+    void createStudent(Student student);
+    void getAllStudents();
+}
+```
+### Implementación de StudentService
+```java
+@Service
+public class StudentServiceImpl implements StudentService {
+
+    @Override
+    public void createStudent(Student student) {
+
+    }
+
+    @Override
+    public void getAllStudents() {
+
+    }
+
+}
+```
+
+De esta manera entonces 
+
+¿Cómo hacemos wiring de los beans?
+
 
 
 
