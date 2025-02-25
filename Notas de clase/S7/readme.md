@@ -145,8 +145,10 @@ De esta manera entonces
 
 # Wiring de beans cuando tenemos desacoplamiento
 
-En este caso nuestro `Controller` tiene una dependencia con `Service`
+En este caso nuestro `Controller` tiene una dependencia con `Service`. Así que nuestro controller puede recibirlo en su constructor
 
+> [!IMPORTANT]  
+> Note que se usa `@Qualifer` para especificar cuál es el bean de implementación del servicio
 
 ```java
 private StudentService studentService
@@ -156,6 +158,7 @@ StudentController(@Qualifier("studentServiceImpl") StudentService studentService
 }
 ```
 
+Si no quiere usar el constructor, también puede hacer el wiring de los beans usando `@Autowired` e igualmente con `@Qualifier`
 
 
 ```java
