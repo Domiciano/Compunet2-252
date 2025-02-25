@@ -143,7 +143,26 @@ De esta manera entonces
 ¿Cómo hacemos wiring de los beans?
 
 
+# Wiring de beans cuando tenemos desacoplamiento
 
+En este caso nuestro `Controller` tiene una dependencia con `Service`
+
+
+```java
+private StudentService studentService
+
+StudentController(@Qualifier("studentServiceImpl") StudentService studentService){
+    this.studentService = studentService
+}
+```
+
+
+
+```java
+@Autowired
+@Qualifier("studentServiceImpl")
+private StudentService studentService;
+```
 
 
 
