@@ -69,3 +69,42 @@ Vamos a agregar la dependencia web en el `pom.xml`
   <artifactId>spring-boot-starter-web</artifactId>
 </dependency>
 ```
+
+Con esto podemos incluir nuestra capa de **controller**
+
+# Creación de su primer controller
+
+Finalmente ya podemos construir nuestros **endpoints** por medio de las anotaciones de `spring-boot-starter-web`.
+
+```java
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@Controller
+@RequestMapping("/students")
+public class StudentController {
+
+    @GetMapping("/all")
+    @ResponseBody
+    public String index() {
+        return "Aqui hay unos estudiantes";
+    }
+
+}
+```
+
+En este caso observemos que podemos crear un grupo de endpoints cuyo bloque de código se ejecutará en el momento en el que un cliente HTTP vaya a la ruta configurada.
+
+Con `@RequestMapping` configuramos la ruta del controller que será prefijo para cada endpoint que contenga `StudentController`. 
+
+Luego, por medio de `@GetMapping` se configura tanto la ruta al endpoint como el `HTTP Verb` con el que se podrá acceder.
+
+
+
+
+
+
+
+
