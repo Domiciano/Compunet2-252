@@ -245,6 +245,8 @@ public class Student {
 
     private String program;
 
+    // Getters y setters
+
 }
 ```
 
