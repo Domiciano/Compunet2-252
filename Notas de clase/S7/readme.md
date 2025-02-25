@@ -117,7 +117,7 @@ Por ejemplo entre Controller y Service, será una buena práctica que Controller
 ```java
 public interface StudentService {
     void createStudent(Student student);
-    void getAllStudents();
+    List<Student> getAllStudents();
 }
 ```
 ### Implementación de StudentService
