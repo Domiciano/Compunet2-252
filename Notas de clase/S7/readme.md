@@ -253,3 +253,35 @@ public class Student {
 `@Entity` establece la clase como una representación de tabla en base de datos. Por medio de `@Table` podemos elegir nombre para la tabla en base de datos.
 
 `@Id` establece cuál va a ser la llave primaria y `@GeneratedValue` permite establecer que el campo se autoincremente en la medida en la que se insertan datos
+
+# Configuración de base de datos
+
+Si está con H2 use
+```properties
+spring.application.name=IntroSpring
+
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2
+```
+
+Esta es una base de datos en memoria y aqui se almacenará la información
+
+# Capa Repository
+Ahora los repositorios lucirán así
+```java
+import co.edu.icesi.introspring.model.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface StudentRepository extends JpaRepository<Student, Integer> {
+
+}
+```
+En <A,B> A corresponde a la `Entity`y B corresponde al tipo de la llave foránea, en este caso `Integer`
