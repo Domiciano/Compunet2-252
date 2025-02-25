@@ -207,3 +207,47 @@ Para hacerlo necesitamos 2 dependencias
     <scope>runtime</scope>
 </dependency>
 ```
+
+Primero debemos preparar nuestra clase de modelo
+
+```java
+public class Student {
+
+    private int id;
+    
+    private String code;
+    //Example: A00123456
+    
+    private String name;
+
+    private String program;
+
+    // Getters y setters
+
+}
+```
+
+Para crear una tabla en base de datos a partir de la tabla Studentes hagamos
+
+```java
+@Entity
+@Table(name = "student")
+public class Student {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
+
+    private String code;
+    //Example: A00123456
+
+    private String name;
+
+    private String program;
+
+}
+```
+
+`@Entity` establece la clase como una representación de tabla en base de datos. Por medio de `@Table` podemos elegir nombre para la tabla en base de datos.
+
+`@Id` establece cuál va a ser la llave primaria y `@GeneratedValue` permite establecer que el campo se autoincremente en la medida en la que se insertan datos
