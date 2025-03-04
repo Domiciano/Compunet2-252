@@ -147,15 +147,14 @@ spring.datasource.username=USERNAME
 spring.datasource.password=PASSWORD
 spring.datasource.hikari.maximum-pool-size=20
 spring.datasource.driver-class-name=org.postgresql.Driver
-spring.datasource.url=jdbc:postgresql://ep-tight-violet-a5wloerb-pooler.us-east-2.aws.neon.tech/midb
+spring.datasource.url=jdbc:postgresql://localhost:5432/DB
 spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
 ```
 
 `spring.jpa.hibernate.ddl-auto=update` permite que Hibernate actualice automáticamente la estructura de la base de datos (tablas, columnas) según los cambios en las entidades JPA sin perder datos existentes.
 
 
-`spring.datasource.tomcat.max-active` define el número máximo de conexiones activas permitidas en el pool de conexiones de Tomcat para la base de datos.
-
+`spring.datasource.hikari.maximum-pool-size` define el número máximo de conexiones activas permitidas en el pool de conexiones para la base de datos
 
 
 # Relaciones entre tablas
