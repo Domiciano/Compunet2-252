@@ -82,7 +82,7 @@ HikariCP es un pool de conexiones altamente eficiente y ligero para bases de dat
 JPA (Jakarta Persistence API) es una especificación de Java que define una forma estándar de trabajar con bases de datos relacionales mediante el mapeo objeto-relacional (ORM). No es una implementación, sino un conjunto de reglas que deben seguir las librerías que lo implementan.
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/Domiciano/Compunet2-251/refs/heads/main/Images/image13.png" width="512">
+<img src="https://raw.githubusercontent.com/Domiciano/Compunet2-251/refs/heads/main/Images/image14.png" width="512">
 </p>
 
 
