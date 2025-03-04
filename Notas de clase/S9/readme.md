@@ -255,6 +255,10 @@ Donde `@Getter`, `@Setter`, `@NoArgsConstructor`, `@AllArgsConstructor` y `@ToSt
 
 # Docker
 
+¿Tiene instalado docker y no quiere sufrir más con instalaciones de programas/servicios usuales en el mundo de la programación?
+
+Cree el siguiente archivo como `docker-compose.yml`
+
 ```yml
 services:
   db:
@@ -274,3 +278,10 @@ services:
 volumes:
   my-volume:
 ```
+
+Luego, use 
+```sh
+docker-compose up -d
+```
+
+Para crear el contenedor
