@@ -64,10 +64,15 @@ spring.jpa.show-sql=true
 Escoja 3 de los siguiente 6 objetivos e impleméntelos usando Query Methods
 
 🎯 Cree un Query Method que le permita listar estudiantes por programa
+
 🎯 Cree un Query Method que le permita obtener los cursos que está viendo un estudiante
+
 🎯 Cree un Query Method que le permita ver los estudiantes de un curso
+
 🎯 Buscar un profesor por nombre (ignorando mayúsculas y minúsculas)
+
 🎯 Buscar los cursos dictados por un profesor
+
 🎯 Contar cuántos estudiantes están en un programa específico
 
 # Pagination
