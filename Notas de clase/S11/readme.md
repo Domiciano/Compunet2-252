@@ -83,7 +83,7 @@ Sí, si puede
 Me sale un JSON largo y sospechosamente erróneo, ¿Qué es?
 Como estamos respondiendo Entities y no DTO, las composiciones entre entidades es el problema. Por ejemplo, Student tiene una lista de Enrollment. Pero a su vez Enrollment tiene un Student y el desearilizador caerá en bucle. Puede hacer esto:
 
-```
+```java
 @Entity
 @Table(name = "students")
 public class Student {
