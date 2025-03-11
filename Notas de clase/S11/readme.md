@@ -61,7 +61,7 @@ Si quiere ver en la consola, la consulta que se está haciendo, puede incluir la
 spring.jpa.show-sql=true
 ```
 
-Escoja 3 de los siguiente 6 objetivos e impleméntelos usando Query Methods
+Cumpla con los siguientes objetivos, implementando Query Methods
 
 🎯 Cree un Query Method que le permita listar estudiantes por programa
 
@@ -69,11 +69,11 @@ Escoja 3 de los siguiente 6 objetivos e impleméntelos usando Query Methods
 
 🎯 Cree un Query Method que le permita ver los estudiantes de un curso
 
-🎯 Buscar un profesor por nombre (ignorando mayúsculas y minúsculas)
-
 🎯 Buscar los cursos dictados por un profesor
 
 🎯 Contar cuántos estudiantes están en un programa específico
+
+🎯 Buscar un profesor por nombre (ignorando mayúsculas y minúsculas)
 
 
 ### Posible preguntas
