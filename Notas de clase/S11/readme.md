@@ -75,6 +75,26 @@ Escoja 3 de los siguiente 6 objetivos e impleméntelos usando Query Methods
 
 🎯 Contar cuántos estudiantes están en un programa específico
 
+### Posible preguntas
+¿Un service puede tener dos o más repository como dependencias? 
+
+Sí, si puede
+
+Me sale un JSON largo y sospechosamente erróneo, ¿Qué es?
+Como estamos respondiendo Entities y no DTO, las composiciones entre entidades es el problema. Por ejemplo, Student tiene una lista de Enrollment. Pero a su vez Enrollment tiene un Student y el desearilizador caerá en bucle. Puede hacer esto:
+
+```
+@Entity
+@Table(name = "students")
+public class Student {
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Enrollment> enrollments;
+}
+```
+
+Usando @JsonIgnore, puede no incluir enrollments como parte de la respuesta. Sin embargo, más adelante NO contestaremos con Entity, contestaremos con DTO
+
 # Pagination
 
 La paginación es una estrategia eficiente basada en lazy loading para manejar grandes volúmenes de datos en una base de datos.
