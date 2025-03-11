@@ -61,6 +61,15 @@ Si quiere ver en la consola, la consulta que se está haciendo, puede incluir la
 spring.jpa.show-sql=true
 ```
 
+Escoja 3 de los siguiente 6 objetivos e impleméntelos usando Query Methods
+
+🎯 Cree un Query Method que le permita listar estudiantes por programa
+🎯 Cree un Query Method que le permita obtener los cursos que está viendo un estudiante
+🎯 Cree un Query Method que le permita ver los estudiantes de un curso
+🎯 Buscar un profesor por nombre (ignorando mayúsculas y minúsculas)
+🎯 Buscar los cursos dictados por un profesor
+🎯 Contar cuántos estudiantes están en un programa específico
+
 # Pagination
 
 La paginación es una estrategia eficiente basada en lazy loading para manejar grandes volúmenes de datos en una base de datos.
