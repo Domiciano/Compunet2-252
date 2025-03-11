@@ -75,6 +75,7 @@ Escoja 3 de los siguiente 6 objetivos e impleméntelos usando Query Methods
 
 🎯 Contar cuántos estudiantes están en un programa específico
 
+
 ### Posible preguntas
 ¿Un service puede tener dos o más repository como dependencias? 
 
@@ -94,6 +95,28 @@ public class Student {
 ```
 
 Usando @JsonIgnore, puede no incluir enrollments como parte de la respuesta. Sin embargo, más adelante NO contestaremos con Entity, contestaremos con DTO
+
+# Poblemos la tabla de Enrollments
+
+```sql
+-- Insertar matriculas
+INSERT INTO enrollments (id, student_id, course_id)
+VALUES
+    -- Ingeniería de Software IV
+    (1, 1, 1), (2, 2, 1), (3, 6, 1), (4, 8, 1), (5, 13, 1),
+
+    -- Computación y estructuras discretas III
+    (6, 1, 2), (7, 2, 2), (8, 3, 2), (9, 6, 2), (10, 14, 2),
+
+    -- Computación y estructuras discretas II
+    (11, 3, 3), (12, 5, 3), (13, 10, 3), (14, 12, 3), (15, 18, 3),
+
+    -- Ingeniería de Software III
+    (16, 1, 4), (17, 4, 4), (18, 6, 4), (19, 9, 4), (20, 13, 4),
+
+    -- Proyecto Integrador I
+    (21, 7, 5), (22, 8, 5), (23, 11, 5), (24, 15, 5), (25, 20, 5);
+```
 
 # Pagination
 
