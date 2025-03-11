@@ -148,36 +148,58 @@ Pageable pageable = PageRequest.of(page, size);
 # <a href="https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html">Query Methods</a>
 
 1️⃣ Comparaciones básicas
+
 Is, Equals → findByNameIs(String name)
+
 Not → findByNameNot(String name)
+
 Like → findByNameLike(String pattern)
+
 StartingWith / EndingWith / Containing → findByNameStartingWith("J")
 
 2️⃣ Comparaciones numéricas
+
 GreaterThan → findByAgeGreaterThan(int age)
+
 GreaterThanEqual → findByAgeGreaterThanEqual(int age)
+
 LessThan → findByAgeLessThan(int age)
+
 LessThanEqual → findByAgeLessThanEqual(int age)
+
 Between → findBySalaryBetween(BigDecimal min, BigDecimal max)
 
 3️⃣ Operadores lógicos
+
 And → findByFirstNameAndLastName(String first, String last)
+
 Or → findByCityOrCountry(String city, String country)
 
+
 4️⃣ Valores nulos
+
 IsNull → findByEmailIsNull()
+
 IsNotNull → findByEmailIsNotNull()
 
 5️⃣ Booleanos
+
 True → findByActiveTrue()
+
 False → findByActiveFalse()
 
 6️⃣ Relaciones y colecciones
+
 In → findByCategoryIn(List<String> categories)
+
 NotIn → findByCategoryNotIn(List<String> categories)
+
 Exists → findByOrdersExists() (cuando hay relaciones)
+
 Size → findByItemsSize(int size) (para colecciones dentro de una entidad)
 
 7️⃣ Ordenación y límites
+
 OrderBy → findByLastNameOrderByFirstNameAsc()
+
 Top / First → findTop3ByOrderBySalaryDesc()
