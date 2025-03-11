@@ -169,6 +169,28 @@ Y pasar el parámetro de Pageable puede crear un objeto asi
 Pageable pageable = PageRequest.of(page, size);
 ```
 
+Podemos hacer inserciones de valores para parámetros usando `@Value`. Value es capaz de resolver expresiones de `Spring Expression Language (SpEL)`
+
+En `application.properties` podemos agregar un valor para la página. Este valor es arbitrario nombrado por nosotros
+
+```
+app.pagination.size=3
+```
+
+Luego, puede ser en `Service` o cualquier otra capa, podemos usar el valor inyectándolo en una variable global de la clase
+
+```java
+@Service
+public class MiService{
+
+    @Value("${app.pagination.size}")
+    private int pageSize;
+    ...
+
+}
+```
+
+
 # <a href="https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html">Query Methods</a>
 
 1️⃣ Comparaciones básicas
