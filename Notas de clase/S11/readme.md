@@ -55,6 +55,11 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 }
 ```
 
+Si quiere ver en la consola, la consulta que se está haciendo, puede incluir la siguiente propiedad en el `application.properties`
+
+```
+spring.jpa.show-sql=true
+```
 
 # Pagination
 
