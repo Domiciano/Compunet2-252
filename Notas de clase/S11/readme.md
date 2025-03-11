@@ -118,6 +118,30 @@ VALUES
     (21, 7, 5), (22, 8, 5), (23, 11, 5), (24, 15, 5), (25, 20, 5);
 ```
 
+# Native Queries
+
+Puede también usar sus conocimientos de SQL para llevar a cabo queries. Tenga en cuenta que sólo debe seleccionar los campos que hacen match con la respuesta del método.
+
+```java
+@Query(value = "SELECT s.id,s.name,s.code,s.program FROM domi_students s JOIN domi_enrollments e ON s.id = e.student_id JOIN domi_courses c ON e.course_id=c.id WHERE c.id = :courseId", nativeQuery = true)
+    List<Student> findStudentsInCourse(long courseId);
+```
+
+Note que la inserción del search term de la consulta, se hace por medio de `:courseId`
+
+También puede insertar estos datos por posición
+```java
+@Query(value = """
+    SELECT s.id, s.code, s.name, s.program
+    FROM domi_students s
+    JOIN domi_enrollments e ON s.id = e.student_id
+    WHERE e.course_id = ?1
+""", nativeQuery = true)
+List<Student> findStudentsInCourse(long courseId);
+```
+
+Donde se pueden usar `?1`, `?2`, `?3`, ...
+
 # Pagination
 
 La paginación es una estrategia eficiente basada en lazy loading para manejar grandes volúmenes de datos en una base de datos.
