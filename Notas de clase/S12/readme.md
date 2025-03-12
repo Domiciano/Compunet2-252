@@ -157,3 +157,36 @@ verify(...)
 Verifica si un método se llamó.
 verify(repo, times(1)).findAll();
 ```
+
+
+# Pruebas de integración
+```
+@SpringBootTest 
+class CourseServiceIntegrationTest {
+
+    @Autowired 
+    private CourseService courseService;
+
+    @Autowired
+    private CourseRepository courseRepository;
+
+    @BeforeEach
+    void setUp() {
+        courseRepository.deleteAll(); 
+    }
+
+    @Test
+    void testCreateCourse() {
+        // Arrange
+        Course course = new Course();
+        course.setName("Spring Boot");
+
+        // Act
+        Course savedCourse = courseService.createCourse(course);
+
+        // Assert
+        assertNotNull(savedCourse.getId());
+        assertEquals("Spring Boot", savedCourse.getName());
+    }
+}
+```
