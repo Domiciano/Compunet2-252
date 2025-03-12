@@ -190,3 +190,5 @@ class CourseServiceIntegrationTest {
     }
 }
 ```
+
+Disponga de `application.properties` en la ruta `test/`
