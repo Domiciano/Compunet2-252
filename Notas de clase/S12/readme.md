@@ -139,3 +139,21 @@ class CourseServiceTest {
 
 ```
 
+
+```
+when(...).thenReturn(...)
+Simula un método que devuelve un valor.
+when(repo.findById(1L)).thenReturn(Optional.of(course))
+
+doNothing().when(...)
+Simula un método void.
+doNothing().when(repo).deleteById(1L);
+
+doThrow(...).when(...)
+Simula una excepción.
+doThrow(new RuntimeException()).when(repo).deleteById(1L);
+
+verify(...)
+Verifica si un método se llamó.
+verify(repo, times(1)).findAll();
+```
