@@ -66,7 +66,7 @@ Luego puede crear algunos test positivos usando el patrón de pruebas AAA (Arran
 
 ```java
     @Test
-    void getAllCoursesThenReturnsCourseList() {
+    void getAllCourses_ReturnsCourseList() {
         // Arrange
         // Creamos la información que simularemos que nos devolverá la capa de Repository
         Professor professor = new Professor();
@@ -102,7 +102,7 @@ Luego puede crear algunos test positivos usando el patrón de pruebas AAA (Arran
 # Simulando retornos de Optionals
 ```java
     @Test
-    void getExistingCourseByIdThenReturnCourse() {
+    void getCourseById_WhenExists_ReturnsCourse() {
         // Arrange
         Professor professor = new Professor();
         professor.setId(1L);
@@ -133,7 +133,7 @@ Aquí se simula un optinal por medio de `Optional.of(object)`
 
 ```java
     @Test
-    void getNotExistingCourseByIdThThrowsException() {
+    void getCourseById_WhenNotExists_ThrowsException() {
         // Arrange
         when(courseRepository.findById(1L)).thenReturn(Optional.empty());
         // Act y Assert
@@ -151,7 +151,7 @@ Por ejemplo
 
 ```java
     @Test
-    void deleteCourseThenSuccess() {
+    void deleteCourse_WhenCalled_DeletesSuccessfully() {
         // Arrange
         long courseId = 1L;
         doNothing().when(courseRepository).deleteById(courseId);
