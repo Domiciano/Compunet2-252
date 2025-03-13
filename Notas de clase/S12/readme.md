@@ -69,12 +69,16 @@ Luego puede crear algunos test positivos usando el patrón de pruebas AAA (Arran
 void getAllCoursesThenReturnsCourseList() {
     // Arrange
     // Creamos la información que simularemos que nos devolverá la capa de Repository
+    Professor professor = new Professor();
+        
     Course course1 = new Course();
     course1.setId(1L);
+    course1.setProfessor(professor);
     course1.setName("Computación en Internet II");
 
     Course course2 = new Course();
     course2.setId(2L);
+    course2.setProfessor(professor);
     course2.setName("Ingeniería de Software IV");
 
     // Aquí en donde simulamos con Mockito el retorno del elemento de repositoy
