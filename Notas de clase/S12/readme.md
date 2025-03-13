@@ -88,7 +88,7 @@ void getAllCoursesThenReturnsCourseList() {
     // Assert
     // Finalmente verificamos que todo esté ok
     assertEquals(2, courses.size());
-    assertEquals("Computación en Internet II"", courses.get(0).getName());
+    assertEquals("Computación en Internet II", courses.get(0).getName());
     assertEquals("Ingeniería de Software IV", courses.get(1).getName());
 }
 ```
