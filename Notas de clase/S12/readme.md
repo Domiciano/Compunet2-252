@@ -65,57 +65,64 @@ public class CourseServiceTest {
 Luego puede crear algunos test positivos usando el patrón de pruebas AAA (Arrange, Act y Assert).
 
 ```java
-@Test
-void getAllCoursesThenReturnsCourseList() {
-    // Arrange
-    // Creamos la información que simularemos que nos devolverá la capa de Repository
-    Professor professor = new Professor();
-        
-    Course course1 = new Course();
-    course1.setId(1L);
-    course1.setProfessor(professor);
-    course1.setName("Computación en Internet II");
+    @Test
+    void getAllCoursesThenReturnsCourseList() {
+        // Arrange
+        // Creamos la información que simularemos que nos devolverá la capa de Repository
+        Professor professor = new Professor();
+        professor.setId(1L);
+        professor.setName("Alice Andrew");
 
-    Course course2 = new Course();
-    course2.setId(2L);
-    course2.setProfessor(professor);
-    course2.setName("Ingeniería de Software IV");
+        Course course1 = new Course();
+        course1.setId(1L);
+        course1.setProfessor(professor);
+        course1.setName("Computación en Internet II");
 
-    // Aquí en donde simulamos con Mockito el retorno del elemento de repositoy
-    // La estructura es when( llamado a repository ) -> thenReturn( se devuelve la información simulada )
-    when(courseRepository.findAll()).thenReturn(Arrays.asList(course1, course2));
+        Course course2 = new Course();
+        course2.setId(2L);
+        course2.setProfessor(professor);
+        course2.setName("Ingeniería de Software IV");
 
-    // Act
-    // Aquí probamos ahora sí el método que deseamos testear
-    List<Course> courses = courseService.getAllCourses();
+        // Aquí en donde simulamos con Mockito el retorno del elemento de repositoy
+        // La estructura es when( llamado a repository ) -> thenReturn( se devuelve la información simulada )
+        when(courseRepository.findAll()).thenReturn(Arrays.asList(course1, course2));
 
-    // Assert
-    // Finalmente verificamos que todo esté ok
-    assertEquals(2, courses.size());
-    assertEquals("Computación en Internet II", courses.get(0).getName());
-    assertEquals("Ingeniería de Software IV", courses.get(1).getName());
-}
+        // Act
+        // Aquí probamos ahora sí el método que deseamos testear
+        List<Course> courses = courseService.getAllCourses();
+
+        // Assert
+        // Finalmente verificamos que todo esté ok
+        assertEquals(2, courses.size());
+        assertEquals("Computación en Internet II", courses.get(0).getName());
+                assertEquals("Ingeniería de Software IV", courses.get(1).getName());
+    }
 ```
 
 # Simulando retornos de Optionals
 ```java
     @Test
-void getExistingCourseByIdThenReturnCourse() {
-    // Arrange
-    Course course = new Course();
-    course.setId(1L);
-    course.setName("Computación en internet II");
+    void getExistingCourseByIdThenReturnCourse() {
+        // Arrange
+        Professor professor = new Professor();
+        professor.setId(1L);
+        professor.setName("Alice Andrew");
 
-    when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
+        Course course = new Course();
+        course.setId(1L);
+        course.setProfessor(professor);
+        course.setName("Computación en internet II");
 
-    // Act
-    Course result = courseService.getCourseById(1L);
+        when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
 
-    // Assert
-    assertNotNull(result);
-    assertEquals(1L, result.getId());
-    assertEquals("Computación en internet II", result.getName());
-}
+        // Act
+        Course result = courseService.getCourseById(1L);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+        assertEquals("Computación en internet II", result.getName());
+    }
 ```
 
 Aquí se simula un optinal por medio de `Optional.of(object)`
@@ -125,14 +132,13 @@ Aquí se simula un optinal por medio de `Optional.of(object)`
 ¿Qué pasa si requerimos probar una excepción? Lo podemos hacer así
 
 ```java
-@Test
-void getNotExistingCourseByIdThThrowsException() {
-    // Arrange
-    when(courseRepository.findById(1L)).thenReturn(Optional.empty());
-
-    // Act y Assert
-    assertThrows(RuntimeException.class, () -> courseService.getCourseById(1L));
-}
+    @Test
+    void getNotExistingCourseByIdThThrowsException() {
+        // Arrange
+        when(courseRepository.findById(1L)).thenReturn(Optional.empty());
+        // Act y Assert
+        assertThrows(RuntimeException.class, () -> courseService.getCourseById(1L));
+    }
 ```
 
 # Simulando método Void
@@ -144,19 +150,18 @@ doNothing() -> when(objectoMockeado) -> método del objeto mockeado;
 Por ejemplo
 
 ```java
- @Test
-void deleteCourse_Success() {
-    // Arrange
-    long courseId = 1L;
-    doNothing().when(courseRepository).deleteById(courseId);
-
-    // Act
-    courseService.deleteCourse(courseId);
-
-    // Assert
-    verify(courseRepository, times(1)).deleteById(courseId);
-}
+    @Test
+    void deleteCourseThenSuccess() {
+        // Arrange
+        long courseId = 1L;
+        doNothing().when(courseRepository).deleteById(courseId);
+        // Act
+        courseService.deleteCourse(courseId);
+        // Assert
+        verify(courseRepository, times(1)).deleteById(courseId);
+    }
 ```
+
 Aquí usamos verify para verificar que el llamado al repositorio sólo se hace una vez
 
 
