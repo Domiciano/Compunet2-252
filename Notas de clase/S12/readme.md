@@ -192,11 +192,20 @@ verify(repo, times(1)).findAll();
 
 # Pruebas de integración
 
-En estas pruebas buscamos ahora sí no simular la capa de repository. Vamos a probar las capas de `Service` + `Repository` verificando siempre información de la base de datos
+En estas pruebas buscamos ahora sí no simular la capa de repository. Vamos a probar las capas de `Service` + `Repository` verificando siempre información de la base de datos.
 
 ```
-@SpringBootTest 
-class CourseServiceIntegrationTest {
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@SpringBootTest
+public class CourseServiceTest {
 
     @Autowired
     private CourseService courseService;
@@ -243,7 +252,12 @@ class CourseServiceIntegrationTest {
         courseRepository.deleteAll();
         professorRepository.deleteAll();
     }
+
 }
 ```
 
-Disponga de `application.properties` en la ruta `test/`
+Puede marcar con @Transactional alguna prueba para que, si sucede un fallo, se haga RollBack.
+
+# Propiedades para test
+
+Cree un `application.properties` en `/src/test/resources`
