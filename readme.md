@@ -16,6 +16,10 @@ Bienvenido al curso de Computación en Internet II. Para mantenernos en contacto
   </tr>
 </table>
 
+# Asignaciones
+
+<a href="https://docs.google.com/document/d/1tK_muqBr7ln06HvAxWgOfgS1exKQYK5S/edit?usp=sharing&ouid=117897710133227559254&rtpof=true&sd=true">Taller JPA</a>
+
 
 
 # Planeador
