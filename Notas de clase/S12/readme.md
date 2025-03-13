@@ -1,9 +1,16 @@
-Dependencias
+# Intro a testing en Spring Boot
 
-Test de unidad con información mockeada.
+Haremos dos tipos de pruebas. Tests sobre la capa de `Service` aislada y tests sobre la capa de `Service` en conjunto con `Repository`.
 
-Aquí los test de unidad se harán a la capa service y se simulará la información para sólo probar la capa de service. 
+Para aislar la capa de `Service` podemos simular el funcionamiento de la capa `Repository` usando `Mockito`.
 
+Para testear la capa de `Service` + `Repository` tendremos que aprender a cargar el `Application Context` en el proyecto de test.
+
+Primero vamos con las dependencias
+
+# Dependencias
+
+Requerimos  `JUnit`, `Mockito` y `SpringBootTest`
 
 ```xml
 <dependencies>
@@ -30,117 +37,128 @@ Aquí los test de unidad se harán a la capa service y se simulará la informaci
 </dependencies>
 ```
 
-```java
-package co.edu.icesi.introspringboot2.service;
+# Test de capa Service con Información Mockeada
 
-import co.edu.icesi.introspringboot2.entity.Course;
+```java
 import co.edu.icesi.introspringboot2.repository.CourseRepository;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+@ExtendWith(MockitoExtension.class)
+public class CourseServiceTest {
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-@ExtendWith(MockitoExtension.class) 
-class CourseServiceTest {
-
+    //Cargamos una simulación de la capa repository
     @Mock
     private CourseRepository courseRepository;
 
+    //Inyectamos el mock a CourseService teniendo en cuenta la dependencia que tiene
     @InjectMocks
-    private CourseService courseService;
+    private CourseService courseService;   
 
-    @Test
-    void getAllCourses_ReturnsCourseList() {
-        // Arrange
-        Course course1 = new Course();
-        course1.setId(1L);
-        course1.setName("Spring Boot");
-
-        Course course2 = new Course();
-        course2.setId(2L);
-        course2.setName("Java Avanzado");
-
-        when(courseRepository.findAll()).thenReturn(Arrays.asList(course1, course2));
-
-        // Act
-        List<Course> courses = courseService.getAllCourses();
-
-        // Assert
-        assertEquals(2, courses.size());
-        assertEquals("Spring Boot", courses.get(0).getName());
-        assertEquals("Java Avanzado", courses.get(1).getName());
-    }
-
-    @Test
-    void getCourseById_CourseExists_ReturnsCourse() {
-        // Arrange
-        Course course = new Course();
-        course.setId(1L);
-        course.setName("Spring Boot");
-
-        when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
-
-        // Act
-        Course result = courseService.getCourseById(1L);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals("Spring Boot", result.getName());
-    }
-
-    @Test
-    void getCourseById_CourseDoesNotExist_ThrowsException() {
-        // Arrange
-        when(courseRepository.findById(1L)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(RuntimeException.class, () -> courseService.getCourseById(1L));
-    }
-
-    @Test
-    void saveCourse_Success() {
-        // Arrange
-        Course course = new Course();
-        course.setName("Spring Boot");
-
-        when(courseRepository.save(course)).thenReturn(course);
-
-        // Act
-        Course savedCourse = courseService.saveCourse(course);
-
-        // Assert
-        assertNotNull(savedCourse);
-        assertEquals("Spring Boot", savedCourse.getName());
-    }
-
-    @Test
-    void deleteCourse_Success() {
-        // Arrange
-        long courseId = 1L;
-        doNothing().when(courseRepository).deleteById(courseId);
-
-        // Act
-        courseService.deleteCourse(courseId);
-
-        // Assert
-        verify(courseRepository, times(1)).deleteById(courseId);
-    }
 }
-
 ```
 
+# Simulando retornos de listas
 
+Luego puede crear algunos test positivos usando el patrón de pruebas AAA (Arrange, Act y Assert).
+
+```java
+@Test
+void getAllCoursesThenReturnsCourseList() {
+    // Arrange
+    // Creamos la información que simularemos que nos devolverá la capa de Repository
+    Course course1 = new Course();
+    course1.setId(1L);
+    course1.setName("Computación en Internet II");
+
+    Course course2 = new Course();
+    course2.setId(2L);
+    course2.setName("Ingeniería de Software IV");
+
+    // Aquí en donde simulamos con Mockito el retorno del elemento de repositoy
+    // La estructura es when( llamado a repository ) -> thenReturn( se devuelve la información simulada )
+    when(courseRepository.findAll()).thenReturn(Arrays.asList(course1, course2));
+
+    // Act
+    // Aquí probamos ahora sí el método que deseamos testear
+    List<Course> courses = courseService.getAllCourses();
+
+    // Assert
+    // Finalmente verificamos que todo esté ok
+    assertEquals(2, courses.size());
+    assertEquals("Computación en Internet II"", courses.get(0).getName());
+    assertEquals("Ingeniería de Software IV", courses.get(1).getName());
+}
 ```
+
+# Simulando retornos de Optionals
+```java
+    @Test
+void getExistingCourseByIdThenReturnCourse() {
+    // Arrange
+    Course course = new Course();
+    course.setId(1L);
+    course.setName("Computación en internet II");
+
+    when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
+
+    // Act
+    Course result = courseService.getCourseById(1L);
+
+    // Assert
+    assertNotNull(result);
+    assertEquals(1L, result.getId());
+    assertEquals("Computación en internet II", result.getName());
+}
+```
+
+Aquí se simula un optinal por medio de `Optional.of(object)`
+
+# Probando test negativos
+
+¿Qué pasa si requerimos probar una excepción? Lo podemos hacer así
+
+```java
+@Test
+void getNotExistingCourseByIdThThrowsException() {
+    // Arrange
+    when(courseRepository.findById(1L)).thenReturn(Optional.empty());
+
+    // Act y Assert
+    assertThrows(RuntimeException.class, () -> courseService.getCourseById(1L));
+}
+```
+
+# Simulando método Void
+
+¿Qué pasa si quiero mockear un método que no devuelve nada? La estructura de mock cambia a
+
+doNothing() -> when(objectoMockeado) -> método del objeto mockeado;
+
+Por ejemplo
+
+```java
+ @Test
+void deleteCourse_Success() {
+    // Arrange
+    long courseId = 1L;
+    doNothing().when(courseRepository).deleteById(courseId);
+
+    // Act
+    courseService.deleteCourse(courseId);
+
+    // Assert
+    verify(courseRepository, times(1)).deleteById(courseId);
+}
+```
+Aquí usamos verify para verificar que el llamado al repositorio sólo se hace una vez
+
+
+
+
+```java
 when(...).thenReturn(...)
 Simula un método que devuelve un valor.
 when(repo.findById(1L)).thenReturn(Optional.of(course))
