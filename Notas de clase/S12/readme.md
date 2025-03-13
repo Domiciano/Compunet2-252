@@ -195,29 +195,50 @@ verify(repo, times(1)).findAll();
 @SpringBootTest 
 class CourseServiceIntegrationTest {
 
-    @Autowired 
+    @Autowired
     private CourseService courseService;
 
     @Autowired
     private CourseRepository courseRepository;
 
+    @Autowired
+    private ProfessorRepository professorRepository;
+
+    private Professor professor;
+
     @BeforeEach
-    void setUp() {
-        courseRepository.deleteAll(); 
+    void setup() {
+        professor = new Professor();
+        professor.setName("Alice Andrew");
+        professor = professorRepository.save(professor);
     }
 
     @Test
-    void testCreateCourse() {
+    void createCourse_WhenValid_ReturnsSavedCourse() {
         // Arrange
         Course course = new Course();
-        course.setName("Spring Boot");
+        course.setName("Computación en Internet II");
+        course.setProfessor(professor);
 
         // Act
         Course savedCourse = courseService.createCourse(course);
 
         // Assert
         assertNotNull(savedCourse.getId());
-        assertEquals("Spring Boot", savedCourse.getName());
+        assertEquals("Computación en Internet II", savedCourse.getName());
+        assertNotNull(savedCourse.getProfessor());
+        assertEquals(professor.getId(), savedCourse.getProfessor().getId());
+
+        // Verificar que realmente está en la BD
+        Course foundCourse = courseRepository.findById(savedCourse.getId()).orElse(null);
+        assertNotNull(foundCourse);
+        assertEquals("Computación en Internet II", foundCourse.getName());
+    }
+
+    @AfterEach
+    void cleanup() {
+        courseRepository.deleteAll();
+        professorRepository.deleteAll();
     }
 }
 ```
