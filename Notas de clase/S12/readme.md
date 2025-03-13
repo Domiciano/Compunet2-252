@@ -191,6 +191,9 @@ verify(repo, times(1)).findAll();
 
 
 # Pruebas de integración
+
+En estas pruebas buscamos ahora sí no simular la capa de repository. Vamos a probar las capas de `Service` + `Repository` verificando siempre información de la base de datos
+
 ```
 @SpringBootTest 
 class CourseServiceIntegrationTest {
