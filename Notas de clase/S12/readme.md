@@ -64,9 +64,13 @@ public class CourseServiceTest {
 
 Luego puede crear algunos test positivos usando el patrón de pruebas AAA (Arrange, Act y Assert).
 
+Para escribir los test use esta convención
+
+`MethodName_WhenCondition_ExpectedBehavior`
+
 ```java
     @Test
-    void getAllCourses_ReturnsCourseList() {
+    void getAllCourses_WhenCalled_ReturnsCourseList() {
         // Arrange
         // Creamos la información que simularemos que nos devolverá la capa de Repository
         Professor professor = new Professor();
