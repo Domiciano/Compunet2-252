@@ -194,6 +194,26 @@ verify(repo, times(1)).findAll();
 
 En estas pruebas buscamos ahora sí no simular la capa de repository. Vamos a probar las capas de `Service` + `Repository` verificando siempre información de la base de datos.
 
+
+
+# Propiedades para test
+
+Cree un `application.properties` en `/src/test/resources`. Aquí usted define las propiedades para apuntar a su base de datos de pruebas.
+
+```
+
+# Base de datos de purebas
+spring.jpa.hibernate.ddl-auto=create
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.datasource.url=jdbc:postgresql://localhost:5432/db
+spring.datasource.username=user
+spring.datasource.password=password
+spring.datasource.hikari.maximum-pool-size=20
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+```
+
+# Implementación de prueba de integración
+
 ```java
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -258,6 +278,3 @@ public class CourseServiceTest {
 
 Puede marcar con @Transactional alguna prueba para que, si sucede un fallo, se haga RollBack.
 
-# Propiedades para test
-
-Cree un `application.properties` en `/src/test/resources`
