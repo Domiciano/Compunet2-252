@@ -122,7 +122,11 @@ getEnrolledStudents_WhenCourseHasStudents_ShouldReturnStudentList
 
 Crear un Student, un Course y una Enrollment.
 
-Debe testear un método de service que reciba de una vez el estudiante y el curso, para producir el enrollment.
+Debe testear un método de service que reciba los objetos de estudiante y el curso, para producir el enrollment.
+
+Si no existe el estudiante, se crea.
+
+Si no existe el curso, se crea
 
 Guardar los datos y verificar que la inscripción se refleje correctamente en la base de datos.
 
@@ -134,7 +138,7 @@ enrollStudent_WhenStudentAndCourseExist_ShouldSaveEnrollment
 
 Crear un estudiante y un curso.
 
-Intentar inscribirlo dos veces y validar que se lanza una excepción o que la inscripción no se duplique.
+Intentar inscribirlo dos veces y validar que se lanza una excepción.
 
 
 ```
