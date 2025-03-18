@@ -85,16 +85,20 @@ public class CourseServiceIntegrationTest {
 
 Puede marcar con @Transactional alguna prueba para que, si sucede un fallo, se haga RollBack.
 
-# Test para entrenar
+# Tests para entrenar
 
-Para cada test, nombre apropiadamente el método de test y haga que el test pase desarrollando la funcionalidad.
+Vamos a entrenarnos en hacer algunos test donde probaremos el funcionamiento en conjunto de la capa `Service` + `Repository`.
+
+Para cada uno de los siguientes test, nombre apropiadamente el método de test y haga que pase, desarrollando la funcionalidad.
 
 
-### 1. Crear un curso y asignarlo a un profesor
 
-Guardar un Course con un Professor en la base de datos y verificar que se asoció correctamente.
+### A. Crear un curso repetido
 
-### 2. Obtener la lista de estudiantes inscritos en un curso
+Crear 2 cursos iguales. Intentar almacenarlos y asegurarse de que falle la segunda inserción.
+
+
+### B. Obtener la lista de estudiantes inscritos en un curso
 
 Crear un curso y varios estudiantes.
 
@@ -102,22 +106,23 @@ Inscribir los estudiantes en el curso.
 
 Recuperar la lista de estudiantes inscritos y validar los datos.
 
-### 3. Eliminar un curso y verificar que las inscripciones también se eliminan
 
-Crear un curso con inscripciones.
-
-Eliminar el curso y verificar que las inscripciones asociadas se eliminaron automáticamente (cascada).
-
-### 4. Inscribir un estudiante en un curso
+### C. Inscribir un estudiante en un curso
 
 Crear un Student, un Course y una Enrollment.
 Guardar los datos y verificar que la inscripción se refleje correctamente en la base de datos.
 
-### 5. Verificar que un estudiante no pueda inscribirse dos veces en el mismo curso
+### C'. Verificar que un estudiante no pueda inscribirse dos veces en el mismo curso
 
 Crear un estudiante y un curso.
 
 Intentar inscribirlo dos veces y validar que se lanza una excepción o que la inscripción no se duplique.
+
+### D. Eliminar un curso y verificar que las inscripciones también se eliminan
+
+Crear un curso con inscripciones.
+
+Eliminar el curso y verificar que las inscripciones asociadas se eliminaron automáticamente (cascada).
 
 
 # Thymeleaf
