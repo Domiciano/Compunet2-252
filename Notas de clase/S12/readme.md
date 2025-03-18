@@ -1,6 +1,7 @@
 # QUIZ
 
-
+> [!NOTE]  
+> En esta clase se hizo un quiz sobre Spring Core
 
 # Intro a testing en Spring Boot
 
