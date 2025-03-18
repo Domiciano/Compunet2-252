@@ -161,6 +161,12 @@ deleteCourse_WhenCourseHasEnrollments_ShouldCascadeDeleteEnrollments
 Thymeleaf es un motor de plantillas para Java que se integra fácilmente con Spring Boot. Es una excelente alternativa a JSP, permitiendo generar vistas dinámicas en aplicaciones web de Spring MVC.
 
 
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
+```
 
 # Plantillas
 
