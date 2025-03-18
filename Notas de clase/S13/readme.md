@@ -9,7 +9,6 @@ En estas pruebas buscamos ahora sí no simular la capa de repository. Vamos a pr
 Cree un `application.properties` en `/src/test/resources`. Aquí usted define las propiedades para apuntar a su base de datos de pruebas.
 
 ```
-
 # Base de datos de purebas
 spring.jpa.hibernate.ddl-auto=create
 spring.datasource.driver-class-name=org.postgresql.Driver
@@ -33,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
-public class CourseServiceTest {
+public class CourseServiceIntegrationTest {
 
     @Autowired
     private CourseService courseService;
