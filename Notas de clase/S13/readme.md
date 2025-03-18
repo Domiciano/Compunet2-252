@@ -8,7 +8,7 @@ En estas pruebas buscamos ahora sí no simular la capa de repository. Vamos a pr
 
 Cree un `application.properties` en `/src/test/resources`. Aquí usted define las propiedades para apuntar a su base de datos de pruebas.
 
-```
+```ini
 # Base de datos de purebas
 spring.jpa.hibernate.ddl-auto=create
 spring.datasource.driver-class-name=org.postgresql.Driver
