@@ -88,6 +88,21 @@ Puede marcar con @Transactional alguna prueba para que, si sucede un fallo, se h
 > [!WARNING]  
 > Es importante que al momento de crear las entidades para pruebas, NO use el método `setId()` ya que puede sobreescribir el comportamiento autogenerativo de hibernate
 
+El error esperado es
+
+> [!CAUTION]  
+> org.springframework.orm.ObjectOptimisticLockingFailureException: Row was updated or deleted by another transaction (or unsaved-value mapping was incorrect): [your.project.package.entity.ExampleEntity#1]
+
+
+
+> [!WARNING]  
+> Si en su test, usted requiere almacenar datos, no olvide guardarlos. Si por alguna razón, sea porque lo olvidó o sea porque el método de almacenamiento de service nunca invoca al método `save()` del `Repository`, le saldrá un error.
+
+El error esperado es
+> [!CAUTION]  
+> org.springframework.dao.InvalidDataAccessApiUsageException: org.hibernate.TransientObjectException: persistent instance references an unsaved transient instance of 'co.edu.icesi.introspringboot2.entity.Professor' (save the transient instance before flushing)
+
+
 
 # Tests para entrenar
 
