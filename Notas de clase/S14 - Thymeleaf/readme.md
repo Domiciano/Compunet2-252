@@ -150,7 +150,6 @@ Podemos renderizarlo así
 
 # Envio de información
 
-
 > [!WARNING]  
 >Si tiene ha agregado datos, no olvide actualizar las secuencias de base de datos en su `data.sql`
 
@@ -170,12 +169,16 @@ Lo primer que necesita es que su página que renderiza su `form` tenga un objeto
 
 ```java
 @Controller
+@RequestMapping("/example")
 public class ExampleController {
     
-    @PostMapping("/all")
-    public String save(@Model ExampleEntity exampleEntity) {
+    @GetMapping
+    public String all(Model model) {
         //Insertamos un modelo vacío
-        model.addAttribute("exampleEntity", new Course());
+        model.addAttribute("exampleEntity", new ExampleEntity());
+        //Se puede insertar la lista de entity
+        model.addAttribute("entityList", entityList);
+        //Se devuelve la plantilla, que ya tiene cargados exampleEntity y entityList
         return "entityList";
     }
 
@@ -186,7 +189,7 @@ public class ExampleController {
 En el `form` de `entityList.html` tiene que usar ese objeto vacío
 
 ```html
-<form th:action="@{/save}" th:object="${exampleEntity}" method="post">
+<form th:action="@{/example}" th:object="${exampleEntity}" method="post">
     
     <label>Nombre:</label>
     <input type="text" th:field="*{attribute1}" required>
@@ -199,29 +202,19 @@ En el `form` de `entityList.html` tiene que usar ese objeto vacío
 </form>
 ```
 
-
-Luego necesitará es un controller para recibir los datos
+Luego necesitará un controller para recibir los datos
 
 ```java
-@Controller
-public class ExampleController {
-    
     @PostMapping("/save")
     public String guardar(@ModelAttribute ExampleEntity exampleEntity) {
-        //Tareas de almacenamiento
-        return "result";
+        //Puede almacenar la exampleEntity
+        //Puede redirigirse a la ruta raiz para recargar la página
+        return "redirect:/example";
     }
-
-}
-
 ```
 
 
-Note que se llama al endpoint por medio de `@{/save}`.
 
-Adicionalmente se debe especificar el objeto con el mismo nombre con el que se recibe en el endpoint. En este caso `exampleEntity`
-
-Posteriomente se especifican los atributos de esa entidad por medio de `*{attr}`
 
 
 # Etiquetas Thymeleaf
