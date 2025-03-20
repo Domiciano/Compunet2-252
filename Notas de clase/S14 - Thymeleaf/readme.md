@@ -213,6 +213,33 @@ Luego necesitará un controller para recibir los datos
     }
 ```
 
+# Ejercicio
+
+🎯 Cree una pantalla que permita crear un curso. El usuario debe poder escoger un profesor existente. Haga uso de `select` y `option` de HTML.
+
+
+```html
+<!--Debe poner un objeto vacío desde Thymeleaf que tenga alguna llave foránea-->
+<form th:action="@{/ruta}" method="post" th:object="${emptyObject}">
+
+        <!--th:field para definir cuál es el campo al que se hace la asignación-->
+        <!--th:each para iterar sobre las opciones cargadas en Model-->
+        <!--th:value para definir cuál de los parámetros se enviará en el formulario-->
+        <!--th:text para definir lo que se le muestra al usuario-->
+        <select th:field="*{foreingKeyField}">
+            <option th:each="entityObject : ${entityList}"
+                    th:value="${entityObject.id}"
+                    th:text="${entityObject.attribute1}">
+            </option>
+        </select>
+
+        <button>OK</button>
+</form>
+```
+
+
+🎯 Cree una pantalla que permita realizar la matrícula de un estudiante
+
 
 
 
