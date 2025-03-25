@@ -238,10 +238,6 @@ Luego necesitará un controller para recibir los datos
 ```
 
 
-🎯 Cree una pantalla que permita realizar la matrícula de un estudiante
-
-
-
 
 
 # Etiquetas Thymeleaf
