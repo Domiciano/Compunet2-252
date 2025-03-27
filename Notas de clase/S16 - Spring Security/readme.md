@@ -109,9 +109,7 @@ public class WebSecurityConfig {
 Ya hemos visto cómo se carga un in-memory user. Pero ahora, tenemos que llevar esta forma en la que funcionan los usuarios en SpringBoot para habilitar los usuarios almacenados en base de datos.
 
 
-<p align="center">
-        <img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image15.png" width="512">
-</p>
+<img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image15.png">
 
 Requerimos varios ingredientes
 
