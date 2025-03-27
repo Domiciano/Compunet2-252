@@ -211,6 +211,13 @@ Una vez que estamos autorizados, el flujo se ve como en la imagen
 
 <img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image16.png">
 
+El request, ahora lleva la cookie `JSESSIONID`. Esta cookie es verificada por `SecurityContextPersistenceFilter`.
+
+Si el request se mantiene, el filtro recupera la HTTPSession de Tomcat. Por debajo la HTTPSession tiene un objeto llamado `SecurityContext` que se carga en el `SecurityContextHolder`. Esto se mantiene almacenado de forma estática durante el proceso de request-response. Una vez ha terminado al transacción, se limpia el `SecurityContext`
+
+Posteriomente, el `AuthorizationFilter` verifica permisos de esa sesión verificando si la ruta que se solicita en el `request` si es accesible por el usuario con la sesión identificada con `JSESSIONID`
+
+
 
 # Registro de usuarios
 
