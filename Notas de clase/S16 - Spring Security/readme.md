@@ -210,6 +210,12 @@ Con todo listo, devolvámos una instancia de `UserDetails` a partir de un `usern
 
 Use el `UserService` y cree un objeto de tipo `UserDetail` a partir del usuario recuperado de la base de datos.
 
+# Request autorizadas
+
+Una vez que estamos autorizados, el flujo se ve como en la imagen
+
+<img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image16.png">
+
 
 # Registro de usuarios
 
