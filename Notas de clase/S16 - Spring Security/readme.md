@@ -46,22 +46,18 @@ Content-Type: application/x-www-form-urlencoded
 username=user&password=3b4c1d2e-5f6g-7h8i-9j0k-l1m2n3o4p5q6
 ```
 
-4. Spring Security verifica las credenciales contra un UserDetailsService. 
+4. Spring Security verifica las credenciales 
 
-5. Si son correctas, se crea un objeto de autenticación (UsernamePasswordAuthenticationToken) con los detalles del usuario.
+5. Si son correctas, el servidor crea una nueva sesión HTTP y genera un JSESSIONID único para el usuario autenticado.
 
-6. Se almacena en el SecurityContext de Spring.
-
-7. El servidor crea una nueva sesión HTTP y genera un JSESSIONID único para el usuario autenticado.
-
-8. Se devuelve la cookie JSESSIONID al cliente en la respuesta HTTP:
+6. Se devuelve la cookie JSESSIONID al cliente en la respuesta HTTP:
 
 ```
 HTTP/1.1 200 OK
 Set-Cookie: JSESSIONID=ABC123XYZ456; Path=/; HttpOnly; Secure
 ```
 
-9. A partir de este momento, cada vez que el usuario haga una nueva solicitud al servidor, el navegador enviará automáticamente la cookie JSESSIONID:
+7. A partir de este momento, cada vez que el usuario haga una nueva solicitud al servidor, el navegador enviará automáticamente la cookie JSESSIONID:
 
 ```
 GET /admin
