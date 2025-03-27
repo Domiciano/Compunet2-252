@@ -46,9 +46,9 @@ Content-Type: application/x-www-form-urlencoded
 username=user&password=3b4c1d2e-5f6g-7h8i-9j0k-l1m2n3o4p5q6
 ```
 
-4. Spring Security verifica las credenciales contra un UserDetailsService. Si son correctas:
+4. Spring Security verifica las credenciales contra un UserDetailsService. 
 
-5. Se crea un objeto de autenticación (UsernamePasswordAuthenticationToken) con los detalles del usuario.
+5. Si son correctas, se crea un objeto de autenticación (UsernamePasswordAuthenticationToken) con los detalles del usuario.
 
 6. Se almacena en el SecurityContext de Spring.
 
@@ -107,6 +107,11 @@ public class WebSecurityConfig {
 # Cargando usuario de DB
 
 Ya hemos visto cómo se carga un in-memory user. Pero ahora, tenemos que llevar esta forma en la que funcionan los usuarios en SpringBoot para habilitar los usuarios almacenados en base de datos.
+
+
+<p align="center">
+        <img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image15.png" width="512">
+</p>
 
 Requerimos varios ingredientes
 
