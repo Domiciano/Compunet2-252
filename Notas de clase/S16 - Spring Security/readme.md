@@ -25,9 +25,8 @@ This generated password is for development use only. Your security configuration
 
 Este es un usuario por defecto almacenado en memoria que usted debe/puede usar para obtener acceso a la página.
 
----
 
-Verifique en la consola del navegador la cookie que se crea
+*Verifique en la consola del navegador la cookie que se crea*
 
 
 # Mecanismo de autenticación basada en estado
@@ -156,8 +155,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 El método `loadUserByUsername(String username)` devuelve un objeto de tipo `UserDetails`. De modo que tenemos que crear una clase que implemente esa interfaz.
 
----
-
 
 ### SecurityUser
 
@@ -194,8 +191,6 @@ public class SecurityUser implements UserDetails {
     }
 }
 ```
-
----
 
 ### Método loadUserByUsername
 
@@ -243,8 +238,6 @@ En Service desarrolle un método de almacenamiento del usario donde **guarde la 
 
 Entonces en el service use el bean de PasswordEncoder.
 
-
----
 
 # Modelo básico de Usuarios
 
