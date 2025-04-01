@@ -219,31 +219,7 @@ Posteriomente, el `AuthorizationFilter` verifica permisos de esa sesión verific
 
 
 
-# Registro de usuarios
 
-Para dar de alta a un usuario, debemos insertar el registro en la tabla `User`.
-
-Elabore una plantilla `signup.html`con Thymeleaf para dar de alta al usuario.
-
-Lo mejor sería **hashear la contraseña**. Para esto, cambie el **bean**.
-
-```java
-@Configuration
-public class WebSecurityConfig {
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-    
-}
-```
-
-`BCrypt` es un algoritmo de hashing. 
-
-En Service desarrolle un método de almacenamiento del usario donde **guarde la constraseña hasheada**. No la contraseña legible.
-
-Entonces en el service use el bean de PasswordEncoder.
 
 
 # Modelo básico de Usuarios
