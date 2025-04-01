@@ -213,8 +213,8 @@ VALUES (1, 1),
 
 
 -- Configurar secuencia
-SELECT setval('domi_users_seq', (SELECT MAX(id) FROM domi_users));
-SELECT setval('domi_roles_seq', (SELECT MAX(id) FROM domi_roles));
+SELECT setval('users_seq', (SELECT MAX(id) FROM users));
+SELECT setval('roles_seq', (SELECT MAX(id) FROM roles));
 ```
 
 Luego asignamos los al usuario estudiante@gmail.com el rol estudiante y a profesor@gmail.com el rol de profesor.
