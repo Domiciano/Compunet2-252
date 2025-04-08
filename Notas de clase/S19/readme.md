@@ -209,8 +209,11 @@ Vamos a poner en práctica lo que hemos visto.
 
 Tenga en cuenta que el prefijo con el que debe nombrar sus endpoints debe ser con semántica REST. Debe preguntarse cuál es el recurso principal que está devolviendo. Puede pensar en el **sujeto** de la oración.
 
+---
 
 🎯 Obtener todos los cursos con su respectivo profesor. **Hecho en este readme**
+
+---
 
 🎯 Obtener todos los estudiantes inscritos en un curso específico
 
