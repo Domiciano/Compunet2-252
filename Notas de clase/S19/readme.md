@@ -61,3 +61,11 @@ GET /usuarios
 POST /productos
 DELETE /usuarios/{id}
 ```
+
+# Data Transfer Object
+
+DTO es un objeto que se utiliza para transportar datos entre diferentes capas de una aplicación, especialmente entre el backend y el frontend o entre controladores y servicios. 
+
+*Su propósito principal es encapsular y estructurar la información que se va a enviar o recibir, evitando exponer directamente las entidades del modelo de base de datos.*
+
+Usar DTOs mejora la seguridad, la claridad del código y la flexibilidad, ya que puedes controlar exactamente qué datos se intercambian y adaptar la forma en que se presentan sin afectar tu modelo interno.
