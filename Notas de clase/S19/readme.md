@@ -31,7 +31,7 @@ Al diseñar tus endpoints, es esencial seguir una **convención semántica clara
 ---
 
 
-# Anotaciones importantes de Spring para REST
+## Anotaciones importantes de Spring para REST
 
 | Anotación                 | Descripción                                                                 |
 |---------------------------|-----------------------------------------------------------------------------|
