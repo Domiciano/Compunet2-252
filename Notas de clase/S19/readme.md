@@ -212,41 +212,50 @@ Tenga en cuenta que el prefijo con el que debe nombrar sus endpoints debe ser co
 ---
 
 🎯 Obtener todos los cursos con su respectivo profesor. **Hecho en este readme**
-
+<!--GET /courses-->
 ---
 
 🎯 Obtener todos los estudiantes inscritos en un curso específico
-
+<!--GET /courses/{id}/students-->
 ---
 
 🎯 Registrar un nuevo estudiante
-
+<!--POST /students-->
 ---
 
 🎯 Matricular un estudiante en un curso
-
+<!--POST /enrollments-->
 ---
 
 🎯 Consultar todos los cursos en los que está matriculado un estudiante
-
+<!--GET /students/{id}/courses-->
 ---
 
 🎯 Actualizar el nombre o programa de un estudiante
-
+<!--PATCH /students/{id}-->
 ---
 
 🎯 Eliminar una matrícula específica por `id`
-
+<!--DELETE /enrollments/{id}-->
 ---
 
 🎯 Buscar estudiantes por programa académico
-
+<!--GET /students?program=SIS-->
 ---
 
-🎯 Crear un nuevo curso y asignarle un profesor
-
+🎯 Crear un nuevo curso y asignarle un profesor existente
+<!--POST /courses-->
 ---
 
 🎯 Listar todos los cursos con la cantidad de estudiantes inscritos
+<!--GET /courses/enrollments/summary-->
+---
 
+
+🎯 Listar estudiantes paginados y ordenados por nombre
+<!--GET /students?page=0&size=10&sort=name,asc-->
+---
+
+🎯 Buscar cursos por coincidencia de nombre (filtro parcial) con paginación
+<!--GET /courses?search=software&page=0&size=5-->
 ---
