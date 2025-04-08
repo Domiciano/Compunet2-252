@@ -28,10 +28,8 @@ Al diseñar tus endpoints, es esencial seguir una **convención semántica clara
 🔸 **No uses verbos en los nombres de los endpoints**. El verbo ya lo determina el método HTTP.
 
 
----
 
-
-## Anotaciones importantes de Spring para REST
+# Anotaciones importantes de Spring para REST
 
 | Anotación                 | Descripción                                                                 |
 |---------------------------|-----------------------------------------------------------------------------|
@@ -45,4 +43,21 @@ Al diseñar tus endpoints, es esencial seguir una **convención semántica clara
 | `@PathVariable`           | Extrae valores de la ruta.                                                 |
 | `@RequestParam`           | Extrae parámetros de la URL (ej. filtros o paginación).                    |
 
----
+
+# Buenas prácticas
+
+❌ Incorrecto
+
+```http
+GET /getUsuarios
+POST /createProducto
+DELETE /deleteUsuarioById
+```
+
+✅ Correcto
+
+```http
+GET /usuarios
+POST /productos
+DELETE /usuarios/{id}
+```
