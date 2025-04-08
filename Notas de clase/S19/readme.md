@@ -259,3 +259,53 @@ Tenga en cuenta que el prefijo con el que debe nombrar sus endpoints debe ser co
 🎯 Buscar cursos por coincidencia de nombre (filtro parcial) con paginación
 <!--GET /courses?search=software&page=0&size=5-->
 ---
+
+
+
+
+
+
+
+
+
+
+
+
+# MapStruct y Loombok
+
+```xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <version>3.8.1</version>
+    <configuration>
+        <annotationProcessorPaths>
+            <path>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${mapstruct.version}</version>
+            </path>
+            <path>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </path>
+        </annotationProcessorPaths>
+    </configuration>
+</plugin>
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
