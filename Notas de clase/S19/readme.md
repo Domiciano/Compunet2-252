@@ -217,18 +217,34 @@ Tenga en cuenta que el prefijo con el que debe nombrar sus endpoints debe ser co
 
 🎯 Obtener todos los estudiantes inscritos en un curso específico
 
+---
+
 🎯 Registrar un nuevo estudiante
+
+---
 
 🎯 Matricular un estudiante en un curso
 
+---
+
 🎯 Consultar todos los cursos en los que está matriculado un estudiante
+
+---
 
 🎯 Actualizar el nombre o programa de un estudiante
 
+---
+
 🎯 Eliminar una matrícula específica por `id`
+
+---
 
 🎯 Buscar estudiantes por programa académico
 
+---
+
 🎯 Crear un nuevo curso y asignarle un profesor
+
+---
 
 🎯 Listar todos los cursos con la cantidad de estudiantes inscritos
