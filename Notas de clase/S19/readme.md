@@ -11,7 +11,7 @@ Stateless (sin estado) significa que cada solicitud HTTP enviada al servidor deb
 Uso de URLs limpias y semánticas.
 
 
-# 🔤 Semántica REST y nombres de endpoints
+# Semántica REST y nombres de endpoints
 
 Al diseñar tus endpoints, es esencial seguir una **convención semántica clara y predecible**:
 
@@ -27,3 +27,22 @@ Al diseñar tus endpoints, es esencial seguir una **convención semántica clara
 
 🔸 **No uses verbos en los nombres de los endpoints**. El verbo ya lo determina el método HTTP.
 
+
+---
+
+
+# Anotaciones importantes de Spring para REST
+
+| Anotación                 | Descripción                                                                 |
+|---------------------------|-----------------------------------------------------------------------------|
+| `@RestController`         | Marca la clase como un controlador REST.                                   |
+| `@RequestMapping`         | Define la ruta base del controlador.                                       |
+| `@GetMapping`             | Asocia un método a una petición GET.                                       |
+| `@PostMapping`            | Asocia un método a una petición POST.                                      |
+| `@PutMapping` / `@PatchMapping` | Asocian un método a una petición PUT o PATCH.                        |
+| `@DeleteMapping`          | Asocia un método a una petición DELETE.                                    |
+| `@RequestBody`            | Indica que el contenido del cuerpo debe ser deserializado (ej. JSON → obj).|
+| `@PathVariable`           | Extrae valores de la ruta.                                                 |
+| `@RequestParam`           | Extrae parámetros de la URL (ej. filtros o paginación).                    |
+
+---
