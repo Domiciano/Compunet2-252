@@ -211,7 +211,7 @@ Tenga en cuenta que el prefijo con el que debe nombrar sus endpoints debe ser co
 
 ---
 
-- [ ] Obtener todos los cursos con su respectivo profesor. **Hecho en este readme**
+🎯 Obtener todos los cursos con su respectivo profesor. **Hecho en este readme**
 
 ---
 
@@ -248,3 +248,5 @@ Tenga en cuenta que el prefijo con el que debe nombrar sus endpoints debe ser co
 ---
 
 🎯 Listar todos los cursos con la cantidad de estudiantes inscritos
+
+---
