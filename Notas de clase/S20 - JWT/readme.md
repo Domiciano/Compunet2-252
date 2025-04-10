@@ -92,6 +92,8 @@ Con esto en mente ya podemos crear un un método para generar el token. Los JWT 
     <img src="https://fusionauth.io/img/shared/json-web-token.png" width="512">
 </p>
 
+El método para crearlo puede ser
+
 ```java
 public String generateToken(UserDetails userDetails) {
     Date now = new Date();
@@ -106,13 +108,89 @@ public String generateToken(UserDetails userDetails) {
 }
 ```
 
+Donde note que se crea a partir de los userDetails. En general el subject de un JWT tiene el username/email del usuario propietario del token.
+
+¿Qué pasa si queremos darle más datos al token?. Lo podemos hacer para incluir el rol del usuario, así como sus authorities.
+
+Incluso esto nos ayudaría a saber cuál es el `UserDetails` a partir de la información del token. Esta información se denomina `claims`. Podemos crearlos a partir del UserDetails.
+
+
+```java
+public Map<String, Object> createClaims(UserDetails userDetails){
+    Map<String, Object> claims = new HashMap<>();
+    claims.put("email", userDetails.getUsername());
+    claims.put("roles", userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+    return claims;
+}
+```
+
+Con esto, lo podemos incluir los claims en el token
+```java
+//return Jwts.builder()
+            .setClaims( createClaims(userDetails) )
+//          .compact();
+```
 
 
 
 
+# Endpoint de login
+
+Vamos a hacer un endpoint entonces para permitir login de nuestros usuarios.
+
+Tenemos que tener dos DTO. Uno para el Request que incluya email/username y password. Otro para el Response donde podamos enviar el token producido.
+
+
+```java
+public class AuthRequest {
+    private String username;
+    private String password;
+    ...
+}
+```
+
+
+```java
+public class AuthResponse {
+    private String accessToken;
+    ...
+}
+```
+
+
+Nuestro primer protipo de login es
+
+```java
+@PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
+        
+        //Proceso de autenticación
+
+
+        //Creación de token
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(request.getUsername());
+        String jwt = jwtService.generateToken(userDetails);
+
+        var response = new AuthResponse(jwt);
+        return ResponseEntity.ok(response);
+}
+```
+
+Si utiliza el método, este es capaz de crear el token. Sin embargo, aún no tenemos implementado el proceso de autenticación
+
+De acuerdo con la cadena de autenticación Stateful es que el request pasa por `UsernamePasswordAuthenticationFilter > AuthenticationManager > DaoAuthenticationProvider > UserDetailService`. Vea el <a href="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image15.png">gráfico de referencia<a>
+
+
+
+
+
+
+# En el próximo capítulo...
 
 # Creación del filtro de JWT para el filter chain
-
 
 
 ```java
