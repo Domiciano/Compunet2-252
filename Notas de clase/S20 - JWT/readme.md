@@ -164,6 +164,12 @@ public class AuthResponse {
 Nuestro primer protipo de login es
 
 ```java
+@Autowired
+private JwtService jwtService;
+
+@Autowired
+private CustomUserDetailsService customUserDetailsService;
+
 @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
         
@@ -218,6 +224,15 @@ Una vez con el objeto, podemos autenticar los datos que nos llegan al endpoint.
 
 
 ```java
+//@Autowired
+//private JwtService jwtService;
+
+//@Autowired
+//private CustomUserDetailsService customUserDetailsService;
+
+@Autowired
+private AuthenticationManager authenticationManager;
+
 //@PostMapping("/login")
 //public ResponseEntity<?> login(@RequestBody AuthRequest request) {
       
