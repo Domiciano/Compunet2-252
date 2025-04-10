@@ -230,8 +230,8 @@ Una vez con el objeto, podemos autenticar los datos que nos llegan al endpoint.
 //@Autowired
 //private CustomUserDetailsService customUserDetailsService;
 
-@Autowired
-private AuthenticationManager authenticationManager;
+  @Autowired
+  private AuthenticationManager authenticationManager;
 
 //@PostMapping("/login")
 //public ResponseEntity<?> login(@RequestBody AuthRequest request) {
