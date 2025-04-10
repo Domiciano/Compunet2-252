@@ -179,12 +179,62 @@ Nuestro primer protipo de login es
 }
 ```
 
-Si utiliza el método, este es capaz de crear el token. Sin embargo, aún no tenemos implementado el proceso de autenticación
+Si utiliza el método, este es capaz de crear el token. Sin embargo, aún no tenemos implementado el proceso de autenticación.
 
 De acuerdo con la cadena de autenticación Stateful es que el request pasa por `UsernamePasswordAuthenticationFilter > AuthenticationManager > DaoAuthenticationProvider > UserDetailService`. Vea el <a href="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image15.png">gráfico de referencia<a>
 
+Debemos modificar la cadena y para esto debemos configurar el `SecurityFilterChain`. Debemos lograr que los procesos de authentication como por ejemplo `/login`, `/signup`, `/refresh` sean de acceso público.
+
+Además configuremos que el CSRF Token quede deshabilitado y además que las sesiones sean estilo *stateless* de modo que no se guarde HTTP Session.
+
+```java
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(
+                        auth -> auth
+                                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                                .requestMatchers("/api/auth/**").permitAll()
+                                .anyRequest().authenticated()
+                );
+        
+        return http.build();
+}
+```
+
+Adicionalmente necesitamos poder usar el `AuthenticationManager`, para eso podemos definir el bean en nuestro `WebSecurityConfig`
+
+```java
+@Bean
+public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    return config.getAuthenticationManager();
+}
+```
 
 
+Una vez con el objeto, podemos autenticar los datos que nos llegan al endpoint.
+
+
+```java
+//@PostMapping("/login")
+//public ResponseEntity<?> login(@RequestBody AuthRequest request) {
+      
+      authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getUsername(),
+                        request.getPassword()
+                )
+      );
+        
+//    UserDetails userDetails = customUserDetailsService.loadUserByUsername(request.getUsername());
+//    String jwt = jwtService.generateToken(userDetails);
+
+//    var response = new AuthResponse(jwt);
+//    return ResponseEntity.ok(response);
+//}
+```
 
 
 
