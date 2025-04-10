@@ -21,6 +21,32 @@ Bienvenido al curso de Computación en Internet II. Para mantenernos en contacto
 <a href="https://docs.google.com/spreadsheets/d/1-zrRvMVMIfBs8LABaeKFdkZX5ZIt4-bmFlbrJHKiHjM/edit">Tarea 2</a>
 
 
+Incluya en la carpeta `webapps` su `.war` nombrado como `g5#nombredelequipo.war`
+
+Tenga en cuenta que los host requeridos para que usted haga su despliegue son
+
+### Sala 206M
+```
+10.147.19.21	x206m01
+```
+
+### Sala 205M
+```
+10.147.20.61	x205m01
+```
+
+### Sala 104M
+```
+10.147.17.101	x104m01
+```
+
+Estas direcciones IP son direcciones de **la VPN de ZeroTier**
+
+Use el usuario `computacion2` para conectarse a SSH 
+
+
+
+
 # Planeador
 
 <table style="border-collapse: collapse; border: none;" border="0">
