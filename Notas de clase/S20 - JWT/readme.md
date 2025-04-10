@@ -266,6 +266,53 @@ Al final de todo el proceso, la respuesta esperada es algo asi
 }
 ```
 
+Siguiendo la estructura:
+
+```
+HEADER.PAYLOAD.SIGNATURE
+```
+
+
+### Header
+
+```
+eyJhbGciOiJIUzM4NCJ9
+
+es igual a
+
+Base64URL(
+    {
+        "alg": "HS384"
+    }
+)
+```
+
+### Payload
+
+```
+eyJyb2xlcyI6WyJST0xFX1BST0ZFU1NPUiJdLCJlbWFpbCI6InByb2Zlc29yQGdtYWlsLmNvbSIsInN1YiI6InByb2Zlc29yQGdtYWlsLmNvbSIsImlhdCI6MTc0NDI5ODQxNSwiZXhwIjoxNzQ0MzAwMjE1fQ
+
+es igual a
+
+Base64URL(
+    {
+      "roles": ["ROLE_PROFESOR"],
+      "email": "profesor@gmail.com",
+      "sub": "profesor@gmail.com",
+      "iat": 1744298415,
+      "exp": 1744300215
+    }
+)
+```
+
+### Signature
+```
+3LugKiiy629iV5wWKwnGAmXsX42lH-t2UFwUKF2bMqzLTOHAxUzVFPpiVe3qbzVu
+
+es igual 
+
+base64(header) + "." + base64(payload)
+```
 
 # Filtros por request
 
