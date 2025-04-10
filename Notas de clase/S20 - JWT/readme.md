@@ -8,16 +8,17 @@ Vamos ahora a hacer una autenticación RESTful. Para este caso los endpoints, al
 
 El mecanismo es como se ilustra a continuación
 
-<img src="https://cdn.prod.website-files.com/5ff66329429d880392f6cba2/674f5a91d2947ab18514bc45_62738d92e923e73c4ceaad08_Token-based%2520Authentication%2520in%2520action.jpeg" width="512">
+<p align="center">
+    <img src="https://cdn.prod.website-files.com/5ff66329429d880392f6cba2/674f5a91d2947ab18514bc45_62738d92e923e73c4ceaad08_Token-based%2520Authentication%2520in%2520action.jpeg" width="512">
+</p>
+
+# JSON Web Tokens
 
 El uso de tokens sigue los principios REST porque mantiene la comunicación entre el cliente y el servidor sin estado (stateless), uno de los pilares fundamentales de REST. 
 
 En lugar de almacenar información de sesión en el servidor, el token (como un JWT) contiene toda la información necesaria para autenticar una solicitud y se envía en cada petición, generalmente en el encabezado Authorization. 
 
 Esto permite que cada solicitud sea autocontenida, sin necesidad de que el servidor recuerde el estado de conexiones anteriores, cumpliendo así con la naturaleza independiente y escalable de las APIs RESTful.
-
-
-# JSON Web Tokens
 
 Instale las dependencias
 
@@ -41,66 +42,74 @@ Instale las dependencias
 </dependency>
 ```
 
-
 # Utilidad para crear JWT
 
 
-Requiere mínimo 32 caracteres
+Requiere mínimo 32 caracteres. Puede crearlo en el `aplicacition.properties` para llamarlo mediante SpEl.
 
-```
-
+```ini
+app.security.secretkey=universidadicesiuniversidadicesiuniversidadicesi
+app.security.expirationMinutes=30
 ```
 
 
 ```java
+package co.edu.icesi.introspringboot2.service.impl;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import java.security.Key;
+import java.util.*;
+import java.util.stream.Collectors;
 
-@Component
-public class JwtUtil {
+@Service
+public class JwtService {
 
-    private final String SECRET_KEY = "mi_clave_secreta_super_segura";
+    @Value("${app.security.secretkey}")
+    private String secret;
 
-    public String generateToken(String username) {
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hora
-                .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS256)
-                .compact();
-    }
+    @Value("${app.security.expirationMinutes}")
+    private int expirationMinutes;
 
-    public String extractUsername(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY.getBytes())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
+    ...
 
-    public boolean validateToken(String token, UserDetails userDetails) {
-        String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
-    }
-
-    private boolean isTokenExpired(String token) {
-        Date expiration = Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY.getBytes())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getExpiration();
-        return expiration.before(new Date());
-    }
 }
 ```
+
+
+El token debe ser firmado utilizando una clave secreta (secret key), lo que permite garantizar su integridad. Al usuario autenticado se le entrega un token que contiene ciertos datos, y si un atacante intenta presentar un token falso, este no superará la validación de firma, ya que no posee la clave secreta necesaria para generarlo correctamente.
+
+Con esto en mente ya podemos crear un un método para generar el token. Los JWT tienen esta estrcutura
+
+
+<p align="center">
+    <img src="https://fusionauth.io/img/shared/json-web-token.png" width="512">
+</p>
+
+```java
+public String generateToken(UserDetails userDetails) {
+    Date now = new Date();
+    Date expiry = new Date(now.getTime() + 1000L * 60L * expirationMinutes);
+
+    return Jwts.builder()
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
+                .compact();
+}
+```
+
+
+
+
+
 
 # Creación del filtro de JWT para el filter chain
 
