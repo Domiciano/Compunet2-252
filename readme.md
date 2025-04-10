@@ -20,8 +20,15 @@ Bienvenido al curso de Computación en Internet II. Para mantenernos en contacto
 
 <a href="https://docs.google.com/spreadsheets/d/1-zrRvMVMIfBs8LABaeKFdkZX5ZIt4-bmFlbrJHKiHjM/edit">Tarea 2</a>
 
+En el `application.properties` usen
 
-Incluya en la carpeta `webapps` su `.war` nombrado como `g5#nombredelequipo.war`
+```
+server.servlet.context-path=/g5/nombredelequipo
+```
+
+Esto provoca que la URL local de prueba es `http://localhost:8080/g5/nombredelequipo`
+
+Luego, incluya en la carpeta `webapps` su `.war` nombrado como `g5#nombredelequipo.war` en el servidor
 
 Tenga en cuenta que los host requeridos para que usted haga su despliegue son los siguientes
 
