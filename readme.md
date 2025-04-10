@@ -23,7 +23,9 @@ Bienvenido al curso de Computación en Internet II. Para mantenernos en contacto
 
 Incluya en la carpeta `webapps` su `.war` nombrado como `g5#nombredelequipo.war`
 
-Tenga en cuenta que los host requeridos para que usted haga su despliegue son
+Tenga en cuenta que los host requeridos para que usted haga su despliegue son los siguientes
+
+**Use 1 de los 3 disponibles**
 
 ### Sala 206M
 ```
