@@ -139,7 +139,12 @@ Con esto, lo podemos incluir los claims en el token
 
 # Endpoint de login
 
-Vamos a hacer un endpoint entonces para permitir login de nuestros usuarios.
+El mecanismo que debemos considerar es el siguiente
+
+<img src="https://github.com/Domiciano/Compunet2-251/blob/main/Images/image17.png?raw=true">
+
+
+Vamos a hacer entonces el Controller `RestAuthenticationController` con un endpoint para permitir login de nuestros usuarios.
 
 Tenemos que tener dos DTO. Uno para el Request que incluya email/username y password. Otro para el Response donde podamos enviar el token producido.
 
@@ -251,6 +256,40 @@ Una vez con el objeto, podemos autenticar los datos que nos llegan al endpoint.
 //}
 ```
 
+El AuthenticationManager llamará a `DaoAuthenticationProvider > UserDetailService > UserService > UserRepository > DB`. Con esto hacemos la comparación con base de datos
+
+
+Al final de todo el proceso, la respuesta esperada es algo asi
+```json
+{
+    "accessToken": "eyJhbGciOiJIUzM4NCJ9.eyJyb2xlcyI6WyJST0xFX1BST0ZFU1NPUiJdLCJlbWFpbCI6InByb2Zlc29yQGdtYWlsLmNvbSIsInN1YiI6InByb2Zlc29yQGdtYWlsLmNvbSIsImlhdCI6MTc0NDI5ODQxNSwiZXhwIjoxNzQ0MzAwMjE1fQ.3LugKiiy629iV5wWKwnGAmXsX42lH-t2UFwUKF2bMqzLTOHAxUzVFPpiVe3qbzVu"
+}
+```
+
+
+# Filtros por request
+
+Lo siguiente es poder verificar el token para que el usuario pueda acceder a los controllers de la aplicación sólo si está autenticado.
+
+Para esto Spring Boot permite crear filtros para interceptar cada request y procesarlo para determinar si la solicitud puede seguir adelante.
+
+La estructura general para poner un filtro en la cadena de filtros es
+
+```java
+@Component
+public class FilterA extends OncePerRequestFilter {
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        filterChain.doFilter(request, response);
+    }
+}
+```
+
+Intente extraer el `token` para ver cómo le va. Puede depurar la aplicación para verificar si lo está extrayendo correctamente.
+
+
+
 
 
 # En el próximo capítulo...
@@ -316,33 +355,49 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 # Security Config
 
 ```java
-@EnableWebSecurity
-@Configuration
-public class SecurityConfig {
+//@EnableWebSecurity
+//@Configuration
+//public class SecurityConfig {
 
     @Autowired
     private JwtAuthenticationFilter jwtFilter;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-            .build();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        return http
+//            .csrf(csrf -> csrf.disable())
+//            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//            .authorizeHttpRequests(auth -> auth
+//                .requestMatchers("/auth/**").permitAll()
+//                .anyRequest().authenticated()
+//            )
+              .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+//            .build();
     }
 }
 ```
+
+
+# Verificar firma
+
+```java
+public Claims extractAllClaims(String token) {
+    return Jwts.parserBuilder()
+            .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes()))
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+}
+```
+
+# Verificar expiración del token
+
+```java
+private boolean isTokenExpired(String token) {
+    return extractAllClaims(token).getExpiration().before(new Date());
+}
+```
+
 
 
 
