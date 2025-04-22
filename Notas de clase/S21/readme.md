@@ -12,7 +12,7 @@ Al filtro que llamaremos `JwtAuthenticationFilter` lo debemos referenciar y post
 //public class SecurityConfig {
 
     @Autowired
-    private JwtAuthenticationFilter jwtFilter;
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
 //    @Bean
 //    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -23,7 +23,7 @@ Al filtro que llamaremos `JwtAuthenticationFilter` lo debemos referenciar y post
 //                .requestMatchers("/auth/**").permitAll()
 //                .anyRequest().authenticated()
 //            )
-              .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+              .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 //            .build();
 //   }
 //}
@@ -256,23 +256,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
 
-# Postman
+# 403
 
-```js
-let randomEmail = `user_${Math.floor(Math.random() * 10000)}@mail.com`;
-pm.environment.set("randomEmail", randomEmail);
+En caso de que el usuario ingrese al API y no tenga los permisos suficientes, usted puede hacer
+
+```java
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(csrf -> csrf.disable())
+        .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+            .requestMatchers("/api/v1/auth/**").permitAll()
+            .requestMatchers("/api/v1/**").hasAnyRole("PROFESSOR")
+            .anyRequest().authenticated()
+        ).exceptionHandling(eh -> eh
+            .accessDeniedHandler((request, response, accessDeniedException) -> {
+                response.setStatus(403);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"You don't have permission to access this resource\"}");
+            })
+        );
+    http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+    return http.build();
+}
 ```
 
+
+# Postman
+ 
+Puede almacenar los valores en su entorno. Un ejemplo es el token de autenticación
+
 ```js
-pm.sendRequest({
-    url: 'https://api.example.com/login',
-    method: 'POST',
-    header: 'Content-Type:application/json',
-    body: {
-        mode: 'raw',
-        raw: JSON.stringify({ username: 'user', password: 'pass' })
-    }
-}, function (err, res) {
-    pm.environment.set("authToken", res.json().token);
-});
+let token = pm.response.json().data.access_token;
+pm.environment.set("access_token", token);
 ```
