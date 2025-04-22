@@ -36,17 +36,17 @@ Tenga en cuenta que los host requeridos para que usted haga su despliegue son lo
 
 **Use 1 de los 3 disponibles**
 
-### Sala 206M
+### Sala 206M (IASLAB1)
 ```
 10.147.19.21	x206m01
 ```
 
-### Sala 205M
+### Sala 205M (IASLAB2)
 ```
 10.147.20.61	x205m01
 ```
 
-### Sala 104M
+### Sala 104M (IASLAB3)
 ```
 10.147.17.101	x104m01
 ```
