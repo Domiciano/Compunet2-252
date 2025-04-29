@@ -179,13 +179,11 @@ const mostrarUsuario = ({ nombre, correo }) => {
   console.log("Correo:", correo);
 };
 
-const usuario = {
+mostrarUsuario({
   nombre: "María",
   correo: "maria@example.com",
   rol: "admin"
-};
-
-mostrarUsuario(usuario);
+});
 // Salida:
 // Nombre: María
 // Correo: maria@example.com
