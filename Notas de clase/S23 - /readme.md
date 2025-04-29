@@ -380,23 +380,24 @@ Listará los primeros 10 pokemon. *Atrápalos a todos* los 10 de esa lista en ta
       "name": "bulbasaur",
       "url": "https://pokeapi.co/api/v2/pokemon/1/"
     }
+   ]
 }
 ```
 
-Es decir que en el arreglo de `result` encontrará al pokemon y su nombre. Además tendrá una URL que al consultarla podrá acceder a un objeto con esta estructura
+Es decir que en el arreglo de `result` encontrará al pokemon y su nombre. Además tendrá una URL que al consultarla podrá acceder a un objeto con estos valores en su estructura
 
 ```json
 {
-    ...
+    
     "name": "bulbasaur",
-    ...
+    
     "sprites": {
         "back_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/1.png",
         "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
         "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1.png",
-        ...
+        
     }
-    ...
+    
 }
 ```
 
