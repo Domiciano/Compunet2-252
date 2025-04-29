@@ -292,7 +292,7 @@ npm install axios
 Vamos a ejecutar esto usando Node.JS y no el Navegador. Para eso vamos a crear `script.js`
 
 ```js
-const axios = require('axios');
+const axios = require('axios'); //Cargar el CommonJS module
 
 const URL = 'https://pokeapi.co/api/v2/pokemon/15';
 
@@ -306,7 +306,39 @@ axios.get(URL)
   });
 ```
 
-Puede usar `node script.js`
+Puede usar `node script.js` para ejecutarlo
+
+Editemos el `package.json` para incluir
+
+```json
+{
+    "type": "module"
+}
+```
+
+Esto le permite cargarlo como un ES Module axios así
+
+```js
+import axios from 'axios';
+```
+
+
+En general puede secuenciar `Promises` con `then()` o marcando el método como `async` y usando `await` al llamar una promesa.
+
+```js
+const URL = 'https://pokeapi.co/api/v2/pokemon/15';
+
+const httpGetExample = async () => {
+  try {
+    const response = await axios.get(URL);
+    console.log('Datos recibidos:');
+    console.log(response.data);
+  } catch (error) {
+    console.error('Error al hacer la solicitud:', error.message);
+  }
+};
+```
+
 
 
 # Modulos
