@@ -341,7 +341,7 @@ const httpGetExample = async () => {
 
 
 
-# Modulos
+# Módulos
 
 CommonJS es el sistema de módulos tradicional de Node.js. Utiliza require() para importar y module.exports o exports para exportar módulos. Es sincrónico y se usa principalmente en aplicaciones del lado del servidor.
 
