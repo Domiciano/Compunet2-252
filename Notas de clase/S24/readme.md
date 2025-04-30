@@ -5,7 +5,7 @@ npm create vite@latest misuperapp -- --template react
 ```
 
 
-# Guía de Eventos en React + Vite
+# Diccionario de eventos de React
 
 Aquí los eventos más comunes que puedes usar en componentes React, con ejemplos simples.
 
