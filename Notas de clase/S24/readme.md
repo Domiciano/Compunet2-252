@@ -39,7 +39,7 @@ Y listo disfrute de Tailwind.
 
 Puede comprobarlo usando en algun componentes de la aplicación
 
-```
+```html
 <h1 class="text-3xl font-bold underline">
   Hello world!
 </h1>
