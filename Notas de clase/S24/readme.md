@@ -14,7 +14,7 @@ Cree aplicaciones de react por medio de este comando
 npm create vite@latest misuperapp -- --template react
 ```
 
-<br><br><br>
+<br><br>
 
 <p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Tailwind_CSS_logo.svg/2560px-Tailwind_CSS_logo.svg.png" width="512"></p>
 
