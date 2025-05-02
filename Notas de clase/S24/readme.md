@@ -1,4 +1,4 @@
-<p><img src="https://logos-download.com/wp-content/uploads/2016/09/React_logo_wordmark-3000x1007.png" width="512"></p>
+<p><img src="https://logos-download.com/wp-content/uploads/2016/09/React_logo_wordmark-3000x1007.png" width="384"></p>
 
 Cree aplicaciones de react por medio de este comando
 
@@ -6,7 +6,9 @@ Cree aplicaciones de react por medio de este comando
 npm create vite@latest misuperapp -- --template react
 ```
 
-# Tailwind
+
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Tailwind_CSS_logo.svg/2560px-Tailwind_CSS_logo.svg.png" width="512"></p>
+
 
 Es un framework de CSS que te deja estilizar tus páginas web usando clases ya hechas, sin tener que escribir montones de reglas en un archivo aparte. En vez de escribir `background-color: red`, solo se pone `bg-red-500` y listo, rápido y al grano, como nos gusta. 
 
