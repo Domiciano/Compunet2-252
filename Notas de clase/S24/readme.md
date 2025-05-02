@@ -1,4 +1,7 @@
-# Crear aplicación de React
+# React
+
+
+Cree aplicaciones de react por medio de este comando
 
 ```sh
 npm create vite@latest misuperapp -- --template react
