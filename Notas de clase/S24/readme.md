@@ -1,5 +1,7 @@
 <p><img src="https://logos-download.com/wp-content/uploads/2016/09/React_logo_wordmark-3000x1007.png" width="310"></p>
 
+---
+
 React es una librería de JavaScript desarrollada por Meta para construir interfaces de usuario de manera declarativa y eficiente, especialmente en aplicaciones web de una sola página (SPA). 
 
 Permite crear componentes reutilizables que gestionan su propio estado, facilitando la construcción de interfaces dinámicas y reactivas. 
@@ -15,6 +17,7 @@ npm create vite@latest misuperapp -- --template react
 
 <p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Tailwind_CSS_logo.svg/2560px-Tailwind_CSS_logo.svg.png" width="512"></p>
 
+---
 
 Es un framework de CSS que te deja estilizar tus páginas web usando clases ya hechas, sin tener que escribir montones de reglas en un archivo aparte. En vez de escribir `background-color: red`, solo se pone `bg-red-500` y listo, rápido y al grano, como nos gusta. 
 
