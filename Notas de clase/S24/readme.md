@@ -1,4 +1,4 @@
-<p><img src="https://logos-download.com/wp-content/uploads/2016/09/React_logo_wordmark-3000x1007.png" width="256"></p>
+<p><img src="https://logos-download.com/wp-content/uploads/2016/09/React_logo_wordmark-3000x1007.png" width="310"></p>
 
 Cree aplicaciones de react por medio de este comando
 
