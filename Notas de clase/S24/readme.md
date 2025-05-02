@@ -4,6 +4,49 @@
 npm create vite@latest misuperapp -- --template react
 ```
 
+# Tailwind
+
+Es un framework de CSS que te deja estilizar tus páginas web usando clases ya hechas, sin tener que escribir montones de reglas en un archivo aparte. En vez de escribir `background-color: red`, solo se pone `bg-red-500` y listo, rápido y al grano, como nos gusta. 
+
+Sirve tener agilidad cuando estás montando una interfaz, y como es utilitario, todo lo hacés desde el HTML mismo.
+
+```sh
+npm install tailwindcss @tailwindcss/vite
+```
+
+En el archivo `vite.config.ts` introduzca
+
+```js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'  <- Introducimos esta línea
+
+export default defineConfig({
+  plugins: [
+    react(),
+    tailwindcss(), <- Introducimos esta línea
+  ],
+})
+```
+
+En el `index.css` 
+```css
+@import "tailwindcss";
+...
+```
+
+Y listo disfrute de Tailwind.
+
+Puede comprobarlo usando en algun componentes de la aplicación
+
+```
+<h1 class="text-3xl font-bold underline">
+  Hello world!
+</h1>
+```
+
+Debería ver el texto subrayado
+
 
 # Diccionario de eventos de React
 
