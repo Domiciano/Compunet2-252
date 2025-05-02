@@ -1,5 +1,11 @@
 <p><img src="https://logos-download.com/wp-content/uploads/2016/09/React_logo_wordmark-3000x1007.png" width="310"></p>
 
+React es una librería de JavaScript desarrollada por Meta para construir interfaces de usuario de manera declarativa y eficiente, especialmente en aplicaciones web de una sola página (SPA). 
+
+Permite crear componentes reutilizables que gestionan su propio estado, facilitando la construcción de interfaces dinámicas y reactivas. 
+
+React utiliza un *Virtual DOM* para minimizar las manipulaciones reales del DOM, lo que mejora el rendimiento. Además, su enfoque basado en componentes y su integración con herramientas modernas lo han convertido en una de las tecnologías más populares para el desarrollo frontend.
+
 Cree aplicaciones de react por medio de este comando
 
 ```sh
