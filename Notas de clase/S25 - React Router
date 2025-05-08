@@ -1,0 +1,74 @@
+
+# React Router
+
+React Router es una librería de JavaScript que permite a las aplicaciones hechas con React tener navegación entre páginas sin necesidad de recargar el navegador.
+
+En otras palabras, nos ayuda a construir aplicaciones de una sola página (SPA) donde podemos tener múltiples "pantallas" (como Inicio, Acerca de, Contacto), cada una con su propia URL, pero sin salir de la misma aplicación.
+
+Para instalarlo
+
+```bash
+npm install react-router-dom
+```
+
+# Páginas
+
+Crea una carpeta llamada `pages` dentro de `src/` para agregar nuestras páginas o screens.
+
+Las screen son componentes que representan toda la pantalla que ve el usuario. Regularmente son componentes que son compuestos por componentes más pequeños
+
+
+```jsx
+export default function Login() {
+  return (
+    <h1>Login</h1>
+  );
+}
+```
+
+```jsx
+export default function About() {
+  return (
+    <h1>Acerca de mi super aplicación</h1>
+  );
+}
+```
+
+```jsx
+export default function Home() {
+  return (
+    <h1>Home</h1>
+  );
+}
+```
+
+# Definición de rutas
+
+Una vez tenemos algunos 
+
+```jsx
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import Home from "./pages/Home";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <nav>
+        <Link to="/">Inicio</Link> | 
+        <Link to="/about">Acerca de</Link> | 
+        <Link to="/contact">Contacto</Link>
+      </nav>
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+```
