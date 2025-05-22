@@ -186,6 +186,8 @@ export default ChatScreen;
 ```
 
 
+`useRef` es un hook de React que permite crear una referencia mutable que persiste durante todo el ciclo de vida del componente sin causar re-renderizados cuando su valor cambia. Se utiliza comúnmente para acceder directamente a elementos del DOM o para almacenar valores mutables (como una instancia de WebSocket, un temporizador, o un contador) que no deben provocar una actualización visual del componente.
+
 
 # Advance mode
 
