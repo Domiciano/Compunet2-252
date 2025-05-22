@@ -27,9 +27,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     private final CustomWebSocketHandler customWebSocketHandler;
 
-    @Autowired
-    private JwtService jwtService;
-
     public WebSocketConfig(CustomWebSocketHandler handler) {
         this.customWebSocketHandler = handler;
     }
