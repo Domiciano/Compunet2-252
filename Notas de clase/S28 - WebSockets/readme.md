@@ -102,15 +102,9 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
 }
 ```
 
-## Cliente React
 
-Crea un archivo `ChatScreen.jsx`. Haga que sea su ruta principal.
 
-```jsx
-
-```
-
-## WebSocket como patrón delegado
+# WebSocket como patrón delegado
 
 Cree el archivo `WebSocketConnection.js`
 
@@ -138,7 +132,56 @@ export default WebSocketConnection;
 
 Como ve, se genera un `WebSocket` nuevo. Esta clase es nativa de Javascript. Hay eventos similares al backend en el cliente como `ws.onopen`, `ws.onmessage` y `ws.onclose`.
 
+# Cliente React
 
+Crea un archivo `ChatScreen.jsx`. Haga que sea su ruta principal.
+
+```jsx
+import { useEffect, useRef, useState } from "react";
+import { Container, Button, TextField, Typography } from "@mui/material";
+import WebSocketConnection from "...";
+
+const ChatScreen = () => {
+  const ws = useRef(null);
+
+  useEffect(() => {
+    ws.current = WebSocketConnection((data) => {
+      ...
+    });
+
+    //Función de clean-up
+    return () => {
+      if (ws.current) {
+        ws.current.close();
+      }
+    };
+  }, []);
+
+  const sendMessage = () => {
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(message);
+    }
+  };
+
+  return (
+    <Container>
+      <TextField
+        type="text"
+        label="Mensaje"
+      />
+      <Button onClick={sendMessage}>Enviar</Button>
+
+      <Container sx={{ height: "100vh"}}>
+        {messages.map((msg, i) => (
+          <Typography key={i}>{msg}</Typography>
+        ))}
+      </Container>
+    </Container>
+  );
+};
+
+export default ChatScreen;
+```
 
 
 
