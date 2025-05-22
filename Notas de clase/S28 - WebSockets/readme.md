@@ -155,7 +155,7 @@ Como ve, se genera un `WebSocket` nuevo. Esta clase es nativa de Javascript. Hay
 
 Podemos crear un hook de React. Este enfoque es ideal porque limpia automáticamente la conexión.
 
-```
+```js
 import { useEffect, useRef } from "react";
 
 const useWebSocket = (url, onMessage) => {
