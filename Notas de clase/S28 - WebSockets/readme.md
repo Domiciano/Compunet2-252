@@ -14,7 +14,7 @@ En el archivo `pom.xml` de tu proyecto Spring Boot, agrega:
 </dependency>
 ```
 
----
+
 
 ## Configurar WebSocket en Spring Boot
 
@@ -205,4 +205,57 @@ Esto se usa por ejemplo asi en la capa de la vista
 const { sendMessage } = useWebSocket("ws://localhost:8080/ws/chat", (msg) => {
    ...
 });
+```
+
+# JWT para websockets
+
+Para usar el token en el WebSocket, debes usar un `HandshakeInterceptor`. Este se ejecuta durante la fase de handshake (negociación) del WebSocket y no hace parte del IoC Container, por lo cual no es un `@Component` ni se inyecta automáticamente. Debe crearse manualmente dentro del `WebSocketConfig`.
+
+No obstante, usted puede inyectar manualmente un bean que le permita hacer la validación del token usando el constructor de la clase
+
+```java
+import co.edu.icesi.introspringboot2.util.JwtService;
+import io.jsonwebtoken.JwtException;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.server.HandshakeInterceptor;
+import java.util.Map;
+
+public class JwtHandshakeInterceptor implements HandshakeInterceptor {
+
+
+    public JwtHandshakeInterceptor(...) {
+        ...
+    }
+
+    @Override
+    public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) {
+        if (request instanceof ServletServerHttpRequest servletRequest) {
+            HttpServletRequest httpRequest = servletRequest.getServletRequest();
+            String token = httpRequest ???
+            // Retorne true si quiere que la solicitud cruce desde los servlet hasta el IoC Container
+            // Retorne false si quiere impedir la conexión
+        }
+    }
+
+    @Override
+    public void afterHandshake(ServerHttpRequest request,
+                               ServerHttpResponse response,
+                               WebSocketHandler wsHandler,
+                               Exception exception) {}
+}
+```
+
+Una vez hecho, registre el `HandshakeInterceptor` en el `WebSocketConfig`
+
+```java
+@Override
+public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+   registry.addHandler(customWebSocketHandler, "/ws/chat")
+           //.addInterceptors(new JwtHandshakeInterceptor(...))
+             .setAllowedOrigins("http://?:?");
+}
 ```
