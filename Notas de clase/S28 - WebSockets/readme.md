@@ -245,7 +245,7 @@ export default useWebSocket;
 
 Esto se usa por ejemplo asi en la capa de la vista
 
-```
+```js
 const { sendMessage } = useWebSocket("ws://localhost:8080/ws/chat", (msg) => {
    ...
 });
