@@ -1,6 +1,8 @@
 # WebSocket con Spring Boot y React
 
-Este repositorio contiene una integración básica entre **Spring Boot (WebSocket)** y **React**. Aquí encontrarás los pasos para construir la conexión WebSocket y manejar mensajes en tiempo real entre el cliente (React) y el servidor (Spring Boot).
+El protocolo **WebSocket** es un estándar de comunicación en tiempo real que permite establecer una conexión persistente y bidireccional entre un cliente (generalmente un navegador) y un servidor. A diferencia del modelo tradicional basado en HTTP, donde el cliente debe realizar múltiples peticiones para obtener actualizaciones, WebSocket permite que tanto el cliente como el servidor envíen y reciban datos de forma continua sin necesidad de nuevas solicitudes. Esto lo convierte en una solución eficiente para aplicaciones que requieren interacción en tiempo real, como chats, juegos en línea, notificaciones instantáneas o sistemas de monitoreo. El protocolo WebSocket inicia mediante una negociación (handshake) sobre HTTP, pero luego cambia a una conexión TCP que permanece abierta mientras sea necesaria, reduciendo así la latencia y el consumo de recursos.
+
+<img src="https://cdn.prod.website-files.com/5ff66329429d880392f6cba2/6751c956639844e6bdff90e3_617a90ab08641e631353de50_Websocket%2520vs%2520HTTP.png">
 
 
 ## Agregar dependencia en el backend
