@@ -1,0 +1,208 @@
+# WebSocket con Spring Boot y React
+
+Este repositorio contiene una integración básica entre **Spring Boot (WebSocket)** y **React**. Aquí encontrarás los pasos para construir la conexión WebSocket y manejar mensajes en tiempo real entre el cliente (React) y el servidor (Spring Boot).
+
+
+## Agregar dependencia en el backend
+
+En el archivo `pom.xml` de tu proyecto Spring Boot, agrega:
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-websocket</artifactId>
+</dependency>
+```
+
+---
+
+## Configurar WebSocket en Spring Boot
+
+Crea un archivo llamado `WebSocketConfig.java` en el paquete `websocket`.
+
+```java
+@Configuration
+@EnableWebSocket
+public class WebSocketConfig implements WebSocketConfigurer {
+
+    private final CustomWebSocketHandler customWebSocketHandler;
+
+    @Autowired
+    private JwtService jwtService;
+
+    public WebSocketConfig(CustomWebSocketHandler handler) {
+        this.customWebSocketHandler = handler;
+    }
+
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(customWebSocketHandler, "/ws/chat")
+                .setAllowedOrigins("http://?:?");
+    }
+}
+```
+
+### Puedes luego:
+
+- Activar un interceptor para autenticar conexiones con JWT.
+- Cambiar la ruta `/ws/chat` si deseas otra funcionalidad.
+
+
+## Crear un manejador personalizado de mensajes
+
+Crea `CustomWebSocketHandler.java`. `TextWebSocketHandler` nos permite elegir cómo realizar las operaciones básicas: conexión, recepción de mensajes y desconexión
+
+```java
+import org.springframework.web.socket.*;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Component
+public class CustomWebSocketHandler extends TextWebSocketHandler {
+    ...
+}
+```
+
+
+Necesitará una colección thread-safe para inscribir cada sesión entrante
+
+```java
+private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
+```
+
+Al hacer la conexión podría agregar la sesión al mapa
+
+```java
+@Override
+public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+   System.out.println("Nueva conexión WebSocket: " + session.getId());
+   ...
+}
+```
+
+Al finalizar la conexión, puede remover la conexión de la colección
+
+```java
+@Override
+public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+   System.out.println("Conexión cerrada: " + session.getId());
+   ...
+}
+```
+
+Y durante los mensajes, el objetivo es hacer un broadcast de los mensajes a todos los participantes
+
+```java
+@Override
+protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+   System.out.println("Mensaje recibido: " + message.getPayload());
+   System.out.println("Mensaje recibido: " + session.isOpen());
+   // Ejemplo: enviar solo a quien envió el mensaje
+   // session.sendMessage(new TextMessage("Tu mensaje fue recibido"));        
+}
+```
+
+## Cliente React
+
+Crea un archivo `ChatScreen.jsx`. Haga que sea su ruta principal.
+
+```jsx
+
+```
+
+## WebSocket como patrón delegado
+
+Cree el archivo `WebSocketConnection.js`
+
+```js
+const WebSocketConnection = (onMessage) => {
+    let ws = new WebSocket("ws://localhost:8080/ws/chat");
+
+    ws.onopen = () => {
+        console.log("Conectado al WebSocket");
+    };
+
+    ws.onmessage = (event) => {
+        onMessage(event.data);
+    };
+
+    ws.onclose = () => {
+        console.log("Conexión cerrada");
+    };
+
+    return ws;
+};
+
+export default WebSocketConnection;
+```
+
+Como ve, se genera un `WebSocket` nuevo. Esta clase es nativa de Javascript. Hay eventos similares al backend en el cliente como `ws.onopen`, `ws.onmessage` y `ws.onclose`.
+
+
+
+
+
+# Advance mode
+
+¿Se puede mejorar la escritura del websocket a algo más React-friendly? 
+
+¿Cómo evitar que el chat sea público sino que sea sólo para usuarios autenticados?
+
+# Custom Hook para nuestro WebSocket
+
+Podemos crear un hook de React. Este enfoque es ideal porque limpia automáticamente la conexión.
+
+```
+import { useEffect, useRef } from "react";
+
+const useWebSocket = (url, onMessage) => {
+  const ws = useRef(null);
+
+  useEffect(() => {
+    ws.current = new WebSocket(url);
+
+    ws.current.onopen = () => {
+      console.log("Conectado al WebSocket");
+    };
+
+    ws.current.onmessage = (event) => {
+      if (onMessage) onMessage(event.data);
+    };
+
+    ws.current.onclose = () => {
+      console.log("Conexión cerrada");
+    };
+
+    ws.current.onerror = (error) => {
+      console.error("Error en WebSocket:", error);
+    };
+
+    return () => {
+      ws.current.close();
+    };
+  }, [url, onMessage]);
+
+  const sendMessage = (message) => {
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(message);
+    } else {
+      console.warn("WebSocket no está listo para enviar mensajes");
+    }
+  };
+
+  return { sendMessage };
+};
+
+export default useWebSocket;
+```
+
+Esto se usa por ejemplo asi en la capa de la vista
+
+```
+const { sendMessage } = useWebSocket("ws://localhost:8080/ws/chat", (msg) => {
+   ...
+});
+```
