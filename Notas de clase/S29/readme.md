@@ -183,7 +183,7 @@ export default function NotificationBanner() {
 
 En este caso `useStore` nos permite seleccionar el estado a partir del store.
 
-Para activar la notificación, se puede usar:
+Para alterar el estado de un store, se puede usar:
 
 ```jsx
 notificationStore.setState(() => ({
