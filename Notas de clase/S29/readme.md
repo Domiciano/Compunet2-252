@@ -1,4 +1,4 @@
-# Tanstank
+# Tanstack
 
 TanStack es un conjunto moderno de bibliotecas open source para aplicaciones web, desarrollado con un enfoque en la gestión eficiente de datos y la construcción de interfaces de usuario altamente reactivas. Incluye herramientas como TanStack Query (antes React Query), TanStack Table, TanStack Router y TanStack Virtual, que ayudan a manejar tareas complejas como el fetching de datos, ruteo, renderizado de tablas y virtualización de listas de manera optimizada. Es muy utilizado en aplicaciones React, aunque muchas de sus herramientas también funcionan con otros frameworks.
 
