@@ -148,4 +148,64 @@ const ItemsCreateScreen = () => {
 export default ItemsCreateScreen;
 ```
 
+# Store
+
+Así como con el context, tanstank tiene un store de datos que permite compartir estado entre varios componentes sin importar la posición del arbol en la que se encuentre. Para crear un store o estado global:
+
+```jsx
+import { Store } from '@tanstack/react-store'
+
+export const notificationStore = new Store({
+  message: '',
+  visible: false
+})
+```
+
+En este caso vamos a hacer una notificación elegante. Por cada vez que se añada una task, aparezca una notificación.
+
+Vamos a crear un componente de notificación que use ese elemento
+
+```jsx
+import { Alert } from "@mui/material";
+import { useStore } from "@tanstack/react-store";
+import { notificationStore } from "./NotificationStore";
+
+export default function NotificationBanner() {
+  const notification = useStore(notificationStore, (state) => state);
+
+  // Si se quiere seleccionar una sección
+  // const message = useStore(notificationStore, (state) => state.message);
+  // const visible = useStore(notificationStore, (state) => state.visible);
+
+  return notification.visible && <Alert>{notification.message}</Alert>;
+}
+```
+
+En este caso `useStore` nos permite seleccionar el estado a partir del store.
+
+Para activar la notificación, se puede usar:
+
+```jsx
+notificationStore.setState(() => ({
+   message: "Item creado exitosamente",
+   visible: true,
+}));
+```
+
+Si quiere que no sea visible, luego de un tiempo, use los timers de JS
+
+```jsx
+setTimeout(
+   () =>
+      notificationStore.setState(() => ({
+      message: "",
+      visible: false,
+   })),
+   1000
+);
+```
+
+
+
+
 
