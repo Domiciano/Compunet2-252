@@ -49,57 +49,60 @@ npm install @tanstack/react-query @tanstack/store axios @mui/material @emotion/r
 Debemos usar como top node a QueryClientProvider, dándole una sóla instancia del cliente a toda la aplicación
 
 ```jsx
-// App.jsx
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import Items from './Items'
-import { Container } from '@mui/material'
-import NotificationBanner from './components/NotificationBanner'
+import './App.css'
 
-const queryClient = new QueryClient()
+function App() {
+  
+  const queryClient = new QueryClient()
 
-export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Container maxWidth="sm">
-        <NotificationBanner />
-        <Items />
-      </Container>
+        <AppRouter />
     </QueryClientProvider>
   )
 }
+
+export default App
 ```
 
-# Ejemplo de GET
+Cree usted el `AppRouter` con las rutas de su aplicación. Que de momento tendremos `ItemsScreen`
 
-Con el cliente se pueden hacer cosas como las siguientes
+
+# ItemsScreen
+
+Con el cliente cargado se pueden hacer cosas como las siguientes
 
 ```jsx
-// Items.jsx
-import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
-import { List, ListItem, ListItemText, CircularProgress, Alert } from '@mui/material'
-import NewItemForm from './NewItemForm'
+import { Typography } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
-export default function Items() {
+const ItemsScreen = () => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ['items'],
-    queryFn: () => axios.get('https://api.example.com/items').then(res => res.data),
-  })
+    queryKey: ["items"],
+    queryFn: () =>
+      axios.get("https://ejemplo.com/lista").then(res=>res.data),
+  });
 
-  if (isLoading) return <CircularProgress />
-  if (error) return <Alert severity="error">Error al cargar</Alert>
+  console.log(data);
 
   return (
     <>
-      <List>
-        {data.map(item => (
-          <ListItem key={item.id}>
-            <ListItemText primary={item.name} />
-          </ListItem>
-        ))}
-      </List>
+      <Typography>Alfa</Typography>
     </>
-  )
-}
+  );
+};
+
+export default ItemsScreen;
 ```
 
+Analice un momento el código y maravíllese al ver `useQuery`.
+
+Este hook recibe un objeto `{}` con 2 parámetros. El nombre con el que se identifica el flujo de datos en este caso `items` y `queryFn` que es la función de donde se obtendrán los datos. A esta función se le debe devolver una `Promise` en lugar del arreglo de datos. Esto es porque internamente Tanstank usará la promesa para el flujo de renderizado.
+
+Allí, `data` serán los datos una vez descargados y usted perfectamente lo puede renderizar como lo hacer con los states usuales.
+
+Renderícelos.
+
+Además `isLoading` y `error` son estados que permiten reflejar en la interfaz el estado de la solicitud. Úselos también
