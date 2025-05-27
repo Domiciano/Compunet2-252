@@ -12,7 +12,6 @@ En vez de tener estados dispersos por muchos componentes, todo se maneja desde u
 En TanStack Query, este store es el QueryClient.
 En TanStack Store, lo creás con createStore().
 
-⸻
 
 # Estado reactivo
 
@@ -28,7 +27,6 @@ Estado > Componente > Evento > Cambio de estado > Vuelta al estado
 Esto evita loops y errores confusos.
 TanStack mantiene este flujo al actualizar el cache (o el store) y luego reflejar esos cambios en los componentes.
 
-⸻
 
 # Acciones que modifican el estado
 
