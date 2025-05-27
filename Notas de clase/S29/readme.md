@@ -64,7 +64,7 @@ function App() {
 export default App
 ```
 
-Cree usted el `AppRouter` con las rutas de su aplicación. Que de momento tendremos `ItemsScreen`
+🎯 Cree usted el `AppRouter` con las rutas de su aplicación. Que de momento tendremos `ItemsScreen`
 
 
 # ItemsScreen
@@ -80,10 +80,8 @@ const ItemsScreen = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["items"],
     queryFn: () =>
-      axios.get("https://ejemplo.com/lista").then(res=>res.data),
+      axios.get("https://facelogprueba.firebaseio.com/items.json").then(res=>res.data),
   });
-
-  console.log(data);
 
   return (
     <>
@@ -101,14 +99,13 @@ Este hook recibe un objeto `{}` con 2 parámetros. El nombre con el que se ident
 
 Allí, `data` serán los datos una vez descargados y usted perfectamente lo puede renderizar como lo hacer con los states usuales.
 
-Renderícelos.
-
 Además `isLoading` y `error` son estados que permiten reflejar en la interfaz el estado de la solicitud. Úselos también
 
 
+🎯 Renderice la información
+
+
 # Post de elementos
-
-
 
 ```jsx
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -145,6 +142,10 @@ const ItemsCreateScreen = () => {
 
 export default ItemsCreateScreen;
 ```
+
+Allí `useMutation` nos permite crear *Mutaciones* de los datos por medio de POST, PUT, PATCH o DELETE. `mutationFn` es la función HTTP que permite modificar los datos.
+
+Cada vez que cambie los datos, puede actualizar el caché de tanstack usando `queryClient.invalidateQueries(["items"])`
 
 # Store
 
