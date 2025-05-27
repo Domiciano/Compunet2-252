@@ -147,7 +147,7 @@ Allí `useMutation` nos permite crear *Mutaciones* de los datos por medio de POS
 
 Cada vez que cambie los datos, puede actualizar el caché de tanstack usando `queryClient.invalidateQueries(["items"])`
 
-# Store
+# Store (Experimental)
 
 Así como con el context, tanstank tiene un store de datos que permite compartir estado entre varios componentes sin importar la posición del arbol en la que se encuentre. Para crear un store o estado global:
 
