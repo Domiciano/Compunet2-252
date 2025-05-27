@@ -106,3 +106,46 @@ Allí, `data` serán los datos una vez descargados y usted perfectamente lo pued
 Renderícelos.
 
 Además `isLoading` y `error` son estados que permiten reflejar en la interfaz el estado de la solicitud. Úselos también
+
+
+# Post de elementos
+
+
+
+```jsx
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { useState } from "react";
+
+const ItemsCreateScreen = () => {
+  
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: (newItem) =>
+      axios.post("https://facelogprueba.firebaseio.com/items.json", newItem),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["items"]);
+    },
+  });
+
+  const handleSubmit = () => {
+    mutation.mutate({ name });
+  };
+
+  return (
+    <Stack direction="column">
+      <TextField
+        label="Nombre del item"
+        value={name}
+        onChange={(e) => ... }
+      />
+      <Button>Agregar</Button>
+    </Stack>
+  );
+};
+
+export default ItemsCreateScreen;
+```
+
+
