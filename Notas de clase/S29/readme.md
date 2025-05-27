@@ -38,7 +38,7 @@ En TanStack, esto puede venir de un mutate(), un setState(), o de un evento como
 Instalemos primero las dependencias
 
 ```bash
-npm install @tanstack/react-query @tanstack/store axios @mui/material @emotion/react @emotion/styled
+npm install @tanstack/react-query @tanstack/react-store axios @mui/material @emotion/react @emotion/styled
 ```
 
 
