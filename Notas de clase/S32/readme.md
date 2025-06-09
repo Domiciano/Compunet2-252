@@ -14,6 +14,7 @@ Esto generará una carpeta dist/ con los archivos estáticos listos para producc
 
 Abre el archivo vite.config.js y agrega (o modifica) la propiedad base con el nombre del path base que usarás en Tomcat. En este ejemplo, lo llamaremos misuperapp:
 
+```js
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -21,6 +22,7 @@ export default defineConfig({
   plugins: [react()],
   base: '/misuperapp/'
 });
+```
 
 Guarda los cambios y vuelve a ejecutar:
 
