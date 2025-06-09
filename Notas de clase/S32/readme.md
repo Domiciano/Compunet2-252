@@ -45,7 +45,7 @@ Tiene que concordar con su ruta `base`
 
 Copia el contenido de dist/ dentro de la carpeta recién creada
 
-La estructura de archivos debe ser 
+La estructura de archivos quedará como
 
 ```
 $TOMCAT/
