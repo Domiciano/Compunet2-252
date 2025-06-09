@@ -32,7 +32,7 @@ npm run build
 
 # Paso 3: Crear una carpeta con el nombre del path base
 
-Dirígete al directorio webapps de Tomcat y crea una carpeta llamada `misuperapp` o como le haya puesto a su path `base`. Esta carpeta determina la ruta de acceso en el servidor. Por ejemplo si la carpeta se llama `misuperapp`, la URL queda:
+Dirígete al directorio `webapps` de Tomcat y crea una carpeta llamada `misuperapp` o como le haya puesto a su path `base`. Esta carpeta determina la ruta de acceso en el servidor. Por ejemplo si la carpeta se llama `misuperapp`, la URL queda:
 
 http://localhost:8080/misuperapp
 
