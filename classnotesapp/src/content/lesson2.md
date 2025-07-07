@@ -1,83 +1,122 @@
-[t] Operadores numéricos
+[t] Servidor web multi-hilos
+
+[i] image2.png|Diagrama de respuesta de recursos
 
 [p]
-Los operadores te permiten realizar cálculos y comparaciones con variables numéricas en Dart. Vamos a ver los más importantes.
+En esta lección afinarás tu servidor web para que pueda responder a la petición de diversos recursos: archivos HTML (`text/html`) e imágenes (`image/jpeg`, `image/gif`). El servidor analizará la solicitud HTTP y enviará una respuesta apropiada al browser.
 
-[st] Operadores aritméticos básicos
-
-[c:dart]
-void main() {
-  int a = 10;
-  int b = 3;
-  
-  print(a + b);  // Suma: 13
-  print(a - b);  // Resta: 7
-  print(a * b);  // Multiplicación: 30
-  print(a / b);  // División: 3.333...
-  print(a % b);  // Módulo (resto): 1
-  print(a ~/ b); // División entera: 3
-}
-[end]
-[trycode] 0b724266b8c3b41729324393b1770bf3
+[st] Extracción del recurso solicitado
 
 [p]
-`+` suma, `-` resta, `*` multiplica, `/` divide (resultado decimal)
+El nombre del archivo solicitado se extrae de la línea de solicitud HTTP usando `StringTokenizer`. Se asume que el método es siempre `GET`.
 
-[p]
-`%` obtiene el resto de la división
-
-[p]
-`~/` divide y devuelve solo la parte entera
-
-[st] Operadores de asignación
-
-[c:dart]
-void main() {
-  int x = 5;
-  x += 3;  // Equivale a: x = x + 3
-  print(x); // 8
-  
-  x *= 2;  // Equivale a: x = x * 2
-  print(x); // 16
-}
+[c:java]
+// Extrae el nombre del archivo de la línea de solicitud.
+StringTokenizer partesLinea = new StringTokenizer(linea);
+String method = partesLinea.nextToken();
+String nombreArchivo = partesLinea.nextToken();
+nombreArchivo = "." + nombreArchivo;
 [end]
 
+[p]
+El browser precede el nombre del archivo con `/`, por eso se antepone un punto para indicar el directorio actual.
+
+[st] Envío de archivos y manejo de errores
 
 [p]
-Los operadores `+=`, `-=`, `*=`, `/=` son atajos para modificar una variable.
+El servidor debe buscar el archivo solicitado y enviarlo al cliente. Si el archivo no existe, debe responder con un mensaje HTTP 404 y un archivo de error.
 
-[st] Operadores de comparación
+[c:java]
+InputStream inputStream = ClassLoader.getSystemResourceAsStream(nombreArchivo);
+File file = new File(ClassLoader.getSystemResource(nombreArchivo).toURI());
+long filesize = file.length();
+[end]
 
-[c:dart]
-void main() {
-  int edad = 18;
-  
-  print(edad > 16);   // Mayor que: true
-  print(edad < 21);   // Menor que: true
-  print(edad >= 18);  // Mayor o igual: true
-  print(edad <= 20);  // Menor o igual: true
-  print(edad == 18);  // Igual: true
-  print(edad != 20);  // Diferente: true
+[p]
+Para enviar la respuesta, usa un `BufferedOutputStream`:
+
+[c:java]
+BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
+[end]
+
+[p]
+Para enviar texto:
+
+[c:java]
+private static void enviarString(String line, OutputStream os) throws Exception {
+    os.write(line.getBytes(StandardCharsets.UTF_8));
 }
 [end]
 
-
 [p]
-Estos operadores devuelven `true` o `false` y son fundamentales para las estructuras de control.
+Para enviar bytes:
 
-[st] Operadores de incremento y decremento
-
-[c:dart]
-void main() {
-  int contador = 5;
-  
-  contador++;  // Incrementa en 1
-  print(contador); // 6
-  
-  contador--;  // Decrementa en 1
-  print(contador); // 5
+[c:java]
+private static void enviarBytes(InputStream fis, OutputStream os) throws Exception {
+    byte[] buffer = new byte[1024];
+    int bytes = 0;
+    while ((bytes = fis.read(buffer)) != -1) {
+        os.write(buffer, 0, bytes);
+    }
 }
 [end]
+
+[st] Construcción de la respuesta HTTP
+
+[p]
+La respuesta HTTP tiene tres partes: línea de estado, headers y cuerpo. Si el archivo existe, se determina el tipo MIME y se envía el archivo. Si no, se responde con 404 y un HTML de error.
+
+[c:java]
+String lineaDeEstado = null;
+String lineaHeader = null;
+String cuerpoMensaje = null;
+
+if ( /* archivo existe */ ) {
+    lineaDeEstado = /* 200 OK */; 
+    lineaHeader = "Content-type: " + contentType(nombreArchivo) + CRLF;
+    // Enviar línea de estado
+    // Enviar header
+    // Enviar archivo
+} else {
+    lineaDeEstado = "HTTP/1.0 404 Not Found\r\n";
+    lineaHeader = /* header error */;
+    // Enviar línea de estado
+    // Enviar header
+    // Enviar archivo 404.html
+}
+out.flush();
+[end]
+
+[st] Detección del tipo de archivo (MIME)
+
+[p]
+El tipo de archivo se determina con un método auxiliar:
+
+[c:java]
+private static String contentType(String nombreArchivo) {
+    if(nombreArchivo.endsWith(".htm") || nombreArchivo.endsWith(".html")) {
+        return "text/html";
+    }
+    if(nombreArchivo.endsWith(".jpg")) {
+        return "image/jpeg";
+    }
+    if(nombreArchivo.endsWith(".gif")) {
+        return "image/gif";
+    }
+    return "application/octet-stream";
+}
+[end]
+
+[st] Ejemplo de Request
+
+[i] image3.png|Ejemplo de solicitud HTTP
+
+[st] Ejemplo de Response
+
+[i] image4.png|Ejemplo de respuesta HTTP
+
+[p]
+¡Ahora tu servidor puede servir archivos y recursos estáticos como un servidor web real!
 
 
 

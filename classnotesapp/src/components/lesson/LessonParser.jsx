@@ -70,6 +70,24 @@ const LessonParser = ({ content }) => {
     const rawLine = lines[i];
     const trimmedLine = rawLine.trim();
 
+    // Antes de procesar cualquier directiva, si hay un pendingCodeBlock, agrégalo
+    if (
+      pendingCodeBlock &&
+      (trimmedLine.startsWith("[t]") ||
+        trimmedLine.startsWith("[st]") ||
+        trimmedLine === "[p]" ||
+        trimmedLine.startsWith("[v]") ||
+        trimmedLine.startsWith("[i]") ||
+        trimmedLine.startsWith("[icon]") ||
+        trimmedLine.startsWith("[dartpad]") ||
+        trimmedLine.startsWith('[trycode]') ||
+        trimmedLine.startsWith("[c:") ||
+        trimmedLine.startsWith("[link]"))
+    ) {
+      elements.push(pendingCodeBlock);
+      pendingCodeBlock = null;
+    }
+
     // Check if the current line is a directive *before* checking parsingCode
     const isDirective = trimmedLine.match(/^\[(t|st|p|v|i|icon|dartpad|trycode|c:|link).*"]$/);
 
