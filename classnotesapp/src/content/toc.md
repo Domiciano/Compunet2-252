@@ -2,4 +2,3 @@
 [lesson] lesson1.md
 [lesson] lesson2.md
 [lesson] lesson3.md
-[lesson] lesson4.md

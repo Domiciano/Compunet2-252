@@ -2,82 +2,80 @@
 
 export const light = {
   // Títulos y textos
-  contentTitle: '#fff',         // Títulos de contenido en blanco
-  contentSubtitle: '#6DB33F',      // Verde Spring Boot para subtítulos
-  drawerTitle: '#1b1f23',          // Gris muy oscuro para títulos del drawer
-  drawerSection: '#6DB33F',        // Verde Spring Boot para secciones del drawer
-  textPrimary: '#23272f',          // Texto principal sobre fondo claro
-  textSecondary: '#4b5563',        // Texto secundario
+  contentTitle: '#222',         // Títulos en gris casi negro
+  contentSubtitle: '#00D084',   // Subtítulos en verde brillante
+  drawerTitle: '#222',          // Título del drawer en gris casi negro
+  drawerSection: '#00B97A',     // Verde intermedio para secciones del drawer
+  textPrimary: '#222',          // Texto principal sobre fondo claro
+  textSecondary: '#444',        // Texto secundario
 
   // Fondos
-  background: '#f6f8fa',           // Fondo general claro
-  backgroundLight: '#ffffff',      // Fondo alternativo (cards, etc.)
-  drawerBg: '#f6f8fa',             // Drawer y TOC fondo
+  background: '#F5F7FA',        // Fondo general claro
+  backgroundLight: '#FFFFFF',   // Fondo alternativo (cards, etc.)
+  drawerBg: '#F5F7FA',          // Drawer y TOC fondo (igual que background)
 
   // Drawer y TOC
-  tocTitle: '#6DB33F',             // Verde Spring Boot para título TOC
-  tocText: '#23272f',              // Texto TOC
+  tocTitle: '#222',             // Título TOC en gris casi negro
+  tocText: '#222',              // Texto TOC
 
   // Accentos y bordes
-  accent: '#43a047',               // Verde acento (Spring)
-  accentSecondary: '#6DB33F',      // Verde Spring Boot para detalles menores
+  accent: '#00D084',               // Verde brillante acento
   border: '#e0e0e0',               // Bordes sutiles
 
   // Inline code
-  inlineCodeBg: 'rgba(60,60,60,0.08)',
-  inlineCodeText: '#388e3c',
+  inlineCodeBg: 'rgba(120,120,120,0.10)',
+  inlineCodeText: '#009F6B',
 
   // Otros
-  error: '#d32f2f',                // Errores
-  success: '#388e3c',              // Éxito
-  warning: '#ffa000',              // Advertencia
+  error: '#D32F2F',                // Errores
+  success: '#00B97A',              // Éxito (verde fuerte)
+  warning: '#FFA000',              // Advertencia
 
   // CodeBlock
-  codeBg: '#f3f6fa',
-  codeText: '#23272f',
+  codeBg: '#f5f5f5',
+  codeText: '#222',
 
-  appBarBg: '#6DB33F',             // Fondo AppBar verde Spring Boot
-  appBarText: '#ffffff',           // Texto AppBar blanco
+  appBarBg: '#009F6B',             // Fondo AppBar claro - Verde muy oscuro
+  appBarText: '#FFFFFF',           // Texto AppBar claro - Blanco para contraste
 };
 
 export const dark = {
   // Títulos y textos
-  contentTitle: '#fff',         // Títulos de contenido en blanco
-  contentSubtitle: '#6DB33F',      // Verde Spring Boot para subtítulos
-  drawerTitle: '#e0e0e0',          // Gris claro para títulos del drawer
-  drawerSection: '#6DB33F',        // Verde Spring Boot para secciones del drawer
-  textPrimary: '#f3f6fb',          // Texto principal sobre fondo oscuro
-  textSecondary: '#aab4be',        // Texto secundario
+  contentTitle: '#FFFFFF',         // Títulos en blanco
+  contentSubtitle: '#00D084',      // Subtítulos en verde brillante
+  drawerTitle: '#FFFFFF',          // Título del drawer en blanco
+  drawerSection: '#00B97A',        // Verde intermedio para secciones del drawer
+  textPrimary: '#F3F6FB',          // Texto principal sobre fondo oscuro
+  textSecondary: '#AAB4BE',        // Texto secundario
 
   // Fondos
-  background: '#181c23',           // Fondo general oscuro
+  background: '#181C23',           // Fondo general oscuro, elegante
   backgroundLight: '#232936',      // Fondo alternativo (cards, etc.)
-  drawerBg: '#181c23',             // Drawer y TOC fondo
+  drawerBg: '#181C23',             // Drawer y TOC fondo (igual que background)
 
   // Drawer y TOC
-  tocTitle: '#6DB33F',             // Verde Spring Boot para título TOC
-  tocText: '#f3f6fb',              // Texto TOC
+  tocTitle: '#FFFFFF',             // Título TOC en blanco
+  tocText: '#F3F6FB',              // Texto TOC
 
   // Accentos y bordes
-  accent: '#43a047',               // Verde acento (Spring)
-  accentSecondary: '#6DB33F',      // Verde Spring Boot para detalles menores
+  accent: '#00D084',               // Verde brillante acento
   border: '#232936',               // Bordes sutiles
 
   // Inline code
-  inlineCodeBg: 'rgba(60,60,60,0.22)',
-  inlineCodeText: '#43a047',
+  inlineCodeBg: 'rgba(120,120,120,0.22)',
+  inlineCodeText: '#00B97A',
 
   // Otros
-  error: '#ff5370',                // Errores
-  success: '#43d39e',              // Éxito
-  warning: '#ffb300',              // Advertencia
+  error: '#FF5370',                // Errores
+  success: '#00B97A',              // Éxito (verde fuerte)
+  warning: '#FFB300',              // Advertencia
 
   // CodeBlock
   codeBg: '#23272e',
   codeText: '#f8f8f2',
 
-  appBarBg: '#6DB33F',             // Fondo AppBar verde Spring Boot
-  appBarText: '#ffffff',           // Texto AppBar blanco
+  appBarBg: '#009F6B',             // Fondo AppBar oscuro - Verde muy oscuro
+  appBarText: '#ffffff',           // Texto AppBar oscuro - Blanco para contraste
 };
 
 // Por defecto exportamos dark

@@ -64,10 +64,10 @@
 }
 
 .inline-code {
-  background-color: #e6f4ea; /* Verde muy suave */
+  background-color: #00D084;
   border-radius: 6px;
   font-family: 'Fira Code', 'Roboto Mono', monospace;
   padding: 0.15em 0.4em;
   white-space: nowrap;
-  color: #388e3c; /* Verde medio para texto */
+  color: #fff;
 }
