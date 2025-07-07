@@ -1,112 +1,207 @@
-[t] Trabajando con Strings
+[t] Servidor de Aplicaciones
+
+[i] image5.png|Diagrama de servidor de aplicaciones
 
 [p]
-Los strings en Dart son secuencias de caracteres que puedes manipular de varias formas. Vamos a ver las más comunes: concatenación e interpolación.
+En esta clase trabajaremos con el servidor de Aplicaciones Tomcat y lo configuraremos manualmente para verificar su funcionamiento usando como base nuestros conocimientos previos de Servidores Web.
 
-[st] Concatenación de strings
+[p]
+El propósito es observar las principales características de un servidor de aplicaciones y qué provee que el servidor web no.
 
-[c:dart]
-void main() {
-  String nombre = 'Ana';
-  String apellido = 'García';
-  
-  // Concatenación con +
-  String nombreCompleto = nombre + ' ' + apellido;
-  print(nombreCompleto); // Ana García
-  
-  // Concatenación con +
-  String saludo = 'Hola ' + nombre;
-  print(saludo); // Hola Ana
+[st] Descargar el servidor de aplicaciones
+
+[p]
+Vamos a descargar Tomcat 10 de la URL:
+[link] Tomcat 10 https://tomcat.apache.org/download-10.cgi
+
+[p]
+Descargue el ZIP y descomprímalo. Si está en Mac o Linux, debe darle permisos a la carpeta de ejecutar los scripts de tipo `.sh`.
+
+[c:sh]
+chmod +x bin/*.sh
+[end]
+
+[st] Cree un proyecto Maven
+
+[p]
+Con el nombre que desee.
+
+[st] Instalar dependencias
+
+[p]
+Debemos instalar el Jakarta Servlet API. Esta API permite crear servlets para procesar solicitudes HTTP y generar respuestas dinámicas en aplicaciones web Java.
+
+[c:xml]
+<dependency>
+  <groupId>jakarta.servlet</groupId>
+  <artifactId>jakarta.servlet-api</artifactId>
+  <version>6.1.0</version>
+  <scope>provided</scope>
+</dependency>
+[end]
+
+[st] Definir packing
+
+[p]
+Vamos a requerir crear un artefacto distribuible del proyecto. Eso se hace por medio de Maven. Por defecto hace el packing en el formato `.jar`. Sin embargo, vamos a hacerlo con `.war` ya que Tomcat es capaz de usar este formato.
+
+[c:xml]
+<project ...>
+  ...
+  <packaging>war</packaging>
+  ...
+</project>
+[end]
+
+[st] Verificar versión de Java
+
+[p]
+Debe verificar que esté usando la misma versión de Java tanto en su sistema como en IntelliJ. Esto es porque quien compila el proyecto es IntelliJ, pero Tomcat usará el Java JDK o JRE de su sistema.
+
+[c:sh]
+java -version
+[end]
+
+[p]
+Debería concordar o ser inferior la versión de compilación. Esto lo puede cambiar en IntelliJ. Vaya a `File > Project Structure`. En la sección de `Project` podrá elegir el SDK. Finalmente, si debe cambiar el SDK, edite el `pom.xml`:
+
+[c:xml]
+<properties>
+  <maven.compiler.source>18</maven.compiler.source>
+  <maven.compiler.target>18</maven.compiler.target>
+  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+</properties>
+[end]
+
+[st] Verificar estructura de carpetas
+
+[p]
+Debe crear una carpeta llamada webapp en la carpeta main. Dentro, puede crear su index.jsp
+
+[c:tree]
+📦 project
+ ┣ 📂 src
+ ┃ ┗ 📂 main
+ ┃   ┣ 📂 java
+ ┃   ┃  ┗ 📂 com.icesi.webappexample
+ ┃   ┃    ┗ 📂 servlet
+ ┃   ┃       ┗ 📄 ServletExample.java
+ ┃   ┣ 📂 resources              
+ ┃   ┗ 📂 webapp
+ ┃      ┗ 📄 index.jsp
+ ┗ 📄 pom.xml 
+[end]
+
+[st] Cree su primer Servlet
+
+[c:java]
+package com.icesi.webappexample.servlet;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+
+@WebServlet("/hello")
+public class ServletExample extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html");
+        resp.getWriter().println("<h1>Este es un servlet<h1>");
+    }
 }
 [end]
-[trycode] 9ea5113dcc307145e4f26950b3770012
 
-[p]
-La concatenación con `+` es la forma más simple de unir strings.
+[st] Cree su primer JSP
 
-[p]
-También puedes usar interpolación para unir strings.
-
-[st] Interpolación de strings
-
-[c:dart]
-void main() {
-  String nombre = 'Carlos';
-  int edad = 25;
-  
-  // Interpolación simple con $
-  String mensaje = 'Hola, me llamo $nombre';
-  print(mensaje); // Hola, me llamo Carlos
-  
-  // Interpolación con expresiones
-  String presentacion = 'Tengo $edad años y el año que viene tendré ${edad + 1}';
-  print(presentacion); // Tengo 25 años y el año que viene tendré 26
-  
-  // Interpolación con propiedades
-  String lista = 'Lista de compras: ${['manzanas', 'leche', 'pan']}';
-  print(lista); // Lista de compras: [manzanas, leche, pan]
-}
+[c:xml]
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+  <head>
+      <title>Title</title>
+  </head>
+  <body>
+    <h1>Beta Gamma Alfa Delta</h1>
+  </body>
+</html>
 [end]
-[trycode] 9375d5f2e5afb0049c2deabf728a2102
+
+[st] Empaquetar el proyecto
 
 [p]
-La interpolación con `$` es más legible y eficiente que la concatenación.
+Para empaquetar el proyecto, vaya a `Maven > Execute Maven Goal` y ejecute:
 
-[p]
-Puedes usar `${}` para expresiones más complejas.
-
-[st] Strings multilínea
-
-[c:dart]
-void main() {
-  // String multilínea con comillas triples
-  String poema = '''
-  El viento sopla
-  Las hojas caen
-  Es otoño
-  ''';
-  print(poema);
-  
-  // String multilínea con comillas dobles
-  String carta = """
-  Estimado señor:
-  
-  Le escribo para informarle...
-  
-  Saludos cordiales.
-  """;
-  print(carta);
-}
+[c:sh]
+mvn clean package
 [end]
-[trycode] fb3770f6687957ed296000cfe5a6e483
 
 [p]
-Usa comillas triples `'''` o `"""` para strings que ocupan múltiples líneas.
+Esto generará su `.war` en el folder `./target`
 
-[st] Métodos útiles de strings
+[st] Usar el WAR
 
-[c:dart]
-void main() {
-  String texto = '  Hola Mundo  ';
-  
-  print(texto.toUpperCase()); //   HOLA MUNDO  
-  print(texto.toLowerCase()); //   hola mundo  
-  print(texto.trim()); // Hola Mundo
-  print(texto.length); // 13
-  print(texto.contains('Mundo')); // true
-  print(texto.startsWith('  ')); // true
-  print(texto.endsWith('  ')); // true
-}
+[p]
+Ya con el `.war`, vaya a la carpeta donde descomprimió Tomcat y ponga el `.war` en el folder `webapps`. Renómbrelo para que sea un nombre sencillo.
+
+[st] Ejecutar el servidor
+
+[p]
+Vaya a la carpeta `bin` de Tomcat y ejecute:
+
+[c:sh]
+./startup.sh
 [end]
-[trycode] 4c4d6995aece9660c1b65839437c4c03
 
 [p]
-`toUpperCase()` y `toLowerCase()` cambian el caso.
+En Windows:
+
+[c:bat]
+./startup.bat
+[end]
 
 [p]
-`trim()` elimina espacios al inicio y final.
+Puede detener el server usando:
+
+[c:sh]
+./shutdown.sh
+[end]
 
 [p]
-`contains()`, `startsWith()` y `endsWith()` verifican contenido.
+En Windows:
+
+[c:bat]
+./shutdown.bat
+[end]
+
+[st] Ingresar al sitio
+
+[p]
+La URL de ingreso es:
+[inline-code]http://localhost:8080/<nombre>[inline-code]
+
+[p]
+Esto carga el index.jsp.
+[inline-code]http://localhost:8080/<nombre>/hello[inline-code]
+
+[p]
+Esto carga la respuesta desde el Servlet.
+Donde <nombre> es el nombre del war.
+
+[st] Automatizar el proceso
+
+[p]
+Vaya a `Run > Run... > Edit Configurations`. Use `+`. Busque `Tomcat Server/Local`.
+
+[p]
+En la pestaña `Server`, en Application Server vaya a Configure y añada el servidor de Tomcat.
+
+[p]
+Vaya a la pestaña de Deployment y use `+ > Artifact` y seleccione `App:war exploded`. Donde App es el nombre de su proyecto.
+
+[p]
+Verifique que el Application Context quedó como `/App_war_exploded`. Puede libremente alterar el contexto.
 
 
