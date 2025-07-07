@@ -1,6 +1,6 @@
 [t] Servidor web multi-hilos
 
-[i] image2.png|Diagrama de respuesta de recursos
+[icon] image2.png|Diagrama de respuesta de recursos
 
 [p]
 En esta lección afinarás tu servidor web para que pueda responder a la petición de diversos recursos: archivos HTML (`text/html`) e imágenes (`image/jpeg`, `image/gif`). El servidor analizará la solicitud HTTP y enviará una respuesta apropiada al browser.
@@ -109,11 +109,11 @@ private static String contentType(String nombreArchivo) {
 
 [st] Ejemplo de Request
 
-[i] image3.png|Ejemplo de solicitud HTTP
+[icon] image3.png|Ejemplo de solicitud HTTP
 
 [st] Ejemplo de Response
 
-[i] image4.png|Ejemplo de respuesta HTTP
+[icon] image4.png|Ejemplo de respuesta HTTP
 
 [p]
 ¡Ahora tu servidor puede servir archivos y recursos estáticos como un servidor web real!
