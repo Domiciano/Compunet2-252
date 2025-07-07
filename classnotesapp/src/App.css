@@ -64,10 +64,17 @@
 }
 
 .inline-code {
-  background-color: #00D084;
+  background-color: #234236;
   border-radius: 6px;
   font-family: 'Fira Code', 'Roboto Mono', monospace;
   padding: 0.15em 0.4em;
   white-space: nowrap;
   color: #fff;
+}
+
+.codeblock-pre-hide-scroll {
+  scrollbar-width: none; /* Firefox */
+}
+.codeblock-pre-hide-scroll::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
