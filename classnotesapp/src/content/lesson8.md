@@ -1,6 +1,5 @@
 [t] Integración con Bases de Datos y JPA
 
-[st] Introducción
 [p]
 Vamos a trabajar con una base de datos en memoria llamada H2 y veremos cómo integrar Spring Boot con JPA y un ORM para persistencia de datos.
 
@@ -76,7 +75,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
 [end]
 
 [st] Configuración para base de datos PostgreSQL
-[c:plain]
+[c:ini]
 spring.jpa.hibernate.ddl-auto=update
 spring.datasource.username=USERNAME
 spring.datasource.password=PASSWORD
