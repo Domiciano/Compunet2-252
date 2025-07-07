@@ -157,7 +157,7 @@ public class Student {
 [end]
 
 [st] Usando Docker para la base de datos
-[c:yaml]
+[c:yml]
 services:
   db:
     image: postgres:17

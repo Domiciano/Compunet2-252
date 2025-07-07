@@ -7,6 +7,7 @@ import "prismjs/components/prism-jsx";
 import "prismjs/components/prism-java";
 import "prismjs/components/prism-sql";
 import "prismjs/themes/prism-tomorrow.css";
+import "prismjs/components/prism-yaml";
 
 // Importar lenguajes personalizados
 import "@/prism/languages/prism-http.js";
