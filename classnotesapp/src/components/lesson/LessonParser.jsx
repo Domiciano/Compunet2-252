@@ -249,16 +249,14 @@ const LessonParser = ({ content }) => {
       }
       paragraphBuffer += (paragraphBuffer ? " " : "") + trimmedLine;
     }
-
-    // --- FIN DEL ARCHIVO ---
-    if (i === lines.length - 1) {
-      if (pendingCodeBlock) {
-        elements.push(pendingCodeBlock);
-        pendingCodeBlock = null;
-      }
-      flushParagraph(elements, paragraphBuffer, i);
-    }
   }
+
+  // --- FUERA DEL CICLO: Asegura que cualquier bloque pendiente se agregue ---
+  if (pendingCodeBlock) {
+    elements.push(pendingCodeBlock);
+    pendingCodeBlock = null;
+  }
+  flushParagraph(elements, paragraphBuffer, lines.length);
 
   return {
     elements: <LessonContainer>{elements}</LessonContainer>,
