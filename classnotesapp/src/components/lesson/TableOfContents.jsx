@@ -6,6 +6,8 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { useThemeMode } from '@/theme/ThemeContext';
+import IconButton from '@mui/material/IconButton';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 // Función para convertir texto a slug válido para URL
 const createSlug = (text) => {
@@ -19,7 +21,7 @@ const createSlug = (text) => {
     .trim('-'); // Remueve guiones al inicio y final
 };
 
-const TableOfContents = ({ subtitles = [], lessonTitle, activeSection = '' }) => {
+const TableOfContents = ({ subtitles = [], lessonTitle, activeSection = '', lessonId }) => {
   const { theme } = useThemeMode();
 
   const scrollToSubtitle = (id) => {
@@ -52,23 +54,40 @@ const TableOfContents = ({ subtitles = [], lessonTitle, activeSection = '' }) =>
         position: 'sticky',
         top: { xs: '56px', sm: '64px' },
         pt: 2,
-        pl: { lg: 3 },
         background: { lg: theme.background, xs: 'none' },
       }}
     >
-      <Typography
-        variant="h6"
-        sx={{
-          color: theme.textPrimary,
-          fontWeight: 700,
-          mb: 2,
-          fontSize: '1.1rem',
-          textTransform: 'none',
-          letterSpacing: '0.01em',
-        }}
-      >
-        {lessonTitle}
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', paddingTop:2, paddingBottom:2 }}>
+        {typeof lessonId !== 'undefined' && (
+          <IconButton
+            onClick={() => {
+              if (typeof lessonId !== 'undefined' && lessonId !== null) {
+                // Usar el contexto si está disponible
+                if (typeof window !== 'undefined' && window.useStudiedLessons) {
+                  window.useStudiedLessons().toggleStudied(String(lessonId));
+                }
+              }
+            }}
+            sx={{ marginTop:0.5, color: theme.accent, p:0}}
+            aria-label={'Marcar como completado'}
+          >
+            <CheckCircleIcon sx={{ color: theme.accent }} fontSize="small" />
+          </IconButton>
+        )}
+        <Typography
+          variant="h6"
+          sx={{
+            marginLeft:1,
+            color: theme.textPrimary,
+            fontWeight: 700,
+            fontSize: '1.1rem',
+            textTransform: 'none',
+            letterSpacing: '0.01em',
+          }}
+        >
+          {lessonTitle}
+        </Typography>
+      </Box>
       <List dense sx={{ p: 0 }}>
         {subtitles.map((subtitle) => (
           <ListItem key={subtitle.id} sx={{ p: 0, mb: 0.5 }}>

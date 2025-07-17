@@ -1,15 +1,15 @@
 [t] Three Layered architecture
 
 [st] Introducción
-[p]
+
 En este punto, ya sabemos crear beans y conectarlos entre sí para construir una aplicación. Ahora vamos a reestructurar el proyecto para aplicar los conceptos de las capas Service y Repository, poniendo cada función en su lugar.
 
 [st] Reestructuración del proyecto
-[p]
+
 Construye este esquema para organizar las capas:
 [icon]image10.png|Esquema de capas Service y Repository
 
-[p]
+
 Nos falta aún la clase `CourseService`:
 [c:java]
 public class CourseService {
@@ -21,14 +21,14 @@ public class CourseService {
 [end]
 
 [st] Capas Repository y Service
-[p]
+
 Capa Repository
-[p]
+
 Asegúrate de que tu clase Repository tenga acceso bruto a los datos, tanto para almacenar como para obtener. Evita hacer validaciones aquí. Métodos típicos: `findAll()`, `findById()`, `save()`.
 
-[p]
+
 Capa Service
-[p]
+
 En las clases Service, haz las validaciones necesarias antes de usar las funciones de acceso a datos. Aquí se implementan reglas de negocio, como impedir operaciones no autorizadas. Métodos típicos: `getAll()`, `getById(id)`, `create(entity)`, `update(id, entity)`, `delete(id)`.
 
 [st] Servlets para las entidades
@@ -53,7 +53,7 @@ public class StudentServlet extends HttpServlet {
 [end]
 
 [st] Definición de Beans con @Configuration
-[p]
+
 Puedes generar los beans y el wiring usando la anotación `@Configuration` en una clase donde se listan y conectan los beans.
 
 [c:java]
@@ -115,7 +115,7 @@ public StudentRepository studentRepository() {
 [end]
 
 [st] Definición de Beans con Anotaciones
-[p]
+
 Puedes usar la anotación `@Component` sobre la clase para definir un bean. Existen alias como `@Service` y `@Repository` para mayor semántica.
 
 [c:java]
@@ -172,7 +172,7 @@ public void initializeData(){
 [end]
 
 [st] Funcionalidades desde el Servlet
-[p]
+
 Como estudiante quiero registrarme en el sistema proporcionando mi información personal, para poder utilizar la plataforma de matrícula.
 
 Como estudiante quiero agregarme a un curso proporcionando su información para gestionar mi matrícula.

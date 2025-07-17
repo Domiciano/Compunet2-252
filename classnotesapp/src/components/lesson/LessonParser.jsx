@@ -11,9 +11,15 @@ import IconBlock from "@/components/lesson/IconBlock";
 import Link from "@/components/lesson/Link";
 import images from "@/assets";
 import TryCodeButton from './TryCodeButton';
+import Typography from "@mui/material/Typography";
 
 const LessonParser = ({ content }) => {
+  // Eliminar líneas en blanco al final para asegurar flush correcto
   const lines = content.split("\n");
+  let lastNonEmptyIndex = lines.length - 1;
+  while (lastNonEmptyIndex >= 0 && lines[lastNonEmptyIndex].trim() === "") {
+    lastNonEmptyIndex--;
+  }
   const elements = [];
   const subtitles = [];
   let lessonTitleText = null;
@@ -23,19 +29,14 @@ const LessonParser = ({ content }) => {
   let codeLang = "";
   let pendingCodeBlock = null;
 
-  // Helper function to flush the current code block
-  const flushCodeBlock = (index) => {
-    if (parsingCode) {
-      const codeBlock = (
-        <CodeBlock key={`code-${index}`} language={codeLang}>
-          {codeBuffer}
-        </CodeBlock>
-      );
-      pendingCodeBlock = codeBlock;
-      parsingCode = false;
-      codeBuffer = "";
-      codeLang = "";
-    }
+  // --- LISTA ---
+  let parsingList = false;
+  let listItems = [];
+
+  // Definir estilos de lista idénticos a LessonParagraph
+  const listTextStyle = {
+    fontSize: '1rem',
+    fontFamily: 'Roboto, Arial, sans-serif',
   };
 
   // Helper function to flush the current paragraph buffer
@@ -43,7 +44,7 @@ const LessonParser = ({ content }) => {
     if (buffer.trim() !== "") {
       elements.push(
         <LessonParagraph key={`p-${key}`}>
-          {parseInlineCode(buffer.trim())}
+          {parseInlineLinks(parseInlineCode(buffer.trim()))}
         </LessonParagraph>
       );
     }
@@ -66,42 +67,176 @@ const LessonParser = ({ content }) => {
     });
   };
 
-  for (let i = 0; i < lines.length; i++) {
+  // Helper function for inline link parsing
+  const parseInlineLinks = (elements) => {
+    if (typeof elements === 'string') {
+      // Si es una cadena, procesar normalmente
+      const parts = elements.split(/(\[link\]\s+[^\]]+)/g);
+      return parts.map((part, index) => {
+        if (part.startsWith("[link]")) {
+          const rest = part.slice(6).trim();
+          
+          // Buscar patrón con paréntesis: [link] (texto) url
+          const parenthesesMatch = rest.match(/^\((.*?)\)\s+(.+)$/);
+          if (parenthesesMatch) {
+            const displayname = parenthesesMatch[1].trim();
+            const url = parenthesesMatch[2].trim();
+            return (
+              <Link key={`inline-link-${index}`} displayname={displayname} url={url} />
+            );
+          } else {
+            // Sintaxis original: [link] displayname url
+            const firstSpace = rest.indexOf(" ");
+            if (firstSpace > 0) {
+              const displayname = rest.slice(0, firstSpace).trim();
+              const url = rest.slice(firstSpace + 1).trim();
+              return (
+                <Link key={`inline-link-${index}`} displayname={displayname} url={url} />
+              );
+            }
+          }
+          return part; // Si no coincide con ningún patrón, devolver el texto original
+        } else {
+          return part;
+        }
+      });
+    } else if (Array.isArray(elements)) {
+      // Si es un array (resultado de parseInlineCode), procesar cada elemento
+      return elements.map((element, index) => {
+        if (typeof element === 'string') {
+          // Procesar el string para links
+          const parts = element.split(/(\[link\]\s+[^\]]+)/g);
+          if (parts.length === 1) {
+            return element; // No hay links en este string
+          }
+          return parts.map((part, partIndex) => {
+            if (part.startsWith("[link]")) {
+              const rest = part.slice(6).trim();
+              
+              // Buscar patrón con paréntesis: [link] (texto) url
+              const parenthesesMatch = rest.match(/^\((.*?)\)\s+(.+)$/);
+              if (parenthesesMatch) {
+                const displayname = parenthesesMatch[1].trim();
+                const url = parenthesesMatch[2].trim();
+                return (
+                  <Link key={`inline-link-${index}-${partIndex}`} displayname={displayname} url={url} />
+                );
+              } else {
+                // Sintaxis original: [link] displayname url
+                const firstSpace = rest.indexOf(" ");
+                if (firstSpace > 0) {
+                  const displayname = rest.slice(0, firstSpace).trim();
+                  const url = rest.slice(firstSpace + 1).trim();
+                  return (
+                    <Link key={`inline-link-${index}-${partIndex}`} displayname={displayname} url={url} />
+                  );
+                }
+              }
+              return part; // Si no coincide con ningún patrón, devolver el texto original
+            } else {
+              return part;
+            }
+          });
+        } else {
+          // Es un elemento React (como <code>), devolverlo tal como está
+          return element;
+        }
+      }).flat(); // Aplanar el array resultante
+    } else {
+      // Es un elemento React, devolverlo tal como está
+      return elements;
+    }
+  };
+
+  for (let i = 0; i <= lastNonEmptyIndex; i++) {
     const rawLine = lines[i];
     const trimmedLine = rawLine.trim();
 
-    // Antes de procesar cualquier directiva, si hay un pendingCodeBlock, agrégalo
-    if (
-      pendingCodeBlock &&
-      (trimmedLine.startsWith("[t]") ||
-        trimmedLine.startsWith("[st]") ||
-        trimmedLine === "[p]" ||
-        trimmedLine.startsWith("[v]") ||
-        trimmedLine.startsWith("[i]") ||
-        trimmedLine.startsWith("[icon]") ||
-        trimmedLine.startsWith("[dartpad]") ||
-        trimmedLine.startsWith('[trycode]') ||
-        trimmedLine.startsWith("[c:") ||
-        trimmedLine.startsWith("[link]"))
-    ) {
-      elements.push(pendingCodeBlock);
-      pendingCodeBlock = null;
-    }
-
-    // Check if the current line is a directive *before* checking parsingCode
-    const isDirective = trimmedLine.match(/^\[(t|st|p|v|i|icon|dartpad|trycode|c:|link).*"]$/);
-
-    // If we are parsing code and encounter [end], flush the code block
-    if (parsingCode && trimmedLine === "[end]") {
-      flushCodeBlock(i);
+    // --- INICIO DE LISTA ---
+    if (trimmedLine === '[list]') {
+      flushParagraph(elements, paragraphBuffer, i);
+      paragraphBuffer = "";
+      parsingList = true;
+      listItems = [];
       continue;
     }
 
-    // If we are parsing code and encounter any other directive, flush the code block first
-    if (parsingCode && isDirective) {
-      flushCodeBlock(i);
-      // We don't continue here; we let the subsequent directive handling logic run
-      // on the *current* line.
+    // --- FIN DE LISTA ---
+    if (trimmedLine === '[endlist]') {
+      parsingList = false;
+      elements.push(
+        <ul key={`list-${i}`} style={{ margin: '0px 0 0px 4px', ...listTextStyle }}>
+          {listItems}
+        </ul>
+      );
+      listItems = [];
+      continue;
+    }
+
+    // --- ELEMENTO DE LISTA ---
+    if (parsingList) {
+      // Cada línea no vacía dentro de la lista es un item
+      if (trimmedLine !== "") {
+        listItems.push(
+          <li key={`li-${i}`} style={{ padding:0, margin: '0px 0', listStyle: 'none', display: 'flex', alignItems: 'baseline' }}>
+            <span style={{
+              display: 'inline-block',
+              width: 4,
+              height: '1em',
+              background: '#fff',
+              borderRadius: 0,
+              marginRight: 12,
+              marginLeft: 2,
+              verticalAlign: 'middle',
+              marginTop: 0,
+            }} />
+            <Typography
+              sx={{
+                p:0,
+                color: 'inherit',
+                fontSize: { xs: '1rem', md: '1.1rem' },
+                lineHeight: 'calc(1.7em)',
+                fontFamily: 'Roboto, Arial, sans-serif',
+              }}
+            >
+              {parseInlineLinks(parseInlineCode(trimmedLine))}
+            </Typography>
+          </li>
+        );
+      }
+      continue;
+    }
+
+    // Si estamos dentro de una lista, ignorar cualquier otra línea
+    if (parsingList) {
+      continue;
+    }
+
+    // --- INICIO DE BLOQUE DE CÓDIGO NUEVO ---
+    if (trimmedLine.startsWith("[code:")) {
+      parsingCode = true;
+      codeLang = trimmedLine.match(/\[code:(.*)\]/)[1].trim();
+      codeBuffer = "";
+      continue;
+    }
+
+    // --- CIERRE DE BLOQUE DE CÓDIGO NUEVO ---
+    if (parsingCode) {
+      if (trimmedLine === '[endcode]') {
+        // Agregar el bloque de código
+        elements.push(
+          <CodeBlock key={`code-${i}`} language={codeLang}>
+            {codeBuffer}
+          </CodeBlock>
+        );
+        parsingCode = false;
+        codeLang = "";
+        codeBuffer = "";
+        continue;
+      } else {
+        codeBuffer += rawLine + "\n";
+        continue;
+      }
     }
 
     // --- TÍTULO PRINCIPAL ---
@@ -113,7 +248,7 @@ const LessonParser = ({ content }) => {
       
       elements.push(
         <LessonTitle key={`title-${i}`}>
-          {parseInlineCode(titleText)}
+          {parseInlineLinks(parseInlineCode(titleText))}
         </LessonTitle>
       );
       continue;
@@ -123,6 +258,11 @@ const LessonParser = ({ content }) => {
     if (trimmedLine.startsWith("[st]")) {
       flushParagraph(elements, paragraphBuffer, i);
       paragraphBuffer = "";
+      // Si hay un pendingCodeBlock, insertarlo antes del subtítulo
+      if (pendingCodeBlock) {
+        elements.push(pendingCodeBlock);
+        pendingCodeBlock = null;
+      }
       const subtitleText = trimmedLine.slice(4).trim();
       subtitles.push({
         id: `subtitle-${i}`,
@@ -130,16 +270,9 @@ const LessonParser = ({ content }) => {
       });
       elements.push(
         <LessonSub key={`subtitle-${i}`} id={`subtitle-${i}`}>
-          {parseInlineCode(subtitleText)}
+          {parseInlineLinks(parseInlineCode(subtitleText))}
         </LessonSub>
       );
-      continue;
-    }
-
-    // --- INICIO DE NUEVO PÁRRAFO ---
-    if (trimmedLine === "[p]") {
-      flushParagraph(elements, paragraphBuffer, i);
-      paragraphBuffer = "";
       continue;
     }
 
@@ -193,34 +326,18 @@ const LessonParser = ({ content }) => {
       continue;
     }
 
-    // --- INICIO DE BLOQUE DE CÓDIGO ---
-    if (trimmedLine.startsWith("[c:")) {
-      flushParagraph(elements, paragraphBuffer, i);
-      paragraphBuffer = "";
-      parsingCode = true;
-      codeLang = trimmedLine.match(/\[c:(.*)\]/)[1];
-      codeBuffer = "";
-      continue;
-    }
-
-    // --- CIERRE DE BLOQUE DE CÓDIGO o CÓDIGO CONTINUO ---
-    if (parsingCode) {
-      codeBuffer += rawLine + "\n";
-      if (i === lines.length - 1) {
-        flushCodeBlock(i);
-      }
-      continue;
-    }
-
     // --- TRY CODE BUTTON ---
     if (trimmedLine.startsWith('[trycode]')) {
       flushParagraph(elements, paragraphBuffer, i);
       paragraphBuffer = "";
       const gistId = trimmedLine.slice(9).trim();
-      elements.push(
-        <TryCodeButton key={`trycode-${i}`} gistId={gistId} codeBlock={pendingCodeBlock} />
-      );
-      pendingCodeBlock = null;
+      // Solo crear TryCodeButton si hay un pendingCodeBlock válido
+      if (pendingCodeBlock) {
+        elements.push(
+          <TryCodeButton key={`trycode-${i}`} gistId={gistId} codeBlock={pendingCodeBlock} />
+        );
+        pendingCodeBlock = null;
+      }
       continue;
     }
 
@@ -228,35 +345,64 @@ const LessonParser = ({ content }) => {
     if (trimmedLine.startsWith("[link]")) {
       flushParagraph(elements, paragraphBuffer, i);
       paragraphBuffer = "";
-      // Sintaxis: [link] displayname url
+      // Sintaxis: [link] displayname url o [link] (texto del enlace) url
       const rest = trimmedLine.slice(6).trim();
-      const firstSpace = rest.indexOf(" ");
-      if (firstSpace > 0) {
-        const displayname = rest.slice(0, firstSpace).trim();
-        const url = rest.slice(firstSpace + 1).trim();
+      
+      // Buscar patrón con paréntesis: [link] (texto) url
+      const parenthesesMatch = rest.match(/^\((.*?)\)\s+(.+)$/);
+      if (parenthesesMatch) {
+        const displayname = parenthesesMatch[1].trim();
+        const url = parenthesesMatch[2].trim();
         elements.push(
           <Link key={`link-${i}`} displayname={displayname} url={url} />
         );
+      } else {
+        // Sintaxis original: [link] displayname url
+        const firstSpace = rest.indexOf(" ");
+        if (firstSpace > 0) {
+          const displayname = rest.slice(0, firstSpace).trim();
+          const url = rest.slice(firstSpace + 1).trim();
+          elements.push(
+            <Link key={`link-${i}`} displayname={displayname} url={url} />
+          );
+        }
       }
       continue;
     }
 
     // --- TEXTO CONTINUO (NOT PART OF CODE BLOCK) ---
-    if (trimmedLine !== "") {
+    // Cada línea (vacía o no) debe reflejarse con un <br /> en el output
+    if (!parsingList && !parsingCode) {
+      if (rawLine !== "") {
+        elements.push(
+          <React.Fragment key={`line-${i}`}>
+            {parseInlineLinks(parseInlineCode(rawLine))}
+            <br key={`br-${i}`} />
+          </React.Fragment>
+        );
+      } else {
+        // Línea vacía, solo <br />
+        elements.push(<br key={`br-${i}`} />);
+      }
+    }
+
+    // --- FIN DEL ARCHIVO ---
+    if (i === lastNonEmptyIndex) {
+      flushParagraph(elements, paragraphBuffer, i);
+      // Si hay un pendingCodeBlock al final, insertarlo
       if (pendingCodeBlock) {
         elements.push(pendingCodeBlock);
         pendingCodeBlock = null;
       }
-      paragraphBuffer += (paragraphBuffer ? " " : "") + trimmedLine;
     }
   }
 
   // --- FUERA DEL CICLO: Asegura que cualquier bloque pendiente se agregue ---
+  flushParagraph(elements, paragraphBuffer, lines.length);
   if (pendingCodeBlock) {
     elements.push(pendingCodeBlock);
     pendingCodeBlock = null;
   }
-  flushParagraph(elements, paragraphBuffer, lines.length);
 
   return {
     elements: <LessonContainer>{elements}</LessonContainer>,

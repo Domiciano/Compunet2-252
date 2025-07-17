@@ -1,6 +1,6 @@
 [t] Integración con Bases de Datos y JPA
 
-[p]
+
 Vamos a trabajar con una base de datos en memoria llamada H2 y veremos cómo integrar Spring Boot con JPA y un ORM para persistencia de datos.
 
 [st] Dependencias necesarias
@@ -43,7 +43,7 @@ public class Student {
 [end]
 
 [st] Conceptos clave: Connection Pool y ORM
-[p]
+
 HikariCP es un pool de conexiones eficiente para bases de datos en Java. Permite reutilizar conexiones y mejorar el rendimiento en aplicaciones con múltiples accesos concurrentes.
 
 JPA (Jakarta Persistence API) es una especificación para trabajar con bases de datos relacionales mediante mapeo objeto-relacional (ORM). Un ORM mapea tablas a clases y filas a instancias de esas clases, facilitando la manipulación de datos con código orientado a objetos.
@@ -176,7 +176,7 @@ volumes:
   my-volume:
 [end]
 
-[p]
+
 Para crear el contenedor ejecuta:
 [c:sh]
 docker-compose up -d

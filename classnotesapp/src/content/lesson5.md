@@ -1,13 +1,13 @@
 [t] Wiring de Beans e Inyección de Dependencias en Spring
 
 [st] Introducción
-[p]
+
 En Spring Boot, la inyección de dependencias es el mecanismo mediante el cual el framework administra y proporciona instancias de objetos (beans) a otras clases sin que estas tengan que crearlas manualmente. Este proceso, conocido como wiring de beans, permite definir cómo se relacionan y comunican los componentes dentro de la aplicación, asegurando un código más modular, reutilizable y fácil de mantener al reducir el acoplamiento entre las dependencias.
 
 [icon]image8.png|Wiring de Beans
 
 [st] Capas Repository y Service
-[p]
+
 La capa Repository es la encargada de acceder a los datos. Es la que se comunica con la base de datos, archivos o cualquier otro sistema de almacenamiento. En este ejemplo, usaremos una lista en memoria en lugar de una base de datos real. Más adelante, podríamos reemplazarla por JDBC, JPA o cualquier otro mecanismo sin cambiar la lógica de negocio.
 
 Es el "almacén" de la aplicación, donde se guardan y recuperan datos.
@@ -19,7 +19,7 @@ Es como el cerebro de la aplicación, que decide qué hacer antes de interactuar
 [icon]image9.png|Capas Service y Repository
 
 [st] Ejemplo: Registro de Estudiantes y Cursos
-[p]
+
 Vamos a aplicar el wiring de beans para trabajar en una aplicación que gestione el registro de Estudiantes y sus Cursos.
 
 [st] Clases principales
@@ -109,7 +109,7 @@ public class StudentService {
 [icon]image7.png|Relación entre beans y capas
 
 [st] Inyección de dependencias
-[p]
+
 Para lograr la relación entre beans, debe hacer inyección de dependencias. Puede hacerse mediante constructor o mediante método (setter).
 
 [st] Inyección por constructor
@@ -155,7 +155,7 @@ public class ClaseB {
 [end]
 
 [st] Inicialización y prueba
-[p]
+
 Puede usar métodos de inicialización en los beans. Por ejemplo:
 
 [c:xml]
@@ -166,7 +166,7 @@ Puede usar métodos de inicialización en los beans. Por ejemplo:
 
 Aquí se ejecuta el método `initializeBean()` luego de que Spring Framework instancia los beans y hace el wiring.
 
-[p]
+
 Ejemplo de datos de prueba para inicializar:
 
 [c:plain]

@@ -66,21 +66,38 @@ const LessonPage = forwardRef(({ sections }, ref) => {
     <Box sx={{ 
       display: 'flex', 
       width: '100%', 
-      flexDirection: { xs: 'column', lg: 'row' } 
+      flexDirection: { xs: 'column', lg: 'row' },
+      minWidth: 0 // <-- CLAVE para evitar desbordes en layouts flex
     }}>
-      <Box sx={{ flex: 1, width: '100%' }}>
+      <Box sx={{ 
+        flex: 1, 
+        right:{lg:220, xs: 10},
+        left:{lg:240, xs: 10},
+        position:'absolute',
+        overflow:'scroll',
+        height:'100vh',
+        bottom:0,
+        
+      }}
+      className="hide-scrollbar"
+      >
         {parsedContent.elements}
       </Box>
       {/* TOC en desktop */}
       <Box sx={{ 
-        width: { lg: '280px' }, 
+        width: { lg: 235 }, 
         flexShrink: 0, 
-        display: { xs: 'none', lg: 'block' } 
+        display: { xs: 'none', lg: 'block' },
+        mr: 2,
+        position:'fixed',
+        right: 0,
+        top: 64,
       }}>
         <TableOfContents 
           subtitles={parsedContent.subtitles} 
           lessonTitle={parsedContent.lessonTitle}
           activeSection={activeSection}
+          lessonId={lessonId}
         />
       </Box>
       {/* TOC en mobile: Drawer temporal */}
@@ -111,6 +128,7 @@ const LessonPage = forwardRef(({ sections }, ref) => {
               subtitles={parsedContent.subtitles} 
               lessonTitle={parsedContent.lessonTitle}
               activeSection={activeSection}
+              lessonId={lessonId}
             />
           </Box>
         </Box>

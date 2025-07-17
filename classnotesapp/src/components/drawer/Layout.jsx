@@ -15,15 +15,19 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import { Link, useLocation } from "react-router-dom";
 import { useThemeMode } from '@/theme/ThemeContext';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useStudiedLessons } from '@/theme/StudiedLessonsContext';
 
-const drawerWidth = 240;
+const drawerWidth = 280;
 
 const Layout = ({ children, sections = [], onOpenMobileNav }) => {
   const muiTheme = useTheme();
-  const isMobile = useMediaQuery(muiTheme.breakpoints.down("md"));
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down("lg"));
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { theme } = useThemeMode();
+  const { studiedLessons, toggleStudied } = useStudiedLessons();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -35,7 +39,12 @@ const Layout = ({ children, sections = [], onOpenMobileNav }) => {
   }, [onOpenMobileNav]);
 
   const drawerContent = (
-    <Box sx={{ width: drawerWidth, backgroundColor: theme.background, height: '100vh' }}>
+    <Box sx={{
+      width: drawerWidth,
+      backgroundColor: 'theme.background',
+      height: '100vh',
+    }}>
+      <Box sx={{ height: '64px' }} />
       <List>
         {sections.map((sec, index) => {
           if (sec.type === "title") {
@@ -56,12 +65,14 @@ const Layout = ({ children, sections = [], onOpenMobileNav }) => {
             );
           }
           if (sec.type === "lesson") {
+            const isStudied = studiedLessons.includes(sec.id);
+            const isSelected = location.pathname === `/lesson/${sec.id}`;
             return (
               <ListItemButton
                 key={`lesson-${sec.id}`}
                 component={Link}
                 to={`/lesson/${sec.id}`}
-                selected={location.pathname === `/lesson/${sec.id}`}
+                selected={isSelected}
                 sx={{
                   color: theme.drawerSection,
                   '&.Mui-selected': {
@@ -69,16 +80,33 @@ const Layout = ({ children, sections = [], onOpenMobileNav }) => {
                     color: theme.drawerTitle,
                   },
                   '&:hover': { color: theme.drawerTitle },
+                  display: 'flex',
+                  alignItems: 'center',
                 }}
                 onClick={() => setMobileOpen(false)}
               >
                 <ListItemText primary={sec.label} />
+                <IconButton
+                  size="small"
+                  onClick={e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleStudied(String(sec.id));
+                  }}
+                  sx={{ ml: 1 }}
+                  aria-label={isStudied ? 'Marcar como no estudiada' : 'Marcar como estudiada'}
+                >
+                  {isStudied
+                    ? <CheckCircleIcon sx={{ color: theme.accent }} />
+                    : <CheckCircleOutlineIcon sx={{ color: isSelected ? theme.accent : theme.border, opacity: isSelected ? 0.8 : 1 }} />}
+                </IconButton>
               </ListItemButton>
             );
           }
           return null;
         })}
       </List>
+      <Box sx={{ height: 100 }} />
     </Box>
   );
 
@@ -98,9 +126,9 @@ const Layout = ({ children, sections = [], onOpenMobileNav }) => {
             top: 0,
             height: '100vh',
             zIndex: 1201,
-            display: 'flex',
-            flexDirection: 'column',
-            pt: '64px',
+            overflowY: 'auto',
+            scrollbarWidth: 'none', // Firefox
+            '&::-webkit-scrollbar': { display: 'none' }, // Chrome/Safari
           }}
         >
           {drawerContent}

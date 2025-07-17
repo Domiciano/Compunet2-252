@@ -58,12 +58,8 @@ const CodeBlock = ({ children, language, className = "" }) => {
       >
         <ContentCopyIcon fontSize="small" />
       </IconButton>
-      <pre style={{ margin: 0, maxWidth: 800, overflowX: 'auto', paddingBottom: 8, scrollbarWidth: 'none' }}
-        className="codeblock-pre-hide-scroll"
-      >
-        {/* Usamos 'ref' para que Prism.js pueda acceder al elemento <code> */}
-        {/* El texto va directamente dentro de <code>, Prism lo resaltará */}
-        <code className={`language-${language}`} ref={codeRef}>
+      <pre style={{ margin: 0, marginBottom: 0, width: '100%', maxWidth: '100%', overflowX: 'auto', paddingBottom: 8, display: 'block', whiteSpace: 'pre' }}>
+        <code className={`language-${language}`} ref={codeRef} style={{ width: '100%', maxWidth: '100%', display: 'block' }}>
           {children}
         </code>
       </pre>

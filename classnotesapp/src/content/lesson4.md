@@ -1,5 +1,5 @@
 [t] Introducción
-[p]
+
 Luego de tener una configuración simple con el servidor de aplicaciones Tomcat, vamos a integrar el Spring Framework al proyecto.
 
 Si no completaste la sesión S3, puedes clonar este repositorio:
@@ -8,7 +8,7 @@ Si no completaste la sesión S3, puedes clonar este repositorio:
 Antes, vamos a poner los puntos sobre las íes, conceptualmente.
 
 [st] Ciclo de vida de un Servlet
-[p]
+
 Todo servidor de aplicaciones Java contiene un Servlet Container, que es el componente encargado de gestionar el ciclo de vida de los servlets, manejar las solicitudes HTTP y facilitar la comunicación entre el cliente y la aplicación web. En el caso de Tomcat, su Servlet Container se llama Catalina.
 
 Catalina crea una única instancia de cada Servlet y la reutiliza. Para cada solicitud del cliente, el Servlet Container genera un nuevo hilo que ejecuta el método `service()`, el cual redirige a `doGet()`, `doPost()`, u otro método según el tipo de petición. La instancia del servlet es inicializada una sola vez mediante el método `init()`.
@@ -20,7 +20,7 @@ Finalmente, `destroy()` se ejecuta una sola vez, justo antes de que el servlet s
 Asimismo, un archivo JSP es convertido en un servlet en tiempo de ejecución por el Servlet Container. Cuando se solicita un JSP, este se traduce a una clase Java que extiende `HttpServlet`, se compila y luego se ejecuta para generar y entregar la respuesta al cliente.
 
 [st] Spring IoC Container
-[p]
+
 El IoC Container es un componente de Spring que gestiona instancias de objetos llamados beans. Un bean es cualquier clase de la aplicación que se registra en el contenedor, ya sea de forma explícita o automática. El IoC Container se encarga de crear, configurar y administrar sus instancias, permitiendo su uso en diferentes partes de la aplicación sin necesidad de instanciarlos manualmente.
 
 Inicialmente vamos a registrarlos de forma explícita. Para eso necesitamos primero el IoC Container.
@@ -35,7 +35,7 @@ Inicialmente vamos a registrarlos de forma explícita. Para eso necesitamos prim
 [end]
 
 [st] Ejemplo de Bean
-[p]
+
 La aplicación tendrá una lista de mensajes que se llenará en la medida que clientes envíen los mensajes. Tenga en cuenta que no tenemos persistencia. Por lo cual una vez el servidor haya terminado su ejecución, la información se perderá.
 
 [c:java]
@@ -56,7 +56,7 @@ public class MessageService {
 [end]
 
 [st] Registro del Bean en el IoC Container
-[p]
+
 En resources, cree un archivo llamado `applicationContext.xml`, cuyo contenido es el siguiente:
 
 [c:xml]
@@ -72,7 +72,7 @@ En resources, cree un archivo llamado `applicationContext.xml`, cuyo contenido e
 [end]
 
 [st] Creación del IoC Container
-[p]
+
 Aquí lo que va a hacer es crear un contexto para la aplicación de modo que el IoC Container podrá ser accedido en cualquier parte de la aplicación. El IoC Container contendrá los beans dentro del XML.
 
 [c:java]
@@ -91,7 +91,7 @@ public class Application {
 [end]
 
 [st] Uso del bean
-[p]
+
 Cree un Servlet que permita el uso del bean. Tendrá un método POST que recibirá un parámetro llamado `message` que se agregará al arreglo del Bean.
 
 [c:java]
