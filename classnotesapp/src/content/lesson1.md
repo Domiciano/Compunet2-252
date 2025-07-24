@@ -8,10 +8,8 @@ Para este servidor se implementará parcialmente la versión 1.0 de HTTP, como e
 [st] Servidor web simple
 Servidor web multi-hilos que mostrará el contenido de la solicitud (request) HTTP que recibe. A continuación se hará un recorrido a través del código para la primera parte de la  implementación de un servidor Web. En los lugares donde usted encuentre un signo de interrogación, `?`, usted debe completar el código que hace falta.
 La primera parte de la implementación del servidor web será multi-hilos, ya que el procesamiento de cada solicitud HTTP que llegue será atendida dentro de un hilo de ejecución separado. Esto permitirá al servidor
-
-
-Atender múltiples clientes en paralelo
-Realizar transferencias de archivos múltiples en paralelo al mismo cliente
+1. Atender múltiples clientes en paralelo
+2. Realizar transferencias de archivos múltiples en paralelo al mismo cliente
 
 Cuando se crea un nuevo hilo de ejecución, se debe pasar al constructor de hilos una instancia de alguna clase que implemente la interface `Runnable`. Esta es la razón por la cual se debe definir una clase separada llamada `SolicitudHttp`. La estructura del servidor web será la siguiente.
 
@@ -21,7 +19,7 @@ import java.net.* ;
 import java.util.* ;
 
 public final class ServidorWeb {
-        public static void main(String argv[]) throws Exception {asdasdasd asd asd as das d asd as d asd asd asd as d
+        public static void main(String argv[]) throws Exception {
                 . . .
         }
 }
@@ -39,11 +37,8 @@ public static void main(String argv[]) throws Exception {
 
         . . .
 }
-```
 [endcode]
 Luego, se abre un socket y se espera a que se solicite una conexión TCP. Debido a que el servidor estará recibiendo solicitudes indefinidamente, se colocará la operación de escucha (`listen`) dentro de un ciclo infinito. 
-
-
 [code:java]
 // Estableciendo el socket de escucha.
 ?
@@ -55,8 +50,6 @@ while (true) {
         . . .
 }
 [endcdoe]
-
-
 Cuando se reciba una solicitud de conexión se debe crear un objeto `SolicitudHttp`, pasando al método constructor una referencia al objeto socket que representa la conexión establecida con el cliente.
 
 [code:dart]
@@ -69,29 +62,17 @@ Thread hilo = new Thread(solicitud);
 // Inicia el hilo.
 hilo.start();
 [endcode]
-
-
 Para que el objeto `SolicitudHttp` maneje la solicitud de servicio HTTP que llega en un hilo separado, primero se debe crear una nueva instancia del objeto `Thread`, pasando a su método constructor una referencia al objeto `SolicitudHttp`, y luego se invoca el método `start()` del hilo recien creado.
-
 
 Después que el nuevo hilo ha sido creado e iniciado, la ejecución en el hilo principal regresa al inicio del ciclo de procesamiento del mensaje. Entonces el hilo principal podrá seguir escuchando, esperando otras solicitudes de conexión TCP, mientras el nuevo hilo continua corriendo. 
 
-
 Cuando se reciba otra solicitud de conexión TCP, el hilo principal realizará el mismo proceso de creación de un nuevo hilo sin importar si el hilo previo ha terminado o aún continua su ejecución.
-
 
 Esto completa el código del método `main()`. Para el resto de la primera parte de la práctica, sólo resta desarrollar el código de la clase `SolicitudHttp`.
 
-
-
-
 Se declararán dos variables para la clase `SolicitudHttp`: `CRLF` y `socket`. De acuerdo con la especificación del protocolo HTTP, debemos terminar cada línea de los mensajes de respuesta del servidor con un carriage return (`CR`) y un line feed (`LF`), por esto es conveniente definir `CRLF`. 
 
-
-
 La variable `socket` será utilizada para guardar una referencia al socket de conexión, con el cual se invocó el constructor de esta clase. La estructura de la clase `SolicitudHttp` es mostrada a continuación:
-
-
 [code:dart]
 final class SolicitudHttp implements Runnable {
         final static String CRLF = "\r\n";

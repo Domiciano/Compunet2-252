@@ -12,6 +12,7 @@ import Link from "@/components/lesson/Link";
 import images from "@/assets";
 import TryCodeButton from './TryCodeButton';
 import Typography from "@mui/material/Typography";
+import BeanVisualizer from "@/components/BeanVisualizer/BeanVisualizer";
 
 const LessonParser = ({ content }) => {
   // Eliminar líneas en blanco al final para asegurar flush correcto
@@ -28,6 +29,10 @@ const LessonParser = ({ content }) => {
   let parsingCode = false;
   let codeLang = "";
   let pendingCodeBlock = null;
+
+  // --- BEAN SIMULATOR ---
+  let parsingBeanSim = false;
+  let beanSimBuffer = "";
 
   // --- LISTA ---
   let parsingList = false;
@@ -152,6 +157,33 @@ const LessonParser = ({ content }) => {
     const rawLine = lines[i];
     const trimmedLine = rawLine.trim();
 
+    // --- INICIO DE BEANSIM ---
+    if (trimmedLine === '[beansim]') {
+      flushParagraph(elements, paragraphBuffer, i);
+      paragraphBuffer = "";
+      parsingBeanSim = true;
+      beanSimBuffer = "";
+      continue;
+    }
+
+    // --- FIN DE BEANSIM ---
+    if (trimmedLine === '[endbeansim]') {
+      if (parsingBeanSim) {
+        elements.push(
+          <BeanVisualizer key={`beansim-${i}`} initialCode={beanSimBuffer} />
+        );
+        parsingBeanSim = false;
+        beanSimBuffer = "";
+      }
+      continue;
+    }
+
+    // --- CONTENIDO DE BEANSIM ---
+    if (parsingBeanSim) {
+      beanSimBuffer += rawLine + "\n";
+      continue;
+    }
+
     // --- INICIO DE LISTA ---
     if (trimmedLine === '[list]') {
       flushParagraph(elements, paragraphBuffer, i);
@@ -165,7 +197,7 @@ const LessonParser = ({ content }) => {
     if (trimmedLine === '[endlist]') {
       parsingList = false;
       elements.push(
-        <ul key={`list-${i}`} style={{ margin: '0px 0 0px 4px', ...listTextStyle }}>
+        <ul key={`list-${i}`} style={{ margin: '0px 0 0px 0px', ...listTextStyle }}>
           {listItems}
         </ul>
       );
@@ -178,7 +210,7 @@ const LessonParser = ({ content }) => {
       // Cada línea no vacía dentro de la lista es un item
       if (trimmedLine !== "") {
         listItems.push(
-          <li key={`li-${i}`} style={{ padding:0, margin: '0px 0', listStyle: 'none', display: 'flex', alignItems: 'baseline' }}>
+          <li key={`li-${i}`} style={{ padding:0, margin: '0 0', listStyle: 'none', display: 'flex', alignItems: 'baseline' }}>
             <span style={{
               display: 'inline-block',
               width: 4,

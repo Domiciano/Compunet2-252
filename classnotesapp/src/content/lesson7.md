@@ -1,7 +1,5 @@
 [t] Introducción
-
 [st] ¿Qué es Spring Boot?
-
 Spring Boot es una extensión de Spring Framework que simplifica la creación de aplicaciones Spring al eliminar la configuración manual extensa. Proporciona configuraciones automáticas, un servidor embebido y convenciones predeterminadas para acelerar el desarrollo, manteniendo la flexibilidad y potencia de Spring.
 
 [st] Creación del primer proyecto
@@ -142,3 +140,17 @@ public class StudentController {
     }
 }
 [end] 
+
+
+[st] Simulador de beans
+[beansim]
+@Component
+public class BeanA {
+    @Autowired
+    private BeanB beanB;
+}
+
+@Repository
+public class BeanB {}
+[endbeansim]
+.
