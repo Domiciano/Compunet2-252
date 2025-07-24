@@ -169,11 +169,14 @@ const LessonParser = ({ content }) => {
     // --- FIN DE BEANSIM ---
     if (trimmedLine === '[endbeansim]') {
       if (parsingBeanSim) {
-        elements.push(
-          <BeanVisualizer key={`beansim-${i}`} initialCode={beanSimBuffer} />
-        );
+        if (beanSimBuffer.trim() !== "") {
+          elements.push(
+            <BeanVisualizer key={`beansim-${i}`} initialCode={beanSimBuffer} />
+          );
+        }
         parsingBeanSim = false;
         beanSimBuffer = "";
+        flushParagraph(elements, paragraphBuffer, i); // Flush after [endbeansim]
       }
       continue;
     }

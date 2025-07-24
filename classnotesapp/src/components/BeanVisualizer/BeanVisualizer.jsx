@@ -25,10 +25,21 @@ const BEAN_GAP = 40;
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 2.5;
 
-// Elimino getGridLayout porque no se usa
 
 export default function BeanVisualizer({ initialCode }) {
-  const [code, setCode] = useState(initialCode);
+  const [code, setCode] = useState('');
+
+  useEffect(() => {
+    const beanSimStartTag = '[beansim]';
+    const beanSimEndTag = '[endbeansim]';
+    const startIndex = (initialCode || '').indexOf(beanSimStartTag);
+    const endIndex = (initialCode || '').indexOf(beanSimEndTag);
+    if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+      setCode(initialCode.substring(startIndex + beanSimStartTag.length, endIndex).trim());
+    } else {
+      setCode(initialCode || '');
+    }
+  }, [initialCode]);
   const [beans, setBeans] = useState([]);
   const [wirings, setWirings] = useState([]);
   const [warnings, setWarnings] = useState({});
@@ -45,17 +56,22 @@ export default function BeanVisualizer({ initialCode }) {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [cycleWarnings, setCycleWarnings] = useState([]);
 
+  const LEVEL_VERTICAL_PADDING = 48;
+
   // Códigos de ejemplo
-  const javaExample = `@Component
+  const javaExample = `[beansim]
+@Component
 public class BeanA {}
 
 @Component
 public class BeanB {
     @Autowired
     private BeanA beanA;
-}`;
+}
+[endbeansim]`;
 
-  const xmlExample = `public class BeanA {}
+  const xmlExample = `[beansim]
+public class BeanA {}
 public class BeanB {}
 
 <?xml version="1.0" encoding="UTF-8"?>
@@ -70,15 +86,32 @@ public class BeanB {}
         <constructor-arg ref="beanA"/>
     </bean>
     
-</beans>`;
+</beans>
+[endbeansim]`;
 
   // Manejar clicks en los botones
   const handleJavaClick = () => {
-    setCode(javaExample);
+    const beanSimStartTag = '[beansim]';
+    const beanSimEndTag = '[endbeansim]';
+    const startIndex = javaExample.indexOf(beanSimStartTag);
+    const endIndex = javaExample.indexOf(beanSimEndTag);
+    if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+      setCode(javaExample.substring(startIndex + beanSimStartTag.length, endIndex).trim());
+    } else {
+      setCode(javaExample);
+    }
   };
 
   const handleXmlClick = () => {
-    setCode(xmlExample);
+    const beanSimStartTag = '[beansim]';
+    const beanSimEndTag = '[endbeansim]';
+    const startIndex = xmlExample.indexOf(beanSimStartTag);
+    const endIndex = xmlExample.indexOf(beanSimEndTag);
+    if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+      setCode(xmlExample.substring(startIndex + beanSimStartTag.length, endIndex).trim());
+    } else {
+      setCode(xmlExample);
+    }
   };
 
   // Asignar posiciones iniciales o reacomodar al cambiar beans o wiring
@@ -129,7 +162,6 @@ public class BeanB {}
   const allWirings = wirings;
   const levels = getBeanLevels(beans, allWirings);
   const BEAN_ROW_HEIGHT = 2 * BEAN_RADIUS; // alto real de cada fila
-  const LEVEL_VERTICAL_PADDING = 48; // separación visual extra entre filas (mucho menor)
   const PADDING = 24;
   // El alto virtual es la suma de los altos de las filas más el padding extra
   const virtualHeight = levels.length > 0

@@ -9,14 +9,26 @@ import { validateCode } from '../regex/validations.js';
 import { validateXmlStructure } from '../regex/xmlValidation.js';
 
 export function buildBeanGraph(code) {
+  // Extraer contenido entre [beansim] y [endbeansim] si existen
+  const beanSimStartTag = '[beansim]';
+  const beanSimEndTag = '[endbeansim]';
+  let processedCode = code;
+
+  const startIndex = code.indexOf(beanSimStartTag);
+  const endIndex = code.indexOf(beanSimEndTag);
+
+  if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+    processedCode = code.substring(startIndex + beanSimStartTag.length, endIndex).trim();
+  }
+
   // Detectar si es XML o Java
-  const isXml = code.trim().startsWith('<?xml') || code.includes('<beans') || code.includes('<bean');
+  const isXml = processedCode.trim().startsWith('<?xml') || processedCode.includes('<beans') || processedCode.includes('<bean');
   
   let beans, wirings, methodWirings, constructorWirings, configWirings;
   let warnings;
   
   if (isXml) {
-    warnings = validateXmlStructure(code);
+    warnings = validateXmlStructure(processedCode);
     // Si hay errores críticos en la estructura XML, no procesar beans
     const hasCriticalErrors = warnings.xmlTagWarning || warnings.xmlClosingWarning || warnings.beanUnclosedWarning;
     if (hasCriticalErrors) {
@@ -27,11 +39,11 @@ export function buildBeanGraph(code) {
       configWirings = [];
     } else {
       // Obtener clases declaradas en el código Java
-      const declaredClasses = Array.from(code.matchAll(/public\s+class\s+(\w+)/g)).map(m => m[1]);
+      const declaredClasses = Array.from(processedCode.matchAll(/public\s+class\s+(\w+)/g)).map(m => m[1]);
       // Analizar todos los wirings definidos en el XML (aunque apunten a beans inexistentes)
-      const allXmlBeans = parseXmlBeans(code);
+      const allXmlBeans = parseXmlBeans(processedCode);
       const filteredBeans = allXmlBeans.filter(bean => declaredClasses.includes(bean.className));
-      const allWirings = parseXmlWirings(code, allXmlBeans); // todos los wirings posibles
+      const allWirings = parseXmlWirings(processedCode, allXmlBeans); // todos los wirings posibles
       const validBeanNames = filteredBeans.map(b => b.beanName);
       // Advertencias para wirings rotos
       const brokenWirings = allWirings.filter(w => !validBeanNames.includes(w.to));
@@ -48,9 +60,9 @@ export function buildBeanGraph(code) {
     }
   } else {
     // Parsear Java
-    beans = parseBeans(code);
+    beans = parseBeans(processedCode);
     // Obtener clases declaradas
-    const declaredClasses = Array.from(code.matchAll(/public\s+class\s+(\w+)/g)).map(m => m[1]);
+    const declaredClasses = Array.from(processedCode.matchAll(/public\s+class\s+(\w+)/g)).map(m => m[1]);
     // Filtrar beans de métodos @Bean cuyo tipo no existe
     const filteredBeans = beans.filter(bean => {
       if (bean.type === 'bean') {
@@ -58,12 +70,12 @@ export function buildBeanGraph(code) {
       }
       return true;
     });
-    wirings = parseWirings(code, filteredBeans).wirings;
-    methodWirings = parseMethodWirings(code, filteredBeans).methodWirings;
-    constructorWirings = parseConstructorWirings(code, filteredBeans).constructorWirings;
-    configWirings = parseConfigWirings(code, filteredBeans).configWirings;
+    wirings = parseWirings(processedCode, filteredBeans).wirings;
+    methodWirings = parseMethodWirings(processedCode, filteredBeans).methodWirings;
+    constructorWirings = parseConstructorWirings(processedCode, filteredBeans).constructorWirings;
+    configWirings = parseConfigWirings(processedCode, filteredBeans).configWirings;
     beans = filteredBeans;
-    warnings = validateCode(code, beans);
+    warnings = validateCode(processedCode, beans);
   }
   
   return {

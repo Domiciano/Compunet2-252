@@ -139,18 +139,4 @@ public class StudentController {
         return "Aqui hay unos estudiantes";
     }
 }
-[end] 
-
-
-[st] Simulador de beans
-[beansim]
-@Component
-public class BeanA {
-    @Autowired
-    private BeanB beanB;
-}
-
-@Repository
-public class BeanB {}
-[endbeansim]
-.
+[end]
