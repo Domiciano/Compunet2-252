@@ -1,32 +1,19 @@
 [t] Servidor de Aplicaciones
-
-[i] image5.png|Diagrama de servidor de aplicaciones Tomcat
-
-
 En esta lección aprenderás a trabajar con el servidor de aplicaciones Tomcat, configurarlo manualmente y desplegar aplicaciones Java usando Maven y servlets. Verás las diferencias clave entre un servidor web y un servidor de aplicaciones.
-
+[icon] image5.png|Diagrama de servidor de aplicaciones Tomcat
 [st] Descarga y configuración de Tomcat
-
-
 Descarga Tomcat 10 desde:
-
-[c:plain]
+[code:plain]
 https://tomcat.apache.org/download-10.cgi
-[end]
-
-
-Descomprime el ZIP. Si usas Mac o Linux, da permisos de ejecución a los scripts:
-
-[c:sh]
+[endcode]
+Descomprime el `ZIP`. Si usas Mac o Linux, da permisos de ejecución a los scripts:
+[code:bash]
 chmod +x bin/*.sh
-[end]
+[endcode]
 
 [st] Crear un proyecto Maven y dependencias
-
-
 Crea un proyecto Maven y agrega la dependencia de Jakarta Servlet API en tu `pom.xml`:
-
-[c:xml]
+[code:xml]
 <dependencies>
   <dependency>
     <groupId>jakarta.servlet</groupId>
@@ -35,43 +22,29 @@ Crea un proyecto Maven y agrega la dependencia de Jakarta Servlet API en tu `pom
     <scope>provided</scope>
   </dependency>
 </dependencies>
-[end]
-
+[endcode]
 [st] Empaquetado como WAR
-
-
 Configura el empaquetado como `war` en el `pom.xml`:
-
-[c:xml]
+[code:xml]
 <packaging>war</packaging>
-[end]
-
+[endcode]
 [st] Verificar versión de Java
-
-
 Asegúrate de que la versión de Java en tu sistema y en tu IDE coincidan. Puedes verificarlo con:
-
-[c:sh]
+[code:sh]
 java -version
-[end]
-
-
+[endcode]
 En el `pom.xml` puedes especificar la versión:
-
-[c:xml]
+[code:xml]
 <properties>
   <maven.compiler.source>18</maven.compiler.source>
   <maven.compiler.target>18</maven.compiler.target>
   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 </properties>
-[end]
+[endcode]
 
 [st] Estructura de carpetas del proyecto
-
-
 La estructura típica de un proyecto web con Maven y Tomcat es:
-
-[c:plain]
+[code:plain]
 📦 project
  ┣ 📂 src
  ┃ ┗ 📂 main
@@ -83,11 +56,9 @@ La estructura típica de un proyecto web con Maven y Tomcat es:
  ┃   ┗ 📂 webapp
  ┃      ┗ 📜 index.jsp
  ┗ 📜 pom.xml 
-[end]
-
+[endcode]
 [st] Crear un Servlet básico
-
-[c:java]
+[code:java]
 package com.icesi.webappexample.servlet;
 
 import jakarta.servlet.annotation.WebServlet;
@@ -105,11 +76,10 @@ public class ServletExample extends HttpServlet {
         resp.getWriter().println("<h1>Este es un servlet<h1>");
     }
 }
-[end]
+[endcode]
 
 [st] Crear un JSP básico
-
-[c:xml]
+[code:xml]
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
   <head>
@@ -119,43 +89,26 @@ public class ServletExample extends HttpServlet {
     <h1>Beta Gamma Alfa Delta</h1>
   </body>
 </html>
-[end]
-
+[endcode]
 [st] Empaquetar y desplegar el WAR
-
-
 Para empaquetar el proyecto ejecuta:
-
-[c:sh]
+[code:sh]
 mvn clean package
-[end]
-
-
+[endcode]
 Esto generará el archivo `.war` en la carpeta `target`. Copia el `.war` a la carpeta `webapps` de Tomcat y arráncalo con:
-
-[c:sh]
+[code:sh]
 ./startup.sh
-[end]
-
-
+[endcode]
 Accede a la aplicación en:
-
-[c:plain]
+[code:plain]
 http://localhost:8080/<nombre>
-[end]
-
-
+[endcode]
 Y al servlet en:
-
-[c:plain]
+[code:plain]
 http://localhost:8080/<nombre>/hello
-[end]
-
+[endcode]
 [st] Automatizar el despliegue desde el IDE
-
-
 Puedes automatizar el despliegue configurando Tomcat en tu IDE (por ejemplo, IntelliJ IDEA) y asociando el artefacto WAR al servidor.
-
 
 ¡Ahora sabes cómo desplegar aplicaciones Java en Tomcat y la diferencia entre un servidor web y uno de aplicaciones!
 

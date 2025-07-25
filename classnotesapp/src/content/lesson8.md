@@ -4,7 +4,7 @@
 Vamos a trabajar con una base de datos en memoria llamada H2 y veremos cómo integrar Spring Boot con JPA y un ORM para persistencia de datos.
 
 [st] Dependencias necesarias
-[c:xml]
+[code:xml]
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -14,10 +14,10 @@ Vamos a trabajar con una base de datos en memoria llamada H2 y veremos cómo int
     <artifactId>h2</artifactId>
     <scope>runtime</scope>
 </dependency>
-[end]
+[endcode]
 
 [st] Modelo de datos
-[c:java]
+[code:java]
 public class Student {
     private int id;
     private String code; // Ejemplo: A00123456
@@ -25,10 +25,10 @@ public class Student {
     private String program;
     // Getters y setters
 }
-[end]
+[endcode]
 
 [st] Entidad JPA
-[c:java]
+[code:java]
 @Entity
 @Table(name = "student")
 public class Student {
@@ -40,7 +40,7 @@ public class Student {
     private String program;
     // Getters y setters
 }
-[end]
+[endcode]
 
 [st] Conceptos clave: Connection Pool y ORM
 
@@ -53,7 +53,7 @@ JPA (Jakarta Persistence API) es una especificación para trabajar con bases de 
 Hibernate es un framework ORM para Java que facilita la persistencia de datos en bases de datos relacionales.
 
 [st] Configuración de base de datos H2
-[c:plain]
+[code:plain]
 spring.application.name=IntroSpring
 spring.datasource.url=jdbc:h2:mem:testdb
 spring.datasource.driver-class-name=org.h2.Driver
@@ -62,20 +62,20 @@ spring.datasource.password=
 spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
 spring.h2.console.enabled=true
 spring.h2.console.path=/h2
-[end]
+[endcode]
 
 [st] Capa Repository con Spring Data JPA
-[c:java]
+[code:java]
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Integer> {
 }
-[end]
+[endcode]
 
 [st] Configuración para base de datos PostgreSQL
-[c:ini]
+[code:ini]
 spring.jpa.hibernate.ddl-auto=update
 spring.datasource.username=USERNAME
 spring.datasource.password=PASSWORD
@@ -83,10 +83,10 @@ spring.datasource.hikari.maximum-pool-size=20
 spring.datasource.driver-class-name=org.postgresql.Driver
 spring.datasource.url=jdbc:postgresql://localhost:5432/DB
 spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
-[end]
+[endcode]
 
 [st] Relaciones entre tablas con JPA
-[c:java]
+[code:java]
 import jakarta.persistence.*;
 
 @Entity
@@ -100,9 +100,9 @@ public class Profesor {
     private List<Curso> cursos;
     // Getters y Setters
 }
-[end]
+[endcode]
 
-[c:java]
+[code:java]
 import jakarta.persistence.*;
 
 @Entity
@@ -118,19 +118,19 @@ public class Curso {
     Profesor profesor;
     // Getters y Setters
 }
-[end]
+[endcode]
 
 [st] Reduciendo código repetitivo con Lombok
-[c:xml]
+[code:xml]
 <dependency>
     <groupId>org.projectlombok</groupId>
     <artifactId>lombok</artifactId>
     <version>1.18.30</version>
     <scope>provided</scope>
 </dependency>
-[end]
+[endcode]
 
-[c:java]
+[code:java]
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -153,10 +153,10 @@ public class Student {
     private String name;
     private String program;
 }
-[end]
+[endcode]
 
 [st] Usando Docker para la base de datos
-[c:yml]
+[code:yml]
 services:
   db:
     image: postgres:17
@@ -174,10 +174,10 @@ services:
 
 volumes:
   my-volume:
-[end]
+[endcode]
 
 
 Para crear el contenedor ejecuta:
-[c:sh]
+[code:sh]
 docker-compose up -d
-[end] 
+[endcode] 

@@ -22,18 +22,18 @@ En la clase principal puede ver la anotación `@SpringBootApplication`, que comb
 - `@EnableAutoConfiguration`: Activa la configuración automática basada en las dependencias presentes en el classpath.
 - `@ComponentScan`: Escanea los beans presentes en el paquete principal y los crea.
 
-[c:java]
+[code:java]
 @SpringBootApplication
 public class IntroSpringApplication {
     public static void main(String[] args) {
         SpringApplication.run(IntroSpringApplication.class, args);
     }
 }
-[end]
+[endcode]
 
 
 Puede usar `@PostConstruct` en esta clase para inicializar la aplicación:
-[c:java]
+[code:java]
 @SpringBootApplication
 public class IntroSpringApplication {
     public static void main(String[] args) {
@@ -44,20 +44,20 @@ public class IntroSpringApplication {
         // Código de inicialización
     }
 }
-[end]
+[endcode]
 
 [st] Agregar la dependencia web
-[c:xml]
+[code:xml]
 <dependency>
   <groupId>org.springframework.boot</groupId>
   <artifactId>spring-boot-starter-web</artifactId>
 </dependency>
-[end]
+[endcode]
 
 [st] Creación de un Controller
 
 Con la dependencia web, puede crear endpoints usando anotaciones de `spring-boot-starter-web`.
-[c:java]
+[code:java]
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -72,7 +72,7 @@ public class StudentController {
         return "Aqui hay unos estudiantes";
     }
 }
-[end]
+[endcode]
 
 
 Con `@RequestMapping` configura la ruta del controller como prefijo para los endpoints. Con `@GetMapping` configura la ruta y el verbo HTTP. El endpoint será accesible en:
@@ -83,14 +83,14 @@ Con `@RequestMapping` configura la ruta del controller como prefijo para los end
 
 Para desacoplar las capas Controller, Service y Repository, es buena práctica que el Controller acceda a una interfaz y el programador elija la implementación.
 
-[c:java]
+[code:java]
 public interface StudentService {
     void createStudent(Student student);
     List<Student> getAllStudents();
 }
-[end]
+[endcode]
 
-[c:java]
+[code:java]
 @Service
 public class StudentServiceImpl implements StudentService {
     @Override
@@ -103,29 +103,29 @@ public class StudentServiceImpl implements StudentService {
         return null;
     }
 }
-[end]
+[endcode]
 
 [st] Wiring de beans con interfaces y @Qualifier
 
 El Controller puede recibir la implementación del Service por constructor o por campo usando `@Autowired` y `@Qualifier`.
 
-[c:java]
+[code:java]
 private StudentService studentService;
 
 StudentController(@Qualifier("studentServiceImpl") StudentService studentService){
     this.studentService = studentService;
 }
-[end]
+[endcode]
 
-[c:java]
+[code:java]
 @Autowired
 @Qualifier("studentServiceImpl")
 private StudentService studentService;
-[end]
+[endcode]
 
 
 Ejemplo de uso en el Controller:
-[c:java]
+[code:java]
 @Controller
 @RequestMapping("/students")
 public class StudentController {
@@ -139,4 +139,4 @@ public class StudentController {
         return "Aqui hay unos estudiantes";
     }
 }
-[end]
+[endcode]

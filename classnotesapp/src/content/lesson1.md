@@ -1,8 +1,6 @@
 [t] Servidor WEB
 En esta práctica usted debe completar el código, en lenguaje Java, para construir un servidor web. Al final se tendrá un servidor web multi-hilos (multi-threaded) con la capacidad de procesar solicitudes simultáneas en paralelo. Se considerará que la práctica ha sido concluida con éxito cuando su servidor web pueda atender las solicitudes de un `browser` para web.
-
 [icon] image1.png|Diagrama de arquitectura de servidor web
-
 Para este servidor se implementará parcialmente la versión 1.0 de HTTP, como está definida en el RFC 1945, donde las solicitudes (request HTTP) son enviadas separadas para cada componente de la página web. El servidor debe ser capaz de manipular solicitudes de servicio simultáneas en paralelo. Esto significa que el servidor es multi-hilos (multi-threaded). En el hilo principal, el servidor escuchará por un puerto fijo. Cuando reciba una solicitud de conexión TCP, establecerá una conexión TCP a través de otro socket (socket de conexión) y atenderá la solicitud en un hilo separado. Para simplificar el proceso de programación, el código debe ser desarrollado en dos etapas. En la primera se escribirá un servidor multi-hilos que simplemente mostrará en la pantalla el contenido de la solicitud (request HTTP) que recibe. Cuando este código esté funcionando de manera correcta, usted podrá agregar, en la segunda etapa, el código requerido para generar una respuesta HTTP apropiada al `browser`.
 
 [st] Servidor web simple
@@ -96,13 +94,7 @@ final class SolicitudHttp implements Runnable {
         }
 }
 [endcode]
-
-
 Para poder pasar una instancia de la clase `SolicitudHttp` al constructor de hilos, `SolicitudHttp` debe implementar la interface `Runnable`, que simplemente significa que se debe definir un método público llamado `run()` que retorna void. La mayor parte del procesamiento se realizará dentro del método `proceseSolicitud()`, que es invocado desde `run()`.
-
-
-
-
 
 Hasta este punto se ha venido permitiendo lanzar excepciones, sin manejarlas. Sin embargo, no se pueden lanzar excepciones desde `run()`, ya que se debe respetar estrictamente la declaración de `run()` en la interface `Runnable`, que no lanza ninguna excepción. Todo el código para procesamiento será colocado en `proceseSolicitud()`, y desde allí, lanzar las excepciones para `run()`. Dentro de `run()`, de forma explícita se capturarán y se manejarán las excepciones con un bloque `try`/`catch`.
 
@@ -116,8 +108,6 @@ public void run() {
         }
 }
 [endcode]
-
-
 El siguiente paso es desarrollar el código interno de `proceseSolicitud()`. Primero se obtiene una referencia al stream de salida del socket. Luego se obtiene una referencia al stream de entrada del socket y se envuelven los filtros `InputStreamReader` y `BufferedReader` alrededor del stream de entrada ( no se debe envolver ningún filtro alrededor del stream de salida, ya que se escribirá directamente en el stream de salida).
 
 [code:java]
@@ -130,10 +120,7 @@ private void proceseSolicitud() throws Exception {
         . . .
 }
 [endcode]
-
-
 Ahora se puede recoger el mensaje de solicitud HTTP del cliente, esto se hace leyendo el stream de entrada del socket. El método `readLine()` de la clase `BufferedReader` extrae caracteres del stream de entrada hasta que encuentre un caracter end-of-line, o en este caso, la secuencia `CRLF`.
-
 [code:dart]
 // Recoge la línea de solicitud HTTP del mensaje.
 String linea = ?;
@@ -148,7 +135,6 @@ while ((linea = in.readLine()) != null && !linea.isEmpty()) {
   System.out.println(linea);
 }
 [endcode]
-
 Faltaría colocar las siguientes líneas de código para cerrar los streams y el socket de conexión.
 [code:dart]
 // Cierra los streams y el socket.

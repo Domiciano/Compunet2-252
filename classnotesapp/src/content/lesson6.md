@@ -11,14 +11,14 @@ Construye este esquema para organizar las capas:
 
 
 Nos falta aún la clase `CourseService`:
-[c:java]
+[code:java]
 public class CourseService {
     private CourseRepository courseRepository;
     public CourseService(CourseRepository courseRepository) {
         this.courseRepository = courseRepository;
     }
 }
-[end]
+[endcode]
 
 [st] Capas Repository y Service
 
@@ -32,7 +32,7 @@ Capa Service
 En las clases Service, haz las validaciones necesarias antes de usar las funciones de acceso a datos. Aquí se implementan reglas de negocio, como impedir operaciones no autorizadas. Métodos típicos: `getAll()`, `getById(id)`, `create(entity)`, `update(id, entity)`, `delete(id)`.
 
 [st] Servlets para las entidades
-[c:java]
+[code:java]
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 
@@ -40,9 +40,9 @@ import jakarta.servlet.http.HttpServlet;
 public class CourseServlet extends HttpServlet {
     
 }
-[end]
+[endcode]
 
-[c:java]
+[code:java]
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 
@@ -50,13 +50,13 @@ import jakarta.servlet.http.HttpServlet;
 public class StudentServlet extends HttpServlet {
     
 }
-[end]
+[endcode]
 
 [st] Definición de Beans con @Configuration
 
 Puedes generar los beans y el wiring usando la anotación `@Configuration` en una clase donde se listan y conectan los beans.
 
-[c:java]
+[code:java]
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -64,10 +64,10 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
     ...
 }
-[end]
+[endcode]
 
 [st] Definición de Beans con @Bean
-[c:java]
+[code:java]
 @Configuration
 public class AppConfig {
     @Bean("miBean")
@@ -76,10 +76,10 @@ public class AppConfig {
         return new MiClase();
     }
 }
-[end]
+[endcode]
 
 [st] Wiring de Beans en métodos @Bean
-[c:java]
+[code:java]
 @Configuration
 public class AppConfig {
     @Bean
@@ -91,10 +91,10 @@ public class AppConfig {
         return new StudentService(studentRepository);
     }
 }
-[end]
+[endcode]
 
 [st] Cambiar el contexto de la aplicación
-[c:java]
+[code:java]
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -104,43 +104,43 @@ public class Application {
         return context;
     }
 }
-[end]
+[endcode]
 
 [st] Inicialización de Beans con initMethod
-[c:java]
+[code:java]
 @Bean(initMethod="intialize")
 public StudentRepository studentRepository() {
     return new StudentRepository();
 }
-[end]
+[endcode]
 
 [st] Definición de Beans con Anotaciones
 
 Puedes usar la anotación `@Component` sobre la clase para definir un bean. Existen alias como `@Service` y `@Repository` para mayor semántica.
 
-[c:java]
+[code:java]
 @Component
 public class MiClaseA {
     ...
 }
-[end]
+[endcode]
 
-[c:java]
+[code:java]
 @Repository
 public class CourseRepository {
     ...
 }
-[end]
+[endcode]
 
-[c:java]
+[code:java]
 @Service
 public class CourseService {
     ...
 }
-[end]
+[endcode]
 
 [st] Wiring automático con anotaciones
-[c:java]
+[code:java]
 @Repository
 public class CourseRepository {
     ...
@@ -153,23 +153,23 @@ public class CourseService{
         this.courseRepository = courseRepository;
     }
 }
-[end]
+[endcode]
 
 [st] Inicialización con @PostConstruct
-[c:java]
+[code:java]
 @PostConstruct
 public void initializeData(){
     // Código de inicialización
 }
-[end]
+[endcode]
 
-[c:xml]
+[code:xml]
 <dependency>
     <groupId>jakarta.annotation</groupId>
     <artifactId>jakarta.annotation-api</artifactId>
     <version>2.1.1</version>
 </dependency>
-[end]
+[endcode]
 
 [st] Funcionalidades desde el Servlet
 

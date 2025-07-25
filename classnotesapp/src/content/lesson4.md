@@ -26,19 +26,19 @@ El IoC Container es un componente de Spring que gestiona instancias de objetos l
 Inicialmente vamos a registrarlos de forma explícita. Para eso necesitamos primero el IoC Container.
 
 [st] Instalación del IoC Container
-[c:xml]
+[code:xml]
 <dependency>
     <groupId>org.springframework</groupId>
     <artifactId>spring-context</artifactId>
     <version>6.2.2</version>
 </dependency>
-[end]
+[endcode]
 
 [st] Ejemplo de Bean
 
 La aplicación tendrá una lista de mensajes que se llenará en la medida que clientes envíen los mensajes. Tenga en cuenta que no tenemos persistencia. Por lo cual una vez el servidor haya terminado su ejecución, la información se perderá.
 
-[c:java]
+[code:java]
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,13 +53,13 @@ public class MessageService {
         return messages;
     }
 }
-[end]
+[endcode]
 
 [st] Registro del Bean en el IoC Container
 
 En resources, cree un archivo llamado `applicationContext.xml`, cuyo contenido es el siguiente:
 
-[c:xml]
+[code:xml]
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -69,13 +69,13 @@ En resources, cree un archivo llamado `applicationContext.xml`, cuyo contenido e
     <bean id="messageService" class="org.example.yourproject.service.MessageService" />
     
 </beans>
-[end]
+[endcode]
 
 [st] Creación del IoC Container
 
 Aquí lo que va a hacer es crear un contexto para la aplicación de modo que el IoC Container podrá ser accedido en cualquier parte de la aplicación. El IoC Container contendrá los beans dentro del XML.
 
-[c:java]
+[code:java]
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -88,13 +88,13 @@ public class Application {
     }
 
 }
-[end]
+[endcode]
 
 [st] Uso del bean
 
 Cree un Servlet que permita el uso del bean. Tendrá un método POST que recibirá un parámetro llamado `message` que se agregará al arreglo del Bean.
 
-[c:java]
+[code:java]
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -122,10 +122,10 @@ public class MessageServlet extends HttpServlet {
     }
     
 }
-[end]
+[endcode]
 
 [st] Renderizado y envío de mensajes
-[c:java]
+[code:java]
 <%@ page import="org.springframework.context.support.ClassPathXmlApplicationContext" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
@@ -148,4 +148,4 @@ public class MessageServlet extends HttpServlet {
 
 </body>
 </html>
-[end]
+[endcode]
