@@ -144,7 +144,7 @@ in.close();
 socket.close();
 [endcode]
 [st] HTTP 
-En el `https://datatracker.ietf.org/doc/html/rfc1945` está el esquema de response de un servidor HTTP. 
+En el `rfc1945` está el esquema de response de un servidor HTTP. 
 [code:http]
 HTTP/1.0 200 OK\r\n
 Content-Type: text/html\r\n
@@ -154,3 +154,5 @@ Connection: close\r\n
 <html><body>Hola Mundo</body></html>
 [endcode]
 Donde CRLF es `\r\n`
+
+[link] RFC1945 https://datatracker.ietf.org/doc/html/rfc1945
