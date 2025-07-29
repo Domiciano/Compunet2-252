@@ -14,10 +14,10 @@ import Divider from "@mui/material/Divider";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import { Link, useLocation } from "react-router-dom";
-import { useThemeMode } from '@/theme/ThemeContext';
+import { useThemeMode } from '@/theme/ThemeContext.jsx';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { useStudiedLessons } from '@/theme/StudiedLessonsContext';
+import { useStudiedLessons } from '@/theme/StudiedLessonsContext.jsx';
 
 const drawerWidth = 280;
 
