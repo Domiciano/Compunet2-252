@@ -1,3 +1,4 @@
+
 [t] Servidor web multi-hilos
 En esta lección afinarás tu servidor web para que pueda responder a la petición de diversos recursos: archivos HTML (`text/html`) e imágenes (`image/jpeg`, `image/gif`). El servidor analizará la solicitud HTTP y enviará una respuesta apropiada al browser.
 [icon] image2.png|Diagrama de respuesta de recursos

@@ -1,3 +1,4 @@
+
 [t] Servidor WEB
 En esta práctica usted debe completar el código, en lenguaje Java, para construir un servidor web. Al final se tendrá un servidor web multi-hilos (multi-threaded) con la capacidad de procesar solicitudes simultáneas en paralelo. Se considerará que la práctica ha sido concluida con éxito cuando su servidor web pueda atender las solicitudes de un `browser` para web.
 [icon] image1.png|Diagrama de arquitectura de servidor web

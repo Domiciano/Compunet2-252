@@ -1,3 +1,4 @@
+
 [t] Servidor de Aplicaciones
 En esta lección aprenderás a trabajar con el servidor de aplicaciones Tomcat, configurarlo manualmente y desplegar aplicaciones Java usando Maven y servlets. Verás las diferencias clave entre un servidor web y un servidor de aplicaciones.
 [icon] image5.png|Diagrama de servidor de aplicaciones Tomcat
