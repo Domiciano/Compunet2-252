@@ -12,7 +12,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ThemeProvider>
       <StudiedLessonsProvider>
-        <BrowserRouter basename="/Compunet2-252/">
+        <BrowserRouter basename="/compu2/">
           <App />
         </BrowserRouter>
       </StudiedLessonsProvider>
