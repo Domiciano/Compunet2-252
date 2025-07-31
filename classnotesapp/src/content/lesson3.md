@@ -12,8 +12,29 @@ Descomprime el `ZIP`. Si usas Mac o Linux, da permisos de ejecución a los scrip
 chmod +x bin/*.sh
 [endcode]
 
+[st] Variable de entorno `JAVA_HOME`
+Debes crear una variable de entorno que apunte a la ruta donde está instalado java.
+Ruta típica en Windows
+[code:bash]
+C:\Program Files\Java\jdk-21
+[endcode]
+Ruta típica en Linux
+[code:bash]
+/usr/lib/jvm/java-21-openjdk-amd64
+[endcode]
+Ruta típica en Mac
+[code:bash]
+/opt/homebrew/opt/openjdk@21
+[endcode]
+Si no la encuentras prueba en Windows
+[code:bash]
+where java
+[endcode]
+En Mac/Linux
+[code:bash]
+which java
+[endcode]
 [st] Instala el comando `mvn`
-
 Debes tener el comando `mvn` en tu shell, para eso, descarga Maven en
 [code:bash]
 https://maven.apache.org/download.cgi
