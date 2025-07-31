@@ -3,14 +3,38 @@
 En esta lección aprenderás a trabajar con el servidor de aplicaciones Tomcat, configurarlo manualmente y desplegar aplicaciones Java usando Maven y servlets. Verás las diferencias clave entre un servidor web y un servidor de aplicaciones.
 [icon] image5.png|Diagrama de servidor de aplicaciones Tomcat
 [st] Descarga y configuración de Tomcat
-Descarga Tomcat 10 desde:
+Descarga Tomcat 11 desde:
 [code:plain]
-https://tomcat.apache.org/download-10.cgi
+https://tomcat.apache.org/download-11.cgi
 [endcode]
 Descomprime el `ZIP`. Si usas Mac o Linux, da permisos de ejecución a los scripts:
 [code:bash]
 chmod +x bin/*.sh
 [endcode]
+
+[st] Instala el comando `mvn`
+
+Debes tener el comando `mvn` en tu shell, para eso, descarga Maven en
+[code:bash]
+https://maven.apache.org/download.cgi
+[endcode]
+Descarga el `.zip`, descomprímelo y agrega a tu variable `PATH` la ruta de la carpeta `bin` de maven.
+
+Si estás en Windows, debes entrar a 
+[code:bash]
+Configuración avanzada del sistema > Variables de Entorno > Variables del Sistema
+[endcode]
+Busca la variable `PATH` para editarla y agregarle la ruta de maven.
+
+En Linux o Mac debes editar tu archivo `.bashrc` o `.zshrc` de acuerdo al shell que manejas. Para saber cuál es tu shell usa
+[code:bash]
+echo $SHELL
+[endcode]
+Una vez que haya agregado la ruta de maven a `PATH`, cierra el shell y vuélvelo a abrir. Usa el comando
+[code:bash]
+mvn
+[endcode]
+Si reconoce el comando ya tienen maven en tu sistema.
 
 [st] Crear un proyecto Maven y dependencias
 Crea un proyecto Maven y agrega la dependencia de Jakarta Servlet API en tu `pom.xml`:
@@ -37,8 +61,8 @@ java -version
 En el `pom.xml` puedes especificar la versión:
 [code:xml]
 <properties>
-  <maven.compiler.source>18</maven.compiler.source>
-  <maven.compiler.target>18</maven.compiler.target>
+  <maven.compiler.source>21</maven.compiler.source>
+  <maven.compiler.target>21</maven.compiler.target>
   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 </properties>
 [endcode]
