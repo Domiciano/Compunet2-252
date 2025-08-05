@@ -153,9 +153,83 @@ Y al servlet en:
 [code:plain]
 http://localhost:8080/<nombre>/hello
 [endcode]
-[st] Automatizar el despliegue desde el IDE
-Puedes automatizar el despliegue configurando Tomcat en tu IDE (por ejemplo, IntelliJ IDEA) y asociando el artefacto WAR al servidor.
 
-¡Ahora sabes cómo desplegar aplicaciones Java en Tomcat y la diferencia entre un servidor web y uno de aplicaciones!
+[st] Ciclo de vida
+Todo servidor de aplicaciones Java contiene un Servlet Container, que es el componente encargado de gestionar el ciclo de vida de los servlets, manejar las solicitudes HTTP y facilitar la comunicación entre el cliente y la aplicación web. En el caso de Tomcat, su Servlet Container se llama Catalina.
 
+Catalina crea una única instancia de cada Servlet y la reutiliza. Para cada solicitud del cliente, el Servlet Container genera un nuevo hilo que ejecuta el método service(), el cual redirige a doGet(), doPost(), u otro método según el tipo de petición.
 
+La instancia del servlet es inicializada una sola vez mediante el método init().
+[icon] image6.png
+Finalmente, destroy() se ejecuta una sola vez, justo antes de que el servlet sea eliminado, lo que ocurre cuando el servidor se apaga o el servlet es descargado.
+
+Asimismo, un archivo JSP es convertido en un servlet en tiempo de ejecución por el Servlet Container. Cuando se solicita un JSP, este se traduce a una clase Java que extiende HttpServlet, se compila y luego se ejecuta para generar y entregar la respuesta al cliente.
+
+[st] Ejercicio
+Entre todos vamos a conectarnos a uno de los PC de la sala por SSH. Lo primero es escoger uno de los siguientes PC. 
+[code:plain]
+PC11
+192.168.131.31
+
+PC12
+192.168.131.32
+
+PC13
+192.168.131.33
+
+PC14
+192.168.131.34
+
+PC15
+192.168.131.35
+
+PC16
+192.168.131.36
+
+PC17
+192.168.131.37
+
+PC18
+192.168.131.38
+
+PC19
+192.168.131.39
+
+PC20
+192.168.131.40 
+[endcode]
+
+Entremos con SSH
+[code:plain]
+ssh computacion@<IP>
+[endcode]
+
+Una vez dentro, descarguemos el tomcat
+[code:plain]
+wget https://dlcdn.apache.org/tomcat/tomcat-11/v11.0.9/bin/apache-tomcat-11.0.9.zip
+[endcode]
+
+Descomprimamos
+[code:plain]
+unzip apache-tomcat-11.0.9.zip
+[endcode]
+
+Limpiemos el reguero eliminando el zip
+[code:plain]
+rm apache-tomcat-11.0.5.zip
+[endcode]
+
+Parémosnos en la carpeta bin de tomcat y le damos permiso a la carpeta para ejecutar sh.
+[code:plain]
+chmod +x *.sh
+[endcode]
+
+Ahora podemos ejecutar el startup de tomcat
+[code:plain]
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 ./startup.sh
+[endcode]
+
+Ya una vez todo ok. Vamos a enviar un war de prueba por medio de SCP.
+[code:plain]
+scp ./miapp.war computacion@<IP>:/home/computacion/apache-tomcat-11.0.9/webapps/
+[endcode]
