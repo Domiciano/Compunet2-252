@@ -61,3 +61,6 @@ Para probar usé la URL
 [code:plain]
 http://localhost:8080/miapp/hello
 [endcode]
+
+Finalmente usamos los comando `ssh` y `scp`. Para mayor información mire el enlace
+[link](SSH y SCP) https://i2thub.icesi.edu.co:5443/compu2/lesson/6
