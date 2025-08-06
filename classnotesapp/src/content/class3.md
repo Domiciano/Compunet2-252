@@ -1,4 +1,4 @@
-[t] Sesión 3 · 5 de Julio
+[t] Sesión 3 · 5 de Agosto
 Mayoriatariamente hicimos la configuración del ambiente de ejecución al instalar Tomcat y maven.
 
 Hicimos un proyecto maven con este `pom.xml`
