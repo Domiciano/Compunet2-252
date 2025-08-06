@@ -9,6 +9,7 @@
 [t] Sesiones
 [lesson] class1.md
 [lesson] class2.md
+[lesson] class3.md
 *[t] Spring Framework
 *[lesson] lesson4.md
 *[lesson] lesson5.md
