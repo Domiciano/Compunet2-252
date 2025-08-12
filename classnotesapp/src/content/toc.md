@@ -20,3 +20,4 @@
 [lesson] class1.md
 [lesson] class2.md
 [lesson] class3.md
+[lesson] class4.md
