@@ -21,3 +21,4 @@
 [lesson] class2.md
 [lesson] class3.md
 [lesson] class4.md
+[lesson] class5.md
