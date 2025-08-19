@@ -1,72 +1,55 @@
-[t] Three Layered architecture
-
-[st] Introducción
-
-En este punto, ya sabemos crear beans y conectarlos entre sí para construir una aplicación. Ahora vamos a reestructurar el proyecto para aplicar los conceptos de las capas Service y Repository, poniendo cada función en su lugar.
-
-[st] Reestructuración del proyecto
-
-Construye este esquema para organizar las capas:
-[icon]image10.png|Esquema de capas Service y Repository
-
-
-Nos falta aún la clase `CourseService`:
+[t] Formas de definir un context
+De momento sabemos crear la estructura del software por medio de una arquitectura basada en tres capas. Vamos a ver cómo le podemos dar información inicial a un contexto, por ejemplo, si necesitamos condiciones iniciales.
+[st] Inicializar
+Vamos a hacer uso de métodos de inicialización
 [code:java]
-public class CourseService {
-    private CourseRepository courseRepository;
-    public CourseService(CourseRepository courseRepository) {
-        this.courseRepository = courseRepository;
-    }
-}
-[endcode]
-
-[st] Capas Repository y Service
-
-Capa Repository
-
-Asegúrate de que tu clase Repository tenga acceso bruto a los datos, tanto para almacenar como para obtener. Evita hacer validaciones aquí. Métodos típicos: `findAll()`, `findById()`, `save()`.
-
-
-Capa Service
-
-En las clases Service, haz las validaciones necesarias antes de usar las funciones de acceso a datos. Aquí se implementan reglas de negocio, como impedir operaciones no autorizadas. Métodos típicos: `getAll()`, `getById(id)`, `create(entity)`, `update(id, entity)`, `delete(id)`.
-
-[st] Servlets para las entidades
-[code:java]
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-
-@WebServlet("/course")
-public class CourseServlet extends HttpServlet {
-    
-}
-[endcode]
-
-[code:java]
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-
-@WebServlet("/student")
-public class StudentServlet extends HttpServlet {
-    
-}
-[endcode]
-
-[st] Definición de Beans con @Configuration
-
-Puedes generar los beans y el wiring usando la anotación `@Configuration` en una clase donde se listan y conectan los beans.
-
-[code:java]
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-
-@Configuration
-public class AppConfig {
+<bean id="objetoA" class="MiClaseA" init-method="initializeBean">
     ...
-}
+</bean>
 [endcode]
+Aquí se ejecuta el método `initializeBean()` luego de que Spring Framework instancia los beans y hace el wiring
+[icon] https://camo.githubusercontent.com/77831f0036320216811c0ec03de3254070ea11b293ea6e9260dd538ca6841c13/68747470733a2f2f6d69726f2e6d656469756d2e636f6d2f76322f726573697a653a6669743a313430302f302a5f44307959556464526c2d424f4c6971
+Debes crear la siguiente información inicial. Puede usar un método GET de alguno de los Servlet/JSP para verificar si efectivamente esta información fue almacenada
+[code:plain]
+Cursos
+        Curso 1:
+            10001
+            Computación en Internet 2
+            Kevin Rodriguez        
+        Curso 2:
+            10002
+            Psicología Clínica
+            Yamileth Bolaños
+        Curso 3:
+            10003
+            Matemáticas Aplicadas II
+            Marlon Gómez
 
+
+Estudiantes
+    Estudiante 1:
+        A00111111
+        Andrea Gutiérrez
+        Ingeniería de Sistemas
+        Cursos:
+            Curso 1:
+                10003
+            Curso 2:
+                10001
+    Estudiante 2
+        A00333333
+        Carlos Zapata
+        Cursos:
+            Curso 1:
+                10001
+            Curso 2:
+                10002
+[endcode]
+[st] Versiones del proyecto
+Tenemos este esquema y basado en esto, vamos a ver otras formas de especificar un contexto de Spring.
+[icon]image10.png|Esquema de capas Service y Repository
 [st] Definición de Beans con @Bean
+Usando las anotaciones `@Configuration` y `@Bean`, podemos especificar beans y sus conexiones. Por ejemplo
 [code:java]
 @Configuration
 public class AppConfig {
@@ -77,8 +60,7 @@ public class AppConfig {
     }
 }
 [endcode]
-
-[st] Wiring de Beans en métodos @Bean
+Si quieremos conectar los beans basta con usar métodos y usar las dependencias sobre los constructores
 [code:java]
 @Configuration
 public class AppConfig {
@@ -92,8 +74,7 @@ public class AppConfig {
     }
 }
 [endcode]
-
-[st] Cambiar el contexto de la aplicación
+Finalmente cambiemos el conexto de la aplicación
 [code:java]
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -105,8 +86,7 @@ public class Application {
     }
 }
 [endcode]
-
-[st] Inicialización de Beans con initMethod
+Puede especificar un `initMethod` para que cuando el bean se construya, se puedan ejecutar acciones
 [code:java]
 @Bean(initMethod="intialize")
 public StudentRepository studentRepository() {
@@ -114,37 +94,27 @@ public StudentRepository studentRepository() {
 }
 [endcode]
 
-[st] Definición de Beans con Anotaciones
-
+[st] Definición de Beans con `@Component`
 Puedes usar la anotación `@Component` sobre la clase para definir un bean. Existen alias como `@Service` y `@Repository` para mayor semántica.
 
 [code:java]
 @Component
-public class MiClaseA {
-    ...
-}
+public class MiClaseA {}
 [endcode]
 
 [code:java]
 @Repository
-public class CourseRepository {
-    ...
-}
+public class CourseRepository {}
 [endcode]
 
 [code:java]
 @Service
-public class CourseService {
-    ...
-}
+public class CourseService {}
 [endcode]
-
-[st] Wiring automático con anotaciones
+La conexión de beans sucede de forma automática siempre que se declaren correctamento los constructores
 [code:java]
 @Repository
-public class CourseRepository {
-    ...
-}
+public class CourseRepository {}
 
 @Service
 public class CourseService{
@@ -154,15 +124,21 @@ public class CourseService{
     }
 }
 [endcode]
-
-[st] Inicialización con @PostConstruct
+Aunque en el curso preferiré hacerlo de la siguiente manera
 [code:java]
-@PostConstruct
-public void initializeData(){
-    // Código de inicialización
+@Repository
+public class CourseRepository {
+    ...
+}
+
+@Service
+public class CourseService{
+    @Autowired
+    private CourseRepository courseRepository;
 }
 [endcode]
-
+[st] Inicialización con @PostConstruct
+Puede poner condiciones iniciales, puede usar la anotación `@PostConstruct`. Para usarlo necesitará la dependencia
 [code:xml]
 <dependency>
     <groupId>jakarta.annotation</groupId>
@@ -170,13 +146,31 @@ public void initializeData(){
     <version>2.1.1</version>
 </dependency>
 [endcode]
+De aquí en adelante, cualquier método que marque con `@PostConstruct` se ejecutará una vez construido el bean.
+[code:java]
+@PostConstruct
+public void initializeData(){
+    // Código de inicialización
+}
+[endcode]
 
-[st] Funcionalidades desde el Servlet
+[st] @ComponentScan
+La anotación `@ComponentScan` se utiliza en Spring para escanear automáticamente componentes (clases anotadas con `@Component`, `@Service`, `@Repository`, `@Controller`, etc.) dentro de un paquete base y registrarlos como beans en el contexto de la aplicación. Esto elimina la necesidad de declarar explícitamente cada bean en la configuración XML o Java.
 
-Como estudiante quiero registrarme en el sistema proporcionando mi información personal, para poder utilizar la plataforma de matrícula.
+Ejemplo de uso:
+[code:java]
+@Configuration
+@ComponentScan(basePackages = "com.example.myapp")
+public class AppConfig {
+    // ...
+}
+[endcode]
 
-Como estudiante quiero agregarme a un curso proporcionando su información para gestionar mi matrícula.
-
-Como estudiante quiero ver todos mis cursos matriculados buscando por mi código para verificar mi inscripción y hacer seguimiento a mis materias.
-
-Desde un Servlet podemos acceder al `ApplicationContext` de forma estática. 
+Para escanear múltiples paquetes, puedes especificar un array de strings:
+[code:java]
+@Configuration
+@ComponentScan(basePackages = {"com.example.service", "com.example.repository"})
+public class AppConfig {
+    // ...
+}
+[endcode]
