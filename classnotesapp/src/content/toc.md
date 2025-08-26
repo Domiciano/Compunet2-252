@@ -16,6 +16,7 @@
 [lesson] lesson6.md
 [t] SEMANA 4 · Spring Boot
 [lesson] lesson7.md
+[lesson] lesson71.md
 [lesson] lesson8.md
 [t] Sesiones
 [lesson] class1.md
