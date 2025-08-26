@@ -11,14 +11,17 @@
 [lesson] lesson4.md
 [lesson] lesson41.md
 [lesson] lesson5.md
+[t] SEMANA 4 · Spring Framework
 [lesson] lesson55.md
 [lesson] lesson6.md
-*[t] Spring Boot
-*[lesson] lesson7.md
-*[lesson] lesson8.md
+[t] SEMANA 4 · Spring Boot
+[lesson] lesson7.md
+[lesson] lesson8.md
 [t] Sesiones
 [lesson] class1.md
 [lesson] class2.md
 [lesson] class3.md
 [lesson] class4.md
 [lesson] class5.md
+[lesson] class6.md
+[lesson] class7.md
