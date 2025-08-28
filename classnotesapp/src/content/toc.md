@@ -18,6 +18,8 @@
 [lesson] lesson7.md
 [lesson] lesson71.md
 [lesson] lesson8.md
+[lesson] lesson9.md
+[lesson] lesson10.md
 [t] Sesiones
 [lesson] class1.md
 [lesson] class2.md
