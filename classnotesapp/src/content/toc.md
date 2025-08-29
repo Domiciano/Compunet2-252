@@ -28,3 +28,5 @@
 [lesson] class5.md
 [lesson] class6.md
 [lesson] class7.md
+[lesson] class8.md
+[lesson] class9.md
