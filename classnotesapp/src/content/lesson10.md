@@ -1,9 +1,12 @@
 [t] Desacoplamiento en la Capa de Servicio
-
 [st] ¿Por qué usar interfaces en la capa de servicio?
-
 Usar interfaces en la capa de servicio es una práctica recomendada que promueve el desacoplamiento entre la lógica de negocio y la capa de presentación (controladores). Esto significa que los cambios en la implementación de la lógica de negocio no afectarán a los controladores, siempre y cuando la interfaz no cambie.
+[icon] image18.png
+Cumplimos básicamente 2 principios
 
+Los módulos de alto nivel no deberían importar nada de los módulos de bajo nivel. Ambos deberían depender de abstracciones (por ejemplo, interfaces).
+
+Las abstracciones no deberían depender de los detalles. Los detalles (implementaciones concretas) deberían depender de las abstracciones.
 [st] Ejemplo: Servicio de Estudiantes
 
 Vamos a crear un servicio para gestionar estudiantes. Primero, definimos la interfaz `StudentService`:
@@ -84,15 +87,12 @@ public class StudentController {
     @Autowired
     private StudentService studentService;
 
-    @GetMapping("/students")
-    public List<Student> getAllStudents() {
-        return studentService.getAllStudents();
+    @GetMapping("count")
+    public String getStudentCount(){
+        long count = studentRepository.count();
+        return "Estudiantes: " + count;
     }
 
-    @GetMapping("/students/{id}")
-    public Student getStudentById(@PathVariable String id) {
-        return studentService.getStudentById(id);
-    }
 }
 [endcode]
 
@@ -158,14 +158,10 @@ public class StudentController {
     @Qualifier("studentServiceImpl")
     private StudentService studentService;
 
-    @GetMapping("/students")
-    public List<Student> getAllStudents() {
-        return studentService.getAllStudents();
-    }
-
-    @GetMapping("/students/{id}")
-    public Student getStudentById(@PathVariable String id) {
-        return studentService.getStudentById(id);
+    @GetMapping("count")
+    public String getStudentCount(){
+        long count = studentRepository.count();
+        return "Estudiantes: " + count;
     }
 }
 [endcode]
