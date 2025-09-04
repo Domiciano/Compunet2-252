@@ -1,4 +1,7 @@
 [t] Query Methods en Spring Data JPA
+
+https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html
+
 [st] ¿Qué son los Query Methods?
 Spring Data JPA ofrece una funcionalidad poderosa llamada "Query Methods" (o métodos de consulta). Permite crear consultas a la base de datos de forma automática simplemente declarando métodos en tus interfaces de repositorio.
 
