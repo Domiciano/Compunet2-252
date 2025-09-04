@@ -8,7 +8,7 @@ Spring Data JPA ofrece una funcionalidad poderosa llamada "Query Methods" (o mé
 Spring analiza el nombre del método, lo divide en partes y lo traduce a una consulta JPQL (Java Persistence Query Language). Esto nos ahorra el trabajo de escribir consultas manualmente para la mayoría de los casos de uso comunes. La convención sigue el formato `findBy...`, `readBy...`, `queryBy...`, `countBy...`, y `getBy...`, seguido de las propiedades de la entidad.
 
 [st] Preparando el Modelo
-Para nuestros ejemplos, asumiremos que la entidad `Course` ha sido actualizada para incluir un campo `credits` y la relación con `Profesor` que vimos en lecciones anteriores.
+Para nuestros ejemplos, asumiremos que la entidad `Course` ha sido actualizada para incluir un campo `credits` y la relación con `Profesor` que vimos en lecciones anteriores. 
 
 [code:java]
 package com.example.myapp.model;
