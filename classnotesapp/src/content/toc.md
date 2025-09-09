@@ -19,12 +19,16 @@
 [lesson] lesson71.md
 [lesson] lesson8.md
 [lesson] lesson9.md
-[t] SEMANA 6 · Spring Boot
+[t] SEMANA 6 · Spring Data
 [lesson] lesson10.md
 [lesson] lesson11.md
 [lesson] lesson12.md
 [lesson] lesson13.md
 [lesson] lesson14.md
+[t] SEMANA 7 · Spring Data
+[lesson] lesson15.md
+[lesson] lesson16.md
+[lesson] lesson17.md
 [t] Sesiones
 [lesson] class1.md
 [lesson] class2.md
