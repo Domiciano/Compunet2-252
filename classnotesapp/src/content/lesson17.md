@@ -119,3 +119,17 @@ void createCourse_WhenNameIsNull_ThrowsException() {
 
 Aquí, el método `assertThrows()` de JUnit 5 se encarga de la magia. Ejecuta el código que le pasamos y el test pasa solo si se lanza una excepción del tipo que esperamos (`IllegalArgumentException.class`). Esto asume que hemos codificado nuestro `CourseService` para que valide sus entradas.
 
+[st] Retos
+Realice los siguientes tests
+
+`saveCourse_WhenCourseAlreadyExists_ShouldThrowException` test negativo en el que se debe lanzar excepción si se intenta guardar un curso que ya existe. La regla es que no pueden haber dos cursos con el mismo nombre
+
+`enrollStudent_WhenValid_ReturnsSavedEnrollment` test positivo en el que usted debe poder matricular un estudiante en un curso
+
+`enrollStudent_WhenStudentDoesNotExist_ThrowsException` test negativo cuando el enrollment se intenta hacer con un estudiante que no existe
+
+`enrollStudent_WhenCourseDoesNotExist_ThrowsException` test negativo cuando el enrollment se intenta hacer con un curso que no existe
+
+`enrollStudent_WhenAlreadyEnrolled_ThrowsException` test negativo cuando el estudiante ya se encuentra matriculado en el curso
+
+Se dará cuenta que no cuenta con la lógica necesaria. Puede usar TDD, de modo que escriba primero los test, luego programe la lógica que necesita para pasar el test y refactorice.
