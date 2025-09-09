@@ -20,7 +20,7 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     List<Course> findTop2ByOrderByCreditsDesc();
 
     // Obtiene los 3 cursos del profesor "Juan Perez"
-    List<Course> findFirst3ByProfesorName(String professorName);
+    List<Course> findFirst1ByProfessor_Name(String professorName);
 }
 [endcode]
 *   `findFirst...`: Devuelve un solo objeto, idealmente envuelto en un `Optional`.
