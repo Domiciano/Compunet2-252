@@ -29,6 +29,7 @@
 [lesson] lesson15.md
 [lesson] lesson16.md
 [lesson] lesson17.md
+[lesson] lesson18.md
 [t] Sesiones
 [lesson] class1.md
 [lesson] class2.md

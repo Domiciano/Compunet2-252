@@ -122,14 +122,18 @@ Aquí, el método `assertThrows()` de JUnit 5 se encarga de la magia. Ejecuta el
 [st] Retos
 Realice los siguientes tests
 
-`saveCourse_WhenCourseAlreadyExists_ShouldThrowException` test negativo en el que se debe lanzar excepción si se intenta guardar un curso que ya existe. La regla es que no pueden haber dos cursos con el mismo nombre
+`findStudentByCode_WhenStudentExist_ShouldReturnOptionalStudent`
 
-`enrollStudent_WhenValid_ReturnsSavedEnrollment` test positivo en el que usted debe poder matricular un estudiante en un curso
+`findStudentByCode_WhenStudentDoesNotExist_ShouldThrowRuntimeException`
 
-`enrollStudent_WhenStudentDoesNotExist_ThrowsException` test negativo cuando el enrollment se intenta hacer con un estudiante que no existe
 
-`enrollStudent_WhenCourseDoesNotExist_ThrowsException` test negativo cuando el enrollment se intenta hacer con un curso que no existe
+`getStudentsByCourseName_WhenCalled_ShouldReturnStudentList`
 
-`enrollStudent_WhenAlreadyEnrolled_ThrowsException` test negativo cuando el estudiante ya se encuentra matriculado en el curso
+`getStudentsByCourseName_WhenCourseDoesNotExist_ShouldThrowRuntimeException`
+
+
+`deleteStudentByCode_WhenStudentExists_ShouldCompleteWithoutThrowingException`
+
+`deleteStudentByCode_WhenStudentDoesNotExists_ShouldThrowRuntimeException`
 
 Se dará cuenta que no cuenta con la lógica necesaria. Puede usar TDD, de modo que escriba primero los test, luego programe la lógica que necesita para pasar el test y refactorice.
