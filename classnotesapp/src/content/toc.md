@@ -40,3 +40,7 @@
 [lesson] class7.md
 [lesson] class8.md
 [lesson] class9.md
+[lesson] class10.md
+[lesson] class11.md
+[lesson] class12.md
+[lesson] class13.md
