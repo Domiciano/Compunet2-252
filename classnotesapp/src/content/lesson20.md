@@ -200,7 +200,19 @@ public String saveCourse(@ModelAttribute Course course) {
 [endcode]
 
 [st] Thymeleaf push-ups
-Vamos a realizar ejericicios para poder 
+Vamos a realizar ejericicios para afianzar estos conocimientos
+
+[code:plain]
+https://github.com/Domiciano/Compunet2-252
+[endcode]
+
+[list]
+Agrege un curso
+Agrege un estudiante
+
+[endlist]
+
+
 [list]
 [endlist]
 
