@@ -206,14 +206,16 @@ Vamos a realizar ejericicios para afianzar estos conocimientos
 https://github.com/Domiciano/Compunet2-252
 [endcode]
 
+Realice las siguientes funciones usando platillas de thymeleaf (algunas están hechas arriba)
 [list]
+Listar los estudiantes
+Listar los cursos
 Agrege un curso
 Agrege un estudiante
-
-[endlist]
-
-
-[list]
+Eliminar curso
+Eliminar estudiante
+Matricular un estudiante en un curso
+Eliminar matricula de un curso
 [endlist]
 
 [st] Resumen de Atributos Comunes
