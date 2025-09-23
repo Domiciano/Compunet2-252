@@ -33,7 +33,9 @@
 [t] SEMANA 8 · Spring MVC
 [lesson] lesson19.md
 [lesson] lesson20.md
+[t] SEMANA 9 · Spring MVC
 [lesson] lesson21.md
+[lesson] lesson22.md
 [t] Sesiones
 [lesson] class1.md
 [lesson] class2.md
