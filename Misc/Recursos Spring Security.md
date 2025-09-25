@@ -135,3 +135,63 @@ public class UserRoleId implements Serializable {
     }
 }
 ```
+# RolePermission
+```java
+@Entity
+@Table(name = "role_permissions")
+public class RolePermission {
+
+    @EmbeddedId
+    private RolePermissionId id = new RolePermissionId();
+
+    @ManyToOne
+    @MapsId("roleId")
+    @JoinColumn(name = "role_id")
+    private Role role;
+
+    @ManyToOne
+    @MapsId("permissionId")
+    @JoinColumn(name = "permission_id")
+    private Permission permission;
+
+    public RolePermission() {}
+
+    public RolePermission(Role role, Permission permission) {
+        this.role = role;
+        this.permission = permission;
+        this.id = new RolePermissionId(role.getId(), permission.getId());
+    }
+
+    // Getters y Setters
+}
+```
+# RolePermissionId
+```java
+@Embeddable
+public class RolePermissionId implements Serializable {
+    private Long roleId;
+    private Long permissionId;
+
+    public RolePermissionId() {}
+
+    public RolePermissionId(Long roleId, Long permissionId) {
+        this.roleId = roleId;
+        this.permissionId = permissionId;
+    }
+
+    // equals y hashCode obligatorios
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RolePermissionId)) return false;
+        RolePermissionId that = (RolePermissionId) o;
+        return Objects.equals(roleId, that.roleId) &&
+               Objects.equals(permissionId, that.permissionId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(roleId, permissionId);
+    }
+}
+```
