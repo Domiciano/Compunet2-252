@@ -39,6 +39,8 @@
 [lesson] lesson23.md
 [t] SEMANA 10 · Security
 [lesson] lesson24.md
+[lesson] lesson25.md
+[lesson] lesson26.md
 [t] Sesiones
 [lesson] class1.md
 [lesson] class2.md
