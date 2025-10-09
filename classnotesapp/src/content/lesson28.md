@@ -172,8 +172,11 @@ Matricular un estudiante en un curso
 Actualizar el nombre código o programa de un estudiante 
 Eliminar una matrícula específica por `id`
 [endlist]
-
-[st] Loombok
+[code:plain]
+https://classroom.github.com/a/tFfCV0KZ
+[endcode]
+Entregue esta tarea a más tardar el jueves de semana 12.
+[st] Lombok
 Vamos a instalar loombok en el proyecto
 
 `1` Instalemos la dependencia de Loombok
