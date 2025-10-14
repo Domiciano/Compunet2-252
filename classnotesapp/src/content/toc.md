@@ -44,6 +44,8 @@
 [t] SEMANA 11 · Rest
 [lesson] lesson27.md
 [lesson] lesson28.md
+[lesson] lesson29.md
+[lesson] lesson30.md
 [t] Sesiones
 [lesson] class1.md
 [lesson] class2.md

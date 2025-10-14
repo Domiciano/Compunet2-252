@@ -175,7 +175,7 @@ Eliminar una matrícula específica por `id`
 [code:plain]
 https://classroom.github.com/a/tFfCV0KZ
 [endcode]
-Entregue esta tarea a más tardar el jueves de semana 12.
+Entregue esta tarea a más tardar el jueves de semana 13.
 [st] Lombok
 Vamos a instalar loombok en el proyecto
 
