@@ -76,4 +76,73 @@ Una vez con esto, ponga el filtro antes del UsernamePasswordAuthenticationFilter
 //    return http.build();
 }
 [endcode]
-Verifique qué pasa
+Verifique qué pasa 
+[st] Extracción de información y verificación
+Ya entendiendo como interceptamos request http, vamos a hacer el siguiente flujo: interceptamos el request, verificamos que el header llamado `Authorization` tenga la siguiente sencuencia: `Bearer <access_token>` donde `<access_token>` es el token que el cliente envia al servidor. Si el token es válido, lo dejamos pasar y si no es válido contestamos con 403.
+
+Lo primero es saber cómo extraer la información del token, que debería esta en el `JwtService`
+[code:java]
+public Claims extractAllClaims(String token) {
+  try{
+    Claims claims = Jwts.parserBuilder()
+            .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes()))
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+    return claims;
+  } catch (ExpiredJwtException e) {
+    System.out.println("Token expirado: " + e.getMessage());
+    throw e;
+  } catch (UnsupportedJwtException e) {
+    System.out.println("Token no soportado: " + e.getMessage());
+    throw e;
+  } catch (MalformedJwtException e) {
+    System.out.println("Token mal formado: " + e.getMessage());
+    throw e;
+  } catch (SignatureException e) {
+    System.out.println("Firma JWT inválida: " + e.getMessage());
+    throw e;
+  } catch (IllegalArgumentException e) {
+    System.out.println("Token vacío o nulo: " + e.getMessage());
+    throw e;
+  }
+}
+[endcode]
+Este método devuelve un objeto `Claims`. Que principalmente tiene el subject que es el `username` y los `authorities`.
+[code:java]
+Claims claims = jwtService.extractAllClaims(jwt);
+String username = claims.getSubject();
+List<String> authorities = claims.get("authorities", List.class);
+[endcode]
+[st] Autenticación con Token
+Ya una vez con esto y antes de dejar que el request vaya al siguiente filtro, debemos finalmente autenticarnos.
+[code:java]
+UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+  email, null, authorities
+);
+[endcode]
+Y finalmente ...
+[code:java]
+SecurityContextHolder.getContext().setAuthentication(authToken);
+[endcode]
+Esta última linea nos permite autenticarnos, asi que podemos enviar la request al siguiente eslabón de la cadena
+[code:java]
+filterChain.doFilter(request, response);
+[endcode]
+[st] Manejo de errores
+En el OncePerRequestFilter permite devolver la solicitud
+[code:java]
+@Autowired
+private ObjectMapper objectMapper;
+
+...
+
+response.setStatus(status);
+response.setContentType("application/json");
+
+ApiResponse errorResponse = new ApiResponse("Error de autenticación", message);
+String json = objectMapper.writeValueAsString(errorResponse);
+
+response.getWriter().write(json);
+response.getWriter().flush();
+[endcode]
