@@ -44,19 +44,8 @@
 [t] SEMANA 11 · Rest
 [lesson] lesson27.md
 [lesson] lesson28.md
+[t] SEMANA 12 · Rest
 [lesson] lesson29.md
 [lesson] lesson30.md
-[t] Sesiones
-[lesson] class1.md
-[lesson] class2.md
-[lesson] class3.md
-[lesson] class4.md
-[lesson] class5.md
-[lesson] class6.md
-[lesson] class7.md
-[lesson] class8.md
-[lesson] class9.md
-[lesson] class10.md
-[lesson] class11.md
-[lesson] class12.md
-[lesson] class13.md
+[t] SEMANA 13 · Test de API
+[lesson] lesson31.md

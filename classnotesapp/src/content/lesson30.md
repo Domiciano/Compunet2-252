@@ -146,3 +146,39 @@ String json = objectMapper.writeValueAsString(errorResponse);
 response.getWriter().write(json);
 response.getWriter().flush();
 [endcode]
+
+[st] Exception Handling
+Podemos manejar excepciones en el filter chain orden 2
+[code:java]
+//@Bean
+//@Order(2)
+//public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
+//    http
+//        .securityMatcher("/api/v1/**")
+//        .authorizeHttpRequests(auth -> auth
+//            .requestMatchers("/api/v1/auth/**").permitAll()
+//            .anyRequest().authenticated()
+//        )
+//        .addFilterBefore(tokenValitationFilter, UsernamePasswordAuthenticationFilter.class)
+//        .sessionManagement(session -> session
+//            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//        )
+//        .csrf(csrf -> csrf.disable())
+        .exceptionHandling(ex -> ex
+            .authenticationEntryPoint((request, response, authException) -> {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"Unauthorized\"}");
+            })
+            .accessDeniedHandler((request, response, accessDeniedException) -> {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"Forbidden\"}");
+            })
+        );
+//    return http.build();
+//}
+[endcode]
+Donde `authenticationEntryPoint` se ejecuta cuando no hay token válido. En lugar de redirigir al filtro orden 3, responde `Unauthorized`.
+
+Y `accessDeniedHandler` cuando el usuario sí tiene token válido pero no con los authorities suficientes.
