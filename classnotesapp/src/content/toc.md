@@ -49,3 +49,9 @@
 [lesson] lesson30.md
 [t] SEMANA 13 · Test de API
 [lesson] lesson31.md
+[t] SEMANA 14 · React
+[lesson] lesson32.md
+[lesson] lesson33.md
+[lesson] lesson34.md
+[lesson] lesson35.md
+[lesson] lesson36.md
