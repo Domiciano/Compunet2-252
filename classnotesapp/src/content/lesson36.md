@@ -63,7 +63,7 @@ export default function BasicTextField() {
         label="Nombre" 
         variant="outlined" 
         value={name}
-        onChange={handleNameChange}
+        onChange={(e) => console.log(e.target.value)}
       />
       <Typography variant="body1" style={{ marginTop: '10px' }}>
         Hola, {name || 'desconocido'}!

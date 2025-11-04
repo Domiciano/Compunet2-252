@@ -21,49 +21,49 @@ npm install @mui/icons-material
 [st] Diccionario de eventos de React
 Aquí los eventos más comunes que puedes usar en componentes React, con ejemplos simples.
 [st]Eventos de Mouse
-### `onClick`
+ `onClick`
 Se dispara cuando se hace clic en un elemento.
 [code:jsx]
 <button onClick={() => alert('¡Hiciste clic!')}>Click aquí</button>
 [endcode]
 
-### `onDoubleClick`
+ `onDoubleClick`
 Se ejecuta cuando se hace doble clic sobre un elemento.
 [code:jsx]
 <div onDoubleClick={() => alert('Doble clic')}>Haz doble clic</div>
 [endcode]
 
-### `onMouseEnter`
+ `onMouseEnter`
 Se activa cuando el cursor entra al área del elemento.
 [code:jsx]
 <div onMouseEnter={() => console.log('Entraste al área')}>Pasa el mouse</div>
 [endcode]
 
-### `onMouseLeave`
+ `onMouseLeave`
 Se activa cuando el cursor sale del área del elemento.
 [code:jsx]
 <div onMouseLeave={() => console.log('Saliste del área')}>Pasa el mouse</div>
 [endcode]
 
-### `onMouseMove`
+ `onMouseMove`
 Detecta el movimiento del cursor sobre un elemento.
 [code:jsx]
 <div onMouseMove={(e) => console.log(`X: ${e.clientX}, Y: ${e.clientY}`)}>Mueve el mouse</div>
 [endcode]
 
-### `onMouseDown`
+ `onMouseDown`
 Se activa al presionar el botón del mouse.
 [code:jsx]
 <div onMouseDown={() => console.log('Mouse presionado')}>Presiona mouse</div>
 [endcode]
 
-### `onMouseUp`
+ `onMouseUp`
 Se ejecuta al soltar el botón del mouse.
 [code:jsx]
 <div onMouseUp={() => console.log('Mouse soltado')}>Suelta el mouse</div>
 [endcode]
 
-### `onContextMenu`
+ `onContextMenu`
 Se ejecuta al hacer clic derecho.
 [code:jsx]
 <div onContextMenu={(e) => { e.preventDefault(); alert('Menú contextual bloqueado'); }}>
@@ -71,31 +71,31 @@ Se ejecuta al hacer clic derecho.
 </div>
 [endcode]
 [st]Eventos de Teclado
-### `onKeyDown`
+ `onKeyDown`
 Detecta cuando una tecla es presionada.
 [code:jsx]
 <input onKeyDown={(e) => console.log(`Tecla abajo: ${e.key}`)} />
 [endcode]
 
-### `onKeyUp`
+ `onKeyUp`
 Se activa al soltar una tecla.
 [code:jsx]
 <input onKeyUp={(e) => console.log(`Tecla arriba: ${e.key}`)} />
 [endcode]
 [st]Eventos de Formulario
-### `onChange`
+ `onChange`
 Se dispara cuando cambia el valor de un input o select.
 [code:jsx]
 <input onChange={(e) => console.log(e.target.value)} />
 [endcode]
 
-### `onInput`
+ `onInput`
 Similar a `onChange`, pero se dispara en cada entrada (más inmediato).
 [code:jsx]
 <input onInput={(e) => console.log(e.target.value)} />
 [endcode]
 
-### `onSubmit`
+ `onSubmit`
 Se activa al enviar un formulario.
 [code:jsx]
 <form onSubmit={(e) => { e.preventDefault(); alert('Formulario enviado'); }}>
@@ -103,19 +103,19 @@ Se activa al enviar un formulario.
 </form>
 [endcode]
 
-### `onFocus`
+ `onFocus`
 Se activa cuando un elemento recibe el foco.
 [code:jsx]
 <input onFocus={() => console.log('Enfocado')} />
 [endcode]
 
-### `onBlur`
+ `onBlur`
 Se dispara cuando un elemento pierde el foco.
 [code:jsx]
 <input onBlur={() => console.log('Desenfocado')} />
 [endcode]
 
-### `onReset`
+ `onReset`
 Se ejecuta al reiniciar un formulario.
 [code:jsx]
 <form onReset={() => console.log('Formulario reiniciado')}>
@@ -123,13 +123,13 @@ Se ejecuta al reiniciar un formulario.
 </form>
 [endcode]
 
-### `onSelect`
+ `onSelect`
 Se activa cuando el usuario selecciona texto.
 [code:jsx]
 <input onSelect={(e) => console.log('Texto seleccionado')} />
 [endcode]
 
-### `onInvalid`
+ `onInvalid`
 Se activa cuando un input inválido intenta enviarse.
 [code:jsx]
 <form onSubmit={(e) => e.preventDefault()}>
@@ -138,7 +138,7 @@ Se activa cuando un input inválido intenta enviarse.
 </form>
 [endcode]
 [st]Eventos de Scroll
-### `onScroll`
+ `onScroll`
 Se dispara cuando el usuario hace scroll.
 [code:jsx]
 <div onScroll={() => console.log('Scroll detectado')} style={{ height: 100, overflow: 'auto' }}>
@@ -146,12 +146,12 @@ Se dispara cuando el usuario hace scroll.
 </div>
 [endcode]
 [st]Eventos Misceláneos
-### `onError`
+ `onError`
 Se ejecuta cuando ocurre un error de carga, por ejemplo en imágenes.
 [code:jsx]
 <img src="imagen-inexistente.jpg" onError={() => alert('Error al cargar imagen')} />
 [endcode]
-### `onLoad`
+ `onLoad`
 Se activa cuando el recurso se carga completamente.
 [code:jsx]
 <img src="https://via.placeholder.com/150" onLoad={() => console.log('Imagen cargada')} />
