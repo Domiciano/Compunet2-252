@@ -59,3 +59,5 @@
 [lesson] lesson37.md
 [lesson] lesson38.md
 [lesson] lesson39.md
+[lesson] lesson102.md
+[lesson] lesson103.md
