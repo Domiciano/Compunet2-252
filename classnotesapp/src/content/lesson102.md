@@ -1,4 +1,4 @@
-[t] Guía Completa de React Router: Navegación y Datos
+[t] React Router
 React Router es una librería esencial en el ecosistema de React que permite a las aplicaciones tener navegación entre distintas vistas o "páginas" sin necesidad de recargar el navegador. Esto es la base para construir una Aplicación de una Sola Página (SPA).
 Esta guía combina los enfoques clásico y moderno para darte una comprensión completa de cómo manejar la navegación en tus proyectos.
 [st] Instalación
@@ -113,9 +113,9 @@ Para crear páginas de detalle, como el perfil de un usuario, necesitas rutas di
 
 1.  Define la ruta con un parámetro: El prefijo `:` indica que es un valor dinámico.
     [code:jsx]
-    <Route path="/perfil/:userId" element={<Perfil />} />
+    // <Route path="/perfil/:userId" element={<Perfil />} />
     // O en el enfoque moderno:
-    // { path: "perfil/:userId", element: <Perfil /> }
+     { path: "perfil/:userId", element: <Perfil /> }
     [endcode]
 
 2.  Navega a esa ruta:
