@@ -145,9 +145,9 @@ const HomeScreen = () => {
   return (
     <Stack direction="row" sx={{ height: "100vh" }}>
       <Stack sx={{ width: 300, bgcolor: "#f4f4f4", p: 2 }}>
-        <Button component={Link} to="/">Inicio</Button>
-        <Button component={Link} to="/students">Estudiantes</Button>
-        <Button component={Link} to="/settings">Configuración</Button>
+        <Button component={Link} to="">Inicio</Button>
+        <Button component={Link} to="students">Estudiantes</Button>
+        <Button component={Link} to="settings">Configuración</Button>
       </Stack>
       <Box sx={{ flexGrow: 1, bgcolor: "background.paper", p: 3 }}>
         <Outlet />
