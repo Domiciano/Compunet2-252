@@ -75,6 +75,12 @@ $TOMCAT/
             └── web.xml
 [endcode]
 
+[code:js]
+const router = createBrowserRouter([...],{
+    basename: "/misuperapp",
+});
+[endcode]
+
 Abra el navegador con la URL
 
 http://localhost:8080/misuperapp
