@@ -61,6 +61,9 @@
 [lesson] lesson39.md
 [lesson] lesson102.md
 [lesson] lesson103.md
-[t] SEMANA 16 · Axios
+[t] SEMANA 16 · Deploy
+[lesson] lesson106.md
+[lesson] lesson107.md
+[t] Extras
 [lesson] lesson104.md
 [lesson] lesson105.md
