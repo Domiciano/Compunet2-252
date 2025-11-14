@@ -16,6 +16,12 @@ export default defineConfig({
   base: '/misuperapp/'
 });
 [endcode]
+Luego necesita poner la ruta en el BrowserRouter
+[code:js]
+const router = createBrowserRouter([...],{
+    basename: "/misuperapp",
+});
+[endcode]
 Guarde los cambios y vuelve a ejecutar
 [code:sh]
 npm run build
@@ -75,11 +81,7 @@ $TOMCAT/
             └── web.xml
 [endcode]
 
-[code:js]
-const router = createBrowserRouter([...],{
-    basename: "/misuperapp",
-});
-[endcode]
+
 
 Abra el navegador con la URL
 
