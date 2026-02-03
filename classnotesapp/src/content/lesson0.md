@@ -46,29 +46,44 @@ Durante la clase: Participar en discusiones del tema. Formular preguntas orienta
 
 Después de la clase: Realizar trabajos asignados. Establecer relaciones entre temas. Afianzar conceptos aprendidos.
 [st] Evaluación del Curso
-`10%`
+El curso evalua en su mayoría sus habilidades individuales, aunque también hay un espacio para la parte grupal
+
+[st] Aspecto grupal
+`6%`
 Taller Spring
-Frameworks y herramientas.
 
-`15%`
-Taller Persist
-Frameworks y herramientas.
+`8%`
+Taller de Persistencia
 
-`15%`
-Taller MVC
-Arquitecturas web.
+`8%`
+Taller de MVC
 
-`20%`
-T.Backend
-Desarrollo de funcionalidades backend.
+`8%`
+Taller de Backend
 
-`20%`
-Taller Frontend
-Desarrollo de funcionalidades frontend.
+`8%`
+Taller de Frontend
 
-`20%`
+[st] Aspecto individual
+
+`4%`
+Examen Spring
+
+`12%`
+Examen de Persistencia
+
+`12%`
+Examen de MVC
+
+`12%`
+Examen de Backend
+
+`12%`
+Examen de Frontend
+
+`10%`
 Tareas
-Arquitecturas web.
+
 [st] Recursos de Apoyo
 No es necesario comprar libros para el curso. Todo el material necesario será suministrado a través de este sitio e Intu, incluyendo materiales bibliográficos, guías de clases, videos y blogs, cursos en línea.
 

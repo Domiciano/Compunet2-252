@@ -2,11 +2,12 @@
 [t] Reglas importantes
 Debe tener en cuenta las siguientes reglas en cuanto a las calificaciones del curso, como en el uso de Inteligencia Artificial Generativa.
 [st] Composición de los talleres
-Las calificaciones del curso se componen de cinco (5) talleres que contribuyen progresivamente al desarrollo de un proyecto final. Cada taller tiene dos componentes: uno individual `60%` y otro grupal `40%`.
+Las calificaciones del curso se componen de cinco (5) talleres que contribuyen progresivamente al desarrollo de un proyecto final. 
 
 El `componente grupal` corresponde a la implementación técnica que aportará directamente al proyecto final del curso y será desarrollado en equipo.
 
 El `componente individual` consistirá en un examen diseñado para evaluar las competencias específicas de cada unidad del curso, y será realizado de forma individual.
+
 [st] Acuerdos sobre el uso de Inteligencia Artificial Generativa en la asignatura
 La Inteligencia Artificial Generativa (IAG) es un tipo de Inteligencia Artificial (IA) capaz de crear contenido nuevo, como: textos, imágenes, música o código, a partir de modelos entrenados con grandes volúmenes de datos. Se centra en la creación de nuevo contenido, a partir de datos existentes.
 
