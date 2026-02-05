@@ -11,6 +11,8 @@ Descomprime el `ZIP`. Si usas Mac o Linux, da permisos de ejecución a los scrip
 [code:bash]
 chmod +x bin/*.sh
 [endcode]
+Parado sobre la carpeta raíz de `tomcat`
+
 
 [st] Variable de entorno `JAVA_HOME`
 Debes crear una variable de entorno que apunte a la ruta donde está instalado java.
@@ -34,28 +36,18 @@ En Mac/Linux
 [code:bash]
 which java
 [endcode]
-[st] Instala el comando `mvn`
-Debes tener el comando `mvn` en tu shell, para eso, descarga Maven en
-[code:bash]
-https://maven.apache.org/download.cgi
-[endcode]
-Descarga el `.zip`, descomprímelo y agrega a tu variable `PATH` la ruta de la carpeta `bin` de maven.
 
-Si estás en Windows, debes entrar a 
-[code:bash]
-Configuración avanzada del sistema > Variables de Entorno > Variables del Sistema
-[endcode]
-Busca la variable `PATH` para editarla y agregarle la ruta de maven.
 
-En Linux o Mac debes editar tu archivo `.bashrc` o `.zshrc` de acuerdo al shell que manejas. Para saber cuál es tu shell usa
-[code:bash]
-echo $SHELL
+[st] Servidor web
+Tomcat es un servidor de aplicaciones, es decir, un servidor web capaz de ejecutar aplicaciones escritas en un lenguaje específico, en este caso Java, mediante tecnologías como Servlets y JSP.
+
+Vaya a la carpeta webapps de tomcat, cree una carpeta llamada `miapp1` y dentro cree un archivo `index.html`.
+
+Ejecute el servidor por medio de 
+[code:sh]
+./startup.sh
 [endcode]
-Una vez que haya agregado la ruta de maven a `PATH`, cierra el shell y vuélvelo a abrir. Usa el comando
-[code:bash]
-mvn
-[endcode]
-Si reconoce el comando ya tienen maven en tu sistema.
+
 
 [st] Crear un proyecto Maven y dependencias
 Crea un proyecto Maven y agrega la dependencia de Jakarta Servlet API en tu `pom.xml`:
@@ -124,24 +116,14 @@ public class ServletExample extends HttpServlet {
 }
 [endcode]
 
-[st] Crear un JSP básico
-[code:xml]
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
-  <head>
-      <title>Title</title>
-  </head>
-  <body>
-    <h1>Beta Gamma Alfa Delta</h1>
-  </body>
-</html>
-[endcode]
 [st] Empaquetar y desplegar el WAR
 Para empaquetar el proyecto ejecuta:
 [code:sh]
 mvn clean package
 [endcode]
-Esto generará el archivo `.war` en la carpeta `target`. Copia el `.war` a la carpeta `webapps` de Tomcat y arráncalo con:
+Esto generará el archivo `.war` en la carpeta `target`. Copia el `.war` a la carpeta `webapps` de Tomcat 
+
+Encender el servidor
 [code:sh]
 ./startup.sh
 [endcode]
@@ -164,3 +146,26 @@ La instancia del servlet es inicializada una sola vez mediante el método init()
 Finalmente, destroy() se ejecuta una sola vez, justo antes de que el servlet sea eliminado, lo que ocurre cuando el servidor se apaga o el servlet es descargado.
 
 Asimismo, un archivo JSP es convertido en un servlet en tiempo de ejecución por el Servlet Container. Cuando se solicita un JSP, este se traduce a una clase Java que extiende HttpServlet, se compila y luego se ejecuta para generar y entregar la respuesta al cliente.
+
+[st] `mvn` en tu sistema
+Conviene muchísimo instalar maven en su sistema. Para eso, descarga Maven en
+[code:bash]
+https://maven.apache.org/download.cgi
+[endcode]
+Descarga el `.zip`, descomprímelo y agrega a tu variable `PATH` la ruta de la carpeta `bin` de maven.
+
+Si estás en Windows, debes entrar a 
+[code:bash]
+Configuración avanzada del sistema > Variables de Entorno > Variables del Sistema
+[endcode]
+Busca la variable `PATH` para editarla y agregarle la ruta de maven.
+
+En Linux o Mac debes editar tu archivo `.bashrc` o `.zshrc` de acuerdo al shell que manejas. Para saber cuál es tu shell usa
+[code:bash]
+echo $SHELL
+[endcode]
+Una vez que haya agregado la ruta de maven a `PATH`, cierra el shell y vuélvelo a abrir. Usa el comando
+[code:bash]
+mvn
+[endcode]
+Si reconoce el comando ya tienen maven en tu sistema.
