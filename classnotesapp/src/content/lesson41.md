@@ -19,7 +19,7 @@ La aplicación tendrá una lista de mensajes que se llenará en la medida que cl
 import java.util.ArrayList;
 import java.util.List;
 
-public class MessageService {
+public class MessageRepository {
     private final List<String> messages = new ArrayList<>();
 
     public void addMessage(String message) {
@@ -43,7 +43,7 @@ En `resources`, cree un archivo llamado `applicationContext.xml`, cuyo contenido
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans.xsd">
     
-    <bean id="messageService" class="org.example.yourproject.service.MessageService" />
+    <bean id="messageRepository" class="org.example.yourproject.repository.MessageRepository" />
     
 </beans>
 [endcode]
@@ -73,24 +73,32 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/messageServlet")
+@WebServlet("/messages")
 public class MessageServlet extends HttpServlet {
 
-    private MessageService messageService;
+    private MessageRepository messageRepository;
 
     @Override
     public void init() {
-        messageService = (MessageService) Application.getContext().getBean("messageService");
+        messageRepository = (MessageRepository) Application.getContext().getBean("messageRepository");
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String newMessage = req.getParameter("message");
         if (newMessage != null && !newMessage.trim().isEmpty()) {
-            messageService.addMessage(newMessage);
+            messageRepository.addMessage(newMessage);
         }
         resp.sendRedirect("./");
     }
     
 }
 [endcode]
+[st] Hands-on con el IoC Container
+Vamos a crear un sitio web sencillo donde podamos registrar elementos en una lista de compras.
+Para eso vamos a necesitar 
+[list]
+Un bean que permita almacenar datos en memoria de aplicación (volátil)
+Luego un servlet deberá poder usar el mencionado bean de modo que el usuario pueda obtener la lista de elementos
+Ese bean también debería ofrecernos el medio para insertar elementos.
+[endlist]

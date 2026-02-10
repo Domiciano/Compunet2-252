@@ -9,9 +9,8 @@
 [t] SEMANA 2 · Aplicaciones
 [lesson] lesson4.md
 [lesson] lesson41.md
-[t] SEMANA 3 · Spring Framework
 [lesson] lesson5.md
-[t] SEMANA 4 · Spring Framework
+[t] SEMANA 3 · Spring Framework
 [lesson] lesson55.md
 [lesson] lesson6.md
 [t] SEMANA 5 · Spring Boot
