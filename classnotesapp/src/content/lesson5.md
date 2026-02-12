@@ -115,8 +115,10 @@ public class CourseRepository {
     }
 }
 [endcode]
-[st] 2. Creemos un Service
-Vamos a generar adicionalmente un bean de service que nos ayude a orquestar esto.
+[st] 2. Creemos la capa de Service
+Vamos a generar adicionalmente un bean de service que nos permite hacer lógica de negocio para garantizar condiciones de unicidad e integridad de los datos que se almacenan
+
+Un service para Student
 [code:java]
 import java.util.List;
 
@@ -126,6 +128,17 @@ public class StudentService {
 
 }
 [endcode]
+Otro service para Course
+[code:java]
+import java.util.List;
+
+public class CourseService {
+
+    ...
+
+}
+[endcode]
+
 [st] 3. Hagamos el mise en place
 [code:java]
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -141,18 +154,14 @@ public class StudentService {
     <!--Service-->
     <bean id="studentService" class="paquete.de.tu.proyecto.services.StudentService"/>
 
+    <bean id="courseService" class="paquete.de.tu.proyecto.services.CourseService"/>
 
 </beans>
 [endcode]
 [st] 4. Debemos configurar esta disposición
 La idea es generar los beans y posteriormente conectarlos
 [icon] image7.png
-En la imagen aparece el bean courseRepository. Este bean no está contemplado para desarrollo. Sólo se pone allí para mostrar que cada Repositorio es usado por un Service aludiendo a la misma entidad.
-[list]
-Para lograrlo, debe hacer Inyección de dependencias
-Puede hacerlo mediante Constructor
-[endlist]
-Se deben generar las clases y las dependencias. En este caso usamos la Agregación. En el ejemplo, supongamos que MiClaseB quiere usar los métodos de MiClaseA
+En la imagen aparecen conexinones de bean. En este caso usamos la Agregación. En el ejemplo, supongamos que MiClaseB quiere usar los métodos de MiClaseA
 [code:java]
 public class ClaseA{
     ...
@@ -196,4 +205,40 @@ En el XML ahora se inyecta por medio de `property`
 <bean id="objetoB" class="ClaseB">
     <property name="objetoA" ref="objetoA"/>
 </bean>
+[endcode]
+
+[st] Inicializar y destruir el bean 
+Puede ejecutar un método cuando crea un bean, por ejemplo, para establecer condiciones iniciales
+[code:xml]
+<bean id="studentRepository"
+      class="paquete.de.tu.proyecto.repositories.StudentRepository"
+      init-method="init"
+      destroy-method="cleanup"/>
+[endcode]
+El método debe crearlo como `public void`
+[code:java]
+public class StudentRepository {
+
+    private List<Student> students;
+
+    public void init() {
+        students = new ArrayList<>();
+        System.out.println("StudentRepository inicializado correctamente");
+    }
+
+    public List<Student> findAll() {
+        return students;
+    }
+
+    public void save(Student student) {
+        students.add(student);
+    }
+}
+[endcode]
+
+Y también puede ejecutar código cuando se destruye el IoC container, por ejemplo cerrar conexiones
+[code:java]
+public void cleanup() {
+    System.out.println("Liberando recursos antes de destruir el bean");
+}
 [endcode]
