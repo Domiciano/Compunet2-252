@@ -8,7 +8,7 @@ Vamos a hacer uso de métodos de inicialización
 </bean>
 [endcode]
 Aquí se ejecuta el método `initializeBean()` luego de que Spring Framework instancia los beans y hace el wiring
-[icon] https://camo.githubusercontent.com/77831f0036320216811c0ec03de3254070ea11b293ea6e9260dd538ca6841c13/68747470733a2f2f6d69726f2e6d656469756d2e636f6d2f76322f726573697a653a6669743a313430302f302a5f44307959556464526c2d424f4c6971
+[icon] https://miro.medium.com/v2/0*_D0yYUddRl-BOLiq
 Debes crear la siguiente información inicial. Puede usar un método GET de alguno de los Servlet/JSP para verificar si efectivamente esta información fue almacenada
 [code:plain]
 Cursos
