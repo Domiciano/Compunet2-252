@@ -13,11 +13,11 @@
 [t] SEMANA 3 · Spring Framework
 [lesson] lesson55.md
 [lesson] lesson6.md
+[lesson] lesson9.md
 [t] SEMANA 5 · Spring Boot
 [lesson] lesson7.md
 [lesson] lesson71.md
 [lesson] lesson8.md
-[lesson] lesson9.md
 [t] SEMANA 6 · Spring Data
 [lesson] lesson10.md
 [lesson] lesson11.md
