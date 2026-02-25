@@ -49,7 +49,7 @@ Después de la clase: Realizar trabajos asignados. Establecer relaciones entre t
 El curso evalua en su mayoría sus habilidades individuales, aunque también hay un espacio para la parte grupal
 
 [st] Aspecto grupal
-`6%`
+`4%`
 Taller Spring
 
 `8%`
@@ -66,7 +66,7 @@ Taller de Frontend
 
 [st] Aspecto individual
 
-`4%`
+`6%`
 Examen Spring
 
 `12%`
