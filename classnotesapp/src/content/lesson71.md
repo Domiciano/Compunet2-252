@@ -16,7 +16,7 @@ Vamos a trabajar con una base de datos en memoria llamada H2 y veremos cómo int
 Vamos a partir de un modelo de datos convecional y lo transformaremos en una tabla
 [code:java]
 public class Student {
-    private int id;
+    private Integer id;
     private String code; // Ejemplo: A00123456
     private String name;
     private String program;
@@ -30,10 +30,11 @@ Usaremos las anotaciones a continuación para volverlo una tabla de base de dato
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
     private String code;
     private String name;
     private String program;
+    // Constructor vacío
     // Getters y setters
 }
 [endcode]
@@ -56,6 +57,8 @@ spring.datasource.password=
 spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
 spring.h2.console.enabled=true
 spring.h2.console.path=/h2
+spring.jpa.defer-datasource-initialization=true
+server.port=8080
 [endcode]
 Este bean ya viene con métodos de CRUD
 [st] Inicialización de datos
