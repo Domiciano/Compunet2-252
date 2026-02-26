@@ -4,7 +4,9 @@ Spring Boot es una extensión de Spring Framework que simplifica la creación de
 
 [st] Creación del primer proyecto
 
-Puede usar el wizard online de `Spring Initilizr` https://start.spring.io/
+Puede usar el wizard online de `Spring Initilizr` 
+[link] (Spring-boot Wizard) https://start.spring.io/
+
 
 O también lo puede hacer con IntelliJ. Cree un nuevo proyecto:
 [icon]image11.png|Creación de proyecto Spring Boot en IntelliJ
