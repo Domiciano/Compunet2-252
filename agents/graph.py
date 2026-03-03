@@ -58,7 +58,7 @@ def node_process_file(state: AgentState):
         return {}
 
     prompt = f"""
-You are a frontend software architect.
+You are a Fullstack software architect.
 
 Analyze this file.
 
@@ -66,11 +66,6 @@ Analyze this file.
 - Component
 - Page
 - Hook
-- Context
-- Service
-- Store
-- Utility
-- Other
 
 2. Describe its responsibility in 3-6 lines.
 
@@ -80,9 +75,11 @@ Analyze this file.
 - Internal project dependencies (relative imports)
 - API calls (if any)
 
+4. If the file is the LessonParser.jsx, please list all special tags that the lessonparse parses and in 3-6 line describe the function of the tag
+
 Return structured markdown in this format:
 
-# {file_path}
+# <File name>
 
 Type: <Type>
 
@@ -98,8 +95,8 @@ Type: <Type>
 ## Side Effects
 ...
 
-FILE CONTENT:
-{content}
+If it is the LessonParser.jsx, list the tags that the parser parses
+
 """
 
     result = llm.invoke(prompt).content
