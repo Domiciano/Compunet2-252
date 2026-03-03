@@ -7,7 +7,7 @@ from tools import list_files, read_file, append_spec
 
 
 llm = ChatOllama(
-    model="qwen2.5-coder:latest",
+    model="llama3.1:8b",
     temperature=0
 )
 
@@ -74,12 +74,12 @@ Analyze this file.
 - State management used
 - Internal project dependencies (relative imports)
 - API calls (if any)
+- Tags that the parser parses (if any). For example: [code:java] ... [endcode]
 
-4. If the file is the LessonParser.jsx, please list all special tags that the lessonparse parses and in 3-6 line describe the function of the tag
 
 Return structured markdown in this format:
 
-# <File name>
+# {file_path}
 
 Type: <Type>
 
@@ -94,8 +94,6 @@ Type: <Type>
 
 ## Side Effects
 ...
-
-If it is the LessonParser.jsx, list the tags that the parser parses
 
 """
 
