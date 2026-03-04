@@ -13,5 +13,6 @@ print(f"Analyzing frontend at: {project_root}")
 app.invoke({
     "project_path": str(project_root),
     "files": [],
+    "file_index": 0,  # Initialize file_index
     "current_file": None
 })

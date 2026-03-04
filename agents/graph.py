@@ -3,7 +3,7 @@ from langgraph.graph import StateGraph, END
 from langchain_ollama import ChatOllama
 
 from state import AgentState
-from tools import list_files, read_file, append_spec
+from tools import list_files, read_file, write_file, get_features_md_path
 
 
 llm = ChatOllama(
@@ -11,102 +11,128 @@ llm = ChatOllama(
     temperature=0
 )
 
-
 # 1️⃣ Listar archivos
 def node_list_files(state: AgentState):
+    print("Listing files...")
     files = list_files(state["project_path"])
     print(f"Found {len(files)} files to analyze.")
     return {"files": files}
 
 
-# 2️⃣ Obtener siguiente archivo
-def node_get_next_file(state: AgentState):
+
+
+
+# 2️⃣ Inicializar Features.md
+def node_initialize_features_md(state: AgentState):
+    features_md_path = get_features_md_path()
+    write_file(str(features_md_path), "# Application Features and Specifications\n\n")
+    print(f"Initialized {features_md_path}")
+    return {"features_md_content": "# Application Features and Specifications\n\n"}
+
+
+# 3️⃣ Generar y actualizar especificación incrementalmente
+def node_generate_incremental_spec(state: AgentState):
     files = state.get("files", [])
+    file_index = state.get("file_index", 0)
 
-    if not files:
-        return {
-            "current_file": None,
-            "files": []
-        }
+    if file_index >= len(files):
+        print("No more files to process.")
+        return {"current_file": None, "file_index": file_index}
 
-    next_file = files[0]
-    remaining = files[1:]
-
-    print(f"Processing: {next_file}")
-
-    return {
-        "current_file": next_file,
-        "files": remaining
-    }
-
-
-# 3️⃣ Procesar archivo
-def node_process_file(state: AgentState):
-    file_path = state.get("current_file")
-
-    if not file_path:
-        return {}
+    file_path = files[file_index]
+    print(f"Processing: {file_path}")
 
     path_obj = Path(file_path)
 
     if not path_obj.exists() or not path_obj.is_file():
-        return {}
+        print(f"File {file_path} not found or is not a file. Skipping.")
+        return {"current_file": None, "file_index": file_index + 1}
 
     content = read_file(file_path)
 
     if not content.strip():
-        return {}
+        print(f"File {file_path} is empty. Skipping.")
+        return {"current_file": None, "file_index": file_index + 1}
 
     prompt = f"""
-You are a Fullstack software architect.
+You are a highly experienced Fullstack Software Architect specializing in React applications.
+Your task is to generate a detailed technical specification for the provided file from a React project.
+Focus on clarity, precision, and completeness, ensuring that another developer could understand the file's purpose,
+its interactions, and its internal workings solely from your specification.
 
-Analyze this file.
+For each feature, you MUST include a Mermaid diagram (flowchart, sequence, or class diagram, whichever is most appropriate)
+to visually represent the functionality or interaction.
 
-1. Determine the type:
-- Component
-- Page
-- Hook
+Analyze the following file: {file_path}
 
-2. Describe its responsibility in 3-6 lines.
+--- File Content ---
+{content}
+--- End File Content ---
 
-3. List:
-- Main props (if component)
-- State management used
-- Internal project dependencies (relative imports)
-- API calls (if any)
-- Tags that the parser parses (if any). For example: [code:java] ... [endcode]
+Generate the specification for this file. Each specification MUST follow this structure:
 
+## Technical Specification: {file_path}
 
-Return structured markdown in this format:
+### 1. Overview
+- Briefly describe the primary purpose and role of this file within the application.
+- Identify its type (e.g., React Component, Page, Custom Hook, Utility Function, Context Provider, API Service, etc.).
 
-# {file_path}
+### 2. Functionality & Responsibilities
+- Detail what this file does. What problem does it solve? What features does it implement or support?
+- If it's a component or page, describe its UI elements and user interactions.
+- If it's a hook, explain what state or behavior it manages.
+- If it's a utility, describe the operations it performs.
 
-Type: <Type>
+### 3. Inputs (Props/Parameters)
+- If it's a React Component, list and describe all expected `props`. Include their types, whether they are optional, and their purpose.
+- If it's a Custom Hook or Utility Function, list and describe its parameters.
 
-## Responsibility
-...
+### 4. Outputs/Side Effects
+- What does this file return or produce? (e.g., JSX, state, data, modified data).
+- Describe any side effects:
+    - API calls (specify endpoints, methods, and data exchanged).
+    - State mutations (local, global context, Redux, etc.).
+    - Event emissions or subscriptions.
+    - Direct DOM manipulations.
 
-## Inputs
-...
+### 5. Internal Dependencies
+- List all internal modules/files imported by this file (relative imports within the project).
+- Briefly explain why each dependency is needed.
 
-## Dependencies
-...
+### 6. External Dependencies
+- List all external libraries or packages imported (e.g., React, Material-UI, Axios, Lodash).
+- Briefly explain their usage in this file.
 
-## Side Effects
-...
+### 7. Usage Examples (Optional, if applicable)
+- Provide a brief code snippet or description of how this component/hook/utility is typically used by other parts of the application.
 
+### 8. Notes/Considerations
+- Any important design decisions, potential performance considerations, known limitations, or future improvements.
+
+### 9. Mermaid Diagram
+```mermaid
+graph TD;
+    A[Example Node] --> B[Another Node];
+```
+(Replace with an actual Mermaid diagram relevant to the file's functionality. Ensure the Mermaid syntax is correct.)
+
+Ensure the output is clean, well-formatted Markdown and represents the specification for *this single file*.
 """
+    new_spec_content = llm.invoke(prompt).content
+    features_md_path = get_features_md_path()
+    write_file(str(features_md_path), new_spec_content + "\n\n", append=True)
+    print(f"Appended spec for {file_path} to Features.md")
 
-    result = llm.invoke(prompt).content
-    append_spec(result)
-
-    return {}
+    return {"current_file": file_path, "file_index": file_index + 1}
 
 
 # 4️⃣ Router
 def router(state: AgentState):
-    if state.get("files"):
-        return "get_next_file"
+    files = state.get("files", [])
+    file_index = state.get("file_index", 0)
+
+    if file_index < len(files):
+        return "generate_incremental_spec"
     return END
 
 
@@ -114,13 +140,14 @@ def router(state: AgentState):
 graph = StateGraph(AgentState)
 
 graph.add_node("list_files", node_list_files)
-graph.add_node("get_next_file", node_get_next_file)
-graph.add_node("process_file", node_process_file)
+graph.add_node("initialize_features_md", node_initialize_features_md)
+graph.add_node("generate_incremental_spec", node_generate_incremental_spec)
 
 graph.set_entry_point("list_files")
 
-graph.add_edge("list_files", "get_next_file")
-graph.add_edge("get_next_file", "process_file")
-graph.add_conditional_edges("process_file", router)
+graph.add_edge("list_files", "initialize_features_md")
+graph.add_edge("initialize_features_md", "generate_incremental_spec")
+graph.add_conditional_edges("generate_incremental_spec", router)
 
 app = graph.compile()
+
