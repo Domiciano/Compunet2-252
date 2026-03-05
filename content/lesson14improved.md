@@ -264,3 +264,13 @@ Ahora es tu turno. Añade los siguientes métodos a los repositorios correspondi
 9. En `StudentRepository`: Encuentra todos los estudiantes que cursan materias con un profesor específico. Navega `Student` → `studentCourses` → `course` → `professor` → `name`.
 
 10. En `ProfessorRepository`: Encuentra todos los profesores (sin duplicados) que le enseñan a estudiantes de un programa específico. Navega `Professor` → `courses` → `studentCourses` → `student` → `program`.
+
+11. En `UserRepository`: Encuentra un usuario por su nombre de usuario.
+
+12. En `UserRepository`: Encuentra todos los usuarios que tengan un rol específico (por nombre).
+
+13. En `RoleRepository`: Encuentra roles cuyo nombre contenga una cadena, ignorando mayúsculas/minúsculas.
+
+14. En `UserRepository`: Encuentra todos los usuarios que tengan un permiso específico.
+
+15. En `PermissionRepository`: Encuentra todos los permisos asignados a un rol específico.
