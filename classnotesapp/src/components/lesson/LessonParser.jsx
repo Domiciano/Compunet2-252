@@ -13,6 +13,7 @@ import images from "@/assets";
 import TryCodeButton from './TryCodeButton';
 import Typography from "@mui/material/Typography";
 import BeanVisualizer from "@/components/BeanVisualizer/BeanVisualizer";
+import MermaidBlock from "@/components/lesson/MermaidBlock";
 
 const LessonParser = ({ content }) => {
   // Eliminar líneas en blanco al final para asegurar flush correcto
@@ -33,6 +34,10 @@ const LessonParser = ({ content }) => {
   // --- BEAN SIMULATOR ---
   let parsingBeanSim = false;
   let beanSimBuffer = "";
+
+  // --- MERMAID ---
+  let parsingMermaid = false;
+  let mermaidBuffer = "";
 
   // --- LISTA ---
   let parsingList = false;
@@ -184,6 +189,33 @@ const LessonParser = ({ content }) => {
     // --- CONTENIDO DE BEANSIM ---
     if (parsingBeanSim) {
       beanSimBuffer += rawLine + "\n";
+      continue;
+    }
+
+    // --- INICIO DE MERMAID ---
+    if (trimmedLine === '[mermaid]') {
+      flushParagraph(elements, paragraphBuffer, i);
+      paragraphBuffer = "";
+      parsingMermaid = true;
+      mermaidBuffer = "";
+      continue;
+    }
+
+    // --- FIN DE MERMAID ---
+    if (trimmedLine === '[endmermaid]') {
+      if (parsingMermaid) {
+        elements.push(
+          <MermaidBlock key={`mermaid-${i}`} chart={mermaidBuffer} />
+        );
+        parsingMermaid = false;
+        mermaidBuffer = "";
+      }
+      continue;
+    }
+
+    // --- CONTENIDO DE MERMAID ---
+    if (parsingMermaid) {
+      mermaidBuffer += rawLine + "\n";
       continue;
     }
 
