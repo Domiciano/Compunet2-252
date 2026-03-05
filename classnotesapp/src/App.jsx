@@ -25,7 +25,7 @@ function App() {
 
         // SPEC-10: fetch remote toc.md when a URL is configured
         if (courseConfig.tocUrl) {
-          const response = await fetch(courseConfig.tocUrl);
+          const response = await fetch(courseConfig.tocUrl, { cache: 'no-store' });
           if (!response.ok) throw new Error(`HTTP ${response.status} al cargar toc.md`);
           rawToc = await response.text();
         }

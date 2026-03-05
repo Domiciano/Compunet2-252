@@ -27,7 +27,7 @@ const TableOfContentsParser = async (tocContent) => {
       const url = line.slice(12).trim();
       const lessonId = ++lessonCounter;
       try {
-        const response = await fetch(url);
+        const response = await fetch(url, { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const rawContent = await response.text();
         const lessonLabel = getFirstTitleFromMarkdown(rawContent);
