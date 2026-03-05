@@ -4,7 +4,7 @@
 // Set tocUrl to '' to use the local src/content/toc.md (development / offline mode).
 
 const courseConfig = {
-  tocUrl: 'https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/classnotesapp/src/content/toc.md',
+  tocUrl: 'https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/toc.md',
 };
 
 export default courseConfig;
