@@ -135,7 +135,7 @@ INSERT INTO students_courses (student_id, course_id) VALUES (6, 8); -- Valentina
 INSERT INTO students_courses (student_id, course_id) VALUES (7, 3); -- Camila (Medicina) en Anatomia
 [endcode]
 
-[st] Ejercicios Propuestos
+[t] Tarea 2
 Ahora es tu turno. Añade los siguientes métodos a los repositorios correspondientes y pruébalos.
 
 1.  En `StudentRepository`
@@ -172,3 +172,4 @@ Habilite esta bandera para ver la operación SQL subyacente
 [code:ini]
 spring.jpa.show-sql=true
 [endcode]
+
