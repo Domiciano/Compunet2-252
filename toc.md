@@ -22,10 +22,10 @@
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson8.md
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson11.md
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson14.md
+[lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson12.md
 [t] SEMANA 6 · Spring Data
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson13.md
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson16.md
-[lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson12.md
 [t] SEMANA 7 · Spring Data
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson15.md
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson17.md
