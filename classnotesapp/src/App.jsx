@@ -23,7 +23,7 @@ function App() {
         const response = await fetch(courseConfig.tocUrl, { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status} al cargar toc.md`);
         const rawToc = await response.text();
-        const parsedSections = await TableOfContentsParser(rawToc);
+        const parsedSections = TableOfContentsParser(rawToc);
         setSections(parsedSections);
       } catch (error) {
         console.error('[App] Error cargando la tabla de contenido:', error);

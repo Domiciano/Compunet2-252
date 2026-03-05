@@ -14,6 +14,7 @@ Last updated: 2026-03-05
 | SPEC-08 | Known Issues | 🔧 In progress | See per-issue status below |
 | SPEC-09 | Remote Lessons (`[lesson:url]`) | ✅ Implemented | |
 | SPEC-10 | Remote toc.md via config.js | ✅ Implemented | |
+| SPEC-11 | Lazy Lesson Loading | ✅ Implemented | `LessonContentCache` context; parser now synchronous; inline labels supported |
 
 ## SPEC-08 Bug Tracker
 

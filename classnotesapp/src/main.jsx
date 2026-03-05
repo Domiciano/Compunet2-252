@@ -6,15 +6,18 @@ import './index.css';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from './theme/ThemeContext';
 import { StudiedLessonsProvider } from './theme/StudiedLessonsContext';
+import { LessonContentCacheProvider } from './theme/LessonContentCache';
 import 'prismjs/themes/prism-tomorrow.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ThemeProvider>
       <StudiedLessonsProvider>
-        <BrowserRouter basename="/compu2/">
-          <App />
-        </BrowserRouter>
+        <LessonContentCacheProvider>
+          <BrowserRouter basename="/compu2/">
+            <App />
+          </BrowserRouter>
+        </LessonContentCacheProvider>
       </StudiedLessonsProvider>
     </ThemeProvider>
   </React.StrictMode>

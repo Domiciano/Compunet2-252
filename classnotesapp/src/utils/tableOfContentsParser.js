@@ -1,10 +1,9 @@
 // src/utils/tableOfContentsParser.js
 // SPEC-09: supports [lesson:url] for remote lesson files fetched at runtime.
 // SPEC-10: called with text fetched from a remote URL (configured in config.js).
+// SPEC-11: parser is now fully synchronous — no fetch calls. Content loaded on demand by LessonPage.
 
-import { getFirstTitleFromMarkdown } from './markdownUtils';
-
-const TableOfContentsParser = async (tocContent) => {
+const TableOfContentsParser = (tocContent) => {
   const lines = tocContent.split('\n').map(line => line.trim()).filter(line => line !== '');
   const sections = [];
   let lessonCounter = 0;
@@ -22,36 +21,25 @@ const TableOfContentsParser = async (tocContent) => {
       sections.push({ type: 'divider' });
 
     } else if (line.startsWith('[lesson:url]')) {
-      // Remote lesson — fetch content at runtime
-      const url = line.slice(12).trim();
+      // Parse optional inline label: [lesson:url] <url> | <label>
+      const raw = line.slice(12).trim();
+      const pipeIndex = raw.indexOf('|');
+      const url = (pipeIndex !== -1 ? raw.slice(0, pipeIndex) : raw).trim();
+      const inlineLabel = pipeIndex !== -1 ? raw.slice(pipeIndex + 1).trim() : null;
+      const filenameLabel = url.split('/').pop(); // e.g. "lesson7.md"
       const lessonId = ++lessonCounter;
-      try {
-        const response = await fetch(url, { cache: 'no-store' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const rawContent = await response.text();
-        const lessonLabel = getFirstTitleFromMarkdown(rawContent);
-        sections.push({
-          type: 'lesson',
-          source: 'remote',
-          id: String(lessonId),
-          label: lessonLabel || `Lección ${lessonId} (sin título)`,
-          url,
-          rawContent,
-        });
-      } catch (err) {
-        console.warn(`[TableOfContentsParser] No se pudo cargar la lección remota: ${url}`, err);
-        sections.push({
-          type: 'lesson',
-          source: 'remote',
-          id: String(lessonId),
-          label: `Error cargando lección (${url})`,
-          url,
-          rawContent: `[t] Error\nNo se pudo cargar la lección desde:\n${url}`,
-        });
-      }
+
+      sections.push({
+        type: 'lesson',
+        source: 'remote',
+        id: String(lessonId),
+        label: inlineLabel || filenameLabel,
+        url,
+        rawContent: null, // loaded on demand by LessonPage via LessonContentCache
+      });
 
     } else if (line.startsWith('[lesson]')) {
-      // Local lesson — for development use only (requires local content files)
+      // Local lesson — URL-only mode, ignore
       console.warn(`[TableOfContentsParser] Entrada local ignorada en modo URL: ${line}`);
     }
   }
