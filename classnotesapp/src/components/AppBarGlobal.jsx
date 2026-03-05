@@ -16,7 +16,8 @@ import { useTheme as useMuiTheme } from '@mui/material/styles';
 const AppBarGlobal = ({ onOpenMobileToc, onOpenMobileNav }) => {
   const { mode, toggleTheme, theme } = useThemeMode();
   const muiTheme = useMuiTheme();
-  const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
+  // SPEC-08 L2: use 'lg' breakpoint to match the nav drawer breakpoint in Layout.jsx
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('lg'));
 
   return (
     <AppBar
@@ -68,4 +69,4 @@ const AppBarGlobal = ({ onOpenMobileToc, onOpenMobileNav }) => {
   );
 };
 
-export default AppBarGlobal; 
+export default AppBarGlobal;

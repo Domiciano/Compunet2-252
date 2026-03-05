@@ -1,4 +1,6 @@
 // src/pages/LessonPage.jsx
+// SPEC-09: supports remote lessons (source: 'remote') via section.rawContent
+// SPEC-08 L1: column widths derived from named constants
 
 import React, { useState, useEffect, useMemo, forwardRef, useImperativeHandle } from 'react';
 import { useParams } from 'react-router-dom';
@@ -10,22 +12,27 @@ import { useThemeMode } from '@/theme/ThemeContext';
 import CloseIcon from '@mui/icons-material/Close';
 import { useContentSpy } from '@/hooks/useContentSpy';
 
+// Named constants — match Layout.jsx drawerWidth and TableOfContents desktop width
+const DRAWER_WIDTH = 280;
+const TOC_WIDTH = 235;
+// Pixel offsets for the absolute-positioned content column
+const CONTENT_LEFT_OFFSET = DRAWER_WIDTH - 40;  // 240px: slight inset under the fixed drawer
+const CONTENT_RIGHT_OFFSET = TOC_WIDTH - 15;    // 220px: slight inset under the fixed TOC
+
 const LessonPage = forwardRef(({ sections }, ref) => {
   const { lessonId } = useParams();
   const [loading, setLoading] = useState(true);
   const [parsedContent, setParsedContent] = useState({ elements: null, subtitles: [], lessonTitle: '' });
   const [showMobileToc, setShowMobileToc] = useState(false);
   const { theme } = useThemeMode();
-  
-  // Use content spy to track active section
+
   const { activeSection } = useContentSpy(parsedContent.subtitles);
 
+  // Store full section objects so remote rawContent is accessible
   const lessonMap = useMemo(() => {
     const map = new Map();
     sections.forEach(sec => {
-      if (sec.type === 'lesson') {
-        map.set(sec.id, sec.filePath);
-      }
+      if (sec.type === 'lesson') map.set(sec.id, sec);
     });
     return map;
   }, [sections]);
@@ -33,23 +40,27 @@ const LessonPage = forwardRef(({ sections }, ref) => {
   useEffect(() => {
     setLoading(true);
 
-    const filePath = lessonMap.get(lessonId);
+    const section = lessonMap.get(lessonId);
+    let rawContent = null;
 
-    if (filePath && allLessonRawContents[filePath]) {
-      const rawContent = allLessonRawContents[filePath];
-      
-      // Parse the content to get elements and subtitles
+    if (section) {
+      if (section.source === 'remote') {
+        rawContent = section.rawContent ?? null;
+      } else {
+        rawContent = allLessonRawContents[section.filePath] ?? null;
+      }
+    }
+
+    if (rawContent) {
       const parsed = LessonParser({ content: rawContent });
       setParsedContent(parsed);
     } else {
-      const errorContent = `[p]Lo siento, la lección con ID "${lessonId}" no fue encontrada o el archivo "${filePath}" no existe.`;
-      
+      const errorContent = `[t] Lección no encontrada\nLa lección con ID "${lessonId}" no fue encontrada o su archivo no existe.`;
       const parsed = LessonParser({ content: errorContent });
       setParsedContent(parsed);
     }
+
     setLoading(false);
-    
-    // Scroll to top when lesson changes (instant, no animation)
     window.scrollTo(0, 0);
   }, [lessonId, lessonMap]);
 
@@ -63,44 +74,47 @@ const LessonPage = forwardRef(({ sections }, ref) => {
   }
 
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      width: '100%', 
+    <Box sx={{
+      display: 'flex',
+      width: '100%',
       flexDirection: { xs: 'column', lg: 'row' },
-      minWidth: 0 // <-- CLAVE para evitar desbordes en layouts flex
+      minWidth: 0,
     }}>
-      <Box sx={{ 
-        flex: 1, 
-        right:{lg:220, xs: 10},
-        left:{lg:240, xs: 10},
-        position:'absolute',
-        overflow:'scroll',
-        height:'100vh',
-        bottom:0,
-        
-      }}
-      className="hide-scrollbar"
+      {/* Lesson content — absolute to allow independent scrolling */}
+      <Box
+        sx={{
+          flex: 1,
+          right: { lg: CONTENT_RIGHT_OFFSET, xs: 10 },
+          left: { lg: CONTENT_LEFT_OFFSET, xs: 10 },
+          position: 'absolute',
+          overflow: 'scroll',
+          height: '100vh',
+          bottom: 0,
+        }}
+        className="hide-scrollbar"
       >
         {parsedContent.elements}
       </Box>
-      {/* TOC en desktop */}
-      <Box sx={{ 
-        width: { lg: 235 }, 
-        flexShrink: 0, 
+
+      {/* TOC — desktop: fixed right column */}
+      <Box sx={{
+        width: { lg: TOC_WIDTH },
+        flexShrink: 0,
         display: { xs: 'none', lg: 'block' },
         mr: 2,
-        position:'fixed',
+        position: 'fixed',
         right: 0,
         top: 64,
       }}>
-        <TableOfContents 
-          subtitles={parsedContent.subtitles} 
+        <TableOfContents
+          subtitles={parsedContent.subtitles}
           lessonTitle={parsedContent.lessonTitle}
           activeSection={activeSection}
           lessonId={lessonId}
         />
       </Box>
-      {/* TOC en mobile: Drawer temporal */}
+
+      {/* TOC — mobile: overlay drawer */}
       {showMobileToc && (
         <Box
           sx={{
@@ -117,15 +131,18 @@ const LessonPage = forwardRef(({ sections }, ref) => {
             display: { xs: 'block', lg: 'none' },
           }}
         >
-          {/* Botón de cerrar fijo arriba a la derecha */}
           <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 2100 }}>
-            <button onClick={() => setShowMobileToc(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }} aria-label="Cerrar TOC">
+            <button
+              onClick={() => setShowMobileToc(false)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}
+              aria-label="Cerrar TOC"
+            >
               <CloseIcon sx={{ color: theme.primaryTitle, fontSize: 28 }} />
             </button>
           </Box>
           <Box sx={{ pt: 4 }}>
-            <TableOfContents 
-              subtitles={parsedContent.subtitles} 
+            <TableOfContents
+              subtitles={parsedContent.subtitles}
               lessonTitle={parsedContent.lessonTitle}
               activeSection={activeSection}
               lessonId={lessonId}

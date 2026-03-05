@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
+import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
@@ -24,9 +25,7 @@ const Layout = ({ children, sections = [], onOpenMobileNav }) => {
   const { theme } = useThemeMode();
   const { studiedLessons, toggleStudied } = useStudiedLessons();
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
+  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
   useEffect(() => {
     if (!onOpenMobileNav) return;
@@ -34,11 +33,7 @@ const Layout = ({ children, sections = [], onOpenMobileNav }) => {
   }, [onOpenMobileNav]);
 
   const drawerContent = (
-    <Box sx={{
-      width: drawerWidth,
-      backgroundColor: 'theme.background',
-      height: '100vh',
-    }}>
+    <Box sx={{ width: drawerWidth, height: '100vh' }}>
       <Box sx={{ height: '64px' }} />
       <List>
         {sections.map((sec, index) => {
@@ -59,6 +54,17 @@ const Layout = ({ children, sections = [], onOpenMobileNav }) => {
               </Box>
             );
           }
+
+          // SPEC-08 P3: render [d] divider entries
+          if (sec.type === "divider") {
+            return (
+              <Divider
+                key={`divider-${index}`}
+                sx={{ my: 1, borderColor: theme.border }}
+              />
+            );
+          }
+
           if (sec.type === "lesson") {
             const isStudied = studiedLessons.includes(sec.id);
             const isSelected = location.pathname === `/lesson/${sec.id}`;
@@ -98,6 +104,7 @@ const Layout = ({ children, sections = [], onOpenMobileNav }) => {
               </ListItemButton>
             );
           }
+
           return null;
         })}
       </List>
@@ -107,7 +114,6 @@ const Layout = ({ children, sections = [], onOpenMobileNav }) => {
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
-      {/* Primera columna: Nav Drawer */}
       {!isMobile && (
         <Box
           sx={{
@@ -122,8 +128,8 @@ const Layout = ({ children, sections = [], onOpenMobileNav }) => {
             height: '100vh',
             zIndex: 1201,
             overflowY: 'auto',
-            scrollbarWidth: 'none', // Firefox
-            '&::-webkit-scrollbar': { display: 'none' }, // Chrome/Safari
+            scrollbarWidth: 'none',
+            '&::-webkit-scrollbar': { display: 'none' },
           }}
         >
           {drawerContent}
@@ -134,10 +140,7 @@ const Layout = ({ children, sections = [], onOpenMobileNav }) => {
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
-          ModalProps={{ 
-            keepMounted: true,
-            disableScrollLock: false,
-          }}
+          ModalProps={{ keepMounted: true, disableScrollLock: false }}
           sx={{
             [`& .MuiDrawer-paper`]: {
               width: "85%",
@@ -156,13 +159,12 @@ const Layout = ({ children, sections = [], onOpenMobileNav }) => {
           {drawerContent}
         </Drawer>
       )}
-      {/* Contenido principal */}
       <Box
         component="main"
-        sx={{ 
+        sx={{
           flex: 1,
-          p: isMobile ? 1 : 2, 
-          pt: isMobile ? 8 : 2, // Más espacio arriba en móvil para el AppBar
+          p: isMobile ? 1 : 2,
+          pt: isMobile ? 8 : 2,
           width: "100%",
           boxSizing: "border-box",
           backgroundColor: theme.background,
