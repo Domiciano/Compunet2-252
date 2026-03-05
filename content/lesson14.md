@@ -5,7 +5,7 @@ https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html
 [st] ¿Qué son los Query Methods?
 Spring Data JPA ofrece una funcionalidad poderosa llamada "Query Methods" (o métodos de consulta). Permite crear consultas a la base de datos de forma automática simplemente declarando métodos en tus interfaces de repositorio.
 
-Spring analiza el nombre del método, lo divide en partes y lo traduce a una consulta JPQL (Java Persistence Query Language). Esto nos ahorra el trabajo de escribir consultas manualmente para la mayoría de los casos de uso comunes. La convención sigue el formato `findBy...`, `readBy...`, `queryBy...`, `countBy...`, y `getBy...`, seguido de las propiedades de la entidad.
+Spring analiza el nombre del método, lo divide en partes y lo traduce a una consulta JPQL (Java Persistence Query Language). Esto nos ahorra el trabajo de escribir consultas manualmente para la mayoría de los casos de uso comunes. La convención sigue el formato `findBy...`, `readBy...`, `countBy...`, y `getBy...`, seguido de las propiedades de la entidad.
 
 [st] Preparando el Modelo
 Para nuestros ejemplos, asumiremos que la entidad `Course` ha sido actualizada para incluir un campo `credits` y la relación con `Profesor` que vimos en lecciones anteriores. 
@@ -172,4 +172,3 @@ Habilite esta bandera para ver la operación SQL subyacente
 [code:ini]
 spring.jpa.show-sql=true
 [endcode]
-
