@@ -9,7 +9,7 @@ Spring analiza el nombre del método, lo divide en partes y lo traduce a JPQL au
 
 [st] Preparando el Modelo
 
-El modelo de ejemplo tiene tres entidades: `Professor`, `Course` y `Student`. Un profesor puede dictar muchos cursos (uno a muchos). Un estudiante puede inscribirse en muchos cursos y un curso puede tener muchos estudiantes (muchos a muchos). La tabla intermedia `StudentCourse` se modela como entidad con clave embebida.
+El modelo completo tiene 9 tablas. Las tres primeras entidades son académicas: `Professor`, `Course` y `Student`. Las otras tres son de seguridad: `User`, `Role` y `Permission`. Cada relación muchos a muchos se modela con una entidad intermedia y clave embebida (`StudentCourse`, `UserRole`, `RolePermission`).
 
 [mermaid]
 erDiagram
@@ -33,28 +33,154 @@ erDiagram
         int student_id PK,FK
         int course_id PK,FK
     }
+    USER {
+        int id PK
+        varchar username
+        varchar password
+    }
+    ROLE {
+        int id PK
+        varchar name
+    }
+    PERMISSION {
+        int id PK
+        varchar name
+    }
+    USER_ROLE {
+        int user_id PK,FK
+        int role_id PK,FK
+    }
+    ROLE_PERMISSION {
+        int role_id PK,FK
+        int permission_id PK,FK
+    }
     PROFESSOR ||--o{ COURSE : "dicta"
     STUDENT ||--o{ STUDENT_COURSE : "inscrito en"
     COURSE ||--o{ STUDENT_COURSE : "tiene"
+    USER ||--o{ USER_ROLE : "tiene"
+    ROLE ||--o{ USER_ROLE : "asignado a"
+    ROLE ||--o{ ROLE_PERMISSION : "tiene"
+    PERMISSION ||--o{ ROLE_PERMISSION : "asignado a"
 [endmermaid]
 
 [code:java]
-package com.example.myapp.model;
+package com.example.myapp.model.keys;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Embeddable
 public class StudentCourseId implements Serializable {
+
+    @Column(name = "student_id")
     private Integer studentId;
+
+    @Column(name = "course_id")
     private Integer courseId;
-    // constructores, getters y setters
+
+    public Integer getStudentId() { return studentId; }
+    public void setStudentId(Integer studentId) { this.studentId = studentId; }
+    public Integer getCourseId() { return courseId; }
+    public void setCourseId(Integer courseId) { this.courseId = courseId; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof StudentCourseId) {
+            StudentCourseId that = (StudentCourseId) o;
+            return Objects.equals(studentId, that.studentId) && Objects.equals(courseId, that.courseId);
+        } else return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(studentId, courseId);
+    }
+}
+[endcode]
+
+[code:java]
+package com.example.myapp.model.keys;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import java.io.Serializable;
+import java.util.Objects;
+
+@Embeddable
+public class UserRoleId implements Serializable {
+
+    @Column(name = "user_id")
+    private Integer userId;
+
+    @Column(name = "role_id")
+    private Integer roleId;
+
+    public Integer getUserId() { return userId; }
+    public void setUserId(Integer userId) { this.userId = userId; }
+    public Integer getRoleId() { return roleId; }
+    public void setRoleId(Integer roleId) { this.roleId = roleId; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof UserRoleId) {
+            UserRoleId that = (UserRoleId) o;
+            return Objects.equals(userId, that.userId) && Objects.equals(roleId, that.roleId);
+        } else return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, roleId);
+    }
+}
+[endcode]
+
+[code:java]
+package com.example.myapp.model.keys;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import java.io.Serializable;
+import java.util.Objects;
+
+@Embeddable
+public class RolePermissionId implements Serializable {
+
+    @Column(name = "role_id")
+    private Integer roleId;
+
+    @Column(name = "permission_id")
+    private Integer permissionId;
+
+    public Integer getRoleId() { return roleId; }
+    public void setRoleId(Integer roleId) { this.roleId = roleId; }
+    public Integer getPermissionId() { return permissionId; }
+    public void setPermissionId(Integer permissionId) { this.permissionId = permissionId; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof RolePermissionId) {
+            RolePermissionId that = (RolePermissionId) o;
+            return Objects.equals(roleId, that.roleId) && Objects.equals(permissionId, that.permissionId);
+        } else return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(roleId, permissionId);
+    }
 }
 [endcode]
 
 [code:java]
 package com.example.myapp.model;
 
+import com.example.myapp.model.keys.StudentCourseId;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -68,13 +194,20 @@ public class Professor {
 
     @OneToMany(mappedBy = "professor")
     private List<Course> courses;
-    // constructores, getters y setters
+
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public List<Course> getCourses() { return courses; }
+    public void setCourses(List<Course> courses) { this.courses = courses; }
 }
 [endcode]
 
 [code:java]
 package com.example.myapp.model;
 
+import com.example.myapp.model.keys.StudentCourseId;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -93,13 +226,24 @@ public class Course {
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudentCourse> studentCourses;
-    // constructores, getters y setters
+
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public int getCredits() { return credits; }
+    public void setCredits(int credits) { this.credits = credits; }
+    public Professor getProfessor() { return professor; }
+    public void setProfessor(Professor professor) { this.professor = professor; }
+    public List<StudentCourse> getStudentCourses() { return studentCourses; }
+    public void setStudentCourses(List<StudentCourse> studentCourses) { this.studentCourses = studentCourses; }
 }
 [endcode]
 
 [code:java]
 package com.example.myapp.model;
 
+import com.example.myapp.model.keys.StudentCourseId;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -115,13 +259,24 @@ public class Student {
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudentCourse> studentCourses;
-    // constructores, getters y setters
+
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getCode() { return code; }
+    public void setCode(String code) { this.code = code; }
+    public String getProgram() { return program; }
+    public void setProgram(String program) { this.program = program; }
+    public List<StudentCourse> getStudentCourses() { return studentCourses; }
+    public void setStudentCourses(List<StudentCourse> studentCourses) { this.studentCourses = studentCourses; }
 }
 [endcode]
 
 [code:java]
 package com.example.myapp.model;
 
+import com.example.myapp.model.keys.StudentCourseId;
 import jakarta.persistence.*;
 
 @Entity
@@ -139,7 +294,165 @@ public class StudentCourse {
     @MapsId("courseId")
     @JoinColumn(name = "course_id")
     private Course course;
-    // constructores, getters y setters
+
+    public StudentCourseId getId() { return id; }
+    public void setId(StudentCourseId id) { this.id = id; }
+    public Student getStudent() { return student; }
+    public void setStudent(Student student) { this.student = student; }
+    public Course getCourse() { return course; }
+    public void setCourse(Course course) { this.course = course; }
+}
+[endcode]
+
+[code:java]
+package com.example.myapp.model;
+
+import com.example.myapp.model.keys.UserRoleId;
+import jakarta.persistence.*;
+import java.util.List;
+
+@Entity
+@Table(name = "app_user")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    private String username;
+    private String password;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserRole> userRoles;
+
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    public List<UserRole> getUserRoles() { return userRoles; }
+    public void setUserRoles(List<UserRole> userRoles) { this.userRoles = userRoles; }
+}
+[endcode]
+
+[code:java]
+package com.example.myapp.model;
+
+import com.example.myapp.model.keys.UserRoleId;
+import com.example.myapp.model.keys.RolePermissionId;
+import jakarta.persistence.*;
+import java.util.List;
+
+@Entity
+@Table(name = "role")
+public class Role {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    private String name;
+
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserRole> userRoles;
+
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RolePermission> rolePermissions;
+
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public List<UserRole> getUserRoles() { return userRoles; }
+    public void setUserRoles(List<UserRole> userRoles) { this.userRoles = userRoles; }
+    public List<RolePermission> getRolePermissions() { return rolePermissions; }
+    public void setRolePermissions(List<RolePermission> rolePermissions) { this.rolePermissions = rolePermissions; }
+}
+[endcode]
+
+[code:java]
+package com.example.myapp.model;
+
+import com.example.myapp.model.keys.RolePermissionId;
+import jakarta.persistence.*;
+import java.util.List;
+
+@Entity
+@Table(name = "permission")
+public class Permission {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    private String name;
+
+    @OneToMany(mappedBy = "permission", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RolePermission> rolePermissions;
+
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public List<RolePermission> getRolePermissions() { return rolePermissions; }
+    public void setRolePermissions(List<RolePermission> rolePermissions) { this.rolePermissions = rolePermissions; }
+}
+[endcode]
+
+[code:java]
+package com.example.myapp.model;
+
+import com.example.myapp.model.keys.UserRoleId;
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "user_role")
+public class UserRole {
+    @EmbeddedId
+    private UserRoleId id;
+
+    @ManyToOne
+    @MapsId("userId")
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne
+    @MapsId("roleId")
+    @JoinColumn(name = "role_id")
+    private Role role;
+
+    public UserRoleId getId() { return id; }
+    public void setId(UserRoleId id) { this.id = id; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
+}
+[endcode]
+
+[code:java]
+package com.example.myapp.model;
+
+import com.example.myapp.model.keys.RolePermissionId;
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "role_permission")
+public class RolePermission {
+    @EmbeddedId
+    private RolePermissionId id;
+
+    @ManyToOne
+    @MapsId("roleId")
+    @JoinColumn(name = "role_id")
+    private Role role;
+
+    @ManyToOne
+    @MapsId("permissionId")
+    @JoinColumn(name = "permission_id")
+    private Permission permission;
+
+    public RolePermissionId getId() { return id; }
+    public void setId(RolePermissionId id) { this.id = id; }
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
+    public Permission getPermission() { return permission; }
+    public void setPermission(Permission permission) { this.permission = permission; }
 }
 [endcode]
 
