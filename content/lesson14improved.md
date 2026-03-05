@@ -63,6 +63,8 @@ erDiagram
     PERMISSION ||--o{ ROLE_PERMISSION : "asignado a"
 [endmermaid]
 
+[st] Repo base
+[link] (Repositorio listo para continuar) https://github.com/Domiciano/QueryMethodsTareaTemplate
 
 [st] Ejemplos Básicos
 Estos métodos se declaran en las interfaces de repositorio. Spring genera la implementación en tiempo de ejecución.
