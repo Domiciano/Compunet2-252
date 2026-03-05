@@ -21,8 +21,8 @@
 [t] SEMANA 5 · Spring Data
 [lesson] lesson8.md
 [lesson] lesson11.md
-[t] SEMANA 6 · Spring Data
 [lesson] lesson14.md
+[t] SEMANA 6 · Spring Data
 [lesson] lesson13.md
 [lesson] lesson16.md
 [lesson] lesson12.md
