@@ -1,9 +1,8 @@
 // src/utils/tableOfContentsParser.js
 // SPEC-09: supports [lesson:url] for remote lesson files fetched at runtime.
-// SPEC-10: called with either local toc text or text fetched from a remote URL.
+// SPEC-10: called with text fetched from a remote URL (configured in config.js).
 
 import { getFirstTitleFromMarkdown } from './markdownUtils';
-import allLessonRawContents from './lessonImporter';
 
 const TableOfContentsParser = async (tocContent) => {
   const lines = tocContent.split('\n').map(line => line.trim()).filter(line => line !== '');
@@ -23,7 +22,7 @@ const TableOfContentsParser = async (tocContent) => {
       sections.push({ type: 'divider' });
 
     } else if (line.startsWith('[lesson:url]')) {
-      // SPEC-09: remote lesson — fetch content at runtime
+      // Remote lesson — fetch content at runtime
       const url = line.slice(12).trim();
       const lessonId = ++lessonCounter;
       try {
@@ -52,29 +51,8 @@ const TableOfContentsParser = async (tocContent) => {
       }
 
     } else if (line.startsWith('[lesson]')) {
-      // Local lesson — resolved from build-time bundle
-      const filePath = line.slice(8).trim();
-      const lessonId = ++lessonCounter;
-      const rawContent = allLessonRawContents[filePath];
-      if (rawContent) {
-        const lessonLabel = getFirstTitleFromMarkdown(rawContent);
-        sections.push({
-          type: 'lesson',
-          source: 'local',
-          id: String(lessonId),
-          label: lessonLabel || `Lección ${lessonId} (sin título)`,
-          filePath,
-        });
-      } else {
-        console.warn(`[TableOfContentsParser] No se encontró el contenido para la lección: ${filePath}`);
-        sections.push({
-          type: 'lesson',
-          source: 'local',
-          id: String(lessonId),
-          label: `Error: Lección no encontrada (${filePath})`,
-          filePath,
-        });
-      }
+      // Local lesson — for development use only (requires local content files)
+      console.warn(`[TableOfContentsParser] Entrada local ignorada en modo URL: ${line}`);
     }
   }
 

@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import '@/App.css';
 
 import Layout from '@/components/drawer/Layout';
 import TableOfContentsParser from '@/utils/tableOfContentsParser';
-import localTocContent from '@/content/toc.md?raw';  // fallback for offline / dev mode
-import courseConfig from '@/content/config.js';       // SPEC-10: remote toc URL
+import courseConfig from '@/content/config.js';
 import LessonPage from '@/pages/LessonPage';
 import AppBarGlobal from '@/components/AppBarGlobal';
 
@@ -21,28 +20,14 @@ function App() {
   useEffect(() => {
     const loadSections = async () => {
       try {
-        let rawToc = localTocContent;
-
-        // SPEC-10: fetch remote toc.md when a URL is configured
-        if (courseConfig.tocUrl) {
-          const response = await fetch(courseConfig.tocUrl, { cache: 'no-store' });
-          if (!response.ok) throw new Error(`HTTP ${response.status} al cargar toc.md`);
-          rawToc = await response.text();
-        }
-
+        const response = await fetch(courseConfig.tocUrl, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status} al cargar toc.md`);
+        const rawToc = await response.text();
         const parsedSections = await TableOfContentsParser(rawToc);
         setSections(parsedSections);
       } catch (error) {
         console.error('[App] Error cargando la tabla de contenido:', error);
         setTocError(error.message);
-        // Attempt local fallback when remote fetch fails
-        try {
-          const parsedSections = await TableOfContentsParser(localTocContent);
-          setSections(parsedSections);
-          setTocError(null);
-        } catch (fallbackError) {
-          console.error('[App] Error en fallback local:', fallbackError);
-        }
       } finally {
         setLoading(false);
       }
@@ -81,7 +66,7 @@ function App() {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
         <h2>No se pudo cargar el contenido del curso.</h2>
-        <p>Por favor, verifica la configuración en <code>src/content/config.js</code> y la carpeta <code>content</code>.</p>
+        <p>Verifica la URL configurada en <code>src/content/config.js</code>.</p>
         {tocError && <p style={{ color: '#FF5370', fontSize: '0.9em' }}>{tocError}</p>}
       </div>
     );
