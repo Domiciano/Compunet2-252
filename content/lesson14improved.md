@@ -273,4 +273,4 @@ Ahora es tu turno. Añade los siguientes métodos a los repositorios correspondi
 
 14. En `UserRepository`: Encuentra todos los usuarios que tengan un permiso específico.
 
-15. En `PermissionRepository`: Encuentra todos los permisos asignados a un rol específico.
+15. En `PermissionRepository`: Encuentra todos los permisos asignados a un usuario por username
