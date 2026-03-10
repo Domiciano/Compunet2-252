@@ -13,6 +13,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useThemeMode } from '@/theme/ThemeContext';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useStudiedLessons } from '@/theme/StudiedLessonsContext';
 
 const drawerWidth = 280;
@@ -24,8 +26,24 @@ const Layout = ({ children, sections = [], onOpenMobileNav }) => {
   const location = useLocation();
   const { theme } = useThemeMode();
   const { studiedLessons, toggleStudied } = useStudiedLessons();
+  const [expandedSections, setExpandedSections] = useState(() => {
+    try {
+      const saved = localStorage.getItem('drawer-expanded-sections');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
 
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
+
+  const toggleSection = (titleId) => {
+    setExpandedSections(prev => {
+      const next = { ...prev, [titleId]: !(prev[titleId] ?? true) };
+      localStorage.setItem('drawer-expanded-sections', JSON.stringify(next));
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (!onOpenMobileNav) return;
@@ -36,77 +54,95 @@ const Layout = ({ children, sections = [], onOpenMobileNav }) => {
     <Box sx={{ width: drawerWidth, height: '100vh' }}>
       <Box sx={{ height: '64px' }} />
       <List>
-        {sections.map((sec, index) => {
-          if (sec.type === "title") {
-            return (
-              <Box
-                key={`title-${index}`}
-                sx={{
-                  px: 2,
-                  py: 1,
-                  fontWeight: "bold",
-                  color: theme.drawerTitle,
-                  fontSize: "0.75rem",
-                  textTransform: "uppercase",
-                }}
-              >
-                {sec.label}
-              </Box>
-            );
-          }
-
-          // SPEC-08 P3: render [d] divider entries
-          if (sec.type === "divider") {
-            return (
-              <Divider
-                key={`divider-${index}`}
-                sx={{ my: 1, borderColor: theme.border }}
-              />
-            );
-          }
-
-          if (sec.type === "lesson") {
-            const isStudied = studiedLessons.includes(sec.id);
-            const isSelected = location.pathname === `/lesson/${sec.id}`;
-            return (
-              <ListItemButton
-                key={`lesson-${sec.id}`}
-                component={Link}
-                to={`/lesson/${sec.id}`}
-                selected={isSelected}
-                sx={{
-                  color: theme.drawerSection,
-                  '&.Mui-selected': {
-                    backgroundColor: 'rgba(66, 165, 245, 0.1)',
+        {(() => {
+          let currentTitleId = null;
+          return sections.map((sec, index) => {
+            if (sec.type === "title") {
+              currentTitleId = sec.id;
+              const isExpanded = expandedSections[sec.id] ?? true;
+              return (
+                <Box
+                  key={`title-${index}`}
+                  onClick={() => toggleSection(sec.id)}
+                  sx={{
+                    px: 2,
+                    py: 1,
+                    fontWeight: "bold",
                     color: theme.drawerTitle,
-                  },
-                  '&:hover': { color: theme.drawerTitle },
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-                onClick={() => setMobileOpen(false)}
-              >
-                <ListItemText primary={sec.label} />
-                <IconButton
-                  size="small"
-                  onClick={e => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    toggleStudied(String(sec.id));
+                    fontSize: "0.75rem",
+                    textTransform: "uppercase",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    cursor: "pointer",
+                    userSelect: "none",
+                    '&:hover': { opacity: 0.8 },
                   }}
-                  sx={{ ml: 1 }}
-                  aria-label={isStudied ? 'Marcar como no estudiada' : 'Marcar como estudiada'}
                 >
-                  {isStudied
-                    ? <CheckCircleIcon sx={{ color: theme.accent }} />
-                    : <CheckCircleOutlineIcon sx={{ color: isSelected ? theme.accent : theme.border, opacity: isSelected ? 0.8 : 1 }} />}
-                </IconButton>
-              </ListItemButton>
-            );
-          }
+                  {sec.label}
+                  {isExpanded
+                    ? <ExpandMoreIcon sx={{ fontSize: "1rem" }} />
+                    : <ChevronRightIcon sx={{ fontSize: "1rem" }} />}
+                </Box>
+              );
+            }
 
-          return null;
-        })}
+            // SPEC-08 P3: render [d] divider entries
+            if (sec.type === "divider") {
+              return (
+                <Divider
+                  key={`divider-${index}`}
+                  sx={{ my: 1, borderColor: theme.border }}
+                />
+              );
+            }
+
+            if (sec.type === "lesson") {
+              const isExpanded = currentTitleId ? (expandedSections[currentTitleId] ?? true) : true;
+              if (!isExpanded) return null;
+
+              const isStudied = studiedLessons.includes(sec.id);
+              const isSelected = location.pathname === `/lesson/${sec.id}`;
+              return (
+                <ListItemButton
+                  key={`lesson-${sec.id}`}
+                  component={Link}
+                  to={`/lesson/${sec.id}`}
+                  selected={isSelected}
+                  sx={{
+                    color: theme.drawerSection,
+                    '&.Mui-selected': {
+                      backgroundColor: 'rgba(66, 165, 245, 0.1)',
+                      color: theme.drawerTitle,
+                    },
+                    '&:hover': { color: theme.drawerTitle },
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <ListItemText primary={sec.label} />
+                  <IconButton
+                    size="small"
+                    onClick={e => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleStudied(String(sec.id));
+                    }}
+                    sx={{ ml: 1 }}
+                    aria-label={isStudied ? 'Marcar como no estudiada' : 'Marcar como estudiada'}
+                  >
+                    {isStudied
+                      ? <CheckCircleIcon sx={{ color: theme.accent }} />
+                      : <CheckCircleOutlineIcon sx={{ color: isSelected ? theme.accent : theme.border, opacity: isSelected ? 0.8 : 1 }} />}
+                  </IconButton>
+                </ListItemButton>
+              );
+            }
+
+            return null;
+          });
+        })()}
       </List>
       <Box sx={{ height: 100 }} />
     </Box>
