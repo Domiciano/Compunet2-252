@@ -4,16 +4,16 @@ En el mundo de las bases de datos, una transacción es una secuencia de una o m�
 
 Las transacciones se rigen por los principios ACID:
 
-Atomicidad (Atomicity)
+`Atomicity`
 La transacción es "todo o nada". Si una parte de la transacción falla, toda la transacción falla y la base de datos vuelve al estado en que se encontraba antes de que comenzara la transacción.
 
-Consistencia (Consistency)
+`Consistency`
 La transacción lleva a la base de datos de un estado válido a otro.
 
-Aislamiento (Isolation)
+`Isolation`
 Las transacciones concurrentes se ejecutan de forma aislada unas de otras. Los resultados de una transacción no son visibles para otras hasta que se completa.
 
-Durabilidad (Durability)
+`Durability`
 Una vez que una transacción se ha completado con éxito (commit), sus cambios son permanentes y sobreviven a cualquier fallo del sistema.
 
 [st] La Magia de @Transactional
@@ -47,6 +47,16 @@ sequenceDiagram
         Proxy-->>Client: propaga excepción
     end
 [endmermaid]
+
+En Hibernate (o JPA), un objeto puede estar en cuatro estados principales: `transient`, `managed` (persistent), `detached` y `removed`. 
+
+Un objeto transient es uno que acabas de crear con new y todavía no está asociado al contexto de persistencia, por lo que Hibernate no lo conoce ni lo puede sincronizar con la base de datos; si intentas relacionarlo con otra entidad gestionada puede producir errores si no se persiste primero o no hay cascade. 
+
+Un objeto `managed`/`persistent` es aquel que está dentro del contexto de persistencia activo (por ejemplo dentro de una transacción con `@Transactional`), por lo que Hibernate lo monitorea y cualquier cambio se sincroniza automáticamente con la base de datos. 
+
+Un objeto `detached` es una entidad que fue gestionada pero ya no lo está (por ejemplo cuando termina la transacción o se cierra la sesión); el objeto sigue existiendo pero Hibernate ya no rastrea sus cambios. 
+
+Finalmente, un objeto `removed` es una entidad marcada para eliminación y será borrada en el flush o al finalizar la transacción. El problema con FetchType.LAZY es diferente: la entidad sí está gestionada, pero sus relaciones se cargan mediante proxies, por lo que si intentas acceder a ellas fuera de la sesión o transacción se produce un LazyInitializationException.
 
 [st] Entidades del Proyecto Base
 Usaremos las entidades del proyecto: `Student`, `Course` y `Enrollment` (tabla `student_course` con clave compuesta). La operación de matrícula es un caso perfecto para ilustrar transacciones: debe crear un registro en `student_course` vinculando un estudiante y un curso existentes. Si algo falla a mitad del proceso, nada debe quedar a medias.

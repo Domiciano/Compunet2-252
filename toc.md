@@ -26,7 +26,7 @@
 [t] SEMANA 6 · Spring Data
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson13.md | Transacciones en Spring Boot
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson15.md | Spring Data JPA: Paginación, Orden y Más
-[lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson16.md | Manejo de Fechas
+[lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson16.md | Extra: Manejo de Fechas
 [t] SEMANA 7 · Spring Data
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson17.md | Pruebas de Integración con Spring Boot
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson18.md | Mockito
