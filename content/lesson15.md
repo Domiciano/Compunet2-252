@@ -96,9 +96,7 @@ public class CourseService {
         // Crea un objeto Pageable para solicitar una página específica.
         // page: número de la página (base 0)
         // size: tamaño de la página
-        // Sort: opcional, para ordenar los resultados
-        Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
-
+        Pageable pageable = PageRequest.of(page, size);
         return courseRepository.findByProfesorName(professorName, pageable);
     }
 }
