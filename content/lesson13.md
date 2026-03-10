@@ -152,7 +152,7 @@ public void createCourseWithNewProfessorFixed(String courseName) {
     course.setCredits(3);
     course.setProfessor(newProfessor); // ← ya no es transient
 
-    courseRepository.save(course); // ✅ funciona
+    courseRepository.save(course); // funciona
 }
 [endcode]
 
