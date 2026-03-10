@@ -212,25 +212,7 @@ Para verificar que el rollback funcionó correctamente, accede a la consola H2 e
 [st] ¿Por qué los Selects también usan @Transactional?
 Es común ver métodos de solo lectura anotados con `@Transactional`. Hay dos razones concretas para esto.
 
-La primera es evitar el `LazyInitializationException`. Cuando una colección está marcada como `FetchType.LAZY` (el default en `@OneToMany`), Hibernate no la carga hasta que la accedes. Pero para cargarla necesita una sesión activa. Si accedes a esa colección fuera de una transacción, la sesión ya fue cerrada y Hibernate lanza la excepción.
-
-[code:java]
-// SIN @Transactional — falla al acceder a la colección lazy
-public List<Enrollment> getEnrollmentsOfStudent(Integer studentId) {
-    Student student = studentRepository.findById(studentId).orElseThrow();
-    // La sesión ya se cerró después del findById
-    return student.getEnrollments(); // LazyInitializationException, mal ahi
-}
-[endcode]
-
-[code:java]
-// CON @Transactional — la sesión permanece abierta durante todo el método
-@Transactional
-public List<Enrollment> getEnrollmentsOfStudent(Integer studentId) {
-    Student student = studentRepository.findById(studentId).orElseThrow();
-    return student.getEnrollments(); // Hibernate puede hacer el SELECT aquí
-}
-[endcode]
+La primera es evitar el `LazyInitializationException`. Cuando una colección está marcada como `FetchType.LAZY` (el default en `@OneToMany`), Hibernate no la carga hasta que la accedes. Pero para cargarla necesita una sesión activa.
 
 La segunda razón es la optimización con `readOnly = true`. Cuando marcas una transacción como de solo lectura, Hibernate omite el *dirty checking* al final: no necesita comparar el estado original de cada objeto con su estado actual para saber si algo cambió. En métodos que cargan muchos objetos, esto reduce el trabajo considerablemente.
 
