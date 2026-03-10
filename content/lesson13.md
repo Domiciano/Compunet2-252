@@ -157,54 +157,47 @@ public void createCourseWithNewProfessorFixed(String courseName) {
 [endcode]
 
 [st] RestController para Probar Todo
-Exponemos los tres casos como endpoints HTTP para probarlo directamente con Postman o el navegador.
+Exponemos los tres casos como endpoints HTTP. Los IDs están quemados en código para simplificar: el estudiante 1 y el curso 2 ya existen en el `data.sql` del proyecto.
 
 [code:java]
 @RestController
-@RequestMapping("/enrollments")
 public class EnrollmentController {
 
     @Autowired
     private EnrollmentService enrollmentService;
 
-    // Caso exitoso: POST /enrollments/1/courses/2
-    @PostMapping("/{studentId}/courses/{courseId}")
-    public ResponseEntity<String> enroll(
-            @PathVariable Integer studentId,
-            @PathVariable Integer courseId) {
-        enrollmentService.enroll(studentId, courseId);
-        return ResponseEntity.ok("Matrícula exitosa");
+    // GET /enroll  → caso exitoso
+    @GetMapping("/enroll")
+    public Map<String, String> enroll() {
+        enrollmentService.enroll(1, 2);
+        return Map.of("resultado", "Matrícula exitosa");
     }
 
-    // Rollback: POST /enrollments/1/courses/2/fail
-    @PostMapping("/{studentId}/courses/{courseId}/fail")
-    public ResponseEntity<String> enrollWithFailure(
-            @PathVariable Integer studentId,
-            @PathVariable Integer courseId) {
+    // GET /enroll-fail  → rollback
+    @GetMapping("/enroll-fail")
+    public Map<String, String> enrollFail() {
         try {
-            enrollmentService.enrollWithFailure(studentId, courseId);
-            return ResponseEntity.ok("Nunca debería llegar aquí");
+            enrollmentService.enrollWithFailure(1, 2);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(500)
-                    .body("Falló: " + e.getMessage() + " | Rollback aplicado");
+            return Map.of("error", e.getMessage(), "rollback", "aplicado");
         }
+        return Map.of("resultado", "sin error");
     }
 
-    // Error transient: POST /enrollments/courses/transient
-    @PostMapping("/courses/transient")
-    public ResponseEntity<String> transientError() {
+    // GET /transient-error  → TransientPropertyValueException
+    @GetMapping("/transient-error")
+    public Map<String, String> transientError() {
         try {
             enrollmentService.createCourseWithNewProfessor("Curso Problemático");
-            return ResponseEntity.ok("Sin error (inesperado)");
         } catch (Exception e) {
-            return ResponseEntity.status(500)
-                    .body("TransientPropertyValueException: " + e.getMessage());
+            return Map.of("error", e.getMessage());
         }
+        return Map.of("resultado", "sin error");
     }
 }
 [endcode]
 
-Para verificar que el rollback funcionó correctamente, accede a la consola H2 en `http://localhost:8080/h2` y revisa que la tabla `student_course` no tenga el registro que intentabas crear con el endpoint `/fail`.
+Para verificar que el rollback funcionó correctamente, accede a la consola H2 en `http://localhost:8080/h2` y revisa que la tabla `student_course` no tenga el registro que intentabas crear con `/enroll-fail`.
 
 [st] ¿Por qué los Selects también usan @Transactional?
 Es común ver métodos de solo lectura anotados con `@Transactional`. Hay dos razones concretas para esto.
