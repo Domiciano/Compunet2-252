@@ -4,7 +4,7 @@ En el mundo de las bases de datos, una transacción es una secuencia de una o m�
 
 Las transacciones se rigen por los principios ACID:
 
-Atomicidad (Atomicity) 
+Atomicidad (Atomicity)
 La transacción es "todo o nada". Si una parte de la transacción falla, toda la transacción falla y la base de datos vuelve al estado en que se encontraba antes de que comenzara la transacción.
 
 Consistencia (Consistency)
@@ -15,122 +15,193 @@ Las transacciones concurrentes se ejecutan de forma aislada unas de otras. Los r
 
 Durabilidad (Durability)
 Una vez que una transacción se ha completado con éxito (commit), sus cambios son permanentes y sobreviven a cualquier fallo del sistema.
+
 [st] La Magia de @Transactional
-Spring Boot simplifica enormemente la gestión de transacciones con la anotación `@Transactional`. Cuando anotas un método (o una clase entera) con `@Transactional`, Spring lo envuelve en un proxy que se encarga de iniciar, confirmar (commit) o revertir (rollback) la transacción por ti.
+Spring Boot simplifica enormemente la gestión de transacciones con la anotación `@Transactional`. Cuando anotas un método con `@Transactional`, Spring lo envuelve en un proxy que se encarga de iniciar, confirmar (commit) o revertir (rollback) la transacción por ti.
 
-Un proxy es como un intermediario: en lugar de llamar directamente a tu método, se llama primero a un objeto "falso" (proxy) que decide qué hacer antes y después de ejecutar el método real. En este caso, el proxy se encarga de abrir la transacción antes de ejecutar tu código y cerrarla (con commit o rollback) cuando termina.
+Un proxy es como un intermediario: en lugar de llamar directamente a tu método, se llama primero a un objeto "envoltorio" que decide qué hacer antes y después de ejecutar el método real.
 
-Por defecto, Spring iniciará una transacción cuando se llame al método y la confirmará cuando el método termine sin lanzar una excepción. Si el método lanza una `RuntimeException` o un `Error`, Spring revertirá la transacción automáticamente.
+Por defecto, Spring hace commit si el método termina sin excepción, y rollback automático si lanza una `RuntimeException` o un `Error`.
 
-[st] Ejemplo Práctico: Transferencia Bancaria
-Vamos a crear un ejemplo clásico: transferir dinero de una cuenta bancaria a otra. Esta operación implica dos pasos:
-1.  Restar el monto de la cuenta de origen.
-2.  Sumar el monto a la cuenta de destino.
+[st] Ciclo de una Transacción
+[mermaid]
+sequenceDiagram
+    actor Client as Cliente (Controller)
+    participant Proxy as Spring Proxy (@Transactional)
+    participant Service as Tu Servicio
+    participant DB as Base de Datos
 
-Ambos pasos deben tener éxito. Si el segundo paso falla, el primero debe deshacerse.
+    Client->>Proxy: llama método anotado
+    Proxy->>DB: BEGIN TRANSACTION
+    Proxy->>Service: invoca método real
+    Service->>DB: INSERT / UPDATE / DELETE
+    Service->>DB: INSERT / UPDATE / DELETE
 
-[st] 1. La Entidad y el Repositorio
-Primero, definimos una entidad `Account` y su repositorio.
+    alt Sin excepción
+        Service-->>Proxy: retorna resultado
+        Proxy->>DB: COMMIT
+        Proxy-->>Client: retorna resultado
+    else RuntimeException lanzada
+        Service-->>Proxy: lanza RuntimeException
+        Proxy->>DB: ROLLBACK
+        Proxy-->>Client: propaga excepción
+    end
+[endmermaid]
 
-[code:java]
-package com.example.myapp.model;
+[st] Entidades del Proyecto Base
+Usaremos las entidades del proyecto: `Student`, `Course` y `Enrollment` (tabla `student_course` con clave compuesta). La operación de matrícula es un caso perfecto para ilustrar transacciones: debe crear un registro en `student_course` vinculando un estudiante y un curso existentes. Si algo falla a mitad del proceso, nada debe quedar a medias.
 
-import jakarta.persistence.*;
 
-@Entity
-public class Account {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String owner;
-    private Double balance;
-
-    // Getters y Setters
-}
-[endcode]
-
-[code:java]
-package com.example.myapp.repository;
-
-import com.example.myapp.model.Account;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface AccountRepository extends JpaRepository<Account, Long> {
-}
-[endcode]
-
-Para este ejemplo, es útil tener datos iniciales. En su archivo `data.sql` debe tener
-[code:sql]
-INSERT INTO account (owner, balance) VALUES ('Alice', 1000.0);
-INSERT INTO account (owner, balance) VALUES ('Bob', 500.0);
-[endcode]
-
-[st] 2. El Servicio de Transferencia · Caso Exitoso
-Ahora, creamos un servicio con un método para transferir dinero. Anotamos el método con `@Transactional`.
+[st] Caso Exitoso: Matricular un Estudiante
+El servicio busca el estudiante y el curso, crea el `Enrollment` y lo persiste. Si ambos existen y no hay errores, la transacción hace commit y el registro queda en la base de datos.
 
 [code:java]
-package com.example.myapp.service;
-
-import com.example.myapp.model.Account;
-import com.example.myapp.repository.AccountRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 @Service
-public class TransferService {
+public class EnrollmentService {
 
     @Autowired
-    private AccountRepository accountRepository;
+    private StudentRepository studentRepository;
+
+    @Autowired
+    private CourseRepository courseRepository;
+
+    @Autowired
+    private EnrollmentRepository enrollmentRepository;
 
     @Transactional
-    public void transferMoney(Long fromAccountId, Long toAccountId, Double amount) {
-        Account fromAccount = accountRepository.findById(fromAccountId).orElseThrow(() -> new RuntimeException("Cuenta de origen no encontrada"));
-        Account toAccount = accountRepository.findById(toAccountId).orElseThrow(() -> new RuntimeException("Cuenta de destino no encontrada"));
+    public void enroll(Integer studentId, Integer courseId) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Estudiante no encontrado"));
 
-        fromAccount.setBalance(fromAccount.getBalance() - amount);
-        accountRepository.save(fromAccount);
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Curso no encontrado"));
 
-        toAccount.setBalance(toAccount.getBalance() + amount);
-        accountRepository.save(toAccount);
+        StudentCourseId key = new StudentCourseId(studentId, courseId);
+        Enrollment enrollment = new Enrollment();
+        enrollment.setId(key);
+        enrollment.setStudent(student);
+        enrollment.setCourse(course);
+
+        enrollmentRepository.save(enrollment);
+        // Si llegamos aquí sin excepción → COMMIT automático
     }
 }
 [endcode]
 
-Si este método se ejecuta sin problemas, los cambios en ambas cuentas se guardarán permanentemente en la base de datos.
-
-[st] 3. Simulando un Fallo: El Rollback en Acción
-Para ver `@Transactional` en acción, vamos a simular un fallo. Crearemos un nuevo método que lanza una excepción después de la primera operación de guardado.
+[st] Simulación de Fallo: Rollback en Acción
+Ahora simulamos que algo explota después de guardar la matrícula. Spring detecta la `RuntimeException` y hace rollback: el `Enrollment` guardado en el `save()` se deshace y la base de datos queda igual que antes de entrar al método.
 
 [code:java]
-package com.example.myapp.service;
+@Transactional
+public void enrollWithFailure(Integer studentId, Integer courseId) {
+    Student student = studentRepository.findById(studentId)
+            .orElseThrow(() -> new RuntimeException("Estudiante no encontrado"));
 
-// imports
+    Course course = courseRepository.findById(courseId)
+            .orElseThrow(() -> new RuntimeException("Curso no encontrado"));
 
-@Service
-public class TransferService {
+    StudentCourseId key = new StudentCourseId(studentId, courseId);
+    Enrollment enrollment = new Enrollment();
+    enrollment.setId(key);
+    enrollment.setStudent(student);
+    enrollment.setCourse(course);
 
-    // ... 
+    enrollmentRepository.save(enrollment);
 
-    @Transactional
-    public void transferMoneyWithFailure(Long fromAccountId, Long toAccountId, Double amount) {
-        Account fromAccount = accountRepository.findById(fromAccountId).orElseThrow(() -> new RuntimeException("Cuenta de origen no encontrada"));
-        Account toAccount = accountRepository.findById(toAccountId).orElseThrow(() -> new RuntimeException("Cuenta de destino no encontrada"));
+    // Simulamos un fallo inesperado después del save
+    throw new RuntimeException("Fallo catastrófico del sistema de matrículas");
 
-        fromAccount.setBalance(fromAccount.getBalance() - amount);
-        accountRepository.save(fromAccount);
+    // NUNCA se llega aquí → el save() anterior se revierte (ROLLBACK)
+}
+[endcode]
 
-        // Simulamos un error inesperado antes pasar la plata
-        if (true) {
-            throw new RuntimeException("Nequi lo ha hecho de nuevo!");
+Aunque `save()` se ejecutó, el registro no quedará en la base de datos porque Spring intercepta la excepción y llama a `ROLLBACK` antes de devolver el control al cliente.
+
+[st] El Error Transient
+El error `TransientPropertyValueException` ocurre cuando intentas guardar una entidad que referencia a otra entidad en estado *transient*, es decir, un objeto que aún no tiene ID porque nunca fue persistido.
+
+[code:java]
+@Transactional
+public void createCourseWithNewProfessor(String courseName) {
+    // Este Professor NO viene de la base de datos, fue creado en memoria
+    Professor newProfessor = new Professor();
+    newProfessor.setName("Profesor Sin Guardar");
+
+    Course course = new Course();
+    course.setName(courseName);
+    course.setCredits(3);
+    course.setProfessor(newProfessor); // ← referencia a objeto transient
+
+    // ERROR: object references an unsaved transient instance
+    // Hibernate no sabe qué ID poner en el FK professor_id
+    courseRepository.save(course);
+}
+[endcode]
+
+La solución es guardar primero el `Professor` antes de asignarlo, o usar `cascade = CascadeType.PERSIST` en la relación.
+
+[code:java]
+@Transactional
+public void createCourseWithNewProfessorFixed(String courseName) {
+    Professor newProfessor = new Professor();
+    newProfessor.setName("Profesor Sin Guardar");
+    professorRepository.save(newProfessor); // ← ahora tiene ID
+
+    Course course = new Course();
+    course.setName(courseName);
+    course.setCredits(3);
+    course.setProfessor(newProfessor); // ← ya no es transient
+
+    courseRepository.save(course); // ✅ funciona
+}
+[endcode]
+
+[st] RestController para Probar Todo
+Exponemos los tres casos como endpoints HTTP para probarlo directamente con Postman o el navegador.
+
+[code:java]
+@RestController
+@RequestMapping("/enrollments")
+public class EnrollmentController {
+
+    @Autowired
+    private EnrollmentService enrollmentService;
+
+    // Caso exitoso: POST /enrollments/1/courses/2
+    @PostMapping("/{studentId}/courses/{courseId}")
+    public ResponseEntity<String> enroll(
+            @PathVariable Integer studentId,
+            @PathVariable Integer courseId) {
+        enrollmentService.enroll(studentId, courseId);
+        return ResponseEntity.ok("Matrícula exitosa");
+    }
+
+    // Rollback: POST /enrollments/1/courses/2/fail
+    @PostMapping("/{studentId}/courses/{courseId}/fail")
+    public ResponseEntity<String> enrollWithFailure(
+            @PathVariable Integer studentId,
+            @PathVariable Integer courseId) {
+        try {
+            enrollmentService.enrollWithFailure(studentId, courseId);
+            return ResponseEntity.ok("Nunca debería llegar aquí");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(500)
+                    .body("Falló: " + e.getMessage() + " | Rollback aplicado");
         }
+    }
 
-        // Esta parte del código nunca se alcanzará
-        toAccount.setBalance(toAccount.getBalance() + amount);
-        accountRepository.save(toAccount);
+    // Error transient: POST /enrollments/courses/transient
+    @PostMapping("/courses/transient")
+    public ResponseEntity<String> transientError() {
+        try {
+            enrollmentService.createCourseWithNewProfessor("Curso Problemático");
+            return ResponseEntity.ok("Sin error (inesperado)");
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body("TransientPropertyValueException: " + e.getMessage());
+        }
     }
 }
 [endcode]
 
-[st] 4. Probando el Rollback
-Podemos ejecutar el método de service desde un `@RestController` y evidenciar qué pasó.
+Para verificar que el rollback funcionó correctamente, accede a la consola H2 en `http://localhost:8080/h2` y revisa que la tabla `student_course` no tenga el registro que intentabas crear con el endpoint `/fail`.
