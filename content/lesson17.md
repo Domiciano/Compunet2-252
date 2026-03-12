@@ -255,8 +255,11 @@ public void unenrollStudentFromCourse(String studentCode, String courseName) {
 [endlist]
 
 Para ejecutar los test puede usar
+Para ejecutar los test puede usar
 [code:ini]
-# Una clase                                                                                                                         mvn test                                         
+# Todo
+mvn test                                        
+# Una clase                                                                                                                         
 mvn test -Dtest=StudentServiceTest                  
 # Un método                                               
 mvn test -Dtest=StudentServiceTest#findStudentByCode_WhenExists_ReturnsStudent                                                      
