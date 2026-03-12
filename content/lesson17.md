@@ -233,31 +233,25 @@ public StudentCourse enrollStudentInCourse(String studentCode, String courseName
 `enrollStudentInCourse_WhenCourseNotFound_ShouldThrowRuntimeException`
 [endlist]
 
-Regla de negocio: calcular la nota promedio de un estudiante a partir de sus entregas. Si el código es nulo o vacío lanza `IllegalArgumentException`. Si el estudiante no existe lanza `RuntimeException`. Si el estudiante no tiene entregas devuelve `0.0`. En caso contrario devuelve el promedio de las notas de todas sus entregas.
+Regla de negocio: dar de baja a un estudiante de un curso. Si el estudiante no existe lanza `RuntimeException`. Si el curso no existe lanza `RuntimeException`. Si el estudiante no está inscrito en ese curso lanza `IllegalStateException`. Si todo es válido elimina la inscripción.
 
 [code:java]
-public double getAverageGradeByStudentCode(String code) {
-    if (code == null || code.isBlank()) {
-        throw new IllegalArgumentException("El código no puede ser nulo o vacío");
-    }
-    Student student = studentRepository.findByCode(code)
-            .orElseThrow(() -> new RuntimeException("Estudiante no encontrado: " + code));
-    List<Submission> submissions = submissionRepository.findByStudent(student);
-    if (submissions.isEmpty()) {
-        return 0.0;
-    }
-    return submissions.stream()
-            .mapToDouble(Submission::getGrade)
-            .average()
-            .orElse(0.0);
+public void unenrollStudentFromCourse(String studentCode, String courseName) {
+    Student student = studentRepository.findByCode(studentCode)
+            .orElseThrow(() -> new RuntimeException("Estudiante no encontrado: " + studentCode));
+    Course course = courseRepository.findByName(courseName)
+            .orElseThrow(() -> new RuntimeException("Curso no encontrado: " + courseName));
+    StudentCourse enrollment = studentCourseRepository.findByStudentAndCourse(student, course)
+            .orElseThrow(() -> new IllegalStateException("El estudiante no está inscrito en este curso"));
+    studentCourseRepository.delete(enrollment);
 }
 [endcode]
 
 [list]
-`getAverageGradeByStudentCode_WhenStudentHasSubmissions_ShouldReturnCorrectAverage`
-`getAverageGradeByStudentCode_WhenStudentHasNoSubmissions_ShouldReturnZero`
-`getAverageGradeByStudentCode_WhenStudentNotFound_ShouldThrowRuntimeException`
-`getAverageGradeByStudentCode_WhenCodeIsBlank_ShouldThrowIllegalArgumentException`
+`unenrollStudentFromCourse_WhenEnrolled_ShouldRemoveEnrollment`
+`unenrollStudentFromCourse_WhenNotEnrolled_ShouldThrowIllegalStateException`
+`unenrollStudentFromCourse_WhenStudentNotFound_ShouldThrowRuntimeException`
+`unenrollStudentFromCourse_WhenCourseNotFound_ShouldThrowRuntimeException`
 [endlist]
 
 En la siguiente lección implementarás estos mismos tests con una técnica diferente que no requiere base de datos ni contexto de Spring. Compara cuánto tarda cada suite.
