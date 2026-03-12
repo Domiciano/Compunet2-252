@@ -5,20 +5,7 @@ A diferencia de las pruebas unitarias, que verifican un componente (una clase) d
 
 El objetivo es asegurar que las "tuberÃ­as" entre las diferentes capas de nuestra aplicaciÃ³n estÃ©n bien conectadas.
 
-[st] Base de datos para pruebas
-Las pruebas de integraciÃ³n necesitan una base de datos, pero no debemos usar la de producciÃ³n. La soluciÃ³n estÃ¡ndar es H2, una base de datos en memoria que solo existe durante la ejecuciÃ³n de los tests.
-
-Agrega H2 como dependencia de test en tu `pom.xml`. El scope `test` garantiza que H2 nunca llegue al artefacto de producciÃ³n:
-
-[code:xml]
-<dependency>
-    <groupId>com.h2database</groupId>
-    <artifactId>h2</artifactId>
-    <scope>test</scope>
-</dependency>
-[endcode]
-
-Luego crea el archivo `src/test/resources/application.properties`. Spring Boot lo detecta automÃ¡ticamente durante los tests y lo usa en lugar del `application.properties` principal, sin que tengas que agregar ninguna anotaciÃ³n extra:
+Crea el archivo `src/test/resources/application.properties`. Spring Boot lo detecta automÃ¡ticamente durante los tests y lo usa en lugar del `application.properties` principal, sin que tengas que agregar ninguna anotaciÃ³n extra:
 
 [code:ini]
 spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
@@ -69,7 +56,7 @@ public class CourseServiceIntegrationTest {
 
 `@Autowired` funciona igual que en el cÃ³digo de producciÃ³n: como el contexto de Spring estÃ¡ activo, podemos inyectar cualquier bean.
 
-Una desventaja importante: `@SpringBootTest` levanta todo el contexto de Spring, lo que tarda varios segundos. En la siguiente lecciÃ³n veremos una alternativa que corre en milisegundos.
+Una desventaja importante: `@SpringBootTest` levanta todo el contexto de Spring, lo que tarda varios segundos. 
 
 [st] Gestionando el Estado: `@BeforeEach` y `@AfterEach`
 Una regla de oro de las pruebas es que deben ser independientes entre sÃ­. Para lograrlo, preparamos un estado conocido antes de cada prueba y lo limpiamos despuÃ©s.
@@ -161,3 +148,4 @@ Realice los siguientes tests de integraciÃ³n. Se darÃ¡ cuenta de que no cuen
 `deleteStudentByCode_WhenStudentDoesNotExists_ShouldThrowRuntimeException`
 
 En la siguiente lecciÃ³n implementarÃ¡s estos mismos seis tests con una tÃ©cnica diferente que no requiere base de datos ni contexto de Spring. Compara cuÃ¡nto tarda cada suite.
+
