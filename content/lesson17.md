@@ -156,7 +156,7 @@ void createCourse_WhenNameIsNull_ThrowsException() {
 `assertThrows()` ejecuta el lambda y el test pasa solo si se lanza la excepción del tipo esperado. Esto asume que `CourseService` valida que el nombre no sea nulo.
 
 [st] Retos
-Para cada método de servicio que se muestra a continuación, escribe los tests de integración indicados. Implementa primero el método en tu capa de servicio y luego escribe los tests, o usa TDD: escribe el test primero y deja que el compilador y los fallos te guíen hacia la implementación correcta.
+Para cada método de servicio que se muestra a continuación, escribe los tests de integración indicados.
 
 Regla de negocio: buscar un estudiante por código. Si el código es nulo o vacío lanza `IllegalArgumentException`. Si no se encuentra ningún estudiante lanza `RuntimeException`.
 
@@ -209,3 +209,4 @@ public void deleteStudentByCode(String code) {
 [endlist]
 
 En la siguiente lección implementarás estos mismos tests con una técnica diferente que no requiere base de datos ni contexto de Spring. Compara cuánto tarda cada suite.
+
