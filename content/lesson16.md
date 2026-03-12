@@ -168,12 +168,8 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
 
 [st] Datos no menores
 
-| Tipo Java       | Tipo SQL                          | Ejemplo de valor      |
-|-----------------|-----------------------------------|-----------------------|
-| `LocalDate`     | `DATE`                            | `2025-04-10`          |
-| `LocalDateTime` | `TIMESTAMP`                       | `2025-04-09 22:15:00` |
-| `LocalTime`     | `TIME` / `TIME WITHOUT TIME ZONE` | `22:15:00`            |
-
-`LocalDate` almacena solo aÃ±o, mes y dÃ­a â€” ideal para fechas de examen, fechas de nacimiento o plazos.
-
-`LocalDateTime` almacena fecha y hora exacta â€” ideal para registrar el instante de una acciÃ³n, como la fecha y hora de entrega.
+[list]
+`LocalDate` de Java se mapea con `DATE` en SQL â€” almacena solo aÃ±o, mes y dÃ­a (ej. `2025-04-10`)
+`LocalDateTime` de Java se mapea con `TIMESTAMP` en SQL â€” almacena fecha y hora exacta (ej. `2025-04-09 22:15:00`)
+`LocalTime` de Java se mapea con `TIME` en SQL â€” almacena solo la hora (ej. `22:15:00`)
+[endlist]
