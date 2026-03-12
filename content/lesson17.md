@@ -1,14 +1,14 @@
-[t] Pruebas de IntegraciÃ³n con Spring Boot
+[t] Pruebas de Integración con Spring Boot
 
-[st] Â¿QuÃ© es una Prueba de IntegraciÃ³n?
-A diferencia de las pruebas unitarias, que verifican un componente (una clase) de forma aislada, las pruebas de integraciÃ³n validan la colaboraciÃ³n entre mÃºltiples componentes. En una aplicaciÃ³n Spring Boot, esto tÃ­picamente significa probar que la capa de servicio y la capa de persistencia (repositorios y base de datos) funcionan juntas correctamente.
+[st] ¿Qué es una Prueba de Integración?
+A diferencia de las pruebas unitarias, que verifican un componente (una clase) de forma aislada, las pruebas de integración validan la colaboración entre múltiples componentes. En una aplicación Spring Boot, esto típicamente significa probar que la capa de servicio y la capa de persistencia (repositorios y base de datos) funcionan juntas correctamente.
 
-El objetivo es asegurar que las "tuberÃ­as" entre las diferentes capas de nuestra aplicaciÃ³n estÃ©n bien conectadas.
+El objetivo es asegurar que las "tuberías" entre las diferentes capas de nuestra aplicación estén bien conectadas.
 
 [st] Base de datos para pruebas
-Las pruebas de integraciÃ³n necesitan una base de datos, pero no debemos usar la de producciÃ³n. La soluciÃ³n estÃ¡ndar es H2, una base de datos en memoria que solo existe durante la ejecuciÃ³n de los tests.
+Las pruebas de integración necesitan una base de datos, pero no debemos usar la de producción. La solución estándar es H2, una base de datos en memoria que solo existe durante la ejecución de los tests.
 
-Agrega H2 como dependencia de test en tu `pom.xml`. El scope `test` garantiza que H2 nunca llegue al artefacto de producciÃ³n:
+Agrega H2 como dependencia de test en tu `pom.xml`. El scope `test` garantiza que H2 nunca llegue al artefacto de producción:
 
 [code:xml]
 <dependency>
@@ -18,7 +18,7 @@ Agrega H2 como dependencia de test en tu `pom.xml`. El scope `test` garantiza qu
 </dependency>
 [endcode]
 
-Luego crea el archivo `src/test/resources/application.properties`. Spring Boot lo detecta automÃ¡ticamente durante los tests y lo usa en lugar del `application.properties` principal, sin que tengas que agregar ninguna anotaciÃ³n extra:
+Luego crea el archivo `src/test/resources/application.properties`. Spring Boot lo detecta automáticamente durante los tests y lo usa en lugar del `application.properties` principal, sin que tengas que agregar ninguna anotación extra:
 
 [code:ini]
 spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
@@ -27,12 +27,24 @@ spring.datasource.username=sa
 spring.datasource.password=
 spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
 spring.jpa.hibernate.ddl-auto=create-drop
+spring.sql.init.mode=never
 [endcode]
 
-Con `create-drop`, Hibernate crea el esquema al iniciar el contexto y lo elimina al terminar. Cada ejecuciÃ³n parte de una base de datos vacÃ­a y limpia.
+Con `create-drop`, Hibernate crea el esquema al iniciar el contexto y lo elimina al terminar. Cada ejecución parte de una base de datos vacía y limpia.
 
-[st] ConfiguraciÃ³n de la Prueba de IntegraciÃ³n
-La clase de prueba se configura asÃ­:
+[st] El problema con `data.sql`
+Si tu proyecto tiene un archivo `src/main/resources/data.sql` con datos iniciales, Spring Boot también lo ejecutará durante los tests. Esto rompe la independencia de las pruebas: cuando tu `@BeforeEach` guarda un profesor, ya existen los datos del `data.sql` en la base de datos, y tus asserts sobre cantidades o estados específicos fallarán de forma impredecible.
+
+La solución es agregar esta propiedad al `src/test/resources/application.properties`:
+
+[code:ini]
+spring.sql.init.mode=never
+[endcode]
+
+Con esto, Spring Boot ignora completamente el `data.sql` durante los tests. Toda la información que necesita cada prueba se crea en `@BeforeEach` y se elimina en `@AfterEach`, garantizando que cada test parte de un estado limpio y conocido.
+
+[st] Configuración de la Prueba de Integración
+La clase de prueba se configura así:
 
 [code:java]
 package com.example.myapp.services;
@@ -65,14 +77,14 @@ public class CourseServiceIntegrationTest {
 }
 [endcode]
 
-`@SpringBootTest` le dice a Spring que cargue el contexto completo de la aplicaciÃ³n. Como estamos en el classpath de tests, tomarÃ¡ automÃ¡ticamente el `application.properties` de `src/test/resources` y usarÃ¡ H2 en lugar de la base de datos de producciÃ³n.
+`@SpringBootTest` le dice a Spring que cargue el contexto completo de la aplicación. Como estamos en el classpath de tests, tomará automáticamente el `application.properties` de `src/test/resources` y usará H2 en lugar de la base de datos de producción.
 
-`@Autowired` funciona igual que en el cÃ³digo de producciÃ³n: como el contexto de Spring estÃ¡ activo, podemos inyectar cualquier bean.
+`@Autowired` funciona igual que en el código de producción: como el contexto de Spring está activo, podemos inyectar cualquier bean.
 
-Una desventaja importante: `@SpringBootTest` levanta todo el contexto de Spring, lo que tarda varios segundos. En la siguiente lecciÃ³n veremos una alternativa que corre en milisegundos.
+Una desventaja importante: `@SpringBootTest` levanta todo el contexto de Spring, lo que tarda varios segundos. En la siguiente lección veremos una alternativa que corre en milisegundos.
 
 [st] Gestionando el Estado: `@BeforeEach` y `@AfterEach`
-Una regla de oro de las pruebas es que deben ser independientes entre sÃ­. Para lograrlo, preparamos un estado conocido antes de cada prueba y lo limpiamos despuÃ©s.
+Una regla de oro de las pruebas es que deben ser independientes entre sí. Para lograrlo, preparamos un estado conocido antes de cada prueba y lo limpiamos después.
 
 [code:java]
 @BeforeEach
@@ -85,25 +97,25 @@ void setup() {
 @AfterEach
 void cleanup() {
     // Primero los cursos (tienen FK a professor), luego los profesores.
-    // Invertir el orden causarÃ­a un error de restricciÃ³n de clave forÃ¡nea.
+    // Invertir el orden causaría un error de restricción de clave foránea.
     courseRepository.deleteAll();
     professorRepository.deleteAll();
 }
 [endcode]
 
-`@BeforeEach` se ejecuta antes de cada `@Test`. Guarda un profesor limpio en H2 para que cada prueba tenga un punto de partida idÃ©ntico.
+`@BeforeEach` se ejecuta antes de cada `@Test`. Guarda un profesor limpio en H2 para que cada prueba tenga un punto de partida idéntico.
 
-`@AfterEach` se ejecuta despuÃ©s de cada `@Test`. El orden de eliminaciÃ³n importa: primero los cursos (que dependen de professor por FK) y luego los profesores.
+`@AfterEach` se ejecuta después de cada `@Test`. El orden de eliminación importa: primero los cursos (que dependen de professor por FK) y luego los profesores.
 
 [st] Caso de Prueba Positivo (Happy Path)
-Verifica que el flujo principal funciona correctamente, siguiendo el patrÃ³n AAA (Arrange-Act-Assert).
+Verifica que el flujo principal funciona correctamente, siguiendo el patrón AAA (Arrange-Act-Assert).
 
 [code:java]
 @Test
 void createCourse_WhenValid_ReturnsSavedCourse() {
     // Arrange
     Course course = new Course();
-    course.setName("ComputaciÃ³n en Internet II");
+    course.setName("Computación en Internet II");
     course.setProfessor(professor);
 
     // Act
@@ -111,20 +123,20 @@ void createCourse_WhenValid_ReturnsSavedCourse() {
 
     // Assert
     assertNotNull(savedCourse.getId());
-    assertEquals("ComputaciÃ³n en Internet II", savedCourse.getName());
+    assertEquals("Computación en Internet II", savedCourse.getName());
     assertEquals(professor.getId(), savedCourse.getProfessor().getId());
 
-    // VerificaciÃ³n directa en la BD â€” la verdadera prueba de integraciÃ³n
+    // Verificación directa en la BD — la verdadera prueba de integración
     Course foundCourse = courseRepository.findById(savedCourse.getId()).orElse(null);
     assertNotNull(foundCourse);
-    assertEquals("ComputaciÃ³n en Internet II", foundCourse.getName());
+    assertEquals("Computación en Internet II", foundCourse.getName());
 }
 [endcode]
 
-La verificaciÃ³n final es el corazÃ³n de la prueba de integraciÃ³n: usamos `courseRepository` para leer directamente desde H2 y confirmar que la integraciÃ³n entre el servicio y la persistencia funcionÃ³ de principio a fin.
+La verificación final es el corazón de la prueba de integración: usamos `courseRepository` para leer directamente desde H2 y confirmar que la integración entre el servicio y la persistencia funcionó de principio a fin.
 
 [st] Prueba Negativa
-Verifica que la aplicaciÃ³n maneja correctamente entradas invÃ¡lidas.
+Verifica que la aplicación maneja correctamente entradas inválidas.
 
 [code:java]
 @Test
@@ -141,17 +153,17 @@ void createCourse_WhenNameIsNull_ThrowsException() {
 }
 [endcode]
 
-`assertThrows()` ejecuta el lambda y el test pasa solo si se lanza la excepciÃ³n del tipo esperado. Esto asume que `CourseService` valida que el nombre no sea nulo.
+`assertThrows()` ejecuta el lambda y el test pasa solo si se lanza la excepción del tipo esperado. Esto asume que `CourseService` valida que el nombre no sea nulo.
 
 [st] Retos
-Para cada mÃ©todo de servicio que se muestra a continuaciÃ³n, escribe los tests de integraciÃ³n indicados. Implementa primero el mÃ©todo en tu capa de servicio y luego escribe los tests, o usa TDD: escribe el test primero y deja que el compilador y los fallos te guÃ­en hacia la implementaciÃ³n correcta.
+Para cada método de servicio que se muestra a continuación, escribe los tests de integración indicados. Implementa primero el método en tu capa de servicio y luego escribe los tests, o usa TDD: escribe el test primero y deja que el compilador y los fallos te guíen hacia la implementación correcta.
 
-Regla de negocio: buscar un estudiante por cÃ³digo. Si el cÃ³digo es nulo o vacÃ­o lanza `IllegalArgumentException`. Si no se encuentra ningÃºn estudiante lanza `RuntimeException`.
+Regla de negocio: buscar un estudiante por código. Si el código es nulo o vacío lanza `IllegalArgumentException`. Si no se encuentra ningún estudiante lanza `RuntimeException`.
 
 [code:java]
 public Student findStudentByCode(String code) {
     if (code == null || code.isBlank()) {
-        throw new IllegalArgumentException("El cÃ³digo no puede ser nulo o vacÃ­o");
+        throw new IllegalArgumentException("El código no puede ser nulo o vacío");
     }
     return studentRepository.findByCode(code)
             .orElseThrow(() -> new RuntimeException("Estudiante no encontrado: " + code));
@@ -164,7 +176,7 @@ public Student findStudentByCode(String code) {
 `findStudentByCode_WhenCodeIsNull_ShouldThrowIllegalArgumentException`
 [endlist]
 
-Regla de negocio: obtener los estudiantes inscritos en un curso por nombre. Si el curso no existe lanza `RuntimeException`. Si existe devuelve la lista de estudiantes inscritos, que puede estar vacÃ­a.
+Regla de negocio: obtener los estudiantes inscritos en un curso por nombre. Si el curso no existe lanza `RuntimeException`. Si existe devuelve la lista de estudiantes inscritos, que puede estar vacía.
 
 [code:java]
 public List<Student> getStudentsByCourseName(String courseName) {
@@ -181,7 +193,7 @@ public List<Student> getStudentsByCourseName(String courseName) {
 `getStudentsByCourseName_WhenCourseDoesNotExist_ShouldThrowRuntimeException`
 [endlist]
 
-Regla de negocio: eliminar un estudiante por cÃ³digo. Si el estudiante no existe lanza `RuntimeException`. Si existe lo elimina y ya no debe poder encontrarse en la base de datos.
+Regla de negocio: eliminar un estudiante por código. Si el estudiante no existe lanza `RuntimeException`. Si existe lo elimina y ya no debe poder encontrarse en la base de datos.
 
 [code:java]
 public void deleteStudentByCode(String code) {
@@ -196,4 +208,4 @@ public void deleteStudentByCode(String code) {
 `deleteStudentByCode_WhenStudentDoesNotExist_ShouldThrowRuntimeException`
 [endlist]
 
-En la siguiente lecciÃ³n implementarÃ¡s estos mismos tests con una tÃ©cnica diferente que no requiere base de datos ni contexto de Spring. Compara cuÃ¡nto tarda cada suite.
+En la siguiente lección implementarás estos mismos tests con una técnica diferente que no requiere base de datos ni contexto de Spring. Compara cuánto tarda cada suite.
