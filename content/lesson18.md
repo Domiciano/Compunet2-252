@@ -1,12 +1,12 @@
 [t] Mockito
-Las pruebas de integraciÃ³n validan el sistema completo, pero tienen un costo: levantar el contexto de Spring tarda varios segundos por ejecuciÃ³n.
+Las pruebas de integración validan el sistema completo, pero tienen un costo: levantar el contexto de Spring tarda varios segundos por ejecución.
 
-Mockito ofrece una alternativa: probar la capa de servicio de forma completamente aislada, sin base de datos ni contexto de Spring. En lugar de usar repositorios reales, simulamos sus respuestas con datos controlados. Las pruebas corren en milisegundos y se enfocan exclusivamente en la lÃ³gica de negocio.
+Mockito ofrece una alternativa: probar la capa de servicio de forma completamente aislada, sin base de datos ni contexto de Spring. En lugar de usar repositorios reales, simulamos sus respuestas con datos controlados. Las pruebas corren en milisegundos y se enfocan exclusivamente en la lógica de negocio.
 
-El objetivo de `Mockito` es simular dependencias devolviendo datos controlados por quien escribe la prueba, para verificar cÃ³mo reacciona la lÃ³gica ante distintos escenarios.
+El objetivo de `Mockito` es simular dependencias devolviendo datos controlados por quien escribe la prueba, para verificar cómo reacciona la lógica ante distintos escenarios.
 
 [st] Dependencias
-El mÃ³dulo `spring-boot-starter-test` ya incluye Mockito. Si necesitas agregarlo manualmente:
+El módulo `spring-boot-starter-test` ya incluye Mockito. Si necesitas agregarlo manualmente:
 
 [code:xml]
 <dependency>
@@ -17,7 +17,7 @@ El mÃ³dulo `spring-boot-starter-test` ya incluye Mockito. Si necesitas agregar
 [endcode]
 
 [st] Activar Mockito
-El punto de partida es una clase de test con la anotaciÃ³n `@ExtendWith(MockitoExtension.class)`. Esta anotaciÃ³n activa el motor de Mockito para la clase sin necesitar levantar ningÃºn contexto de Spring.
+El punto de partida es una clase de test con la anotación `@ExtendWith(MockitoExtension.class)`. Esta anotación activa el motor de Mockito para la clase sin necesitar levantar ningún contexto de Spring.
 
 [code:java]
 package com.example.myapp.services;
@@ -44,10 +44,10 @@ public class CourseServiceTest {
 }
 [endcode]
 
-A diferencia de `@SpringBootTest`, aquÃ­ no se levanta ningÃºn contexto. Solo existe la clase de test y Mockito escuchando.
+A diferencia de `@SpringBootTest`, aquí no se levanta ningún contexto. Solo existe la clase de test y Mockito escuchando.
 
 [st] Crear el Mock
-Un `@Mock` es una implementaciÃ³n falsa de una clase o interfaz. Mockito la genera automÃ¡ticamente y por defecto todos sus mÃ©todos no hacen nada: devuelven `null`, `0`, listas vacÃ­as, etc. Nosotros decidimos exactamente quÃ© devolverÃ¡ en cada test.
+Un `@Mock` es una implementación falsa de una clase o interfaz. Mockito la genera automáticamente y por defecto todos sus métodos no hacen nada: devuelven `null`, `0`, listas vacías, etc. Nosotros decidimos exactamente qué devolverá en cada test.
 
 [code:java]
 @ExtendWith(MockitoExtension.class)
@@ -59,10 +59,10 @@ public class CourseServiceTest {
 }
 [endcode]
 
-`courseRepository` ahora es una versiÃ³n simulada. Cuando el servicio le llame a `findAll()` o `findById(...)`, nosotros controlamos quÃ© responde.
+`courseRepository` ahora es una versión simulada. Cuando el servicio le llame a `findAll()` o `findById(...)`, nosotros controlamos qué responde.
 
 [st] Inyectar el Mock en el Servicio
-`@InjectMocks` crea una instancia real de `CourseService` e inyecta automÃ¡ticamente los mocks que declaramos como sus dependencias. Equivale a hacer `new CourseService(courseRepository)` pero sin escribirlo.
+`@InjectMocks` crea una instancia real de `CourseService` e inyecta automáticamente los mocks que declaramos como sus dependencias. Equivale a hacer `new CourseService(courseRepository)` pero sin escribirlo.
 
 [code:java]
 @ExtendWith(MockitoExtension.class)
@@ -80,7 +80,7 @@ public class CourseServiceTest {
 `courseService` es el objeto real que vamos a probar. `courseRepository` es el objeto falso que le inyectamos como dependencia.
 
 [st] Preparar los datos con `@BeforeEach`
-En lugar de repetir la construcciÃ³n de objetos en cada test, usamos `@BeforeEach` para crear los datos de prueba una sola vez antes de cada mÃ©todo. Esto mantiene los tests limpios y enfocados.
+En lugar de repetir la construcción de objetos en cada test, usamos `@BeforeEach` para crear los datos de prueba una sola vez antes de cada método. Esto mantiene los tests limpios y enfocados.
 
 [code:java]
 @ExtendWith(MockitoExtension.class)
@@ -105,25 +105,25 @@ public class CourseServiceTest {
         course1 = new Course();
         course1.setId(1L);
         course1.setProfessor(professor);
-        course1.setName("ComputaciÃ³n en Internet II");
+        course1.setName("Computación en Internet II");
 
         course2 = new Course();
         course2.setId(2L);
         course2.setProfessor(professor);
-        course2.setName("IngenierÃ­a de Software IV");
+        course2.setName("Ingeniería de Software IV");
     }
 }
 [endcode]
 
-A diferencia de las pruebas de integraciÃ³n, aquÃ­ no hay `@AfterEach` de limpieza porque no hay base de datos que limpiar.
+A diferencia de las pruebas de integración, aquí no hay `@AfterEach` de limpieza porque no hay base de datos que limpiar.
 
 [st] Simulando retornos de listas
-Con la clase configurada, ya podemos escribir tests. Usa el patrÃ³n AAA y la convenciÃ³n `MethodName_WhenCondition_ExpectedBehavior`.
+Con la clase configurada, ya podemos escribir tests. Usa el patrón AAA y la convención `MethodName_WhenCondition_ExpectedBehavior`.
 
 [code:java]
 @Test
 void getAllCourses_WhenCalled_ReturnsCourseList() {
-    // Arrange: definimos quÃ© devolverÃ¡ el repositorio cuando se le llame
+    // Arrange: definimos qué devolverá el repositorio cuando se le llame
     when(courseRepository.findAll()).thenReturn(Arrays.asList(course1, course2));
 
     // Act
@@ -131,8 +131,8 @@ void getAllCourses_WhenCalled_ReturnsCourseList() {
 
     // Assert
     assertEquals(2, courses.size());
-    assertEquals("ComputaciÃ³n en Internet II", courses.get(0).getName());
-    assertEquals("IngenierÃ­a de Software IV", courses.get(1).getName());
+    assertEquals("Computación en Internet II", courses.get(0).getName());
+    assertEquals("Ingeniería de Software IV", courses.get(1).getName());
 }
 [endcode]
 
@@ -151,11 +151,11 @@ void getCourseById_WhenExists_ReturnsCourse() {
     // Assert
     assertNotNull(result);
     assertEquals(1L, result.getId());
-    assertEquals("ComputaciÃ³n en Internet II", result.getName());
+    assertEquals("Computación en Internet II", result.getName());
 }
 [endcode]
 
-`Optional.of(object)` simula que el repositorio encontrÃ³ el registro. `Optional.empty()` simula que no lo encontrÃ³.
+`Optional.of(object)` simula que el repositorio encontró el registro. `Optional.empty()` simula que no lo encontró.
 
 [st] Probando test negativos
 [code:java]
@@ -169,8 +169,8 @@ void getCourseById_WhenNotExists_ThrowsException() {
 }
 [endcode]
 
-[st] Simulando mÃ©todos void
-Para mÃ©todos que no devuelven valor la estructura cambia: `doNothing().when(mock).mÃ©todo()`.
+[st] Simulando métodos void
+Para métodos que no devuelven valor la estructura cambia: `doNothing().when(mock).método()`.
 
 [code:java]
 @Test
@@ -186,10 +186,10 @@ void deleteCourse_WhenExists_DeletesSuccessfully() {
 }
 [endcode]
 
-`verify()` es la Ãºnica forma de "afirmar" algo en tests de mÃ©todos void: confirma que el mock fue invocado el nÃºmero de veces esperado.
+`verify()` es la única forma de "afirmar" algo en tests de métodos void: confirma que el mock fue invocado el número de veces esperado.
 
-[st] Simulando excepciones en mÃ©todos void
-`doThrow` simula que el repositorio lanza una excepciÃ³n, permitiendo probar cÃ³mo reacciona el servicio ante fallos.
+[st] Simulando excepciones en métodos void
+`doThrow` simula que el repositorio lanza una excepción, permitiendo probar cómo reacciona el servicio ante fallos.
 
 [code:java]
 @Test
@@ -205,16 +205,16 @@ void deleteCourse_WhenRepositoryFails_ThrowsException() {
 [st] Resumen de la API de Mockito
 
 [list]
-`when(repo.method()).thenReturn(value)` â€” simula un mÃ©todo que devuelve un valor
-`when(repo.method()).thenReturn(Optional.of(obj))` â€” simula que se encontrÃ³ un registro
-`when(repo.method()).thenReturn(Optional.empty())` â€” simula que no se encontrÃ³ nada
-`doNothing().when(repo).method()` â€” simula un mÃ©todo void sin efecto
-`doThrow(new Ex()).when(repo).method()` â€” simula un mÃ©todo void que lanza excepciÃ³n
-`verify(repo, times(1)).method()` â€” verifica que el mÃ©todo fue llamado N veces
+`when(repo.method()).thenReturn(value)` — simula un método que devuelve un valor
+`when(repo.method()).thenReturn(Optional.of(obj))` — simula que se encontró un registro
+`when(repo.method()).thenReturn(Optional.empty())` — simula que no se encontró nada
+`doNothing().when(repo).method()` — simula un método void sin efecto
+`doThrow(new Ex()).when(repo).method()` — simula un método void que lanza excepción
+`verify(repo, times(1)).method()` — verifica que el método fue llamado N veces
 [endlist]
 
 [st] Retos
-Implementa los mismos seis tests que hiciste con pruebas de integraciÃ³n, ahora usando Mockito. No necesitas base de datos ni `@AfterEach` de limpieza. Compara el tiempo de ejecuciÃ³n de ambas suites y reflexiona: Â¿cuÃ¡ndo conviene cada enfoque?
+Implementa los mismos seis tests que hiciste con pruebas de integración, ahora usando Mockito. No necesitas base de datos ni `@AfterEach` de limpieza. Compara el tiempo de ejecución de ambas suites y reflexiona: ¿cuándo conviene cada enfoque?
 
 `findStudentByCode_WhenStudentExist_ShouldReturnOptionalStudent`
 
