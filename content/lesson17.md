@@ -1,11 +1,37 @@
-[t] Pruebas de Integración con Spring Boot
-[st] ¿Qué es una Prueba de Integración?
-A diferencia de las pruebas unitarias, que verifican un componente (una clase) de forma aislada, las pruebas de integración validan la colaboración entre múltiples componentes. En una aplicación Spring Boot, esto típicamente significa probar que la capa de controladores, la capa de servicio y la capa de persistencia (repositorios y base de datos) funcionan juntas correctamente.
+[t] Pruebas de IntegraciÃ³n con Spring Boot
+[st] Â¿QuÃ© es una Prueba de IntegraciÃ³n?
+A diferencia de las pruebas unitarias, que verifican un componente (una clase) de forma aislada, las pruebas de integraciÃ³n validan la colaboraciÃ³n entre mÃºltiples componentes. En una aplicaciÃ³n Spring Boot, esto tÃ­picamente significa probar que la capa de servicio y la capa de persistencia (repositorios y base de datos) funcionan juntas correctamente.
 
-El objetivo es asegurar que las "tuberías" entre las diferentes capas de nuestra aplicación estén bien conectadas. Para esto, Spring Boot nos ofrece un potente módulo de pruebas.
+El objetivo es asegurar que las "tuberÃ­as" entre las diferentes capas de nuestra aplicaciÃ³n estÃ©n bien conectadas.
 
-[st] Configuración de la Prueba de Integración
-Vamos a crear una prueba de integración para nuestro `CourseService`. La clase de prueba se verá así. Analicemos sus partes clave.
+[st] Base de datos para pruebas
+Las pruebas de integraciÃ³n necesitan una base de datos, pero no debemos usar la de producciÃ³n. La soluciÃ³n estÃ¡ndar es H2, una base de datos en memoria que Spring Boot levanta y destruye automÃ¡ticamente con cada ejecuciÃ³n de tests.
+
+Agrega H2 como dependencia de test en tu `pom.xml`:
+
+[code:xml]
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>test</scope>
+</dependency>
+[endcode]
+
+Luego crea el archivo `src/test/resources/application.properties` con la configuraciÃ³n de H2:
+
+[code:ini]
+spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.hibernate.ddl-auto=create-drop
+[endcode]
+
+Con `create-drop`, Hibernate crea el esquema al iniciar el contexto de Spring y lo elimina al terminar. Cada ejecuciÃ³n parte de una base de datos vacÃ­a y limpia.
+
+[st] ConfiguraciÃ³n de la Prueba de IntegraciÃ³n
+La clase de prueba se configura asÃ­:
 
 [code:java]
 package com.example.myapp.services;
@@ -35,20 +61,19 @@ public class CourseServiceIntegrationTest {
     private ProfessorRepository professorRepository;
 
     private Professor professor;
-    
-    // ... métodos de prueba y configuración
 }
 [endcode]
 
-`@SpringBootTest`: Esta es la anotación central. Le dice a Spring que cargue el contexto completo de la aplicación, incluyendo la configuración, los controladores, los servicios, los repositorios y la conexión a la base de datos.
-`@Autowired`: Como el contexto de la aplicación está cargado, podemos inyectar cualquier bean que necesitemos, igual que lo haríamos en el código de la aplicación.
+`@SpringBootTest` le dice a Spring que cargue el contexto completo de la aplicaciÃ³n, incluyendo la configuraciÃ³n, los servicios, los repositorios y la conexiÃ³n a la base de datos H2.
+
+`@Autowired` funciona igual que en el cÃ³digo de producciÃ³n: como el contexto de Spring estÃ¡ activo, podemos inyectar cualquier bean.
+
+Una desventaja importante: `@SpringBootTest` levanta todo el contexto de Spring, lo que tarda varios segundos. En la siguiente lecciÃ³n veremos Mockito, una alternativa que corre en milisegundos.
 
 [st] Gestionando el Estado: `@BeforeEach` y `@AfterEach`
-Una regla de oro de las pruebas es que deben ser independientes. Para lograrlo, preparamos un estado conocido antes de cada prueba y lo limpiamos después.
+Una regla de oro de las pruebas es que deben ser independientes entre sÃ­. Para lograrlo, preparamos un estado conocido antes de cada prueba y lo limpiamos despuÃ©s.
 
 [code:java]
-//... dentro de CourseServiceIntegrationTest
-
 @BeforeEach
 void setup() {
     professor = new Professor();
@@ -58,69 +83,67 @@ void setup() {
 
 @AfterEach
 void cleanup() {
+    // Primero los cursos (tienen FK a professor), luego los profesores.
+    // Invertir el orden causaria un error de restriccion de clave foranea.
     courseRepository.deleteAll();
     professorRepository.deleteAll();
 }
 [endcode]
 
-`@BeforeEach`: Este método se ejecuta antes de cada método de prueba (`@Test`). Lo usamos para crear y guardar un profesor. Esto nos asegura que cada prueba comienza con un profesor limpio en la base de datos con el que podemos trabajar.
+`@BeforeEach` se ejecuta antes de cada `@Test`. Guarda un profesor limpio en H2 para que cada prueba tenga un punto de partida identico.
 
-`@AfterEach`: Este método se ejecuta después de cada método de prueba. Lo usamos para borrar todos los datos de las tablas involucradas. Esto garantiza que el estado de una prueba no "ensucie" la siguiente.
+`@AfterEach` se ejecuta despues de cada `@Test`. El orden de eliminacion importa: primero los cursos (que dependen de professor por FK) y luego los profesores.
 
-[st] Escribiendo el Caso de Prueba Positivo (Happy Path)
-Este test verifica que el flujo principal funciona como se espera, siguiendo el patrón AAA (Arrange-Act-Assert)
+[st] Caso de Prueba Positivo (Happy Path)
+Verifica que el flujo principal funciona correctamente, siguiendo el patron AAA (Arrange-Act-Assert).
 
 [code:java]
-//... dentro de CourseServiceIntegrationTest
-
 @Test
 void createCourse_WhenValid_ReturnsSavedCourse() {
-    // Arrange: Preparar los datos de entrada
+    // Arrange
     Course course = new Course();
-    course.setName("Computación en Internet II");
-    course.setProfessor(professor); // Usamos el profesor creado en setup()
+    course.setName("Computacion en Internet II");
+    course.setProfessor(professor);
 
-    // Act: Ejecutar la lógica que queremos probar
+    // Act
     Course savedCourse = courseService.createCourse(course);
 
-    // Assert: Verificar que el resultado es el esperado
+    // Assert
     assertNotNull(savedCourse.getId());
-    assertEquals("Computación en Internet II", savedCourse.getName());
+    assertEquals("Computacion en Internet II", savedCourse.getName());
     assertEquals(professor.getId(), savedCourse.getProfessor().getId());
 
-    // Verificación final en la BD: La verdadera prueba de integración
+    // Verificacion directa en la BD -- la verdadera prueba de integracion
     Course foundCourse = courseRepository.findById(savedCourse.getId()).orElse(null);
     assertNotNull(foundCourse);
-    assertEquals("Computación en Internet II", foundCourse.getName());
+    assertEquals("Computacion en Internet II", foundCourse.getName());
 }
 [endcode]
 
-El paso crucial aquí es la verificación final. Usamos el `courseRepository` para buscar directamente en la base de datos, confirmando que la integración entre el servicio y la capa de persistencia funcionó.
+La verificacion final es el corazon de la prueba de integracion: usamos `courseRepository` para leer directamente desde H2 y confirmar que la integracion entre el servicio y la persistencia funciono de principio a fin.
 
-[st] Añadiendo una Prueba Negativa
-Una prueba negativa verifica que nuestra aplicación maneja correctamente los datos incorrectos o las situaciones de error.
+[st] Prueba Negativa
+Verifica que la aplicacion maneja correctamente entradas invalidas.
 
 [code:java]
-//... dentro de CourseServiceIntegrationTest
-
 @Test
 void createCourse_WhenNameIsNull_ThrowsException() {
-    // Arrange: Preparar datos inválidos
+    // Arrange
     Course course = new Course();
-    course.setName(null); // Nombre nulo
+    course.setName(null);
     course.setProfessor(professor);
 
-    // Act & Assert: Verificar que se lanza la excepción esperada
+    // Act & Assert
     assertThrows(IllegalArgumentException.class, () -> {
         courseService.createCourse(course);
     });
 }
 [endcode]
 
-Aquí, el método `assertThrows()` de JUnit 5 se encarga de la magia. Ejecuta el código que le pasamos y el test pasa solo si se lanza una excepción del tipo que esperamos (`IllegalArgumentException.class`). Esto asume que hemos codificado nuestro `CourseService` para que valide sus entradas.
+`assertThrows()` ejecuta el lambda y el test pasa solo si se lanza la excepcion del tipo esperado. Esto asume que `CourseService` valida que el nombre no sea nulo.
 
 [st] Retos
-Realice los siguientes tests
+Realice los siguientes tests de integracion. Se dara cuenta de que no cuenta con la logica necesaria en el servicio. Puede usar TDD: escriba primero el test, luego programe la logica que lo haga pasar y refactorice.
 
 `findStudentByCode_WhenStudentExist_ShouldReturnOptionalStudent`
 
@@ -136,4 +159,4 @@ Realice los siguientes tests
 
 `deleteStudentByCode_WhenStudentDoesNotExists_ShouldThrowRuntimeException`
 
-Se dará cuenta que no cuenta con la lógica necesaria. Puede usar TDD, de modo que escriba primero los test, luego programe la lógica que necesita para pasar el test y refactorice.
+En la siguiente leccion implementaras estos mismos seis tests usando Mockito, sin base de datos ni contexto de Spring. Compara cuanto tarda cada suite.
