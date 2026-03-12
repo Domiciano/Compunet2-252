@@ -248,11 +248,11 @@ Mockea `StudentRepository`, `CourseRepository` y `StudentCourseRepository`. Este
 `enrollStudentInCourse_WhenCourseNotFound_ShouldThrowRuntimeException`
 [endlist]
 
-Mockea `StudentRepository` y `SubmissionRepository`. Este reto es diferente: el servicio aplica lógica de cálculo sobre los datos que devuelve el repositorio. Para `ShouldReturnCorrectAverage`, construye una lista de submissions con notas concretas (por ejemplo `4.5` y `3.5`) y verifica que el resultado sea exactamente `4.0`. Mockito no puede probar eso por sí solo — lo prueba tu `assertEquals`.
+Mockea `StudentRepository`, `CourseRepository` y `StudentCourseRepository`. Este método es void, así que no hay valor de retorno que afirmar. La única forma de verificar que funcionó correctamente es con `verify()`: confirma que `delete(enrollment)` fue llamado exactamente una vez. Para el caso `WhenNotEnrolled`, haz que `findByStudentAndCourse(...)` devuelva `Optional.empty()`.
 
 [list]
-`getAverageGradeByStudentCode_WhenStudentHasSubmissions_ShouldReturnCorrectAverage`
-`getAverageGradeByStudentCode_WhenStudentHasNoSubmissions_ShouldReturnZero`
-`getAverageGradeByStudentCode_WhenStudentNotFound_ShouldThrowRuntimeException`
-`getAverageGradeByStudentCode_WhenCodeIsBlank_ShouldThrowIllegalArgumentException`
+`unenrollStudentFromCourse_WhenEnrolled_ShouldRemoveEnrollment`
+`unenrollStudentFromCourse_WhenNotEnrolled_ShouldThrowIllegalStateException`
+`unenrollStudentFromCourse_WhenStudentNotFound_ShouldThrowRuntimeException`
+`unenrollStudentFromCourse_WhenCourseNotFound_ShouldThrowRuntimeException`
 [endlist]
