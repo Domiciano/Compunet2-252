@@ -156,7 +156,7 @@ void createCourse_WhenNameIsNull_ThrowsException() {
 `assertThrows()` ejecuta el lambda y el test pasa solo si se lanza la excepción del tipo esperado. Esto asume que `CourseService` valida que el nombre no sea nulo.
 
 [st] Retos
-Para cada método de servicio que se muestra a continuación, escribe los tests de integración indicados.
+Para cada método de servicio que se muestra a continuación, escribe los tests de integración indicados. Implementa primero el método en tu capa de servicio y luego escribe los tests, o usa TDD: escribe el test primero y deja que el compilador y los fallos te guíen hacia la implementación correcta.
 
 Regla de negocio: buscar un estudiante por código. Si el código es nulo o vacío lanza `IllegalArgumentException`. Si no se encuentra ningún estudiante lanza `RuntimeException`.
 
@@ -208,5 +208,56 @@ public void deleteStudentByCode(String code) {
 `deleteStudentByCode_WhenStudentDoesNotExist_ShouldThrowRuntimeException`
 [endlist]
 
-En la siguiente lección implementarás estos mismos tests con una técnica diferente que no requiere base de datos ni contexto de Spring. Compara cuánto tarda cada suite.
+Regla de negocio: inscribir un estudiante en un curso. Si el estudiante no existe lanza `RuntimeException`. Si el curso no existe lanza `RuntimeException`. Si el estudiante ya está inscrito en ese curso lanza `IllegalStateException`. Si todo es válido crea y devuelve la inscripción.
 
+[code:java]
+public StudentCourse enrollStudentInCourse(String studentCode, String courseName) {
+    Student student = studentRepository.findByCode(studentCode)
+            .orElseThrow(() -> new RuntimeException("Estudiante no encontrado: " + studentCode));
+    Course course = courseRepository.findByName(courseName)
+            .orElseThrow(() -> new RuntimeException("Curso no encontrado: " + courseName));
+    if (studentCourseRepository.existsByStudentAndCourse(student, course)) {
+        throw new IllegalStateException("El estudiante ya está inscrito en este curso");
+    }
+    StudentCourse enrollment = new StudentCourse();
+    enrollment.setStudent(student);
+    enrollment.setCourse(course);
+    return studentCourseRepository.save(enrollment);
+}
+[endcode]
+
+[list]
+`enrollStudentInCourse_WhenValid_ShouldReturnNewEnrollment`
+`enrollStudentInCourse_WhenAlreadyEnrolled_ShouldThrowIllegalStateException`
+`enrollStudentInCourse_WhenStudentNotFound_ShouldThrowRuntimeException`
+`enrollStudentInCourse_WhenCourseNotFound_ShouldThrowRuntimeException`
+[endlist]
+
+Regla de negocio: calcular la nota promedio de un estudiante a partir de sus entregas. Si el código es nulo o vacío lanza `IllegalArgumentException`. Si el estudiante no existe lanza `RuntimeException`. Si el estudiante no tiene entregas devuelve `0.0`. En caso contrario devuelve el promedio de las notas de todas sus entregas.
+
+[code:java]
+public double getAverageGradeByStudentCode(String code) {
+    if (code == null || code.isBlank()) {
+        throw new IllegalArgumentException("El código no puede ser nulo o vacío");
+    }
+    Student student = studentRepository.findByCode(code)
+            .orElseThrow(() -> new RuntimeException("Estudiante no encontrado: " + code));
+    List<Submission> submissions = submissionRepository.findByStudent(student);
+    if (submissions.isEmpty()) {
+        return 0.0;
+    }
+    return submissions.stream()
+            .mapToDouble(Submission::getGrade)
+            .average()
+            .orElse(0.0);
+}
+[endcode]
+
+[list]
+`getAverageGradeByStudentCode_WhenStudentHasSubmissions_ShouldReturnCorrectAverage`
+`getAverageGradeByStudentCode_WhenStudentHasNoSubmissions_ShouldReturnZero`
+`getAverageGradeByStudentCode_WhenStudentNotFound_ShouldThrowRuntimeException`
+`getAverageGradeByStudentCode_WhenCodeIsBlank_ShouldThrowIllegalArgumentException`
+[endlist]
+
+En la siguiente lección implementarás estos mismos tests con una técnica diferente que no requiere base de datos ni contexto de Spring. Compara cuánto tarda cada suite.
