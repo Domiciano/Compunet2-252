@@ -256,3 +256,16 @@ Mockea `StudentRepository`, `CourseRepository` y `StudentCourseRepository`. Este
 `unenrollStudentFromCourse_WhenStudentNotFound_ShouldThrowRuntimeException`
 `unenrollStudentFromCourse_WhenCourseNotFound_ShouldThrowRuntimeException`
 [endlist]
+
+Para ejecutar los test puede usar
+[code:bash]
+# Una clase                                                                                                                         mvn test                                         
+mvn test -Dtest=StudentServiceTest                  
+# Un método                                               
+mvn test -Dtest=StudentServiceTest#findStudentByCode_WhenExists_ReturnsStudent                                                      # Varios métodos de la misma clase
+mvn test -Dtest="StudentServiceTest#findStudentByCode_WhenExists_ReturnsStudent+findStudentByCode_WhenNotExists_ThrowsRuntimeException"
+# Todas las clases de un paquete
+mvn test -Dtest="edu.co.icesi.introspringboot.unit.*"
+[endcode]
+
+
