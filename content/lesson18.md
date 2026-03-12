@@ -1,5 +1,5 @@
 [t] Mockito
-En lesson17 vimos como probar la integracion de todas las capas contra una base de datos H2. Ese enfoque valida el sistema completo, pero tiene un costo: levantar el contexto de Spring tarda varios segundos por ejecucion.
+Las pruebas de integracion validan el sistema completo, pero tienen un costo: levantar el contexto de Spring tarda varios segundos por ejecucion.
 
 Mockito ofrece una alternativa: probar la capa de servicio de forma completamente aislada, sin base de datos ni contexto de Spring. En lugar de usar repositorios reales, simulamos sus respuestas con datos controlados. Las pruebas corren en milisegundos y se enfocan exclusivamente en la logica de negocio.
 
@@ -16,8 +16,8 @@ El modulo `spring-boot-starter-test` ya incluye Mockito. Si necesitas agregarlo 
 </dependency>
 [endcode]
 
-[st] Configuracion del Test con Mockito
-A diferencia de `@SpringBootTest`, aqui no se levanta ningun contexto de Spring. Mockito crea instancias simuladas de las dependencias y las inyecta directamente en el servicio.
+[st] Paso 1 â€” Activar Mockito
+El punto de partida es una clase de test con la anotacion `@ExtendWith(MockitoExtension.class)`. Esta anotacion activa el motor de Mockito para la clase sin necesitar levantar ningun contexto de Spring.
 
 [code:java]
 package com.example.myapp.services;
@@ -39,6 +39,52 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
+public class CourseServiceTest {
+}
+[endcode]
+
+A diferencia de `@SpringBootTest`, aqui no se levanta ningun contexto. Solo existe la clase de test y Mockito escuchando.
+
+[st] Paso 2 â€” Crear el Mock
+Un `@Mock` es una implementacion falsa de una clase o interfaz. Mockito la genera automaticamente y por defecto todos sus metodos no hacen nada: devuelven `null`, `0`, listas vacias, etc. Nosotros decidimos exactamente que devolvera en cada test.
+
+Agregamos el mock del repositorio:
+
+[code:java]
+@ExtendWith(MockitoExtension.class)
+public class CourseServiceTest {
+
+    @Mock
+    private CourseRepository courseRepository;
+
+}
+[endcode]
+
+`courseRepository` ahora es una version simulada. Cuando el servicio le llame a `findAll()` o `findById(...)`, nosotros controlamos que responde.
+
+[st] Paso 3 â€” Inyectar el Mock en el Servicio
+`@InjectMocks` crea una instancia real de `CourseService` e inyecta automaticamente los mocks que declaramos como sus dependencias. Equivale a hacer `new CourseService(courseRepository)` pero sin escribirlo.
+
+[code:java]
+@ExtendWith(MockitoExtension.class)
+public class CourseServiceTest {
+
+    @Mock
+    private CourseRepository courseRepository;
+
+    @InjectMocks
+    private CourseService courseService;
+
+}
+[endcode]
+
+`courseService` es el objeto real que vamos a probar. `courseRepository` es el objeto falso que le inyectamos como dependencia.
+
+[st] Paso 4 â€” Preparar los datos con `@BeforeEach`
+En lugar de repetir la construccion de objetos en cada test, usamos `@BeforeEach` para crear los datos de prueba una sola vez antes de cada metodo. Esto mantiene los tests limpios y enfocados.
+
+[code:java]
 @ExtendWith(MockitoExtension.class)
 public class CourseServiceTest {
 
@@ -71,16 +117,10 @@ public class CourseServiceTest {
 }
 [endcode]
 
-`@ExtendWith(MockitoExtension.class)` activa Mockito sin necesitar Spring. No hay `@AfterEach` de limpieza porque no hay base de datos.
-
-`@Mock` crea una implementacion simulada del repositorio. Ningun metodo hace nada real por defecto.
-
-`@InjectMocks` crea una instancia real del servicio e inyecta los mocks como dependencias.
-
-`@BeforeEach` centraliza la construccion de objetos comunes para evitar repeticion entre tests.
+A diferencia de las pruebas de integracion, aqui no hay `@AfterEach` de limpieza porque no hay base de datos que limpiar.
 
 [st] Simulando retornos de listas
-Usa el patron AAA y la convencion `MethodName_WhenCondition_ExpectedBehavior`.
+Con la clase configurada, ya podemos escribir tests. Usa el patron AAA y la convencion `MethodName_WhenCondition_ExpectedBehavior`.
 
 [code:java]
 @Test
@@ -98,7 +138,7 @@ void getAllCourses_WhenCalled_ReturnsCourseList() {
 }
 [endcode]
 
-La estructura es: `when(llamado al repositorio).thenReturn(dato simulado)`.
+La estructura es: `when(llamado al repositorio).thenReturn(dato simulado)`. El servicio llama al repositorio, el repositorio devuelve lo que nosotros definimos, y probamos que el servicio lo procesa correctamente.
 
 [st] Simulando retornos de Optionals
 [code:java]
@@ -176,7 +216,7 @@ void deleteCourse_WhenRepositoryFails_ThrowsException() {
 [endlist]
 
 [st] Retos
-Implementa los mismos seis tests de lesson17, ahora usando Mockito. No necesitas base de datos ni `@AfterEach` de limpieza. Compara el tiempo de ejecucion de ambas suites y reflexiona: cuando conviene cada enfoque?
+Implementa los mismos seis tests que hiciste con pruebas de integracion, ahora usando Mockito. No necesitas base de datos ni `@AfterEach` de limpieza. Compara el tiempo de ejecucion de ambas suites y reflexiona: cuando conviene cada enfoque?
 
 `findStudentByCode_WhenStudentExist_ShouldReturnOptionalStudent`
 
