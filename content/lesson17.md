@@ -5,7 +5,20 @@ A diferencia de las pruebas unitarias, que verifican un componente (una clase) d
 
 El objetivo es asegurar que las "tuberÃ­as" entre las diferentes capas de nuestra aplicaciÃ³n estÃ©n bien conectadas.
 
-Crea el archivo `src/test/resources/application.properties`. Spring Boot lo detecta automÃ¡ticamente durante los tests y lo usa en lugar del `application.properties` principal, sin que tengas que agregar ninguna anotaciÃ³n extra:
+[st] Base de datos para pruebas
+Las pruebas de integraciÃ³n necesitan una base de datos, pero no debemos usar la de producciÃ³n. La soluciÃ³n estÃ¡ndar es H2, una base de datos en memoria que solo existe durante la ejecuciÃ³n de los tests.
+
+Agrega H2 como dependencia de test en tu `pom.xml`. El scope `test` garantiza que H2 nunca llegue al artefacto de producciÃ³n:
+
+[code:xml]
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>test</scope>
+</dependency>
+[endcode]
+
+Luego crea el archivo `src/test/resources/application.properties`. Spring Boot lo detecta automÃ¡ticamente durante los tests y lo usa en lugar del `application.properties` principal, sin que tengas que agregar ninguna anotaciÃ³n extra:
 
 [code:ini]
 spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
@@ -56,7 +69,7 @@ public class CourseServiceIntegrationTest {
 
 `@Autowired` funciona igual que en el cÃ³digo de producciÃ³n: como el contexto de Spring estÃ¡ activo, podemos inyectar cualquier bean.
 
-Una desventaja importante: `@SpringBootTest` levanta todo el contexto de Spring, lo que tarda varios segundos. 
+Una desventaja importante: `@SpringBootTest` levanta todo el contexto de Spring, lo que tarda varios segundos. En la siguiente lecciÃ³n veremos una alternativa que corre en milisegundos.
 
 [st] Gestionando el Estado: `@BeforeEach` y `@AfterEach`
 Una regla de oro de las pruebas es que deben ser independientes entre sÃ­. Para lograrlo, preparamos un estado conocido antes de cada prueba y lo limpiamos despuÃ©s.
@@ -131,21 +144,56 @@ void createCourse_WhenNameIsNull_ThrowsException() {
 `assertThrows()` ejecuta el lambda y el test pasa solo si se lanza la excepciÃ³n del tipo esperado. Esto asume que `CourseService` valida que el nombre no sea nulo.
 
 [st] Retos
-Realice los siguientes tests de integraciÃ³n. Se darÃ¡ cuenta de que no cuenta con la lÃ³gica necesaria en el servicio. Puede usar TDD: escriba primero el test, luego programe la lÃ³gica que lo haga pasar y refactorice.
+Para cada mÃ©todo de servicio que se muestra a continuaciÃ³n, escribe los tests de integraciÃ³n indicados. Implementa primero el mÃ©todo en tu capa de servicio y luego escribe los tests, o usa TDD: escribe el test primero y deja que el compilador y los fallos te guÃ­en hacia la implementaciÃ³n correcta.
 
-`findStudentByCode_WhenStudentExist_ShouldReturnOptionalStudent`
+Regla de negocio: buscar un estudiante por cÃ³digo. Si el cÃ³digo es nulo o vacÃ­o lanza `IllegalArgumentException`. Si no se encuentra ningÃºn estudiante lanza `RuntimeException`.
 
-`findStudentByCode_WhenStudentDoesNotExist_ShouldThrowRuntimeException`
+[code:java]
+public Student findStudentByCode(String code) {
+    if (code == null || code.isBlank()) {
+        throw new IllegalArgumentException("El cÃ³digo no puede ser nulo o vacÃ­o");
+    }
+    return studentRepository.findByCode(code)
+            .orElseThrow(() -> new RuntimeException("Estudiante no encontrado: " + code));
+}
+[endcode]
 
+[list]
+`findStudentByCode_WhenCodeIsValid_ShouldReturnStudent`
+`findStudentByCode_WhenCodeDoesNotExist_ShouldThrowRuntimeException`
+`findStudentByCode_WhenCodeIsNull_ShouldThrowIllegalArgumentException`
+[endlist]
 
-`getStudentsByCourseName_WhenCalled_ShouldReturnStudentList`
+Regla de negocio: obtener los estudiantes inscritos en un curso por nombre. Si el curso no existe lanza `RuntimeException`. Si existe devuelve la lista de estudiantes inscritos, que puede estar vacÃ­a.
 
+[code:java]
+public List<Student> getStudentsByCourseName(String courseName) {
+    if (!courseRepository.existsByName(courseName)) {
+        throw new RuntimeException("Curso no encontrado: " + courseName);
+    }
+    return studentRepository.findByStudentCourses_Course_Name(courseName);
+}
+[endcode]
+
+[list]
+`getStudentsByCourseName_WhenCourseExists_ShouldReturnEnrolledStudents`
+`getStudentsByCourseName_WhenCourseHasNoStudents_ShouldReturnEmptyList`
 `getStudentsByCourseName_WhenCourseDoesNotExist_ShouldThrowRuntimeException`
+[endlist]
 
+Regla de negocio: eliminar un estudiante por cÃ³digo. Si el estudiante no existe lanza `RuntimeException`. Si existe lo elimina y ya no debe poder encontrarse en la base de datos.
 
-`deleteStudentByCode_WhenStudentExists_ShouldCompleteWithoutThrowingException`
+[code:java]
+public void deleteStudentByCode(String code) {
+    Student student = studentRepository.findByCode(code)
+            .orElseThrow(() -> new RuntimeException("Estudiante no encontrado: " + code));
+    studentRepository.delete(student);
+}
+[endcode]
 
-`deleteStudentByCode_WhenStudentDoesNotExists_ShouldThrowRuntimeException`
+[list]
+`deleteStudentByCode_WhenStudentExists_ShouldRemoveFromDatabase`
+`deleteStudentByCode_WhenStudentDoesNotExist_ShouldThrowRuntimeException`
+[endlist]
 
-En la siguiente lecciÃ³n implementarÃ¡s estos mismos seis tests con una tÃ©cnica diferente que no requiere base de datos ni contexto de Spring. Compara cuÃ¡nto tarda cada suite.
-
+En la siguiente lecciÃ³n implementarÃ¡s estos mismos tests con una tÃ©cnica diferente que no requiere base de datos ni contexto de Spring. Compara cuÃ¡nto tarda cada suite.
