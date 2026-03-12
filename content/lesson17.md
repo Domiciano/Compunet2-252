@@ -68,7 +68,7 @@ public class CourseServiceIntegrationTest {
 
 `@Autowired` funciona igual que en el cÃ³digo de producciÃ³n: como el contexto de Spring estÃ¡ activo, podemos inyectar cualquier bean.
 
-Una desventaja importante: `@SpringBootTest` levanta todo el contexto de Spring, lo que tarda varios segundos. En la siguiente lecciÃ³n veremos Mockito, una alternativa que corre en milisegundos.
+Una desventaja importante: `@SpringBootTest` levanta todo el contexto de Spring, lo que tarda varios segundos. En la siguiente lecciÃ³n veremos una alternativa que corre en milisegundos.
 
 [st] Gestionando el Estado: `@BeforeEach` y `@AfterEach`
 Una regla de oro de las pruebas es que deben ser independientes entre sÃ­. Para lograrlo, preparamos un estado conocido antes de cada prueba y lo limpiamos despuÃ©s.
@@ -159,4 +159,4 @@ Realice los siguientes tests de integracion. Se dara cuenta de que no cuenta con
 
 `deleteStudentByCode_WhenStudentDoesNotExists_ShouldThrowRuntimeException`
 
-En la siguiente leccion implementaras estos mismos seis tests usando Mockito, sin base de datos ni contexto de Spring. Compara cuanto tarda cada suite.
+En la siguiente leccion implementaras estos mismos seis tests con una tecnica diferente que no requiere base de datos ni contexto de Spring. Compara cuanto tarda cada suite.
