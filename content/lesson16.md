@@ -1,12 +1,12 @@
 [t] Manejo de Fechas
 
-[st] IntroducciÃ³n
-En esta lecciÃ³n extendemos el modelo acadÃ©mico ya construido (Professor â†’ Course â†’ StudentCourse â†’ Student) aÃ±adiendo la entidad `Submission`. Un estudiante puede tener muchas entregas; cada entrega registra el tema del trabajo, la fecha del examen, la fecha y hora exacta de entrega y la nota obtenida.
+[st] Introducción
+En esta lección extendemos el modelo académico ya construido (Professor → Course → StudentCourse → Student) añadiendo la entidad `Submission`. Un estudiante puede tener muchas entregas; cada entrega registra el tema del trabajo, la fecha del examen, la fecha y hora exacta de entrega y la nota obtenida.
 
-Esta extensiÃ³n nos permite explorar los tipos de fechas modernos de Java (`LocalDate`, `LocalDateTime`) en un contexto real y ver cÃ³mo se traducen a columnas SQL (`DATE`, `TIMESTAMP`).
+Esta extensión nos permite explorar los tipos de fechas modernos de Java (`LocalDate`, `LocalDateTime`) en un contexto real y ver cómo se traducen a columnas SQL (`DATE`, `TIMESTAMP`).
 
 [st] Diagrama ER actualizado
-El modelo ahora incluye `SUBMISSION` con relaciÃ³n muchos-a-uno hacia `STUDENT`.
+El modelo ahora incluye `SUBMISSION` con relación muchos-a-uno hacia `STUDENT`.
 
 [mermaid]
 erDiagram
@@ -45,7 +45,7 @@ erDiagram
 [endmermaid]
 
 [st] Entidad `Submission`
-`LocalDate` se usa para `examDay` (solo dÃ­a) y `LocalDateTime` para `submittedAt` (dÃ­a + hora exacta). La relaciÃ³n `@ManyToOne` apunta al estudiante dueÃ±o de la entrega.
+`LocalDate` se usa para `examDay` (solo día) y `LocalDateTime` para `submittedAt` (día + hora exacta). La relación `@ManyToOne` apunta al estudiante dueño de la entrega.
 
 [code:java]
 package com.example.myapp.model;
@@ -65,11 +65,11 @@ public class Submission {
     @Column(nullable = false)
     private String topic;
 
-    // Se mapea a DATE en SQL â€” solo almacena aÃ±o, mes y dÃ­a
+    // Se mapea a DATE en SQL — solo almacena año, mes y día
     @Column(name = "exam_day", nullable = false)
     private LocalDate examDay;
 
-    // Se mapea a TIMESTAMP en SQL â€” almacena fecha y hora exacta
+    // Se mapea a TIMESTAMP en SQL — almacena fecha y hora exacta
     @Column(name = "submitted_at", nullable = false)
     private LocalDateTime submittedAt;
 
@@ -85,7 +85,7 @@ public class Submission {
 [endcode]
 
 [st] Actualizar `Student`
-Agrega la lista de submissions en la entidad `Student` para completar la relaciÃ³n bidireccional. El atributo `mappedBy` indica que `Submission` es el lado dueÃ±o de la relaciÃ³n (tiene la FK).
+Agrega la lista de submissions en la entidad `Student` para completar la relación bidireccional. El atributo `mappedBy` indica que `Submission` es el lado dueño de la relación (tiene la FK).
 
 [code:java]
 @OneToMany(mappedBy = "student")
@@ -93,11 +93,11 @@ private List<Submission> submissions;
 [endcode]
 
 [st] Inicializando datos en `data.sql`
-Los inserts usan los mismos estudiantes definidos en lecciones anteriores: Laura (id=1), Pedro (id=2), Andres (id=3), Sofia (id=4) y Camila (id=5). Las fechas siguen el formato estÃ¡ndar compatible con H2 y PostgreSQL.
+Los inserts usan los mismos estudiantes definidos en lecciones anteriores: Laura (id=1), Pedro (id=2), Andres (id=3), Sofia (id=4) y Camila (id=5). Las fechas siguen el formato estándar compatible con H2 y PostgreSQL.
 
 [code:sql]
--- Formato YYYY-MM-DD para LocalDate (exam_day â†’ DATE)
--- Formato YYYY-MM-DD HH:MM:SS para LocalDateTime (submitted_at â†’ TIMESTAMP)
+-- Formato YYYY-MM-DD para LocalDate (exam_day → DATE)
+-- Formato YYYY-MM-DD HH:MM:SS para LocalDateTime (submitted_at → TIMESTAMP)
 
 -- Laura: dos entregas, una con nota alta y otra media
 INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES
@@ -106,11 +106,11 @@ INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES
 INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES
 ('Proyecto Final de Estructuras', '2025-06-05', '2025-06-04 18:00:00', 3.8, 1);
 
--- Pedro: entrega tardÃ­a (submitted_at despuÃ©s del exam_day) con nota baja
+-- Pedro: entrega tardía (submitted_at después del exam_day) con nota baja
 INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES
 ('Parcial de Programacion', '2025-04-10', '2025-04-11 08:30:00', 2.9, 2);
 
--- Andres: entrega de AnatomÃ­a con nota perfecta
+-- Andres: entrega de Anatomía con nota perfecta
 INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES
 ('Corte de Anatomia Humana', '2025-03-20', '2025-03-19 20:00:00', 5.0, 3);
 
@@ -124,13 +124,13 @@ INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES
 INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES
 ('Trabajo de Historia del Arte', '2025-06-20', '2025-06-18 10:00:00', 4.8, 4);
 
--- Camila: entrega de AnatomÃ­a con nota aprobatoria
+-- Camila: entrega de Anatomía con nota aprobatoria
 INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES
 ('Corte de Anatomia Humana', '2025-03-20', '2025-03-20 07:55:00', 3.2, 5);
 [endcode]
 
-[st] `SubmissionRepository` â€” Query Methods con fechas
-Spring Data JPA genera las consultas automÃ¡ticamente a partir del nombre del mÃ©todo. Los tipos `LocalDate` y `LocalDateTime` se usan directamente como parÃ¡metros.
+[st] `SubmissionRepository` Query Methods con fechas
+Spring Data JPA genera las consultas automáticamente a partir del nombre del método. Los tipos `LocalDate` y `LocalDateTime` se usan directamente como parámetros.
 
 [code:java]
 package com.example.myapp.repository;
@@ -143,7 +143,7 @@ import java.util.List;
 
 public interface SubmissionRepository extends JpaRepository<Submission, Long> {
 
-    // Entregas enviadas despuÃ©s de una fecha y hora exacta (LocalDateTime)
+    // Entregas enviadas después de una fecha y hora exacta (LocalDateTime)
     List<Submission> findBySubmittedAtAfter(LocalDateTime dateTime);
 
     // Entregas cuyo examen fue antes de una fecha (LocalDate)
@@ -155,13 +155,13 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     // Entregas con nota mayor a un valor dado
     List<Submission> findByGradeGreaterThan(Double grade);
 
-    // Nota mayor que X Y examen despuÃ©s de una fecha (condiciÃ³n compuesta)
+    // Nota mayor que X Y examen después de una fecha (condición compuesta)
     List<Submission> findByGradeGreaterThanAndExamDayAfter(Double grade, LocalDate date);
 
-    // Entregas de un estudiante especÃ­fico, navegando la relaciÃ³n por cÃ³digo
+    // Entregas de un estudiante específico, navegando la relación por código
     List<Submission> findByStudent_Code(String studentCode);
 
-    // Entregas de un estudiante cuyo examen aÃºn no ha pasado
+    // Entregas de un estudiante cuyo examen aún no ha pasado
     List<Submission> findByStudent_CodeAndExamDayAfter(String studentCode, LocalDate date);
 }
 [endcode]
@@ -169,7 +169,8 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
 [st] Datos no menores
 
 [list]
-`LocalDate` de Java se mapea con `DATE` en SQL â€” almacena solo aÃ±o, mes y dÃ­a (ej. `2025-04-10`)
-`LocalDateTime` de Java se mapea con `TIMESTAMP` en SQL â€” almacena fecha y hora exacta (ej. `2025-04-09 22:15:00`)
-`LocalTime` de Java se mapea con `TIME` en SQL â€” almacena solo la hora (ej. `22:15:00`)
+`LocalDate` de Java se mapea con `DATE` en SQL — almacena solo año, mes y día (ej. `2025-04-10`)
+`LocalDateTime` de Java se mapea con `TIMESTAMP` en SQL — almacena fecha y hora exacta (ej. `2025-04-09 22:15:00`)
+`LocalTime` de Java se mapea con `TIME` en SQL — almacena solo la hora (ej. `22:15:00`)
+
 [endlist]
