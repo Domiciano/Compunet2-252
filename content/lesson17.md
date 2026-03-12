@@ -84,25 +84,25 @@ void setup() {
 @AfterEach
 void cleanup() {
     // Primero los cursos (tienen FK a professor), luego los profesores.
-    // Invertir el orden causaria un error de restriccion de clave foranea.
+    // Invertir el orden causarÃ­a un error de restricciÃ³n de clave forÃ¡nea.
     courseRepository.deleteAll();
     professorRepository.deleteAll();
 }
 [endcode]
 
-`@BeforeEach` se ejecuta antes de cada `@Test`. Guarda un profesor limpio en H2 para que cada prueba tenga un punto de partida identico.
+`@BeforeEach` se ejecuta antes de cada `@Test`. Guarda un profesor limpio en H2 para que cada prueba tenga un punto de partida idÃ©ntico.
 
-`@AfterEach` se ejecuta despues de cada `@Test`. El orden de eliminacion importa: primero los cursos (que dependen de professor por FK) y luego los profesores.
+`@AfterEach` se ejecuta despuÃ©s de cada `@Test`. El orden de eliminaciÃ³n importa: primero los cursos (que dependen de professor por FK) y luego los profesores.
 
 [st] Caso de Prueba Positivo (Happy Path)
-Verifica que el flujo principal funciona correctamente, siguiendo el patron AAA (Arrange-Act-Assert).
+Verifica que el flujo principal funciona correctamente, siguiendo el patrÃ³n AAA (Arrange-Act-Assert).
 
 [code:java]
 @Test
 void createCourse_WhenValid_ReturnsSavedCourse() {
     // Arrange
     Course course = new Course();
-    course.setName("Computacion en Internet II");
+    course.setName("ComputaciÃ³n en Internet II");
     course.setProfessor(professor);
 
     // Act
@@ -110,20 +110,20 @@ void createCourse_WhenValid_ReturnsSavedCourse() {
 
     // Assert
     assertNotNull(savedCourse.getId());
-    assertEquals("Computacion en Internet II", savedCourse.getName());
+    assertEquals("ComputaciÃ³n en Internet II", savedCourse.getName());
     assertEquals(professor.getId(), savedCourse.getProfessor().getId());
 
-    // Verificacion directa en la BD -- la verdadera prueba de integracion
+    // VerificaciÃ³n directa en la BD â€” la verdadera prueba de integraciÃ³n
     Course foundCourse = courseRepository.findById(savedCourse.getId()).orElse(null);
     assertNotNull(foundCourse);
-    assertEquals("Computacion en Internet II", foundCourse.getName());
+    assertEquals("ComputaciÃ³n en Internet II", foundCourse.getName());
 }
 [endcode]
 
-La verificacion final es el corazon de la prueba de integracion: usamos `courseRepository` para leer directamente desde H2 y confirmar que la integracion entre el servicio y la persistencia funciono de principio a fin.
+La verificaciÃ³n final es el corazÃ³n de la prueba de integraciÃ³n: usamos `courseRepository` para leer directamente desde H2 y confirmar que la integraciÃ³n entre el servicio y la persistencia funcionÃ³ de principio a fin.
 
 [st] Prueba Negativa
-Verifica que la aplicacion maneja correctamente entradas invalidas.
+Verifica que la aplicaciÃ³n maneja correctamente entradas invÃ¡lidas.
 
 [code:java]
 @Test
@@ -140,10 +140,10 @@ void createCourse_WhenNameIsNull_ThrowsException() {
 }
 [endcode]
 
-`assertThrows()` ejecuta el lambda y el test pasa solo si se lanza la excepcion del tipo esperado. Esto asume que `CourseService` valida que el nombre no sea nulo.
+`assertThrows()` ejecuta el lambda y el test pasa solo si se lanza la excepciÃ³n del tipo esperado. Esto asume que `CourseService` valida que el nombre no sea nulo.
 
 [st] Retos
-Realice los siguientes tests de integracion. Se dara cuenta de que no cuenta con la logica necesaria en el servicio. Puede usar TDD: escriba primero el test, luego programe la logica que lo haga pasar y refactorice.
+Realice los siguientes tests de integraciÃ³n. Se darÃ¡ cuenta de que no cuenta con la lÃ³gica necesaria en el servicio. Puede usar TDD: escriba primero el test, luego programe la lÃ³gica que lo haga pasar y refactorice.
 
 `findStudentByCode_WhenStudentExist_ShouldReturnOptionalStudent`
 
@@ -159,4 +159,4 @@ Realice los siguientes tests de integracion. Se dara cuenta de que no cuenta con
 
 `deleteStudentByCode_WhenStudentDoesNotExists_ShouldThrowRuntimeException`
 
-En la siguiente leccion implementaras estos mismos seis tests con una tecnica diferente que no requiere base de datos ni contexto de Spring. Compara cuanto tarda cada suite.
+En la siguiente lecciÃ³n implementarÃ¡s estos mismos seis tests con una tÃ©cnica diferente que no requiere base de datos ni contexto de Spring. Compara cuÃ¡nto tarda cada suite.
