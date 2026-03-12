@@ -5,31 +5,6 @@ A diferencia de las pruebas unitarias, que verifican un componente (una clase) d
 
 El objetivo es asegurar que las "tuberías" entre las diferentes capas de nuestra aplicación estén bien conectadas.
 
-[st] Base de datos para pruebas
-Las pruebas de integración necesitan una base de datos, pero no debemos usar la de producción. La solución estándar es H2, una base de datos en memoria que Spring Boot levanta y destruye automáticamente con cada ejecución de tests.
-
-Agrega H2 como dependencia de test en tu `pom.xml`:
-
-[code:xml]
-<dependency>
-    <groupId>com.h2database</groupId>
-    <artifactId>h2</artifactId>
-    <scope>test</scope>
-</dependency>
-[endcode]
-
-Luego crea el archivo `src/test/resources/application.properties` con la configuración de H2:
-
-[code:ini]
-spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
-spring.datasource.driver-class-name=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-spring.jpa.hibernate.ddl-auto=create-drop
-[endcode]
-
-Con `create-drop`, Hibernate crea el esquema al iniciar el contexto de Spring y lo elimina al terminar. Cada ejecución parte de una base de datos vacía y limpia.
 
 [st] Configuración de la Prueba de Integración
 La clase de prueba se configura así:
@@ -161,3 +136,4 @@ Realice los siguientes tests de integración. Se dará cuenta de que no cuenta c
 `deleteStudentByCode_WhenStudentDoesNotExists_ShouldThrowRuntimeException`
 
 En la siguiente lección implementarás estos mismos seis tests con una técnica diferente que no requiere base de datos ni contexto de Spring. Compara cuánto tarda cada suite.
+
