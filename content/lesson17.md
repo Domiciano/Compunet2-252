@@ -254,4 +254,14 @@ public void unenrollStudentFromCourse(String studentCode, String courseName) {
 `unenrollStudentFromCourse_WhenCourseNotFound_ShouldThrowRuntimeException`
 [endlist]
 
-En la siguiente lección implementarás estos mismos tests con una técnica diferente que no requiere base de datos ni contexto de Spring. Compara cuánto tarda cada suite.
+Para ejecutar los test puede usar
+[code:bash]
+# Una clase                                                                                                                         mvn test                                         
+mvn test -Dtest=StudentServiceTest                  
+# Un método                                               
+mvn test -Dtest=StudentServiceTest#findStudentByCode_WhenExists_ReturnsStudent                                                      # Varios métodos de la misma clase
+mvn test -Dtest="StudentServiceTest#findStudentByCode_WhenExists_ReturnsStudent+findStudentByCode_WhenNotExists_ThrowsRuntimeException"
+# Todas las clases de un paquete
+mvn test -Dtest="edu.co.icesi.introspringboot.unit.*"
+[endcode]
+
