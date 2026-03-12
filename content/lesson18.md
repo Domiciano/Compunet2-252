@@ -214,18 +214,45 @@ void deleteCourse_WhenRepositoryFails_ThrowsException() {
 [endlist]
 
 [st] Retos
-Implementa los mismos seis tests que hiciste con pruebas de integración, ahora usando Mockito. No necesitas base de datos ni `@AfterEach` de limpieza. Compara el tiempo de ejecución de ambas suites y reflexiona: ¿cuándo conviene cada enfoque?
+Implementa los mismos tests que hiciste con pruebas de integración, ahora usando Mockito. No necesitas base de datos ni `@AfterEach` de limpieza. Compara el tiempo de ejecución de ambas suites y reflexiona: ¿cuándo conviene cada enfoque?
 
-`findStudentByCode_WhenStudentExist_ShouldReturnOptionalStudent`
+Mockea `StudentRepository`. Verifica que el servicio lanza la excepción correcta cuando el repositorio devuelve `Optional.empty()`, y que retorna el estudiante cuando devuelve `Optional.of(student)`.
 
-`findStudentByCode_WhenStudentDoesNotExist_ShouldThrowRuntimeException`
+[list]
+`findStudentByCode_WhenCodeIsValid_ShouldReturnStudent`
+`findStudentByCode_WhenCodeDoesNotExist_ShouldThrowRuntimeException`
+`findStudentByCode_WhenCodeIsNull_ShouldThrowIllegalArgumentException`
+[endlist]
 
+Mockea `CourseRepository` y `StudentRepository`. Para el caso positivo necesitas que `courseRepository.existsByName(...)` devuelva `true` y que `studentRepository.findByStudentCourses_Course_Name(...)` devuelva la lista esperada.
 
-`getStudentsByCourseName_WhenCalled_ShouldReturnStudentList`
-
+[list]
+`getStudentsByCourseName_WhenCourseExists_ShouldReturnEnrolledStudents`
+`getStudentsByCourseName_WhenCourseHasNoStudents_ShouldReturnEmptyList`
 `getStudentsByCourseName_WhenCourseDoesNotExist_ShouldThrowRuntimeException`
+[endlist]
 
+Mockea `StudentRepository`. Usa `doNothing().when(...)` para el caso exitoso y verifica con `verify()` que `delete(student)` fue llamado exactamente una vez.
 
-`deleteStudentByCode_WhenStudentExists_ShouldCompleteWithoutThrowingException`
+[list]
+`deleteStudentByCode_WhenStudentExists_ShouldRemoveFromDatabase`
+`deleteStudentByCode_WhenStudentDoesNotExist_ShouldThrowRuntimeException`
+[endlist]
 
-`deleteStudentByCode_WhenStudentDoesNotExists_ShouldThrowRuntimeException`
+Mockea `StudentRepository`, `CourseRepository` y `StudentCourseRepository`. Este método consulta tres repositorios y tiene una verificación de estado: asegúrate de cubrir el caso en que `existsByStudentAndCourse(...)` devuelve `true`.
+
+[list]
+`enrollStudentInCourse_WhenValid_ShouldReturnNewEnrollment`
+`enrollStudentInCourse_WhenAlreadyEnrolled_ShouldThrowIllegalStateException`
+`enrollStudentInCourse_WhenStudentNotFound_ShouldThrowRuntimeException`
+`enrollStudentInCourse_WhenCourseNotFound_ShouldThrowRuntimeException`
+[endlist]
+
+Mockea `StudentRepository` y `SubmissionRepository`. Este reto es diferente: el servicio aplica lógica de cálculo sobre los datos que devuelve el repositorio. Para `ShouldReturnCorrectAverage`, construye una lista de submissions con notas concretas (por ejemplo `4.5` y `3.5`) y verifica que el resultado sea exactamente `4.0`. Mockito no puede probar eso por sí solo — lo prueba tu `assertEquals`.
+
+[list]
+`getAverageGradeByStudentCode_WhenStudentHasSubmissions_ShouldReturnCorrectAverage`
+`getAverageGradeByStudentCode_WhenStudentHasNoSubmissions_ShouldReturnZero`
+`getAverageGradeByStudentCode_WhenStudentNotFound_ShouldThrowRuntimeException`
+`getAverageGradeByStudentCode_WhenCodeIsBlank_ShouldThrowIllegalArgumentException`
+[endlist]
