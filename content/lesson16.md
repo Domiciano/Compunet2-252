@@ -92,43 +92,6 @@ Agrega la lista de submissions en la entidad `Student` para completar la relaci�
 private List<Submission> submissions;
 [endcode]
 
-[st] Inicializando datos en `data.sql`
-Los inserts usan los mismos estudiantes definidos en lecciones anteriores: Laura (id=1), Pedro (id=2), Andres (id=3), Sofia (id=4) y Camila (id=5). Las fechas siguen el formato estándar compatible con H2 y PostgreSQL.
-
-[code:sql]
--- Formato YYYY-MM-DD para LocalDate (exam_day → DATE)
--- Formato YYYY-MM-DD HH:MM:SS para LocalDateTime (submitted_at → TIMESTAMP)
-
--- Laura: dos entregas, una con nota alta y otra media
-INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES
-('Parcial de Programacion', '2025-04-10', '2025-04-09 22:15:00', 4.5, 1);
-
-INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES
-('Proyecto Final de Estructuras', '2025-06-05', '2025-06-04 18:00:00', 3.8, 1);
-
--- Pedro: entrega tardía (submitted_at después del exam_day) con nota baja
-INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES
-('Parcial de Programacion', '2025-04-10', '2025-04-11 08:30:00', 2.9, 2);
-
--- Andres: entrega de Anatomía con nota perfecta
-INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES
-('Corte de Anatomia Humana', '2025-03-20', '2025-03-19 20:00:00', 5.0, 3);
-
-INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES
-('Parcial de Fisiologia', '2025-05-15', '2025-05-14 23:45:00', 4.1, 3);
-
--- Sofia: dos materias de Derecho
-INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES
-('Examen de Derecho Penal', '2025-04-25', '2025-04-24 17:30:00', 3.5, 4);
-
-INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES
-('Trabajo de Historia del Arte', '2025-06-20', '2025-06-18 10:00:00', 4.8, 4);
-
--- Camila: entrega de Anatomía con nota aprobatoria
-INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES
-('Corte de Anatomia Humana', '2025-03-20', '2025-03-20 07:55:00', 3.2, 5);
-[endcode]
-
 [st] `SubmissionRepository` Query Methods con fechas
 Spring Data JPA genera las consultas automáticamente a partir del nombre del método. Los tipos `LocalDate` y `LocalDateTime` se usan directamente como parámetros.
 
@@ -173,4 +136,20 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
 `LocalDateTime` de Java se mapea con `TIMESTAMP` en SQL — almacena fecha y hora exacta (ej. `2025-04-09 22:15:00`)
 `LocalTime` de Java se mapea con `TIME` en SQL — almacena solo la hora (ej. `22:15:00`)
 
+[endlist]
+
+[t] Reto
+[list]
+Verifique si existe al menos una entrega (Submission) para un estudiante con un studentId dado.
+Obtenga si un estudiante específico tiene al menos una entrega aprobada (por ejemplo, grade ≥ 3.0).
+Obtenga la primera entrega registrada en el sistema (la más antigua).
+Obtenga las 5 entregas con mejor calificación.
+Obtenga el Top 5 de mejores calificaciones en un topic específico.
+Obtenga todas las entregas realizadas en el rango de fechas de examen entre 2025-03-01 y 2025-03-15.
+Obtenga todas las entregas realizadas después de 2025-03-10T18:00.
+Obtenga todas las entregas de un estudiante (por nombre) ordenadas por fecha de envío descendente.
+Obtenga la mejor entrega (mayor nota) de un estudiante específico.
+Obtenga si existe al menos una entrega de estudiantes de un programa específico con nota mayor a 4.5.
+Obtenga las entregas ordenadas por fecha de envío descendente de forma paginada.
+Obtenga los cursos en los que existen entregas realizadas después de 2025-03-10T18:00.
 [endlist]
