@@ -145,13 +145,13 @@ Obtenga si un estudiante específico tiene al menos una entrega aprobada (por ej
 Obtenga la primera entrega registrada en el sistema (la más antigua).
 Obtenga las 5 entregas con mejor calificación.
 Obtenga el Top 5 de mejores calificaciones en un topic específico.
-Obtenga todas las entregas realizadas en el rango de fechas de examen entre 2025-03-01 y 2025-03-15.
-Obtenga todas las entregas realizadas después de 2025-03-10T18:00.
+Obtenga todas las entregas realizadas en un rango de fechas de examen. Por ejemplo entre 2025-03-01 y 2025-03-15.
+Obtenga todas las entregas realizadas después de cierta fecha. Por ejemplo 2025-03-10T18:00.
 Obtenga todas las entregas de un estudiante (por nombre) ordenadas por fecha de envío descendente.
 Obtenga la mejor entrega (mayor nota) de un estudiante específico.
 Obtenga si existe al menos una entrega de estudiantes de un programa específico con nota mayor a 4.5.
 Obtenga las entregas ordenadas por fecha de envío descendente de forma paginada.
-Obtenga los cursos en los que existen entregas realizadas después de 2025-03-10T18:00.
+Obtenga los cursos en los que existen entregas realizadas después de cierta fecha. Por ejemplo 2025-03-10T18:00.
 [endlist]
 
 [st] Creación de objetos
