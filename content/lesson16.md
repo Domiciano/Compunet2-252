@@ -178,3 +178,8 @@ LocalDateTime now = LocalDateTime.now();
 // Desde un String
 LocalDateTime dateTime = LocalDateTime.parse("2025-03-10T18:00:00");
 [endcode]
+
+Para una inserción en SQL, debe seguir los formatos
+[code:sql]
+INSERT INTO submission (topic, exam_day, submitted_at, grade, student_id) VALUES ('Examen Final de Bioquimica', '2025-07-05', '2025-07-05 09:10:00', 2.8, 5);
+[endcode]
