@@ -152,6 +152,7 @@ Obtenga la mejor entrega (mayor nota) de un estudiante específico.
 Obtenga si existe al menos una entrega de estudiantes de un programa específico con nota mayor a 4.5.
 Obtenga las entregas ordenadas por fecha de envío descendente de forma paginada.
 Obtenga los cursos en los que existen entregas realizadas después de cierta fecha. Por ejemplo 2025-03-10T18:00.
+NIVEL DIOS: Obtenga los estudiantes asociados a las 5 entregas con mejor calificación en un topic específico. Que no se repitan los estudiantes
 [endlist]
 
 [st] Creación de objetos
