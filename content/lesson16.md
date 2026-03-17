@@ -153,3 +153,28 @@ Obtenga si existe al menos una entrega de estudiantes de un programa específico
 Obtenga las entregas ordenadas por fecha de envío descendente de forma paginada.
 Obtenga los cursos en los que existen entregas realizadas después de 2025-03-10T18:00.
 [endlist]
+
+[st] Creación de objetos
+Probablemente necesite saber cómo generar objetos de tipo `LocalDate` y `LocalDateTime`
+
+[code:java]
+// Año, mes, día
+LocalDate date = LocalDate.of(2025, 3, 10);
+
+// Ahora
+LocalDate today = LocalDate.now();
+
+// Desde String
+LocalDate date = LocalDate.parse("2025-03-10");
+
+
+
+// Año, mes, día, hora, minuto
+LocalDateTime dateTime = LocalDateTime.of(2025, 3, 10, 18, 0);
+
+// Ahora
+LocalDateTime now = LocalDateTime.now();
+
+// Desde un String
+LocalDateTime dateTime = LocalDateTime.parse("2025-03-10T18:00:00");
+[endcode]
