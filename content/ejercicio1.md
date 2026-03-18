@@ -45,6 +45,7 @@ erDiagram
     CUSTOMER ||--o{ ORDER : "places"
     ORDER ||--o{ ORDER_ITEM : "contains"
     MENU_ITEM ||--o{ ORDER_ITEM : "is included in"
+
 ```
 Y encuentre los bugs de estas clases. Son 6 en total
 
