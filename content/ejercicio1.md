@@ -1,5 +1,6 @@
 [t] Ejercicio Salvaje
 Básese en este modelo
+
 ```mermaid
 erDiagram
     RESTAURANT {
