@@ -62,7 +62,7 @@ class Restaurant {
     String address;
     @Column
     String phone;
-    @ManyToOne(mappedBy = "restaurant")  // BUG 1: debería ser @OneToMany
+    @ManyToOne(mappedBy = "restaurant")  
     List<MenuItem> menuItems;
     @OneToMany(mappedBy = "restaurant")
     List<Order> orders;
@@ -82,7 +82,7 @@ class MenuItem {
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
     Restaurant restaurant;
-    @OneToMany(mappedBy = "menuItems")   // BUG 2: debería ser "menuItem"
+    @OneToMany(mappedBy = "menuItems")  
     List<OrderItem> orderItems;
 }
 
@@ -112,13 +112,13 @@ class Order {
     String status;
     @Column
     Float total;
-    @OneToMany                           // BUG 3: debería ser @ManyToOne
+    @OneToMany                           
     @JoinColumn(name = "customer_id")
     Customer customer;
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
     Restaurant restaurant;
-    @OneToMany(mappedBy = "orders")      // BUG 4: debería ser "order"
+    @OneToMany(mappedBy = "orders")      
     List<OrderItem> orderItems;
 }
 
@@ -133,7 +133,7 @@ class OrderItemId {
 @Entity
 @Table(name = "order_items")
 class OrderItem {
-    @Id                                  // BUG 5: debería ser @EmbeddedId
+    @Id                                  
     OrderItemId id;
     @Column
     Integer quantity;
