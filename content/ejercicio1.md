@@ -1,7 +1,7 @@
 [t] Ejercicio Salvaje
 Básese en este modelo
 
-```mermaid
+[mermaid]
 erDiagram
     RESTAURANT {
         int id PK
@@ -46,8 +46,8 @@ erDiagram
     CUSTOMER ||--o{ ORDER : "places"
     ORDER ||--o{ ORDER_ITEM : "contains"
     MENU_ITEM ||--o{ ORDER_ITEM : "is included in"
+[endmermaid]
 
-```
 Y encuentre los bugs de estas clases. Son 6 en total
 
 [code:java]
