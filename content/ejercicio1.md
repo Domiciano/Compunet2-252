@@ -32,11 +32,10 @@ erDiagram
     }
 
     ORDER_ITEM {
-        int id PK
+        int order_id PK, FK
+        int menu_item_id PK, FK
         int quantity
         float unit_price
-        int order_id FK
-        int menu_item_id FK
     }
 
     RESTAURANT ||--o{ MENU_ITEM : "offers"
