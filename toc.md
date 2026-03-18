@@ -30,6 +30,7 @@
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson18.md | Mockito
 [t] SEMANA 7 · Spring Data
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson16.md | Manejo de Fechas + Tarea
+[lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/ejercicio1.md | Ejercicio
 [t] SEMANA 8 · Spring MVC
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson19.md | MVC en Spring Boot
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson20.md | Introducción a Thymeleaf para Vistas Dinámicas
