@@ -11,13 +11,13 @@ Contiene la lógica de negocio principal. Orquesta las operaciones, llama a los 
 `Capa de Controlador`
 Expone la funcionalidad de la aplicación al mundo exterior, generalmente a través de endpoints HTTP. Recibe las peticiones, las delega a la capa de servicio y devuelve una respuesta.
 
-([mermaid]
+[mermaid]
 flowchart TD
     Client([Cliente HTTP]) --> Controller
     Controller["Controlador\nStudentController"] --> Service
     Service["Servicio\nStudentService"] --> Repository
     Repository["Repositorio\nStudentRepository"] --> DB[(Base de datos)]
-[endmermaid])
+[endmermaid]
 
 [st] ¿Cómo se relacionan MVC y la Arquitectura de 3 Capas?
 
