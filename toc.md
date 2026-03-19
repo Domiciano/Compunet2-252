@@ -31,11 +31,12 @@
 [t] SEMANA 7 · Spring Data
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson16.md | Manejo de Fechas + Tarea
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/ejercicio1.md | Ejercicio
-[t] SEMANA 8 · Spring MVC
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson19.md | MVC en Spring Boot
-[lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson20.md | Introducción a Thymeleaf para Vistas Dinámicas
-[t] SEMANA 9 · Spring MVC
+[lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson20.md | Introducción a Thymeleaf para Vistas 
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson21.md | Navegación Dinámica
+Dinámicas
+[t] SEMANA 8 · Spring MVC
+[t] SEMANA 9 · Spring MVC
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson22.md | Extra: Fragments de Thymeleaf
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson23.md | Spring Security
 [t] SEMANA 10 · Security
