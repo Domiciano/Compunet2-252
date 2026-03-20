@@ -2,46 +2,38 @@
 [mermaid]
 erDiagram
 
-    CHARACTER ||--o{ MISSION : gives
-    CHARACTER ||--o{ MISSION : targets
+    PLAYABLE_CHARACTER ||--o{ GAME_SESSION : player1
+    PLAYABLE_CHARACTER ||--o{ GAME_SESSION : player2
 
-    MISSION ||--o{ ITEM : requires
-    MISSION ||--o{ REWARD : grants
+    GAME_SESSION ||--o{ DELIVERY : has
 
-    CHARACTER {
+    PLAYABLE_CHARACTER {
         int id
         string name
-        string role
-        int level
+        string ability
     }
 
-    MISSION {
+    GAME_SESSION {
         int id
-        string title
-        string description
-        int giver_id
-        int target_id
+        int duration
+        int player1_id
+        int player2_id
     }
 
-    ITEM {
+    DELIVERY {
         int id
-        string name
-        int quantity
-        int mission_id
-    }
-
-    REWARD {
-        int id
-        string type
-        int amount
-        int mission_id
+        int score
+        int game_session_id
     }
 [endmermaid]
 
 [code:java]
+import jakarta.persistence.*;
+import java.util.List;
+
 @Entity
-@Table(name = "characters")
-public class Character {
+@Table(name = "playable_characters")
+public class PlayableCharacter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,77 +41,57 @@ public class Character {
 
     private String name;
 
-    private String role;
+    private String ability;
 
-    private Integer level;
+    @OneToMany(mappedBy = "player1")
+    private List<GameSession> sessionsAsPlayer1;
 
-    @OneToMany(mappedBy = "giver")
-    private List<Mission> givenMissions;
-
-    @OneToMany(mappedBy = "target")
-    private List<Mission> targetedMissions;
+    @OneToMany(mappedBy = "player2")
+    private List<GameSession> sessionsAsPlayer2;
 }
 
 @Entity
-@Table(name = "missions")
-public class Mission {
+@Table(name = "game_sessions")
+public class GameSession {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
-
-    private String description;
+    private Integer duration;
 
     @ManyToOne
-    @JoinColumn(name = "giver_id")
-    private Character giver;
+    @JoinColumn(name = "player1_id")
+    private PlayableCharacter player1;
 
     @ManyToOne
-    @JoinColumn(name = "target_id")
-    private Character target;
+    @JoinColumn(name = "player2_id")
+    private PlayableCharacter player2;
 
-    @OneToMany(mappedBy = "mission")
-    private List<Item> items;
-
-    @OneToMany(mappedBy = "mission")
-    private List<Reward> rewards;
+    @OneToMany(mappedBy = "gameSession")
+    private List<Delivery> deliveries;
 }
 
 @Entity
-@Table(name = "items")
-public class Item {
+@Table(name = "deliveries")
+public class Delivery {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
-    private Integer quantity;
+    private Integer score;
 
     @ManyToOne
-    @JoinColumn(name = "mission_id")
-    private Mission mission;
-}
-
-@Entity
-@Table(name = "rewards")
-public class Reward {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String type;
-
-    private Integer amount;
-
-    @ManyToOne
-    @JoinColumn(name = "mission_id")
-    private Mission mission;
+    @JoinColumn(name = "game_session_id")
+    private GameSession gameSession;
 }
 [endcode]
 
 [st] Consultas
+[list]
+Devolver la lista de partidas en las que el jugador que actúa como player1 tiene un nombre específico dado como parámetro.
+Listar las partidas que contienen al menos una entrega cuyo puntaje sea mayor a un valor dado.
+Obtener la lista de partidas en las que el jugador en el rol de player1 tenga un nombre específico o exista al menos una entrega asociada a la partida con un puntaje superior a un valor dado
+Obtener la lista de partidas en las que el jugador en el rol de player1 tenga un nombre específico y además exista al menos una entrega asociada a la partida con un puntaje superior a un valor dado.
+[endlist]
