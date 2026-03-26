@@ -8,10 +8,9 @@ Para usar Spring Security debe añadir la dependencia de Maven
     <artifactId>spring-boot-starter-security</artifactId>
 </dependency>
 [endcode]
-En este repositorio está la misma aplicación que venimos manejando en el curso, pero esta vez con las tablas de Usuarios, Roles y Permisos (`User`, `Role`, `Permission`, `UserRole`, `RolePermission`, `UserRoleId`, `RolePermissionId`).
-[code:plain]
-https://github.com/Domiciano/SpringMVCSecurityApp
-[endcode]
+
+Trabajemos en el mismo repositorio que venimos manejando
+
 Al añadir la dependencia, verá que para acceder a sus controllers por medio de request desde el navegador, tendrá que `autenticarse` en la página.
 [st] ¿Cómo o en dónde me autentico?
 Al ejecutar la aplicación aparecerá algo como
