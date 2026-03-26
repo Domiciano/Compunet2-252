@@ -34,16 +34,15 @@
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/ejercicio2.md | Ejercicio 2
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson19.md | MVC en Spring Boot
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson20.md | Introducción a Thymeleaf para Vistas 
-[lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson21.md | Navegación Dinámica
-Dinámicas
 [t] SEMANA 8 · Spring MVC
-[t] SEMANA 9 · Spring MVC
+[lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson21.md | Navegación Dinámica
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson22.md | Extra: Fragments de Thymeleaf
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson23.md | Spring Security
-[t] SEMANA 10 · Security
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson24.md | Autenticación y Autorización
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson25.md | Autorización
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson26.md | Permisos en métodos
+[t] SEMANA 9 · Spring MVC
+[t] SEMANA 10 · Security
 [t] SEMANA 11 · Rest
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson27.md | ¿Qué es REST?
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson28.md | MapStruct
