@@ -10,7 +10,9 @@ Para usar Spring Security debe añadir la dependencia de Maven
 [endcode]
 
 Trabajemos en el mismo repositorio que venimos manejando
-
+[code:http]
+https://github.com/Domiciano/SpringMVC261
+[endcode]
 Al añadir la dependencia, verá que para acceder a sus controllers por medio de request desde el navegador, tendrá que `autenticarse` en la página.
 [st] ¿Cómo o en dónde me autentico?
 Al ejecutar la aplicación aparecerá algo como
