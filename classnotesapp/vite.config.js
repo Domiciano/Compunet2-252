@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 export default defineConfig({
-  base: '/compu2/',
+  base: process.env.VITE_BASE_PATH || '/compu2/',
   plugins: [
     react(),
     string({
