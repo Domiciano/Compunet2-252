@@ -70,6 +70,13 @@ Agregue el plugin de compilación para que el procesador de anotaciones funcione
 </plugin>
 [endcode]
 
+Verifique que el procesador genera el código correctamente:
+[code:bash]
+mvn compile
+[endcode]
+
+Después de compilar, el código generado aparece en `target/generated-sources/annotations/`. Si algo falla, ese directorio muestra exactamente qué mapper no pudo generarse.
+
 [st] Mapping simple
 Suponga que tiene una entidad `Curso` y quiere un DTO que exponga solo algunos campos:
 [code:java]
@@ -200,7 +207,7 @@ public interface CursoMapper {
     // y usa ProfesorMapper para esa conversión
     CursoDTO toDTO(Curso curso);
 
-    Course toEntity(CursoDTO dto);
+    Curso toEntity(CursoDTO dto);
 
     void updateEntityFromDTO(CursoDTO dto, @MappingTarget Curso entity);
 }
@@ -249,41 +256,6 @@ public class CursoController {
     }
 }
 [endcode]
-
-[st] Lombok
-Lombok elimina el boilerplate de getters, setters y constructores en entidades y DTOs.
-
-`1` Agregue la dependencia:
-[code:xml]
-<dependency>
-    <groupId>org.projectlombok</groupId>
-    <artifactId>lombok</artifactId>
-    <version>1.18.42</version>
-    <scope>provided</scope>
-</dependency>
-[endcode]
-
-`2` Active el procesador de anotaciones en IntelliJ:
-File → Settings → Build, Execution, Deployment → Compiler → Annotation Processors → Enable annotation processing
-
-`3` Anote sus clases:
-[code:java]
-@Data           // genera getters, setters, equals, hashCode y toString
-@NoArgsConstructor
-@AllArgsConstructor
-public class CursoDTO {
-    private Long id;
-    private String nombre;
-    private ProfesorDTO profesor;
-}
-[endcode]
-
-[list]
-`@Data` — getters + setters + equals + hashCode + toString
-`@NoArgsConstructor` — constructor sin argumentos
-`@AllArgsConstructor` — constructor con todos los argumentos
-`@Builder` — patrón builder para construcción fluida
-[endlist]
 
 [st] GYM de REST
 Implemente los siguientes endpoints para el proyecto del curso. Recuerde usar semántica REST correcta.

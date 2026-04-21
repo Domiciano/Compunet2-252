@@ -49,6 +49,7 @@
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson272.md | Parámetros HTTP
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson273.md | Ejercicio: Semántica REST
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson28.md | MapStruct
+[lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson281.md | Lombok
 [t] SEMANA 12 · Rest
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson29.md | Auth en REST
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson30.md | Filtros por Request
