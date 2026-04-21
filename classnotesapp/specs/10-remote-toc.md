@@ -52,7 +52,7 @@ A new file `src/content/config.js` is the **only build-time artifact** that need
 const courseConfig = {
   // URL to the remote toc.md file.
   // Change this URL to point the app at a different course without rebuilding.
-  tocUrl: 'https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/classnotesapp/src/content/toc.md',
+  tocUrl: 'https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/classnotesapp/src/content/toc.md',
 };
 
 export default courseConfig;
@@ -139,11 +139,11 @@ Example of the remote `toc.md`:
 
 ```
 [t] Curso
-[lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/classnotesapp/src/content/lesson0.md
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/classnotesapp/src/content/lesson0.md
 
 [t] SEMANA 1 · Protocolo HTTP y servidores
-[lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/classnotesapp/src/content/lesson1.md
-[lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/classnotesapp/src/content/lesson2.md
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/classnotesapp/src/content/lesson1.md
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/classnotesapp/src/content/lesson2.md
 ```
 
 The `[lesson]` (local) tag remains supported for development and testing with local files.

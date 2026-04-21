@@ -37,11 +37,11 @@ jobs:
       - name: Build
         working-directory: classnotesapp
         env:
-          VITE_BASE_PATH: /Compunet2-252/
+          VITE_BASE_PATH: /Computacion2/
         run: npm run build
 
       - name: Patch 404.html base path
-        run: sed -i 's|/compu2|/Compunet2-252|g' classnotesapp/dist/404.html
+        run: sed -i 's|/compu2|/Computacion2|g' classnotesapp/dist/404.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

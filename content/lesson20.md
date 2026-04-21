@@ -203,7 +203,7 @@ public String saveCourse(@ModelAttribute Course course) {
 Vamos a realizar ejericicios para afianzar estos conocimientos
 
 [code:plain]
-https://github.com/Domiciano/Compunet2-252
+https://github.com/DomicianoRincon/Computacion2
 [endcode]
 
 Realice las siguientes funciones usando platillas de thymeleaf (algunas están hechas arriba)
