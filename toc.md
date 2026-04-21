@@ -40,9 +40,9 @@
 [t] SEMANA 9 · Spring MVC
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson23.md | Spring Security
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson24.md | Autenticación y Autorización
+[t] SEMANA 10 · Security
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson25.md | Autorización
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson26.md | Permisos en métodos
-[t] SEMANA 10 · Security
 [t] SEMANA 11 · Rest
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson27.md | ¿Qué es REST?
 [lesson:url] https://raw.githubusercontent.com/Domiciano/Compunet2-252/refs/heads/main/content/lesson28.md | MapStruct

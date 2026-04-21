@@ -186,4 +186,20 @@ A partir de esto, usted puede usar el nombre o authorities para rederizarlo en l
 </body>
 </html>
 [endcode]
+
+Tambien podemos interactuar con los elementos de autenticación por medio de acceso estático
+[code:java]
+@GetMapping("/profile")
+public String profile() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
+}
+[endcode]
+O si solo necesito el UserDetails
+[code:java]
+@GetMapping("/profile")
+public String profile(@AuthenticationPrincipal CustomUserDetails user) {
+    String username = user.getUsername();
+}
+[endcode]
 .
