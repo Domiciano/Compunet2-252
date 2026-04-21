@@ -1,31 +1,56 @@
 [t] MapStruct
-MapStruct es una herramienta de Java que genera automáticamente el código para convertir objetos entre distintos tipos, como entidades y DTOs, de forma eficiente y segura.
+MapStruct es una librería de Java que genera automáticamente el código de conversión entre objetos, como entidades y DTOs. Elimina el código repetitivo de mapeo manual.
+
+[mermaid]
+flowchart TD
+  E[Entity\nDatos de BD] -->|toDTO| D[DTO\nDatos del cliente]
+  D -->|toEntity| E
+  D2[DTO Request] -->|updateEntity| E
+  M([MapStruct Mapper]) --> E
+  M --> D
+  M --> D2
+[endmermaid]
+
+[st] ¿Por qué MapStruct?
+Sin MapStruct, el mapeo manual es tedioso y propenso a errores:
+[code:java]
+// Sin MapStruct — manual y repetitivo
+public UsuarioDTO toDTO(Usuario entity) {
+    UsuarioDTO dto = new UsuarioDTO();
+    dto.setId(entity.getId());
+    dto.setNombre(entity.getNombre());
+    dto.setEmail(entity.getEmail());
+    // ...un campo más y hay que recordar agregarlo aquí
+    return dto;
+}
+[endcode]
+
+Con MapStruct, el compilador genera ese código automáticamente a partir de una interfaz.
+
 [st] Instalación
-Vamos a instalar la librería
+Agregue las dependencias y el plugin al `pom.xml`:
 [code:xml]
-<!--Agreguemos la variable de versión-->
+<!-- Variable de versión -->
 <properties>
-    ...
     <mapstruct.version>1.6.3</mapstruct.version>
-    ...
 </properties>
 
-<!--Mapstruct-->
+<!-- Dependencias -->
 <dependency>
     <groupId>org.mapstruct</groupId>
     <artifactId>mapstruct</artifactId>
     <version>${mapstruct.version}</version>
 </dependency>
 
-<!--Processor-->
 <dependency>
     <groupId>org.mapstruct</groupId>
     <artifactId>mapstruct-processor</artifactId>
     <version>${mapstruct.version}</version>
-     <scope>provided</scope>
+    <scope>provided</scope>
 </dependency>
 [endcode]
-Y necesitaremos el plugin de `MapStruct`
+
+Agregue el plugin de compilación para que el procesador de anotaciones funcione correctamente:
 [code:xml]
 <plugin>
     <groupId>org.apache.maven.plugins</groupId>
@@ -44,142 +69,191 @@ Y necesitaremos el plugin de `MapStruct`
     </configuration>
 </plugin>
 [endcode]
+
 [st] Mapping simple
-Ya finalizada la instalación, podemos considerar lo que necesitamos mapear.
-La idea es tener una clase para modelar objetos que transportan la información (DTO) y otra clase que permita modelar la información que se almacena en base de datos (Entities).
-
-Por ejemplo, el DTO de curso podría ser
+Suponga que tiene una entidad `Curso` y quiere un DTO que exponga solo algunos campos:
 [code:java]
-public class CourseDTO {
-    private long id;
-    private String name;
-    private Long professorId; // solo el ID del profesor
+// Entidad de base de datos
+@Entity
+public class Curso {
+    @Id
+    private Long id;
+    private String nombre;
 
-    //Getters y Setters
+    @ManyToOne
+    private Profesor profesor;
+    // getters y setters
+}
+
+// DTO que expone al cliente
+public class CursoDTO {
+    private Long id;
+    private String nombre;
+    private Long profesorId; // solo el ID del profesor
+    // getters y setters
 }
 [endcode]
-Finalmente debemos tener un mapper que permite la transformación de `Entity` > `DTO` y de `DTO` > `Entity`
+
+El mapper declara los métodos de conversión. MapStruct genera la implementación en tiempo de compilación:
 [code:java]
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
-public interface CourseMapper {
+public interface CursoMapper {
 
-    @Mapping(source = "professor.id", target = "professorId")
-    CourseDTO toDTO(Course course);
+    // Entity → DTO
+    @Mapping(source = "profesor.id", target = "profesorId")
+    CursoDTO toDTO(Curso curso);
 
-    @Mapping(source = "professorId", target = "professor.id")
-    Course toEntity(CourseDTO dto);
+    // DTO → Entity
+    @Mapping(source = "profesorId", target = "profesor.id")
+    Curso toEntity(CursoDTO dto);
 
-    //Actualiza los campos del entity sin crear un objeto nuevo
-    @Mapping(source = "professorId", target = "professor.id")
-    void updateEntityFromDTO(CourseDTO dto, @MappingTarget Course entity);
-}
-[endcode]
-Aquí podemos usar el `@Mapping` el número de veces necesarias para mapear los atributos. Siempre teniendo en cuenta que `source` se hace con base en la entrada y `target` se usa para la salida
-
-Por ejemplo `professor.id` corresponde a `Course course` y `professorId` corresponde a CourseDTO.
-[st] DTO Anidado
-Si quiero tener mappers anidados, por ejemplo tengo los DTO
-[code:java]
-public class CourseDTO {
-    private long id;
-    private String name;
-    private ProfessorDTO professor; // ahora tiene todo el DTO del profesor
-}
-
-public class ProfessorDTO {
-    private Long id;
-    private String name;
-    private String email;
-}
-[endcode]
-Ahora, debo hacer primero un DTO de professor
-[code:java]
-import org.mapstruct.Mapper;
-
-@Mapper(componentModel = "spring")
-public interface ProfessorMapper {
-    ProfessorDTO toDTO(Professor professor);
-    Professor toEntity(ProfessorDTO dto);
-    void updateEntityFromDTO(ProfessorDTO dto, @MappingTarget Professor entity);
-}
-[endcode]
-Para luego, hacer el mapper de curso
-[code:java]
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
-@Mapper(componentModel = "spring", uses = ProfessorMapper.class)
-public interface CourseMapper {
-
-    @Mapping(source = "professor", target = "professor") // usa automáticamente ProfessorMapper
-    CourseDTO toDTO(Course course);
-
-    @Mapping(source = "professor", target = "professor")
-    Course toEntity(CourseDTO dto);
-
-    @Mapping(source = "professor", target = "professor")
-    void updateEntityFromDTO(CourseDTO dto, @MappingTarget Course entity);
-}
-[endcode]
-Note que usamos `uses` para indicar a MapStruct que cuando se encuentre con la necesidad de hacer un Professor -> ProfessorDTO o ProfessorDTO -> Profesor, él utilizará ese mapper.
-
-[st] Controller usando DTO
-Ya con todo el tema de DTO, sus endpoints podrían responder DTO
-[code:java]
-@GetMapping
-public ResponseEntity<List<CourseDTO>> getAllCourses() {
-    return ResponseEntity.status(200).body(courseService.getAllCourses());
+    // Actualiza los campos de un entity existente sin crear uno nuevo
+    @Mapping(source = "profesorId", target = "profesor.id")
+    void updateEntityFromDTO(CursoDTO dto, @MappingTarget Curso entity);
 }
 [endcode]
 
-[st] Service usando mapper
-Dentro de service la forma correcta de usar el mapper es
+El atributo `componentModel = "spring"` hace que el mapper sea un bean de Spring, lo que permite inyectarlo con `@Autowired`.
+
+En `@Mapping`, `source` es la ruta del objeto de entrada y `target` la del objeto de salida. La notación con punto (`profesor.id`) permite acceder a atributos anidados.
+
+[st] Usar el Mapper en el Service
+Inyecte el mapper en el servicio y úselo para convertir entre entidad y DTO:
 [code:java]
 @Service
-public class CourseServiceImpl implements CourseService {
-    @Autowired
-    private CourseMapper courseMapper;
+public class CursoServiceImpl implements CursoService {
 
     @Autowired
-    private CourseRepository courseRepository;
+    private CursoMapper cursoMapper;
+
+    @Autowired
+    private CursoRepository cursoRepository;
 
     @Override
-    public List<CourseDTO> getAllCourses() {
-        return courseRepository.findAll().stream().map(entity -> courseMapper.toDTO(entity)).toList();
+    public List<CursoDTO> findAll() {
+        return cursoRepository.findAll()
+            .stream()
+            .map(cursoMapper::toDTO)
+            .toList();
+    }
+
+    @Override
+    public CursoDTO findById(Long id) {
+        Curso curso = cursoRepository.findById(id).orElse(null);
+        if (curso == null) return null;
+        return cursoMapper.toDTO(curso);
+    }
+
+    @Override
+    public CursoDTO save(CursoDTO dto) {
+        Curso entity = cursoMapper.toEntity(dto);
+        Curso saved = cursoRepository.save(entity);
+        return cursoMapper.toDTO(saved);
+    }
+
+    @Override
+    public CursoDTO update(Long id, CursoDTO dto) {
+        Curso entity = cursoRepository.findById(id).orElseThrow();
+        cursoMapper.updateEntityFromDTO(dto, entity);
+        return cursoMapper.toDTO(cursoRepository.save(entity));
     }
 }
 [endcode]
-En donde se usa el método `toDTO` para mapear de Entity a DTO
 
-[st] GYM de Rest
-Vamos a poner en práctica lo que hemos visto.
-Tenga en cuenta que el prefijo con el que debe nombrar sus endpoints debe ser con semántica REST. Debe preguntarse cuál es el recurso principal que está devolviendo. Puede pensar en el sujeto de la oración.
-[list]
-Obtener todos los cursos con su respectivo profesor. Paginados: defina cuántos registros por página
-Obtener un curso por `id` con su respectivo profesor y la lista de estudiantes
-Búsqueda de curso (sin profesor y sin estudiantes) por coindidencias en `nombre`. Paginados: defina cuántos registros por página
-Obtener todos los estudiantes inscritos en un curso específico
-Consultar todos los cursos en los que está matriculado un estudiante por código de estudiante
-Buscar estudiantes por programa académico. Ordenados por `código`. Paginados: defina cuántos registros por página
-Listar todos los cursos con la cantidad de estudiantes inscritos
-Crear un nuevo curso y asignarle un profesor existente
-Registrar un nuevo estudiante
-Matricular un estudiante en un curso
-Actualizar el nombre código o programa de un estudiante 
-Eliminar una matrícula específica por `id`
-[endlist]
-[code:plain]
-https://classroom.github.com/a/tFfCV0KZ
+[st] DTOs anidados
+Si en lugar de solo el ID del profesor quiere el DTO completo del profesor dentro del DTO de curso, necesita un mapper por cada tipo involucrado:
+[code:java]
+// DTOs
+public class CursoDTO {
+    private Long id;
+    private String nombre;
+    private ProfesorDTO profesor; // DTO anidado
+}
+
+public class ProfesorDTO {
+    private Long id;
+    private String nombre;
+    private String email;
+}
 [endcode]
-Entregue esta tarea a más tardar el jueves de semana 13.
-[st] Lombok
-Vamos a instalar loombok en el proyecto
 
-`1` Instalemos la dependencia de Loombok
+Primero cree el mapper del tipo anidado:
+[code:java]
+@Mapper(componentModel = "spring")
+public interface ProfesorMapper {
+    ProfesorDTO toDTO(Profesor profesor);
+    Profesor toEntity(ProfesorDTO dto);
+    void updateEntityFromDTO(ProfesorDTO dto, @MappingTarget Profesor entity);
+}
+[endcode]
+
+Luego referencie ese mapper desde el mapper principal con `uses`:
+[code:java]
+@Mapper(componentModel = "spring", uses = ProfesorMapper.class)
+public interface CursoMapper {
+
+    // MapStruct detecta automáticamente que Profesor → ProfesorDTO
+    // y usa ProfesorMapper para esa conversión
+    CursoDTO toDTO(Curso curso);
+
+    Course toEntity(CursoDTO dto);
+
+    void updateEntityFromDTO(CursoDTO dto, @MappingTarget Curso entity);
+}
+[endcode]
+
+Con `uses = ProfesorMapper.class`, MapStruct sabe que cuando necesite convertir `Profesor` ↔ `ProfesorDTO` debe delegar al `ProfesorMapper`.
+
+[st] Controller con DTOs y ResponseEntity
+Con DTOs y el mapper configurados, el controller queda limpio y solo se ocupa del HTTP:
+[code:java]
+@RestController
+@RequestMapping("/cursos")
+public class CursoController {
+
+    @Autowired
+    private CursoService cursoService;
+
+    @GetMapping
+    public ResponseEntity<List<CursoDTO>> getAll() {
+        return ResponseEntity.ok(cursoService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CursoDTO> getById(@PathVariable Long id) {
+        CursoDTO dto = cursoService.findById(id);
+        if (dto == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping
+    public ResponseEntity<CursoDTO> create(@RequestBody CursoDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(cursoService.save(dto));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CursoDTO> update(@PathVariable Long id, @RequestBody CursoDTO dto) {
+        return ResponseEntity.ok(cursoService.update(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        cursoService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+[endcode]
+
+[st] Lombok
+Lombok elimina el boilerplate de getters, setters y constructores en entidades y DTOs.
+
+`1` Agregue la dependencia:
 [code:xml]
 <dependency>
     <groupId>org.projectlombok</groupId>
@@ -189,7 +263,45 @@ Vamos a instalar loombok en el proyecto
 </dependency>
 [endcode]
 
-`2` Configuremos el IDE
-Como vamos a querer que IntelliJ siga mostrándonos el proyecto adecuadamente vamos a 
-File → Settings → Build, Execution, Deployment → Compiler → Annotation Processors
-Y activemos el cuadro `Enable annotation processing`
+`2` Active el procesador de anotaciones en IntelliJ:
+File → Settings → Build, Execution, Deployment → Compiler → Annotation Processors → Enable annotation processing
+
+`3` Anote sus clases:
+[code:java]
+@Data           // genera getters, setters, equals, hashCode y toString
+@NoArgsConstructor
+@AllArgsConstructor
+public class CursoDTO {
+    private Long id;
+    private String nombre;
+    private ProfesorDTO profesor;
+}
+[endcode]
+
+[list]
+`@Data` — getters + setters + equals + hashCode + toString
+`@NoArgsConstructor` — constructor sin argumentos
+`@AllArgsConstructor` — constructor con todos los argumentos
+`@Builder` — patrón builder para construcción fluida
+[endlist]
+
+[st] GYM de REST
+Implemente los siguientes endpoints para el proyecto del curso. Recuerde usar semántica REST correcta.
+[list]
+Obtener todos los cursos con su respectivo profesor. Paginados.
+Obtener un curso por `id` con su profesor y su lista de estudiantes.
+Buscar cursos por coincidencias en el nombre. Paginados.
+Obtener todos los estudiantes inscritos en un curso específico.
+Consultar todos los cursos de un estudiante por su código.
+Buscar estudiantes por programa académico, ordenados por código. Paginados.
+Listar todos los cursos con la cantidad de estudiantes inscritos.
+Crear un nuevo curso y asignarle un profesor existente.
+Registrar un nuevo estudiante.
+Matricular un estudiante en un curso.
+Actualizar nombre, código o programa de un estudiante.
+Eliminar una matrícula por `id`.
+[endlist]
+[code:plain]
+https://classroom.github.com/a/tFfCV0KZ
+[endcode]
+Entregue esta tarea a más tardar el jueves de semana 13.
