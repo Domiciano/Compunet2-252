@@ -39,6 +39,10 @@ const LessonParser = ({ content }) => {
   let parsingMermaid = false;
   let mermaidBuffer = "";
 
+  // --- SVG ---
+  let parsingSvg = false;
+  let svgBuffer = "";
+
   // --- LISTA ---
   let parsingList = false;
   let listItems = [];
@@ -216,6 +220,37 @@ const LessonParser = ({ content }) => {
     // --- CONTENIDO DE MERMAID ---
     if (parsingMermaid) {
       mermaidBuffer += rawLine + "\n";
+      continue;
+    }
+
+    // --- INICIO DE SVG ---
+    if (trimmedLine === '[svg]') {
+      flushParagraph(elements, paragraphBuffer, i);
+      paragraphBuffer = "";
+      parsingSvg = true;
+      svgBuffer = "";
+      continue;
+    }
+
+    // --- FIN DE SVG ---
+    if (trimmedLine === '[endsvg]') {
+      if (parsingSvg) {
+        elements.push(
+          <div
+            key={`svg-${i}`}
+            style={{ overflowX: 'auto', margin: '12px 0' }}
+            dangerouslySetInnerHTML={{ __html: svgBuffer }}
+          />
+        );
+        parsingSvg = false;
+        svgBuffer = "";
+      }
+      continue;
+    }
+
+    // --- CONTENIDO DE SVG ---
+    if (parsingSvg) {
+      svgBuffer += rawLine + "\n";
       continue;
     }
 
