@@ -53,6 +53,7 @@
 [t] SEMANA 12 · Rest
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson29.md | Auth en REST
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson30.md | Filtros por Request
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/tarea3.md | Tarea 3
 [t] SEMANA 13 · Test de API
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson31.md | Postman
 [t] SEMANA 14 · React
