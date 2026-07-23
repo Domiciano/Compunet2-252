@@ -2,15 +2,16 @@
 //
 // Per-course look of the login / profile gate. This is a variation axis like
 // the theme: only the values below change per course, the rendering lives in
-// the shared LoginScreen.jsx / LoginBackground.jsx.
+// the shared LoginScreen.jsx / LoginIllustration.jsx.
 //
-//   courseName: shown on the login card.
-//   motif:      background pattern drawn by LoginBackground.jsx —
-//               'mobile'   -> app-icon grid + phone outlines (mobile-apps courses)
-//               'network'  -> nodes + links (networking / internet courses)
-//               'geometric'-> neutral dots & shapes (default / template)
+//   courseName:      shown on the login card.
+//   backgroundImage: optional photo for the left panel (import an asset). When
+//                    null, the generated prototype mosaic is used instead.
+//   motif:           mosaic pattern when backgroundImage is null —
+//                    'mobile' | 'network' | 'geometric'.
 
 export const loginBranding = {
   courseName: 'Computación en Internet II',
+  backgroundImage: null,
   motif: 'network',
 };
