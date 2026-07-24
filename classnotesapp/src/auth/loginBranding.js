@@ -5,13 +5,13 @@
 // the shared LoginScreen.jsx / LoginIllustration.jsx.
 //
 //   courseName:      shown on the login card.
-//   backgroundImage: optional photo for the left panel (import an asset). When
-//                    null, the generated prototype mosaic is used instead.
+//   backgroundImages: optional array of photos for the left panel (slideshow).
+//                    When null, the generated prototype mosaic is used instead.
 //   motif:           mosaic pattern when backgroundImage is null —
 //                    'mobile' | 'network' | 'geometric'.
 
 export const loginBranding = {
   courseName: 'Computación en Internet II',
-  backgroundImage: null,
+  backgroundImages: null,
   motif: 'network',
 };
