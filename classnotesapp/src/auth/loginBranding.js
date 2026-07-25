@@ -11,11 +11,18 @@
 //   motif:            mosaic pattern when backgroundImages is null —
 //                     'mobile' | 'network' | 'geometric'.
 
+import cover1 from '@/assets/login-1.jpg';
+import cover2 from '@/assets/login-2.jpg';
+import cover3 from '@/assets/login-3.jpg';
+import cover4 from '@/assets/login-4.jpg';
+import cover5 from '@/assets/login-5.jpg';
+import cover6 from '@/assets/login-6.jpg';
+
 // Distinctive display face for the course title (loaded in index.html).
 export const DISPLAY_FONT = "'Space Grotesk', 'Segoe UI', sans-serif";
 
 export const loginBranding = {
   courseName: 'Computación en Internet II',
-  backgroundImages: null,
+  backgroundImages: [cover1, cover2, cover3, cover4, cover5, cover6],
   motif: 'network',
 };
