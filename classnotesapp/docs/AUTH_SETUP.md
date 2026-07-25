@@ -11,6 +11,10 @@ Firebase por curso). Mientras ese archivo tenga los valores `REPLACE_*`, el gate
 queda **desactivado** y la app funciona sin login — útil para el template y para
 desarrollo local.
 
+> **Estado de este curso**: Computación en Internet II ya está configurado con el
+> proyecto Firebase `computacion-fcc47` (`courseId: 'compunet2'`). Falta solo lo
+> que se hace en la consola: pasos 3 a 6 de abajo.
+
 ## Pasos en la consola de Firebase (uno por curso)
 
 1. **Crear proyecto** — <https://console.firebase.google.com> → *Add project*.
@@ -22,7 +26,10 @@ desarrollo local.
    Agrega el dominio donde se publica el curso (además de `localhost`, que ya
    viene):
    - Móviles (FlutterApps): `domicianorincon.github.io`
-   - Compunet2 (compu2): `domiciano.github.io`
+   - Compunet2 (Computacion2): `domicianorincon.github.io` — el sitio vivo es
+     <https://domicianorincon.github.io/Computacion2/> (el workflow de Pages
+     construye con `VITE_BASE_PATH=/Computacion2/`). Si además publicas desde
+     `origin` (`Domiciano/Compunet2-252`), agrega también `domiciano.github.io`.
    > Es el **dominio** (host), no la ruta. GitHub Pages sirve en
    > `https://<usuario>.github.io/<repo>/`, pero aquí solo va `<usuario>.github.io`.
 5. **Crear Firestore** — *Build → Firestore Database → Create database* →
