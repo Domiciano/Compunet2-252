@@ -9,7 +9,12 @@
 //                     than one they cross-fade as a slideshow. When null, the
 //                     generated mosaic (LoginIllustration) is used instead.
 //   motif:            mosaic pattern when backgroundImages is null —
-//                     'mobile' | 'network' | 'geometric'.
+//                     'mobile' | 'network' | 'geometric' | 'fullstack'.
+//   comic:            when true the sign-in side gets the comic treatment —
+//                     inked-and-outlined lettering for the course name, the
+//                     intro line in a caption box, and the Icesi logo masked to
+//                     paper white. Left out, the panel keeps the plain look.
+//   comicFont:        display face for that lettering (loaded in index.html).
 
 import cover1 from '@/assets/login-1.jpg';
 import cover2 from '@/assets/login-2.jpg';
@@ -24,5 +29,7 @@ export const DISPLAY_FONT = "'Space Grotesk', 'Segoe UI', sans-serif";
 export const loginBranding = {
   courseName: 'Computación en Internet II',
   backgroundImages: [cover1, cover2, cover3, cover4, cover5, cover6],
-  motif: 'network',
+  motif: 'fullstack',
+  comic: true,
+  comicFont: "'Bangers', 'Space Grotesk', system-ui, sans-serif",
 };
