@@ -55,12 +55,120 @@ Lesson content itself is **not** inside `classnotesapp/` — it lives at the **r
 
 See `specs/02-dsl.md` for the full Markdown → component mapping (headings, images, links, code fences, and the special fenced-block languages like `mermaid`/`beansim`/`dartpad`/`youtube`/`trycode=`).
 
-### Adding a New Lesson
+### Cómo se escribe una lección
 
-1. Create `content/lessonXX.md` **at the repo root** (not inside `classnotesapp/`) using standard Markdown — see `specs/02-dsl.md`
-2. Add a `[lesson:url] <raw-url>` entry to `toc.md` (repo root)
-3. If the lesson uses local images, they must exist in `classnotesapp/src/assets/` and are referenced by filename only (no path) — image files are bundled with the app, not fetched remotely
-4. Push to **both** git remotes — see "Git Remotes" above; `raw.githubusercontent.com` only reflects `second`
+Una lección es un archivo Markdown en `content/` **en la raíz del repo** (hermano de
+`classnotesapp/`, no dentro). La app lo descarga en tiempo de ejecución, así que
+editarlo y pushear lo actualiza en el sitio ya desplegado, sin rebuild.
+
+#### Esqueleto obligatorio
+
+```markdown
+# Spring IoC Container
+
+<!-- tags: IoC Container, inversión de control, bean, @Component, @Autowired,
+     ApplicationContext, inyección por constructor, ciclo de vida del bean -->
+
+Párrafo de entrada que dice de qué va la lección.
+
+## Qué es el IoC Container
+
+Texto del apartado.
+
+## Cómo se declara un bean
+
+Texto del apartado.
+```
+
+| Elemento | Regla |
+|---|---|
+| `#` (un solo h1) | Título de la lección. Es lo que se muestra arriba y lo que el asistente cita |
+| `<!-- tags: … -->` | **Obligatorio.** Ver abajo |
+| `##` | Apartados. Alimentan el índice lateral, el `subsection_dwell` de la analítica y el contexto que se le manda a la IA |
+| `###` en adelante | Estructura interna del apartado; no salen en el índice ni cortan la subsección |
+
+#### La sección de tags
+
+Va en un **comentario HTML** justo bajo el `#`. GitHub no lo muestra, el visor tampoco:
+solo lo leen el asistente y los chips.
+
+```markdown
+<!-- tags: IoC Container, @Autowired, ApplicationContext -->
+```
+
+Sirve para dos cosas a la vez, y por eso importa:
+
+1. **Contexto de la IA.** Entran en la instrucción del sistema como "Temas de esta
+   lección: …". El modelo ya recibe el markdown completo, pero el texto entero no le
+   dice *qué es lo importante*; los tags sí. Es la diferencia entre que entienda
+   "esta lección va de `@Autowired` y del ciclo de vida del bean" y que tenga que
+   deducirlo de 6 KB de prosa.
+2. **Los chips** que el estudiante ve bajo el chat. Se muestran los **primeros 6**;
+   el resto (hasta 12) sigue yendo al modelo. Escribe primero los que más te interese
+   que un estudiante pulse.
+
+**Cómo escribir tags que sirvan.** El criterio es: *¿con qué palabras preguntaría un
+estudiante que se atascó en esta lección?* Eso lleva a incluir tres tipos:
+
+| Tipo | Ejemplos (Compunet2) |
+|---|---|
+| El nombre técnico exacto | `@Autowired`, `ApplicationContext`, `@RestController`, `JpaRepository` |
+| El concepto en español, como lo diría el estudiante | `inyección de dependencias`, `inversión de control`, `mapeo objeto-relacional` |
+| El error o la confusión típica de ese tema | `bean no encontrado`, `dependencia circular`, `LazyInitializationException` |
+
+Los del tercer tipo son los que más rinden: son las palabras que aparecen cuando alguien
+llega con un problema, no con curiosidad.
+
+**Qué NO poner.** Nada genérico (`programación`, `Java`, `backend`): no distingue esta
+lección de las otras 67 y desperdicia un chip. Tampoco frases largas — más de 42
+caracteres se descarta, porque desborda el chip.
+
+**Si no pones tags, la lección sigue funcionando**: se usan los títulos de los `##` como
+respaldo. Pero los títulos describen la *estructura* del texto, no el *vocabulario* del
+tema, así que el asistente queda peor contextualizado. Anotar es opcional para que nada
+se rompa, no porque dé igual.
+
+#### Bloques especiales
+
+Markdown estándar (CommonMark + GFM) para todo, más estos bloques cercados. Detalle en
+`specs/02-dsl.md`:
+
+| Bloque | Para qué |
+|---|---|
+| ` ```mermaid ` | Diagrama Mermaid |
+| ` ```svg ` | SVG en crudo |
+| ` ```youtube ` | `<videoId> \| <título>` |
+| ` ```dartpad ` | Editor DartPad; el cuerpo es el id del Gist |
+| ` ```beansim ` | BeanVisualizer (solo Compunet2) |
+| ` ```java trycode=<gistId> ` | Bloque con pestañas *Código* / *Fire it up!* |
+
+Toda valla cercada **debe declarar lenguaje** (` ```java `, nunca ` ``` ` a secas): sin
+él, el renderizador la confunde con código en línea.
+
+#### Darla de alta en `toc.md`
+
+```
+[t] SEMANA 3 · Spring Framework
+[lesson:url] https://raw.githubusercontent.com/<repo>/main/content/lessonXX.md | Spring IoC Container | lessonSpringIoC
+```
+
+- El **tercer campo es el id estable** (SPEC-12) y es la clave contra la que se guarda
+  toda la analítica y todo el corpus de preguntas. **Nunca lo cambies** al reorganizar
+  el temario: mover, renombrar o reescribir una lección está bien; cambiarle el id parte
+  sus datos en dos y no hay forma de reunirlos.
+- El `[t]` que la precede aporta dos cosas automáticamente: la **sección del temario**
+  (`tocSection`, que ancla cada pregunta al bloque) y, si el título nombra una semana
+  (`SEMANA 3`), la **fecha planeada** de la lección (SPEC-13/14).
+
+#### Antes de dar por hecha la lección
+
+1. Imágenes locales: tienen que existir en `classnotesapp/src/assets/` y se referencian
+   **solo por nombre de archivo**, sin ruta. No se descargan, van en el bundle.
+2. Push a **los dos remotos**. `raw.githubusercontent.com` sirve desde `second`: pushear
+   solo a `origin` no cambia nada de lo que ve un estudiante.
+3. Si cambiaste algo a mitad de semestre —moviste la lección de semana, la reescribiste,
+   añadiste una nueva—, anótalo en `analitics/schedule.md` § 4.3. Sin eso, el análisis
+   ve el temario final y supone que siempre fue así.
 
 ### BeanVisualizer
 
