@@ -34,14 +34,22 @@ jobs:
         working-directory: classnotesapp
         run: npm ci
 
+      # El base path sale del nombre del repo, no escrito a mano. Este workflow
+      # corre en los dos remotos (Domiciano/Compunet2-252 y
+      # DomicianoRincon/Computacion2) y GitHub Pages sirve cada uno bajo su propio
+      # nombre. Con el valor fijo, la copia de Compunet2-252 apuntaba a
+      # /Computacion2/assets/… — rutas inexistentes en ese host— y salía en blanco.
       - name: Build
         working-directory: classnotesapp
         env:
-          VITE_BASE_PATH: /Computacion2/
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/
         run: npm run build
 
+      # 404.html no pasa por Vite (va tal cual desde public/), así que su
+      # `repoBase` se parchea aquí. El literal /compu2 tiene que seguir siendo el
+      # que está en public/404.html y el defecto de vite.config.js.
       - name: Patch 404.html base path
-        run: sed -i 's|/compu2|/Computacion2|g' classnotesapp/dist/404.html
+        run: sed -i 's|/compu2|/${{ github.event.repository.name }}|g' classnotesapp/dist/404.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

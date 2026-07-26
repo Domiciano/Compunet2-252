@@ -68,7 +68,18 @@ Located in `src/components/BeanVisualizer/`. It is an interactive canvas tool th
 
 ### Routing
 
-Routes are `/{base}/lesson/:lessonId` where `lessonId` is a sequential integer assigned by `TableOfContentsParser`. The app is deployed at base path `/compu2/` (configured in `vite.config.js`). Deep-link support for GitHub Pages is handled via `public/404.html` and a `?p=` query parameter redirect in `App.jsx`.
+Routes are `/{base}/lesson/:lessonId`. Since SPEC-12, `lessonId` is the stable id authored as the third field of each `[lesson:url]` entry in `toc.md`, not a positional counter — `TableOfContentsParser` still falls back to the ordinal for entries that lack one, and `LessonPage` resolves old ordinal links so shared URLs keep working.
+
+**Base path — don't trust `vite.config.js`.** Its `/compu2/` default only applies to `npm run dev`. In production the base comes from `.github/workflows/deploy-pages.yml`, which derives it from the repo name (`/${{ github.event.repository.name }}/`) and then patches `dist/404.html` with a `sed` so deep links resolve against it.
+
+Because both remotes run that same workflow, each publishes its own site under its own name, and both work:
+
+- **https://domicianorincon.github.io/Computacion2/** — the one to use. It matches the repo the app fetches content from.
+- https://domiciano.github.io/Compunet2-252/ — a working mirror, but stale content: the app still fetches `toc.md` and lessons from `DomicianoRincon/Computacion2`.
+
+Until 2026-07-26 the workflow hardcoded `/Computacion2/`, which made the `origin` copy serve HTML pointing at asset paths that don't exist on `domiciano.github.io` — 200 on the page, 404 on every asset, blank screen. If you ever hardcode the base again, that breakage comes back.
+
+Deep-link support for GitHub Pages is handled via `public/404.html` and a `?p=` query parameter redirect in `App.jsx`.
 
 ### Theme
 
