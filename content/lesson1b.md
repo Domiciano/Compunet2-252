@@ -1,245 +1,246 @@
-# Construye tu servidor web paso a paso
+# Un servidor de una sola petición
 
-<!-- tags: ServerSocket, Socket, accept, Runnable, Thread, BufferedReader, DataOutputStream, readLine, CRLF, puerto ocupado, Address already in use, la página se queda cargando, telnet localhost -->
+<!-- tags: ServerSocket, Socket, accept, BufferedReader, DataOutputStream, readLine, CRLF, Content-Length, Address already in use, connection refused, la página se queda cargando, localhost 6789 -->
 
-Aquí construyes, en Java puro, el servidor web que describimos en la lección anterior. Son **ocho pasos**, cada uno con un objetivo concreto y una forma de comprobar que va bien. Al terminar tendrás un servidor multi-hilos que imprime en pantalla las peticiones que le manda el browser.
+Vamos a construir el servidor web más pequeño que puede existir: un programa que atiende **una** petición, responde, y termina. No es útil, pero es completo — hace el ciclo entero de HTTP — y cabe en una pantalla.
 
-> **Cómo usar esta guía.** Donde veas `// TODO` te toca a ti escribir esa línea. Todo lo demás está completo: cópialo tal cual. No avances de paso sin haber comprobado el anterior.
+Empezamos por aquí porque un servidor de verdad tiene dos complicaciones encima de esto: el bucle infinito y los hilos. Si las metemos desde el principio, cuando algo falle no sabrás si el problema es HTTP o es concurrencia. Aquí no hay concurrencia que valga: hay un cliente, una petición, una respuesta.
 
-## Paso 0 · Prepara el proyecto
+**Todo el código está completo.** Cópialo, ejecútalo, y lee la explicación de cada bloque.
 
-Crea un proyecto Java vacío con dos archivos:
+## Paso 1 · Crea el archivo
 
-```
-src/
-  WebServer.java
-  HttpRequest.java
-```
-
-Y estos tres imports en ambos archivos:
+Un único archivo, `SimpleWebServer.java`, con todo dentro de `main`:
 
 ```java
 import java.io.*;
 import java.net.*;
-import java.util.*;
-```
+import java.nio.charset.StandardCharsets;
 
-**Comprobación:** el proyecto compila (aunque no haga nada todavía).
+public class SimpleWebServer {
 
-## Paso 1 · El esqueleto de las dos clases
-
-El servidor son dos clases con responsabilidades separadas, y merece la pena entender por qué antes de escribirlas:
-
-| Clase | Responsabilidad |
-|---|---|
-| `WebServer` | Escucha en el puerto y acepta conexiones. Nunca lee ni escribe datos |
-| `HttpRequest` | Atiende **una** conexión: lee la petición y responde. Corre en su propio hilo |
-
-`HttpRequest` implementa `Runnable` porque es lo que exige el constructor de `Thread`: para poder ejecutar algo en un hilo aparte hay que entregarle un objeto con un método `run()`.
-
-```java
-public final class WebServer {
     public static void main(String[] args) throws Exception {
-        // ...
+        // Todo lo que sigue va aquí
     }
 }
 ```
 
-```java
-final class HttpRequest implements Runnable {
-    // ...
-}
-```
+Fíjate en el `throws Exception` del `main`. Casi todo lo que toca la red puede fallar, y en este primer servidor no vamos a manejar esos errores: si algo sale mal, el programa muere con el stack trace, que para aprender es más informativo que un `catch` que se traga la excepción.
 
 ## Paso 2 · Abre el socket de escucha
 
-Elige un puerto por encima de `1024` y crea el `ServerSocket`. Esto es lo único que hace `WebServer` antes de entrar en el bucle.
+```java
+int port = 6789;
+
+ServerSocket serverSocket = new ServerSocket(port);
+System.out.println("Server listening on port " + port);
+```
+
+`ServerSocket` es el socket de **escucha**: le pide al sistema operativo el puerto 6789 y se queda con él. No transporta datos, solo recibe conexiones.
+
+Elegimos 6789 porque los puertos por debajo de 1024 están reservados y suelen requerir permisos de administrador. Cualquier número libre por encima de 1024 sirve, pero tiene que ser el mismo que pongas en la URL del browser.
+
+**Comprobación:** ejecuta. Debe imprimir `Server listening on port 6789` y quedarse ahí, sin terminar.
+
+## Paso 3 · Espera a que llegue alguien
 
 ```java
-public static void main(String[] args) throws Exception {
-    int port = 6789;
+Socket connectionSocket = serverSocket.accept();
+System.out.println("Client connected");
+```
 
-    // TODO 1: crea el socket de escucha en ese puerto
-    ServerSocket serverSocket = ?;
+`accept()` **bloquea**: la ejecución se detiene en esa línea hasta que un cliente se conecte. Cuando llega, devuelve un `Socket` distinto — el socket de **conexión** — y es por ese por donde viajan los bytes.
 
-    System.out.println("Server listening on port " + port);
+Esta es la distinción que más confunde al empezar, y conviene fijarla ahora:
+
+| Socket | Cuántos | Para qué |
+|---|---|---|
+| `serverSocket` (escucha) | Uno, toda la ejecución | Aceptar conexiones |
+| `connectionSocket` (conexión) | Uno por cliente | Leer y escribir datos |
+
+**Comprobación:** ejecuta y abre `http://localhost:6789/` en el browser. Debe aparecer `Client connected`. La página quedará cargando — todavía no respondemos.
+
+## Paso 4 · Abre los streams
+
+```java
+BufferedReader in = new BufferedReader(
+        new InputStreamReader(connectionSocket.getInputStream()));
+
+DataOutputStream out = new DataOutputStream(connectionSocket.getOutputStream());
+```
+
+Un socket da dos streams, uno de entrada y otro de salida, y los envolvemos de forma distinta a propósito:
+
+- **La entrada** va envuelta en `InputStreamReader` (convierte bytes en caracteres) y luego en `BufferedReader` (agrupa caracteres en líneas). Lo hacemos porque una petición HTTP es texto y se lee **línea a línea**.
+- **La salida** queda en `DataOutputStream`, sin ningún filtro de texto. Aquí escribiremos texto ahora, pero en un par de lecciones escribiremos imágenes, y una imagen no son caracteres.
+
+## Paso 5 · Lee la petición
+
+```java
+// Primera línea: método, recurso y versión. Ej: GET /index.html HTTP/1.1
+String requestLine = in.readLine();
+System.out.println(requestLine);
+
+// Después vienen los headers, uno por línea, hasta una línea en blanco
+String headerLine;
+while ((headerLine = in.readLine()) != null && !headerLine.isEmpty()) {
+    System.out.println(headerLine);
 }
 ```
 
-> `ServerSocket` recibe el puerto en su constructor. Si el puerto ya está en uso, esta línea lanza excepción — no es tu código, es que dejaste otro servidor corriendo.
+`readLine()` devuelve la línea **sin** el `\r\n` del final, así que la línea en blanco que cierra los headers llega como cadena vacía. Esa es la condición de parada.
 
-**Comprobación:** ejecuta. Debe imprimir `Server listening on port 6789` y quedarse ahí sin terminar.
+Las dos condiciones del `while` cubren dos finales distintos:
 
-## Paso 3 · Acepta conexiones en un bucle infinito
+- `!headerLine.isEmpty()` — el final normal, la línea en blanco.
+- `headerLine != null` — el cliente cerró la conexión antes de tiempo. `readLine()` devuelve `null` cuando el stream se acaba, y sin esta comprobación el `isEmpty()` explotaría con `NullPointerException`.
 
-Un servidor no atiende una petición y se muere: atiende para siempre. Por eso el `accept()` va dentro de un `while (true)`.
+Y hay que leer los headers hasta el final aunque no nos interesen: si no vaciamos lo que el cliente mandó, el socket se queda con datos pendientes y algunos clientes se atascan.
 
-```java
-while (true) {
-    // TODO 2: espera y acepta la siguiente conexión entrante
-    Socket connectionSocket = ?;
-
-    System.out.println("Client connected");
-}
-```
-
-El método `accept()` **bloquea**: la ejecución se detiene ahí hasta que llegue un cliente. Cuando llega, devuelve un `Socket` nuevo —el socket de conexión— y el bucle vuelve a empezar.
-
-**Comprobación:** ejecuta el servidor y abre `http://localhost:6789/` en el browser. La página no cargará (todavía no respondemos nada), pero en la consola debe aparecer `Client connected`, probablemente varias veces.
-
-## Paso 4 · Un hilo por conexión
-
-Si atendieras la petición aquí mismo, el servidor quedaría ocupado y no podría aceptar a nadie más mientras tanto. La solución es entregarle el socket a un `HttpRequest` y ejecutarlo en un hilo aparte, para que el hilo principal vuelva de inmediato al `accept()`.
-
-```java
-while (true) {
-    Socket connectionSocket = serverSocket.accept();
-
-    // Objeto que sabe atender esta conexión
-    HttpRequest request = new HttpRequest(connectionSocket);
-
-    // TODO 3: crea un hilo para ese objeto y arráncalo
-    Thread thread = ?;
-    ?
-}
-```
-
-> Se crea el `Thread` pasándole el `Runnable` al constructor, y se arranca con `start()`. Llamar a `run()` directamente **no crea ningún hilo**: ejecutaría el método en el hilo principal y perderías todo el paralelismo.
-
-Con esto `WebServer` está terminado. Lo que queda es `HttpRequest`.
-
-## Paso 5 · El constructor y las dos variables
-
-`HttpRequest` necesita guardar el socket que le pasaron, y tener a mano la constante `CRLF` con la que HTTP termina cada línea.
-
-```java
-final class HttpRequest implements Runnable {
-
-    final static String CRLF = "\r\n";
-    Socket socket;
-
-    public HttpRequest(Socket socket) throws Exception {
-        this.socket = socket;
-    }
-
-    public void run() {
-        // ...
-    }
-
-    private void processRequest() throws Exception {
-        // ...
-    }
-}
-```
-
-La lógica real va en `processRequest()`, no en `run()`. El motivo es concreto: `run()` está declarado en `Runnable` sin `throws`, así que **no puede propagar excepciones**. Poniendo el trabajo en un método aparte que sí las lanza, `run()` queda como un simple envoltorio que las captura.
-
-```java
-public void run() {
-    try {
-        processRequest();
-    } catch (Exception e) {
-        System.out.println(e);
-    }
-}
-```
-
-**Comprobación:** el proyecto compila y sigue imprimiendo `Client connected` al abrir el browser.
-
-## Paso 6 · Abre los streams del socket
-
-Un socket da dos streams: uno para leer lo que manda el cliente y otro para escribirle. Se abren al principio de `processRequest()`.
-
-```java
-private void processRequest() throws Exception {
-
-    // TODO 4: stream de salida — para escribirle al cliente
-    DataOutputStream out = new DataOutputStream( ? );
-
-    // TODO 5: stream de entrada — envuelto para poder leer línea a línea
-    BufferedReader in = new BufferedReader(new InputStreamReader( ? ));
-
-    // ...
-}
-```
-
-> Los dos streams salen del mismo objeto `socket`, con `getOutputStream()` y `getInputStream()`.
-
-Fíjate en la asimetría: la entrada la envolvemos en `BufferedReader` porque queremos leer **líneas de texto**, y el `InputStreamReader` intermedio es el que convierte bytes en caracteres. La salida no la envolvemos en nada de texto, porque más adelante escribiremos también imágenes, y una imagen son bytes crudos.
-
-## Paso 7 · Lee la request line
-
-La primera línea que manda el cliente es la importante: trae el método y el recurso pedido. Se lee con `readLine()`, que devuelve la línea sin el `CRLF` final.
-
-```java
-// TODO 6: lee la primera línea de la petición
-String line = ?;
-
-System.out.println(line);
-```
-
-**Comprobación:** recarga el browser. En consola debe salir algo como `GET / HTTP/1.1`. **Este es el momento en que tu servidor entiende HTTP por primera vez.**
-
-## Paso 8 · Lee los headers y cierra
-
-Después de la request line vienen los headers. No sabemos cuántos son, así que se leen en bucle hasta encontrar la línea en blanco que marca el final.
-
-```java
-// Lee y muestra las líneas de header
-while ((line = in.readLine()) != null && !line.isEmpty()) {
-    System.out.println(line);
-}
-
-// Cierra los streams y el socket
-out.close();
-in.close();
-socket.close();
-```
-
-Las dos condiciones del `while` cubren dos finales distintos: `!line.isEmpty()` es el final normal —la línea en blanco— y `line != null` es el cliente que cerró la conexión antes de tiempo. Sin la comprobación de `null` el bucle petaría con `NullPointerException` cada vez que alguien cierra la pestaña a medias.
-
-**Comprobación final:** recarga el browser. Deberías ver la petición completa:
+**Comprobación:** recarga el browser. Debe salir la petición completa en la consola:
 
 ```http
 GET / HTTP/1.1
 Host: localhost:6789
 User-Agent: Mozilla/5.0 ...
 Accept: text/html,application/xhtml+xml,...
-Accept-Language: es-ES,es;q=0.9
 Connection: keep-alive
 ```
 
-La página del browser seguirá en blanco o con error, y **está bien**: todavía no enviamos respuesta. Eso es lo primero de la siguiente lección.
+## Paso 6 · Responde
 
-## Probar sin browser
+Aquí está el corazón de la lección. Una respuesta HTTP son cuatro piezas en este orden: status line, headers, **línea en blanco**, cuerpo.
 
-El browser manda muchos headers y a veces varias peticiones seguidas, lo que ensucia la consola. Para una prueba limpia, `telnet` te deja escribir la petición a mano:
+```java
+final String CRLF = "\r\n";
 
-```bash
-telnet localhost 6789
+String body = "<html><body><h1>It works!</h1></body></html>";
+byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
+
+String head =
+        "HTTP/1.0 200 OK" + CRLF +
+        "Content-Type: text/html; charset=utf-8" + CRLF +
+        "Content-Length: " + bodyBytes.length + CRLF +
+        CRLF;                                   // <- la línea en blanco
+
+out.write(head.getBytes(StandardCharsets.UTF_8));
+out.write(bodyBytes);
+out.flush();
 ```
 
-Escribe `GET /index.html HTTP/1.0`, pulsa Enter **dos veces** (la segunda es la línea en blanco) y observa la consola del servidor.
+Merece la pena mirar pieza por pieza:
+
+- **`CRLF`.** La especificación exige que cada línea termine en `\r\n`, no en `\n`. Es la causa número uno de servidores que "no responden": algunos clientes toleran `\n` y otros descartan el mensaje sin decir nada.
+- **`HTTP/1.0 200 OK`.** La status line. El `200` es **el único** campo que el browser mira para saber si le fue bien.
+- **`Content-Type`.** Le dice al browser que interprete los bytes como HTML. Sin él no sabe si renderizar o descargar.
+- **`Content-Length`.** Cuántos bytes tiene el cuerpo. Calculado sobre `bodyBytes.length`, **no** sobre `body.length()`: en UTF-8 una `ó` o una `ñ` ocupan dos bytes pero un solo carácter, así que contar caracteres daría un número corto y el browser se quedaría esperando el resto.
+- **El `CRLF` suelto al final del head.** La línea en blanco que separa headers de cuerpo. Si falta, el browser sigue leyendo headers indefinidamente y la página se queda cargando para siempre, sin ningún error que te oriente.
+- **`flush()`.** El stream acumula lo escrito en un buffer; `flush()` es lo que lo empuja de verdad por el socket.
+
+Fíjate también en que el head se escribe como texto y el cuerpo como bytes, por separado. Ahora parece innecesario —el cuerpo también es texto— pero es exactamente la estructura que necesitaremos cuando el cuerpo sea un JPEG.
+
+## Paso 7 · Cierra todo
+
+```java
+in.close();
+out.close();
+connectionSocket.close();
+serverSocket.close();
+```
+
+En HTTP/1.0 el cierre de la conexión **es parte del protocolo**: así es como el servidor dice "terminé de hablar". Cerramos también el `serverSocket`, con lo que el programa libera el puerto y termina.
+
+## El código completo
+
+```java
+import java.io.*;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
+
+public class SimpleWebServer {
+
+    public static void main(String[] args) throws Exception {
+
+        final String CRLF = "\r\n";
+        int port = 6789;
+
+        // 1. Socket de escucha
+        ServerSocket serverSocket = new ServerSocket(port);
+        System.out.println("Server listening on port " + port);
+
+        // 2. Espera bloqueante hasta que llegue un cliente
+        Socket connectionSocket = serverSocket.accept();
+        System.out.println("Client connected");
+
+        // 3. Streams de la conexión
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(connectionSocket.getInputStream()));
+        DataOutputStream out = new DataOutputStream(connectionSocket.getOutputStream());
+
+        // 4. Lee la petición
+        String requestLine = in.readLine();
+        System.out.println(requestLine);
+
+        String headerLine;
+        while ((headerLine = in.readLine()) != null && !headerLine.isEmpty()) {
+            System.out.println(headerLine);
+        }
+
+        // 5. Construye y envía la respuesta
+        String body = "<html><body><h1>It works!</h1></body></html>";
+        byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
+
+        String head =
+                "HTTP/1.0 200 OK" + CRLF +
+                "Content-Type: text/html; charset=utf-8" + CRLF +
+                "Content-Length: " + bodyBytes.length + CRLF +
+                CRLF;
+
+        out.write(head.getBytes(StandardCharsets.UTF_8));
+        out.write(bodyBytes);
+        out.flush();
+
+        // 6. Cierra
+        in.close();
+        out.close();
+        connectionSocket.close();
+        serverSocket.close();
+
+        System.out.println("Done");
+    }
+}
+```
+
+## Pruébalo
+
+Ejecuta y abre `http://localhost:6789/` en el browser. **Debe verse "It works!"** — y el programa termina inmediatamente después, imprimiendo `Done`.
+
+Si recargas, el browser dirá que no puede conectar: el servidor ya no existe. Eso no es un error, es literalmente lo que programaste.
+
+Para ver el mensaje HTTP crudo, sin que el browser lo interprete:
+
+```bash
+curl -v http://localhost:6789/
+```
+
+Las líneas con `>` son lo que curl envía y las que empiezan con `<` son tu respuesta. Ahí puedes verificar que la status line, los headers y la línea en blanco salen exactamente como esperabas.
 
 ## Cuando algo no funciona
 
-| Síntoma | Causa habitual |
+| Síntoma | Causa |
 |---|---|
-| `java.net.BindException: Address already in use` | Quedó una ejecución anterior viva. Deténla, o cambia de puerto |
+| `java.net.BindException: Address already in use` | Quedó una ejecución anterior viva, o el puerto está ocupado. Deténla o cambia de puerto |
 | `Connection refused` en el browser | El servidor no está corriendo, o pusiste otro puerto en la URL |
-| La consola no imprime nada al conectar | El `accept()` no está dentro del `while`, o falta el `start()` del hilo |
-| La página se queda cargando indefinidamente | Normal en esta lección: aún no enviamos respuesta |
-| `NullPointerException` al leer headers | Falta la condición `line != null` en el `while` |
-| El servidor atiende a un cliente y se cuelga con el segundo | Llamaste a `run()` en vez de `start()` |
+| La página se queda cargando y nunca termina | Falta el `CRLF` que cierra los headers, o falta el `flush()` |
+| Se ve el HTML como texto plano, con etiquetas | El `Content-Type` no dice `text/html` |
+| Solo funciona una vez | Correcto. Es un servidor de una sola petición |
+| El browser pide dos veces (verás `/favicon.ico`) | Normal: el browser pide el ícono aparte. Este servidor muere antes de atenderlo |
 
-## Checklist
+## El límite de este servidor
 
-Antes de pasar a la siguiente lección, comprueba que:
+Tienes un servidor web funcionando, y eso ya es mucho. Pero tiene dos problemas obvios:
 
-- [ ] El servidor arranca e imprime que está escuchando.
-- [ ] Acepta varias conexiones seguidas sin morirse.
-- [ ] Cada conexión se atiende en un hilo distinto.
-- [ ] Imprime la request line y todos los headers.
-- [ ] Cierra streams y socket al terminar.
+1. **Atiende una petición y se muere.** Un servidor debería atender para siempre.
+2. **Siempre responde lo mismo.** Da igual qué recurso pidas: manda "It works!".
 
-En la próxima lección le añadimos lo que falta: leer qué archivo pidieron, buscarlo y devolverlo con una respuesta HTTP en forma.
+El primero se arregla en la próxima lección, y no basta con meter todo en un `while`: hay que atender a varios clientes **a la vez**, y ahí aparecen los hilos.

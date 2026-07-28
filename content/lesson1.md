@@ -40,7 +40,7 @@ sequenceDiagram
     S->>B: Cierra la conexión
 ```
 
-El browser, cuando recibe un HTML que referencia una imagen, **vuelve a empezar el ciclo completo** para esa imagen: otra conexión, otra petición, otra respuesta. Una página con quince imágenes son dieciséis peticiones. Por eso el servidor tiene que ser capaz de atender varias a la vez, y por eso la siguiente lección lo hace multi-hilos.
+El browser, cuando recibe un HTML que referencia una imagen, **vuelve a empezar el ciclo completo** para esa imagen: otra conexión, otra petición, otra respuesta. Una página con quince imágenes son dieciséis peticiones. Por eso un servidor tiene que ser capaz de atender varias a la vez — es lo que resolveremos en la segunda de las tres lecciones de implementación.
 
 ## Puertos y sockets
 
@@ -108,8 +108,16 @@ Las versiones modernas añaden cosas que aquí solo estorbarían: HTTP/1.1 reuti
 
 Lo que vas a construir es un servidor de **contenido estático**: el recurso ya existe como archivo en disco y el servidor se limita a leerlo y enviarlo tal cual. Dos clientes que piden `/index.html` reciben exactamente los mismos bytes.
 
-Cuando la respuesta hay que **calcularla** —consultar una base de datos, personalizar la página según quién pregunta— ya no basta con leer un archivo, y ahí aparece el **servidor de aplicaciones**. Ese es el tema de la tercera lección de esta semana. Primero, el estático.
+Cuando la respuesta hay que **calcularla** —consultar una base de datos, personalizar la página según quién pregunta— ya no basta con leer un archivo, y ahí aparece el **servidor de aplicaciones**. Ese es el tema de la última lección de la semana. Primero, el estático.
 
 ## Lo que sigue
 
-En la próxima lección construyes este servidor paso a paso, en Java, usando solo `java.net` y `java.io`. Sin frameworks, sin librerías: sockets y strings.
+Lo construimos en Java, usando solo `java.net` y `java.io`. Sin frameworks, sin librerías: sockets y strings. Y en tres etapas, cada una con el código completo y un servidor que funciona al final:
+
+| Lección | Qué construyes | Qué le falta |
+|---|---|---|
+| **Un servidor de una sola petición** | El ciclo completo de HTTP, sin bucles ni hilos | Atiende una petición y se muere |
+| **Servidor web multi-hilos** | Atiende para siempre y a varios clientes a la vez | Responde lo mismo a todo |
+| **Sirve archivos reales** | Busca el recurso en disco, tipo MIME y 404 | Solo devuelve archivos que ya existen |
+
+Vamos por la primera.

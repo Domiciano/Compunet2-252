@@ -1,195 +1,296 @@
-# Completa el servidor: la respuesta HTTP
+# Servidor web multi-hilos
 
-<!-- tags: StringTokenizer, request line, File, FileInputStream, Content-Type, MIME, 404 Not Found, status line, flush, la página se queda cargando, la imagen no se ve, FileNotFoundException, application/octet-stream -->
+<!-- tags: Runnable, Thread, start, run, ServerSocket, accept, bucle infinito, concurrencia, un hilo por conexión, el servidor se cuelga, atiende de a uno, Thread.sleep -->
 
-Tu servidor ya lee lo que le manda el browser, pero no le contesta nada. Aquí lo terminas: entender **qué recurso** están pidiendo, buscarlo, y devolverlo con una respuesta HTTP en forma.
+El servidor de la lección anterior atiende una petición y se muere. Aquí lo convertimos en un servidor de verdad: uno que atiende **indefinidamente** y **a varios clientes a la vez**.
 
-![Diagrama de respuesta de recursos](image2.png "icon")
+![Diagrama de arquitectura de servidor web](image1.png "icon")
 
-Seguimos **exactamente donde quedamos**: todo lo que sigue va dentro de `processRequest()`, en `HttpRequest.java`, justo después del bucle que lee los headers y **antes** de las tres líneas que cierran los streams. Los pasos y los `// TODO` siguen la numeración de la lección anterior.
+Son dos problemas distintos y conviene no mezclarlos. El primero se resuelve con un bucle. El segundo, no — y ver por qué es el objetivo real de esta lección.
 
-## Paso 9 · Extrae el recurso pedido
+**Todo el código está completo.**
 
-La request line que ya imprimiste tiene tres campos separados por espacios: `GET /index.html HTTP/1.1`. El del medio es lo que necesitas. `StringTokenizer` los separa en orden.
+## Paso 1 · El bucle infinito
 
-```java
-// Extrae el nombre del archivo de la request line
-StringTokenizer tokens = new StringTokenizer(line);
-String method = tokens.nextToken();     // GET
-String fileName = tokens.nextToken();   // /index.html
-
-// El browser manda la ruta con "/" delante; el punto la vuelve relativa
-// al directorio desde el que ejecutas el servidor
-fileName = "." + fileName;
-```
-
-Asumimos que el método siempre es `GET`. Un servidor real miraría `method` y respondería `501 Not Implemented` a lo que no sabe hacer; aquí lo leemos solo para consumir el token.
-
-**Comprobación:** imprime `fileName` y recarga el browser. Debe salir `./index.html` — o `./` a secas si pediste la raíz.
-
-## Paso 10 · Busca el archivo
-
-Crea un archivo `index.html` cualquiera **en la carpeta desde la que ejecutas el servidor** (la raíz del proyecto, no dentro de `src/`). Luego pregunta si existe:
+Lo primero es evidente: el `accept()` no puede ejecutarse una sola vez.
 
 ```java
-// TODO 7: abre el archivo pedido
-File file = new File(fileName);
-boolean fileExists = file.exists();
+ServerSocket serverSocket = new ServerSocket(port);
 
-FileInputStream fis = null;
-if (fileExists) {
-    fis = ?;
+while (true) {
+    Socket connectionSocket = serverSocket.accept();
+    // ... leer la petición y responder, como en la lección anterior
+    connectionSocket.close();
 }
 ```
 
-> `FileInputStream` recibe el `File` en su constructor. Ábrelo **solo si existe**: hacerlo cuando no está lanza `FileNotFoundException` y te quedas sin poder responder el 404, que es justo el caso que quieres cubrir.
+Ya no cerramos el `serverSocket`: vive mientras viva el programa. Lo que se cierra en cada vuelta es el socket de **conexión**, el de ese cliente concreto.
 
-**Comprobación:** imprime `fileExists` pidiendo `/index.html` y luego `/noexiste.html`. Deben salir `true` y `false`. Si siempre sale `false`, el archivo no está donde tu programa cree que está el directorio actual — imprime `file.getAbsolutePath()` y compruébalo.
+Con esto el servidor atiende peticiones para siempre. Parece que ya está.
 
-## Paso 11 · Dos formas de escribir en el socket
+## Paso 2 · Por qué el bucle no basta
 
-La respuesta lleva dos cosas de naturaleza distinta: los headers son **texto**, y el cuerpo pueden ser **bytes crudos** (una imagen). Por eso hacen falta dos ayudantes. Añádelos como métodos de `HttpRequest`, junto con un import más de los que tenías en el Paso 0:
+No está. Este servidor atiende **de a uno**, y la diferencia se ve en cuanto una petición tarda.
 
-```java
-import java.nio.charset.StandardCharsets;
-```
+Añade temporalmente esta línea justo después del `accept()`, simulando una respuesta lenta —una consulta a base de datos, un archivo grande—:
 
 ```java
-private static void sendString(String text, OutputStream os) throws Exception {
-    os.write(text.getBytes(StandardCharsets.UTF_8));
-}
-
-private static void sendBytes(InputStream fis, OutputStream os) throws Exception {
-    byte[] buffer = new byte[1024];
-    int bytes = 0;
-    while ((bytes = fis.read(buffer)) != -1) {
-        os.write(buffer, 0, bytes);
-    }
-}
+Thread.sleep(10000);   // 10 segundos
 ```
 
-`sendBytes` copia de a 1024 bytes en vez de cargar el archivo entero en memoria: con una imagen grande la diferencia se nota, y con un video sería la diferencia entre funcionar y no.
+Ahora abre **dos pestañas** del browser al mismo tiempo. La primera tarda 10 segundos, lo esperable. Pero la segunda tarda **20**: no empieza a ser atendida hasta que la primera termina del todo.
 
-Esto explica por qué en el Paso 6 **no** envolvimos la salida en un `BufferedWriter`: un writer piensa en caracteres, y una imagen no son caracteres. El `DataOutputStream` que ya tienes sirve para las dos cosas.
-
-## Paso 12 · Arma la respuesta
-
-Una respuesta HTTP son cuatro piezas **en este orden**, y las cuatro son obligatorias:
+La razón es que hay un solo hilo de ejecución. Mientras está dentro del cuerpo del `while` atendiendo a un cliente, **no está en el `accept()`**, así que nadie más puede entrar. El bucle da la vuelta cuando el cliente anterior ya se fue.
 
 ```mermaid
-flowchart LR
-    A["HTTP/1.0 200 OK"] --> B["Content-Type: text/html"]
-    B --> C["(línea en blanco)"]
-    C --> D["bytes del archivo"]
+flowchart TB
+    subgraph U["Un solo hilo — los clientes hacen fila"]
+        A1["accept cliente 1"] --> A2["atiende 1"] --> A3["accept cliente 2"] --> A4["atiende 2"]
+    end
+    subgraph M["Un hilo por conexión — en paralelo"]
+        B1["accept cliente 1"] --> B2["lanza hilo 1"]
+        B2 --> B3["accept cliente 2"]
+        B3 --> B4["lanza hilo 2"]
+        B2 -.-> C1["atiende 1"]
+        B4 -.-> C2["atiende 2"]
+    end
 ```
 
-Ahora escríbelas, en ese orden:
+Y no es un caso rebuscado: una página con quince imágenes son dieciséis peticiones, que el browser lanza casi a la vez. Con un solo hilo se sirven en fila india.
+
+La solución es que el hilo principal **no atienda a nadie**. Que solo acepte, delegue el trabajo a otro hilo, y vuelva de inmediato al `accept()`.
+
+## Paso 3 · Separa en dos clases
+
+Para ejecutar algo en un hilo aparte, Java pide un objeto que implemente `Runnable` — es decir, que tenga un método `run()`. Eso obliga a partir el programa en dos clases, y la separación resulta ser la correcta también conceptualmente:
+
+| Clase | Responsabilidad | Cuántas instancias |
+|---|---|---|
+| `WebServer` | Escucha y acepta. Nunca lee ni escribe datos | Una |
+| `HttpRequest` | Atiende **una** conexión: lee la petición y responde | Una por cliente |
+
+`WebServer.java`:
 
 ```java
-if (fileExists) {
-    // TODO 8: status line de éxito, terminada en CRLF
-    String statusLine = ?;
-    String contentTypeLine = "Content-Type: " + contentType(fileName) + CRLF;
+import java.io.*;
+import java.net.*;
 
-    sendString(statusLine, out);
-    sendString(contentTypeLine, out);
-    sendString(CRLF, out);   // la línea en blanco: aquí terminan los headers
-    sendBytes(fis, out);     // y aquí empieza el cuerpo
-    fis.close();
-} else {
-    // TODO 9: lo mismo, pero con 404 (Paso 14)
-}
+public final class WebServer {
 
-out.flush();
-```
+    public static void main(String[] args) throws Exception {
 
-> La status line de éxito es `"HTTP/1.0 200 OK" + CRLF`.
+        int port = 6789;
+        ServerSocket serverSocket = new ServerSocket(port);
+        System.out.println("Server listening on port " + port);
 
-Dos detalles que cuestan horas si se pasan por alto:
+        while (true) {
+            // Espera bloqueante: aquí se detiene hasta que llegue un cliente
+            Socket connectionSocket = serverSocket.accept();
 
-- **El `sendString(CRLF, out)` suelto.** Es la línea en blanco que separa headers de cuerpo. Sin ella el browser sigue leyendo headers para siempre y la página se queda cargando, sin ningún error que te oriente.
-- **El `out.flush()` final.** El stream guarda lo escrito en un buffer; `flush()` es lo que lo empuja de verdad por el socket. Si no lo llamas, buena parte de tu respuesta se va con el `close()` o se pierde.
+            // Objeto que sabe atender ESTA conexión
+            HttpRequest request = new HttpRequest(connectionSocket);
 
-**Comprobación:** recarga `http://localhost:6789/index.html`. **Debe verse tu página en el browser.** Ese es el momento en que tienes un servidor web de verdad.
+            // Se la entregamos a un hilo nuevo...
+            Thread thread = new Thread(request);
+            thread.start();
 
-## Paso 13 · Dile al browser qué le estás mandando
-
-El header `Content-Type` lleva el **tipo MIME**, y sin él el browser no sabe qué hacer con los bytes que le llegan. Añade este método auxiliar:
-
-```java
-private static String contentType(String fileName) {
-    if (fileName.endsWith(".htm") || fileName.endsWith(".html")) {
-        return "text/html";
+            // ...y volvemos de inmediato al accept()
+        }
     }
-    if (fileName.endsWith(".jpg")) {
-        return "image/jpeg";
-    }
-    if (fileName.endsWith(".gif")) {
-        return "image/gif";
-    }
-    return "application/octet-stream";
-}
-```
-
-El browser hace lo que le dices, no lo que querías: una imagen anunciada como `text/html` sale en pantalla como un chorro de caracteres ilegibles. Y `application/octet-stream` es el "no sé qué es esto" — el browser normalmente lo descarga en vez de mostrarlo.
-
-**Comprobación:** pon una imagen `.jpg` junto al `index.html`, referénciala con un `<img src="foto.jpg">` y recarga. Debe verse. Fíjate en la consola: son **dos peticiones**, una por el HTML y otra por la imagen, cada una en su hilo. Ahí está sirviendo para algo el Paso 4.
-
-## Paso 14 · El caso que falta: 404
-
-Falta cerrar la rama `else`. Crea un `404.html` con un mensaje de error junto al `index.html`, y devuélvelo con la status line correcta:
-
-```java
-} else {
-    // TODO 9: completa esta rama
-    String statusLine = "HTTP/1.0 404 Not Found" + CRLF;
-    String contentTypeLine = "Content-Type: text/html" + CRLF;
-
-    sendString(statusLine, out);
-    sendString(contentTypeLine, out);
-    sendString(CRLF, out);
-
-    // Envía el contenido de 404.html como cuerpo
-    ?
 }
 ```
 
-> Es el mismo patrón del Paso 12: abre un `FileInputStream` sobre `404.html` y pásalo a `sendBytes`.
+Las tres líneas del medio son toda la diferencia. El hilo principal ya no atiende: construye, delega y vuelve.
 
-El código de estado no es decoración: es **el único** campo que el browser mira para decidir si le fue bien. Devolver la página de error con un `200 OK` es un error clásico — el usuario ve "no encontrado" mientras el browser, los buscadores y cualquier programa que consuma tu servidor creen que todo salió perfecto.
+> **`start()`, nunca `run()`.** Llamar a `request.run()` compila igual y hace lo mismo… en el hilo principal. No crea ningún hilo, así que vuelves exactamente al servidor secuencial del Paso 2 pero con más clases. Es el error más común de esta lección y no da ningún síntoma hasta que pruebas con dos clientes.
 
-**Comprobación:** pide `http://localhost:6789/noexiste.html`. Debe verse tu página de error. En las herramientas de desarrollo del browser (pestaña Red) la petición debe aparecer en **rojo, con 404**.
+## Paso 4 · La clase que atiende
 
-## Ejemplo de Request
+`HttpRequest.java`:
 
-![Ejemplo de solicitud HTTP](image3.png "icon")
+```java
+import java.io.*;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
 
-## Ejemplo de Response
+final class HttpRequest implements Runnable {
 
-![Ejemplo de respuesta HTTP](image4.png "icon")
+    final static String CRLF = "\r\n";
+    Socket socket;
+
+    public HttpRequest(Socket socket) throws Exception {
+        this.socket = socket;
+    }
+
+    // Implementa el método run() de la interface Runnable
+    public void run() {
+        try {
+            processRequest();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    private void processRequest() throws Exception {
+        // el trabajo de verdad
+    }
+}
+```
+
+Hay una decisión de diseño aquí que no es cosmética: **el trabajo va en `processRequest()`, no en `run()`**.
+
+El motivo es que `run()` está declarado en `Runnable` sin `throws`, así que no puede propagar excepciones — y todo lo que hace un servidor (leer un socket, abrir un archivo) las lanza. Poniendo el trabajo en un método aparte que sí las declara, `run()` queda como un envoltorio que las captura.
+
+Y capturarlas importa más de lo que parece: una excepción que escapa de `run()` mata **ese hilo** en silencio. El servidor sigue corriendo tan campante, ese cliente se queda sin respuesta, y en la consola no aparece nada. Ese `catch` es lo único que te va a avisar.
+
+El cuerpo de `processRequest()` es el mismo código de la lección anterior, ahora sobre `this.socket`:
+
+```java
+private void processRequest() throws Exception {
+
+    BufferedReader in = new BufferedReader(
+            new InputStreamReader(socket.getInputStream()));
+    DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+
+    // Lee la petición
+    String requestLine = in.readLine();
+    System.out.println(Thread.currentThread().getName() + " -> " + requestLine);
+
+    String headerLine;
+    while ((headerLine = in.readLine()) != null && !headerLine.isEmpty()) {
+        System.out.println(headerLine);
+    }
+
+    // Responde
+    String body = "<html><body><h1>It works!</h1></body></html>";
+    byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
+
+    String head =
+            "HTTP/1.0 200 OK" + CRLF +
+            "Content-Type: text/html; charset=utf-8" + CRLF +
+            "Content-Length: " + bodyBytes.length + CRLF +
+            CRLF;
+
+    out.write(head.getBytes(StandardCharsets.UTF_8));
+    out.write(bodyBytes);
+    out.flush();
+
+    // Cierra los streams y el socket de ESTA conexión
+    out.close();
+    in.close();
+    socket.close();
+}
+```
+
+El único cambio real respecto a la lección anterior es el `Thread.currentThread().getName()` en el `println`, que imprime qué hilo está atendiendo. Es la forma más fácil de comprobar que esto funciona de verdad.
+
+## El código completo
+
+`HttpRequest.java`, con el método ya en su sitio. `WebServer.java` es el del Paso 3, sin cambios.
+
+```java
+import java.io.*;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
+
+final class HttpRequest implements Runnable {
+
+    final static String CRLF = "\r\n";
+    Socket socket;
+
+    public HttpRequest(Socket socket) throws Exception {
+        this.socket = socket;
+    }
+
+    // Implementa el método run() de la interface Runnable
+    public void run() {
+        try {
+            processRequest();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    private void processRequest() throws Exception {
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(socket.getInputStream()));
+        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+
+        // Lee la petición
+        String requestLine = in.readLine();
+        System.out.println(Thread.currentThread().getName() + " -> " + requestLine);
+
+        String headerLine;
+        while ((headerLine = in.readLine()) != null && !headerLine.isEmpty()) {
+            System.out.println(headerLine);
+        }
+
+        // Responde
+        String body = "<html><body><h1>It works!</h1></body></html>";
+        byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
+
+        String head =
+                "HTTP/1.0 200 OK" + CRLF +
+                "Content-Type: text/html; charset=utf-8" + CRLF +
+                "Content-Length: " + bodyBytes.length + CRLF +
+                CRLF;
+
+        out.write(head.getBytes(StandardCharsets.UTF_8));
+        out.write(bodyBytes);
+        out.flush();
+
+        // Cierra los streams y el socket de ESTA conexión
+        out.close();
+        in.close();
+        socket.close();
+    }
+}
+```
+
+## Pruébalo
+
+Ejecuta `WebServer` y abre `http://localhost:6789/` en el browser. Recarga varias veces: ahora el servidor **no se muere**, y en la consola verás un nombre de hilo distinto cada vez:
+
+```plain
+Thread-0 -> GET / HTTP/1.1
+Thread-1 -> GET /favicon.ico HTTP/1.1
+Thread-2 -> GET / HTTP/1.1
+```
+
+Para comprobar el paralelismo de verdad, vuelve a poner el `sleep` — pero ahora **dentro de `processRequest()`**, que es donde vive el trabajo:
+
+```java
+Thread.sleep(10000);
+```
+
+Abre dos pestañas a la vez. Las dos deben tardar **10 segundos**, no 10 y 20. Ese es el resultado que buscabas: dos clientes atendidos en paralelo, cada uno en su hilo. Bórralo cuando lo hayas visto.
+
+## Un detalle sobre el que volveremos
+
+Este servidor crea **un hilo por cada conexión**, sin límite. Con treinta estudiantes recargando es perfecto; con treinta mil peticiones es un problema, porque cada hilo consume memoria y el sistema operativo se pasa el tiempo alternando entre ellos en vez de trabajando.
+
+Los servidores reales usan un **pool**: un número fijo de hilos que se reparten las conexiones. La idea que acabas de implementar es la correcta; lo que cambia es de dónde sale el hilo. No lo necesitas todavía, pero conviene saber que este diseño tiene un techo.
 
 ## Cuando algo no funciona
 
-| Síntoma | Causa habitual |
+| Síntoma | Causa |
 |---|---|
-| La página se queda cargando y nunca termina | Falta el `sendString(CRLF, out)` que cierra los headers |
-| Llega la respuesta cortada, o no llega nada | Falta el `out.flush()` antes de cerrar |
-| `FileNotFoundException` al pedir algo que no existe | Abriste el `FileInputStream` fuera del `if (fileExists)` |
-| Siempre responde 404 aunque el archivo esté | El directorio de trabajo no es el que crees. Imprime `file.getAbsolutePath()` |
-| La imagen sale como caracteres raros | `Content-Type` equivocado, o usaste `sendString` en vez de `sendBytes` |
-| El HTML se ve como texto plano, con las etiquetas visibles | Mandaste `text/plain` en vez de `text/html` |
-| `NoSuchElementException` en `nextToken()` | Llegó una petición vacía; el browser a veces abre conexiones que no usa |
+| Atiende un cliente y el siguiente espera | Llamaste a `run()` en vez de `start()` |
+| Siempre sale `Thread-0` | Lo mismo: no se está creando ningún hilo |
+| `java.net.BindException: Address already in use` | Quedó una ejecución anterior. El bucle infinito hace que sea fácil olvidarla corriendo |
+| El servidor deja de responder tras un rato | Falta el `socket.close()`; se acumulan conexiones abiertas |
+| Un cliente no recibe nada y no hay error | Una excepción escapó de `processRequest()`. Mira que el `catch` de `run()` imprima algo |
+| `NullPointerException` leyendo headers | Falta la condición `headerLine != null` |
+| El programa termina solo | Se te escapó un `serverSocket.close()` dentro del bucle |
 
 ## Checklist
 
-- [ ] Sirve un `index.html` y se ve en el browser.
-- [ ] Sirve una imagen referenciada desde ese HTML.
-- [ ] Responde `404` con su página de error cuando el recurso no existe.
-- [ ] El `Content-Type` cambia según la extensión.
-- [ ] Cierra el `FileInputStream`, los streams y el socket.
+- [ ] El servidor no termina: atiende recarga tras recarga.
+- [ ] Cada petición imprime un nombre de hilo distinto.
+- [ ] Con el `sleep` puesto, dos pestañas tardan lo mismo que una.
+- [ ] Cada conexión cierra su socket al terminar.
 
-## Lo que acabas de construir
+## Lo que sigue
 
-Un servidor web completo de contenido estático, en unas cien líneas y sin una sola librería externa. Sabe escuchar, aceptar en paralelo, interpretar HTTP, buscar en disco y responder con el estado correcto.
-
-Y ahí está su límite: **solo sabe devolver archivos que ya existen**. No puede consultar una base de datos, ni personalizar la página según quién pregunta, ni procesar un formulario. Para eso hace falta que la respuesta se **calcule** en vez de leerse, y ese es el trabajo de un servidor de aplicaciones — la siguiente lección.
+Ya tienes la infraestructura: escucha para siempre y en paralelo. Lo que le falta es lo interesante — **sigue respondiendo "It works!" a todo**, da igual qué recurso le pidas. En la próxima lección aprende a leer qué archivo le están pidiendo, buscarlo en disco y devolverlo con el tipo correcto.
