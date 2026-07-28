@@ -72,23 +72,20 @@ Taller de Frontend
 
 ## Aspecto individual
 
-`6%`
+`8%`
 Examen Spring
 
-`12%`
+`14%`
 Examen de Persistencia
 
-`12%`
+`14%`
 Examen de MVC
 
-`12%`
+`14%`
 Examen de Backend
 
-`12%`
+`14%`
 Examen de Frontend
-
-`10%`
-Tareas
 
 ## Recursos de Apoyo
 
