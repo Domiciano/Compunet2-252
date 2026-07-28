@@ -5,7 +5,7 @@
 [t] SEMANA 1 · Protocolo HTTP y servidores
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson1.md | Servidor WEB | 0004
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson1b.md | Construye tu servidor web paso a paso | 0070
-[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson2.md | Servidor web multi-hilos | 0005
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson2.md | Completa el servidor: la respuesta HTTP | 0005
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson3.md | Servidor de Aplicaciones | 0006
 [t] SEMANA 2 · Aplicaciones
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson4.md | Introducción | 0007
