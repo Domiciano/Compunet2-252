@@ -1,179 +1,115 @@
 # Servidor WEB
 
-En esta práctica usted debe completar el código, en lenguaje Java, para construir un servidor web. Al final se tendrá un servidor web multi-hilos (multi-threaded) con la capacidad de procesar solicitudes simultáneas en paralelo. Se considerará que la práctica ha sido concluida con éxito cuando su servidor web pueda atender las solicitudes de un `browser` para web.
+<!-- tags: servidor web, HTTP, request, response, socket, puerto, TCP, RFC 1945, cliente-servidor, status line, header, MIME, 404 Not Found, connection refused -->
+
+Antes de escribir una sola línea de código conviene tener claro **qué es** un servidor web y **qué hace exactamente** cuando escribes una dirección en el browser. En esta lección no hay implementación: hay modelo mental. En la siguiente lo construimos.
 
 ![Diagrama de arquitectura de servidor web](image1.png "icon")
 
-Para este servidor se implementará parcialmente la versión 1.0 de HTTP, como está definida en el RFC 1945, donde las solicitudes (request HTTP) son enviadas separadas para cada componente de la página web. El servidor debe ser capaz de manipular solicitudes de servicio simultáneas en paralelo. Esto significa que el servidor es multi-hilos (multi-threaded). En el hilo principal, el servidor escuchará por un puerto fijo. Cuando reciba una solicitud de conexión TCP, establecerá una conexión TCP a través de otro socket (socket de conexión) y atenderá la solicitud en un hilo separado. Para simplificar el proceso de programación, el código debe ser desarrollado en dos etapas. En la primera se escribirá un servidor multi-hilos que simplemente mostrará en la pantalla el contenido de la solicitud (request HTTP) que recibe. Cuando este código esté funcionando de manera correcta, usted podrá agregar, en la segunda etapa, el código requerido para generar una respuesta HTTP apropiada al `browser`.
+## Qué es un servidor web
 
-## Servidor web simple
+Un **servidor web** es un programa que se queda esperando conexiones en un puerto, y cada vez que alguien le pide un recurso, se lo devuelve. Eso es todo. No es una máquina, no es un edificio con aire acondicionado: es un proceso corriendo, y puede estar corriendo en tu propio portátil.
 
-Servidor web multi-hilos que mostrará el contenido de la solicitud (request) HTTP que recibe. A continuación se hará un recorrido a través del código para la primera parte de la  implementación de un servidor Web. En los lugares donde usted encuentre un signo de interrogación, `?`, usted debe completar el código que hace falta.
-La primera parte de la implementación del servidor web será multi-hilos, ya que el procesamiento de cada solicitud HTTP que llegue será atendida dentro de un hilo de ejecución separado. Esto permitirá al servidor
-1. Atender múltiples clientes en paralelo
-2. Realizar transferencias de archivos múltiples en paralelo al mismo cliente
+Tres ideas que conviene separar desde el principio:
 
-Cuando se crea un nuevo hilo de ejecución, se debe pasar al constructor de hilos una instancia de alguna clase que implemente la interface `Runnable`. Esta es la razón por la cual se debe definir una clase separada llamada `SolicitudHttp`. La estructura del servidor web será la siguiente.
+| Término | Qué es |
+|---|---|
+| **Servidor web** | El *programa* que atiende peticiones HTTP |
+| **Servidor** (hardware) | La *máquina* donde ese programa corre |
+| **Servidor de aplicaciones** | Un programa que además *ejecuta lógica* para construir la respuesta (lo vemos más adelante) |
 
-```java
-import java.io.* ;
-import java.net.* ;
-import java.util.* ;
+Un servidor web en su forma más simple hace exactamente cuatro cosas, en ciclo, para siempre:
 
-public final class ServidorWeb {
-        public static void main(String argv[]) throws Exception {
-                . . .
-        }
-}
+1. Escucha en un puerto.
+2. Acepta una conexión de un cliente.
+3. Lee la petición y averigua qué recurso están pidiendo.
+4. Escribe la respuesta y cierra.
 
-final class SolicitudHttp implements Runnable {
-        . . .
-}
+## El modelo cliente-servidor
+
+La comunicación siempre la **inicia el cliente**. El servidor nunca llama al browser por su cuenta: se limita a esperar. Esta asimetría es la que define todo el protocolo.
+
+```mermaid
+sequenceDiagram
+    participant B as Browser (cliente)
+    participant S as Servidor web
+    B->>S: Abre conexión TCP al puerto 6789
+    B->>S: GET /index.html HTTP/1.0
+    S->>S: Busca el recurso
+    S-->>B: HTTP/1.0 200 OK + contenido
+    S->>B: Cierra la conexión
 ```
 
-Normalmente, los servidores web atienden las solicitudes que ellos reciben a través del `port 80`. Para este práctica usted puede escoger cualquier número de puerto superior a `1024` (pero recuerde utilizar este mismo número cuando haga la solicitud desde el `browser`). En el siguiente trozo de código se utiliza el número `6789` para el puerto.
+El browser, cuando recibe un HTML que referencia una imagen, **vuelve a empezar el ciclo completo** para esa imagen: otra conexión, otra petición, otra respuesta. Una página con quince imágenes son dieciséis peticiones. Por eso el servidor tiene que ser capaz de atender varias a la vez, y por eso la siguiente lección lo hace multi-hilos.
 
-```java
-public static void main(String argv[]) throws Exception {
-        // Establece el número de puerto.
-        int puerto = 6789;
+## Puertos y sockets
 
-        . . .
-}
-```
+Una máquina tiene una sola dirección IP pero muchos programas queriendo hablar por red. El **puerto** es el número que desambigua: un entero de 16 bits que dice a cuál de todos los programas de esa máquina va dirigido el tráfico.
 
-Luego, se abre un socket y se espera a que se solicite una conexión TCP. Debido a que el servidor estará recibiendo solicitudes indefinidamente, se colocará la operación de escucha (`listen`) dentro de un ciclo infinito. 
+- Los puertos **0–1023** están reservados para servicios estándar. HTTP usa el **80**, HTTPS el **443**. Reservarlos suele requerir permisos de administrador.
+- Para nuestras prácticas usaremos un puerto libre por encima de `1024` — por ejemplo `6789`. Ese mismo número tendrá que ir en la URL del browser: `http://localhost:6789/index.html`.
 
-```java
-// Estableciendo el socket de escucha.
-?
+El **socket** es la abstracción con la que el sistema operativo te deja usar una conexión de red como si fuera un archivo: tiene un stream de entrada del que lees y un stream de salida al que escribes. En el servidor conviven dos sockets de naturaleza distinta, y confundirlos es el error más común al empezar:
 
-// Procesando las solicitudes HTTP en un ciclo infinito.
-while (true) {
-        // Escuhando las solicitudes de conexión TCP.
-        ?
-        . . .
-}
-```
+| Socket | Rol |
+|---|---|
+| **Socket de escucha** (`ServerSocket`) | Uno solo, vive toda la ejecución. No transporta datos: solo *acepta* conexiones |
+| **Socket de conexión** (`Socket`) | Uno **por cliente**, nace al aceptar y muere al terminar de responder. Por aquí sí viajan los bytes |
 
-Cuando se reciba una solicitud de conexión se debe crear un objeto `SolicitudHttp`, pasando al método constructor una referencia al objeto socket que representa la conexión establecida con el cliente.
+## Anatomía de una petición HTTP
 
-```dart
-// Construye un objeto para procesar el mensaje de solicitud HTTP.
-SolicitudHttp solicitud = new SolicitudHttp( ? );
-
-// Crea un nuevo hilo para procesar la solicitud.
-Thread hilo = new Thread(solicitud);
-
-// Inicia el hilo.
-hilo.start();
-```
-
-Para que el objeto `SolicitudHttp` maneje la solicitud de servicio HTTP que llega en un hilo separado, primero se debe crear una nueva instancia del objeto `Thread`, pasando a su método constructor una referencia al objeto `SolicitudHttp`, y luego se invoca el método `start()` del hilo recien creado.
-
-Después que el nuevo hilo ha sido creado e iniciado, la ejecución en el hilo principal regresa al inicio del ciclo de procesamiento del mensaje. Entonces el hilo principal podrá seguir escuchando, esperando otras solicitudes de conexión TCP, mientras el nuevo hilo continua corriendo. 
-
-Cuando se reciba otra solicitud de conexión TCP, el hilo principal realizará el mismo proceso de creación de un nuevo hilo sin importar si el hilo previo ha terminado o aún continua su ejecución.
-
-Esto completa el código del método `main()`. Para el resto de la primera parte de la práctica, sólo resta desarrollar el código de la clase `SolicitudHttp`.
-
-Se declararán dos variables para la clase `SolicitudHttp`: `CRLF` y `socket`. De acuerdo con la especificación del protocolo HTTP, debemos terminar cada línea de los mensajes de respuesta del servidor con un carriage return (`CR`) y un line feed (`LF`), por esto es conveniente definir `CRLF`. 
-
-La variable `socket` será utilizada para guardar una referencia al socket de conexión, con el cual se invocó el constructor de esta clase. La estructura de la clase `SolicitudHttp` es mostrada a continuación:
-
-```dart
-final class SolicitudHttp implements Runnable {
-        final static String CRLF = "\r\n";
-        Socket socket;
-
-        // Constructor
-        public SolicitudHttp(Socket socket) throws Exception 
-        {
-                this.socket = socket;
-        }
-
-        // Implementa el método run() de la interface Runnable.
-        public void run()
-        {
-                . . .
-        }
-
-        private void proceseSolicitud() throws Exception
-        {
-                . . .
-        }
-}
-```
-
-Para poder pasar una instancia de la clase `SolicitudHttp` al constructor de hilos, `SolicitudHttp` debe implementar la interface `Runnable`, que simplemente significa que se debe definir un método público llamado `run()` que retorna void. La mayor parte del procesamiento se realizará dentro del método `proceseSolicitud()`, que es invocado desde `run()`.
-
-Hasta este punto se ha venido permitiendo lanzar excepciones, sin manejarlas. Sin embargo, no se pueden lanzar excepciones desde `run()`, ya que se debe respetar estrictamente la declaración de `run()` en la interface `Runnable`, que no lanza ninguna excepción. Todo el código para procesamiento será colocado en `proceseSolicitud()`, y desde allí, lanzar las excepciones para `run()`. Dentro de `run()`, de forma explícita se capturarán y se manejarán las excepciones con un bloque `try`/`catch`.
-
-```dart
-// Implementa el método run() de la interface Runnable.
-public void run() {
-        try {
-                proceseSolicitud();
-        } catch (Exception e) {
-                System.out.println(e);
-        }
-}
-```
-
-El siguiente paso es desarrollar el código interno de `proceseSolicitud()`. Primero se obtiene una referencia al stream de salida del socket. Luego se obtiene una referencia al stream de entrada del socket y se envuelven los filtros `InputStreamReader` y `BufferedReader` alrededor del stream de entrada ( no se debe envolver ningún filtro alrededor del stream de salida, ya que se escribirá directamente en el stream de salida).
-
-```java
-private void proceseSolicitud() throws Exception {
-        // Referencia al stream de salida del socket.
-        BufferedWriter out = ?;
-
-        // Referencia y filtros (InputStreamReader y BufferedReader)para el stream de entrada.
-        BufferedReader in = ?;
-        . . .
-}
-```
-
-Ahora se puede recoger el mensaje de solicitud HTTP del cliente, esto se hace leyendo el stream de entrada del socket. El método `readLine()` de la clase `BufferedReader` extrae caracteres del stream de entrada hasta que encuentre un caracter end-of-line, o en este caso, la secuencia `CRLF`.
-
-```dart
-// Recoge la línea de solicitud HTTP del mensaje.
-String linea = ?;
-// Muestra la línea de solicitud en la pantalla.
-System.out.println(linea);
-```
-
-Después de obtener la línea de solicitud del mensaje, se deben recoger las líneas del header. Ya que no se sabe con anticipación cuántas líneas de header enviará el cliente, estas se deben recoger mediante un ciclo.
-
-```dart
-// recoge y muestra las líneas de header.
-String linea = "";
-while ((linea = in.readLine()) != null && !linea.isEmpty()) {
-  System.out.println(linea);
-}
-```
-
-Faltaría colocar las siguientes líneas de código para cerrar los streams y el socket de conexión.
-
-```dart
-// Cierra los streams y el socket.
-out.close();
-in.close();
-socket.close();
-```
-
-## HTTP
-
-En el `rfc1945` está el esquema de response de un servidor HTTP. 
+HTTP es un protocolo de **texto plano**, y esa es la razón de que se pueda implementar a mano en una tarde. Lo que el browser manda por el socket es literalmente esto:
 
 ```http
-HTTP/1.0 200 OK\r\n
-Content-Type: text/html\r\n
-Content-Length: 34\r\n
-Connection: close\r\n
-\r\n
-<html><body>Hola Mundo</body></html>
+GET /index.html HTTP/1.0
+Host: localhost:6789
+User-Agent: Mozilla/5.0
+Accept: text/html
 ```
 
-Donde CRLF es `\r\n`
+- La **primera línea** es la *request line* y trae tres campos separados por espacios: el **método** (`GET`), el **recurso** (`/index.html`) y la **versión** del protocolo.
+- Las siguientes son **headers**, pares `Nombre: valor`, uno por línea.
+- Una **línea en blanco** marca el final de los headers. Es la señal de "ya terminé de hablar" — sin ella el servidor se quedaría esperando indefinidamente.
 
-[RFC1945](https://datatracker.ietf.org/doc/html/rfc1945)
+## Anatomía de una respuesta HTTP
+
+La respuesta tiene la misma forma: una primera línea especial, headers, línea en blanco, y luego el contenido.
+
+```http
+HTTP/1.0 200 OK
+Content-Type: text/html
+Content-Length: 34
+Connection: close
+
+<html><body>Hello World</body></html>
+```
+
+- La **status line** lleva la versión y el **código de estado**: `200 OK` si todo fue bien, `404 Not Found` si el recurso no existe, `500` si el servidor se rompió.
+- `Content-Type` declara el **tipo MIME** del contenido (`text/html`, `image/jpeg`, `image/gif`). Sin él, el browser no sabe si lo que le llega es una página para renderizar o una imagen para dibujar.
+- Después de la línea en blanco va el **cuerpo**: los bytes del recurso.
+
+## CRLF: el detalle que rompe todo
+
+La especificación exige que cada línea del mensaje termine con **carriage return + line feed**, es decir `\r\n` — no con `\n` a secas.
+
+```java
+final static String CRLF = "\r\n";
+```
+
+Es una constante de dos caracteres y es, con diferencia, la causa número uno de servidores que "no responden" en esta práctica. Si terminas las líneas con `\n`, algunos clientes toleran el mensaje y otros lo descartan sin decir nada. Que funcione en tu prueba no significa que esté bien.
+
+## Qué versión de HTTP vamos a implementar
+
+Implementaremos parcialmente **HTTP/1.0**, definido en el [RFC 1945](https://datatracker.ietf.org/doc/html/rfc1945). Es la versión adecuada para aprender porque su modelo es el más simple posible: **una conexión, una petición, una respuesta, se cierra**.
+
+Las versiones modernas añaden cosas que aquí solo estorbarían: HTTP/1.1 reutiliza la conexión para varias peticiones (*keep-alive*) y HTTP/2 multiplexa varias peticiones simultáneas sobre una sola conexión binaria. Son optimizaciones sobre la misma idea, y la idea es la que vas a implementar.
+
+## Contenido estático y contenido dinámico
+
+Lo que vas a construir es un servidor de **contenido estático**: el recurso ya existe como archivo en disco y el servidor se limita a leerlo y enviarlo tal cual. Dos clientes que piden `/index.html` reciben exactamente los mismos bytes.
+
+Cuando la respuesta hay que **calcularla** —consultar una base de datos, personalizar la página según quién pregunta— ya no basta con leer un archivo, y ahí aparece el **servidor de aplicaciones**. Ese es el tema de la tercera lección de esta semana. Primero, el estático.
+
+## Lo que sigue
+
+En la próxima lección construyes este servidor paso a paso, en Java, usando solo `java.net` y `java.io`. Sin frameworks, sin librerías: sockets y strings.

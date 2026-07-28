@@ -1,19 +1,23 @@
 # Servidor web multi-hilos
 
+<!-- tags: StringTokenizer, request line, GET, Content-Type, MIME, 404 Not Found, status line, header, DataOutputStream, flush, archivo no encontrado, la imagen no se ve, application/octet-stream -->
+
 En esta lección afinarás tu servidor web para que pueda responder a la petición de diversos recursos: archivos HTML (`text/html`) e imágenes (`image/jpeg`, `image/gif`). El servidor analizará la solicitud HTTP y enviará una respuesta apropiada al browser.
 
 ![Diagrama de respuesta de recursos](image2.png "icon")
 
+Todo lo que sigue va dentro de `processRequest()`, justo después de haber leído la request line en la lección anterior.
+
 ## Extracción del recurso solicitado
 
-El nombre del archivo solicitado se extrae de la línea de solicitud HTTP usando `StringTokenizer`. Se asume que el método es siempre `GET`.
+El nombre del archivo solicitado se extrae de la request line usando `StringTokenizer`. Se asume que el método es siempre `GET`.
 
 ```java
-// Extrae el nombre del archivo de la línea de solicitud.
-StringTokenizer partesLinea = new StringTokenizer(linea);
-String method = partesLinea.nextToken();
-String nombreArchivo = partesLinea.nextToken();
-nombreArchivo = "." + nombreArchivo;
+// Extrae el nombre del archivo de la request line
+StringTokenizer tokens = new StringTokenizer(line);
+String method = tokens.nextToken();
+String fileName = tokens.nextToken();
+fileName = "." + fileName;
 ```
 
 El browser precede el nombre del archivo con `/`, por eso se antepone un punto para indicar el directorio actual.
@@ -23,21 +27,21 @@ El browser precede el nombre del archivo con `/`, por eso se antepone un punto p
 El servidor debe buscar el archivo solicitado y enviarlo al cliente. Si el archivo no existe, debe responder con un mensaje HTTP 404 y un archivo de error.
 
 ```java
-InputStream inputStream = ClassLoader.getSystemResourceAsStream(nombreArchivo);
-File file = new File(ClassLoader.getSystemResource(nombreArchivo).toURI());
-long filesize = file.length();
+InputStream inputStream = ClassLoader.getSystemResourceAsStream(fileName);
+File file = new File(ClassLoader.getSystemResource(fileName).toURI());
+long fileSize = file.length();
 ```
 
-Para enviar la respuesta, usa un `BufferedOutputStream`:
+Para escribir la respuesta usamos el mismo `DataOutputStream` que abriste en la lección anterior. No lo envolvemos en ningún filtro de texto, precisamente porque por aquí van a viajar también imágenes.
 
 ```java
-BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
+DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 ```
 
 Para enviar texto
 
 ```java
-private static void enviarString(String line, OutputStream os) throws Exception {
+private static void sendString(String line, OutputStream os) throws Exception {
     os.write(line.getBytes(StandardCharsets.UTF_8));
 }
 ```
@@ -45,7 +49,7 @@ private static void enviarString(String line, OutputStream os) throws Exception 
 Para enviar bytes
 
 ```java
-private static void enviarBytes(InputStream fis, OutputStream os) throws Exception {
+private static void sendBytes(InputStream fis, OutputStream os) throws Exception {
     byte[] buffer = new byte[1024];
     int bytes = 0;
     while ((bytes = fis.read(buffer)) != -1) {
@@ -56,47 +60,50 @@ private static void enviarBytes(InputStream fis, OutputStream os) throws Excepti
 
 ## Construcción de la respuesta HTTP
 
-La respuesta HTTP tiene tres partes: línea de estado, headers y cuerpo. Si el archivo existe, se determina el tipo MIME y se envía el archivo. Si no, se responde con 404 y un HTML de error.
+La respuesta HTTP tiene tres partes: status line, headers y cuerpo. Si el archivo existe, se determina el tipo MIME y se envía el archivo. Si no, se responde con 404 y un HTML de error.
 
 ```java
-String lineaDeEstado = null;
-String lineaHeader = null;
-String cuerpoMensaje = null;
+String statusLine = null;
+String headerLine = null;
 
-if ( /* archivo existe */ ) {
-    lineaDeEstado = /* 200 OK */; 
-    lineaHeader = "Content-type: " + contentType(nombreArchivo) + CRLF;
-    // Enviar línea de estado
+if ( /* el archivo existe */ ) {
+    statusLine = /* 200 OK */;
+    headerLine = "Content-Type: " + contentType(fileName) + CRLF;
+    // Enviar status line
     // Enviar header
     // Enviar archivo
 } else {
-    lineaDeEstado = "HTTP/1.0 404 Not Found\r\n";
-    lineaHeader = /* header error */;
-    // Enviar línea de estado
+    statusLine = "HTTP/1.0 404 Not Found" + CRLF;
+    headerLine = /* header del error */;
+    // Enviar status line
     // Enviar header
     // Enviar archivo 404.html
 }
 out.flush();
 ```
 
+Recuerda la línea en blanco entre los headers y el cuerpo: sin ese `CRLF` extra el browser sigue leyendo headers y nunca encuentra el contenido.
+
 ## Detección del tipo de archivo (MIME)
 
 El tipo de archivo se determina con un método auxiliar
 
 ```java
-private static String contentType(String nombreArchivo) {
-    if(nombreArchivo.endsWith(".htm") || nombreArchivo.endsWith(".html")) {
+private static String contentType(String fileName) {
+    if (fileName.endsWith(".htm") || fileName.endsWith(".html")) {
         return "text/html";
     }
-    if(nombreArchivo.endsWith(".jpg")) {
+    if (fileName.endsWith(".jpg")) {
         return "image/jpeg";
     }
-    if(nombreArchivo.endsWith(".gif")) {
+    if (fileName.endsWith(".gif")) {
         return "image/gif";
     }
     return "application/octet-stream";
 }
 ```
+
+Si devuelves el tipo equivocado, el browser hace lo que le dijiste, no lo que querías: una imagen anunciada como `text/html` sale en pantalla como un chorro de caracteres ilegibles.
 
 ## Ejemplo de Request
 
