@@ -189,6 +189,34 @@ Until 2026-07-26 the workflow hardcoded `/Computacion2/`, which made the `origin
 
 Deep-link support for GitHub Pages is handled via `public/404.html` and a `?p=` query parameter redirect in `App.jsx`.
 
+### Vista de administrador (`/admin`)
+
+`src/admin/` cruza la **lista de clase** que entrega la universidad (`students/262.md`:
+código + nombre) con los perfiles de Firestore, para responder quién ya entró al visor,
+con qué correo y con qué usuario de GitHub, y **quién falta**. Un botón exporta todo a
+un `.md`. Se llega desde el menú de cuenta → *Estudiantes*.
+
+La llave es el custom claim `profesor: true` — el mismo que ya exigían las reglas de
+Firestore, no `profile.role`, que lo escribe el propio usuario en el formulario. Sin el
+claim la pantalla lo dice en vez de fallar en silencio (`firestore/README.md`), y la
+opción del menú ni siquiera aparece. **Ya está asignado** (2026-07-30) a la cuenta del
+profesor, y solo a ella: es la única cuenta del proyecto con custom claims.
+
+**La lista de clase se guarda en `rosters/{courseId}` de Firestore, no en el repo ni en
+el bundle**, y es lo único que el profesor escribe en toda la base. La razón es que el
+sitio es público: un `import` del `.md` serviría 27 nombres y códigos dentro del JS de
+GitHub Pages, y un `raw.githubusercontent...` los dejaría abiertos a cualquiera. La sube
+el profesor una vez desde la propia vista (*Cargar lista (.md)*).
+
+Por lo mismo, **`students/` no debe commitearse** a ninguno de los dos remotos: los dos
+son repos públicos.
+
+Los módulos son puros y están probados aparte: `rosterParser.js` (tabla Markdown →
+entradas), `matchRoster.js` (el cruce), `rosterExport.js` (el `.md` de salida).
+`adminData.js` aísla las lecturas de Firestore. El emparejamiento va **por código
+primero** y por nombre como respaldo; una fila que casó por nombre se marca *Revisar
+código*, porque significa que el estudiante escribió mal el suyo.
+
 ### Theme
 
 `ThemeContext.jsx` provides a dark/light theme toggle. Custom color tokens are in `src/theme/colors.js`. The default mode is `dark`.

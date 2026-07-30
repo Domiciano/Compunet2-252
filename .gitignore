@@ -20,3 +20,9 @@ yarn-error.log*
 # Build artifacts
 build/
 dist/
+
+# Lista de clase de la universidad (nombres + códigos de estudiantes).
+# Los dos remotos son repos PÚBLICOS: esto no se commitea. La lista se sube
+# desde la vista /admin y vive en Firestore (rosters/), donde solo la lee el
+# profesor. Ver classnotesapp/firestore/README.md.
+students/
