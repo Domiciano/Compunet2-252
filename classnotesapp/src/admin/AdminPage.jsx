@@ -15,6 +15,7 @@ import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Link from '@mui/material/Link';
+import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -36,8 +37,8 @@ import { useAuth } from '@/auth/AuthContext';
 import { courseId } from '@/auth/firebaseConfig';
 import { loginBranding } from '@/auth/loginBranding';
 import { useThemeMode } from '@/theme/ThemeContext';
-import { fetchRoster, fetchStudents, saveRoster } from './adminData';
-import { parseRosterMarkdown, normalizeName } from './rosterParser';
+import { fetchRoster, fetchStudents, listRosters, saveRoster } from './adminData';
+import { parseRosterMarkdown, parseTermFromFileName, normalizeName } from './rosterParser';
 import { matchRoster } from './matchRoster';
 import { buildRosterMarkdown, downloadMarkdown, rosterFileName } from './rosterExport';
 
@@ -52,26 +53,39 @@ const AdminPage = () => {
   const fileRef = useRef(null);
 
   const [students, setStudents] = useState([]);
-  const [roster, setRoster] = useState(null); // { entries, label, updatedAt }
+  const [rosters, setRosters] = useState([]); // una entrada por semestre, sin `entries`
+  const [term, setTerm] = useState('');       // semestre en pantalla
+  const [roster, setRoster] = useState(null); // { term, entries, label, updatedAt }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [notice, setNotice] = useState(null);
   const [filter, setFilter] = useState('');
 
-  const load = useCallback(async () => {
+  const describeError = (err) =>
+    err?.code === 'permission-denied'
+      ? 'Firestore denegó la lectura. Falta el custom claim `profesor: true` en tu cuenta, o hay que volver a iniciar sesión para que entre en el token.'
+      : `No se pudieron cargar los datos: ${err?.message ?? err}`;
+
+  // `preferred` mantiene el semestre elegido al recargar; si ya no existe (o es la
+  // primera visita), se abre el más reciente, que es el del curso en marcha.
+  const load = useCallback(async (preferred) => {
     setLoading(true);
     setError(null);
     try {
-      const [s, r] = await Promise.all([fetchStudents(), fetchRoster()]);
+      const [s, list] = await Promise.all([fetchStudents(), listRosters()]);
       setStudents(s);
-      setRoster(r);
+      setRosters(list);
+      if (list.length === 0) {
+        setTerm('');
+        setRoster(null);
+      } else {
+        const chosen = (list.find((r) => r.term === preferred) ?? list[0]).term;
+        setTerm(chosen);
+        setRoster(await fetchRoster(chosen));
+      }
     } catch (err) {
       console.error('[Admin] Error cargando los datos:', err);
-      setError(
-        err?.code === 'permission-denied'
-          ? 'Firestore denegó la lectura. Falta el custom claim `profesor: true` en tu cuenta, o hay que volver a iniciar sesión para que entre en el token.'
-          : `No se pudieron cargar los datos: ${err?.message ?? err}`
-      );
+      setError(describeError(err));
     } finally {
       setLoading(false);
     }
@@ -81,6 +95,21 @@ const AdminPage = () => {
     if (isTeacher) load();
     else setLoading(false);
   }, [isTeacher, load]);
+
+  const onSelectTerm = async (next) => {
+    setTerm(next);
+    setError(null);
+    setNotice(null);
+    setLoading(true);
+    try {
+      setRoster(await fetchRoster(next));
+    } catch (err) {
+      console.error('[Admin] Error cargando la lista del semestre:', err);
+      setError(describeError(err));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const roll = useMemo(
     () => matchRoster({ roster: roster?.entries ?? [], students }),
@@ -105,14 +134,41 @@ const AdminPage = () => {
     setError(null);
     setNotice(null);
     try {
-      const entries = parseRosterMarkdown(await file.text());
-      if (entries.length === 0) {
-        setError('No se encontró ninguna fila de tabla en ese archivo. Se espera una tabla Markdown con columnas Código y Nombre.');
+      // El semestre sale del nombre del archivo: `262.md` es la lista del 262. Es
+      // lo que separa un documento de otro, así que sin él no se guarda nada —
+      // adivinarlo pisaría la lista de otro periodo.
+      const fileTerm = parseTermFromFileName(file.name);
+      if (!fileTerm) {
+        setError(
+          `"${file.name}" no dice a qué semestre pertenece. Renómbralo con el periodo, p. ej. "262.md", y vuelve a cargarlo.`
+        );
         return;
       }
-      await saveRoster({ entries, label: file.name, uid: user?.uid });
-      setRoster({ entries, label: file.name, updatedAt: new Date() });
-      setNotice(`Lista cargada: ${entries.length} estudiantes desde ${file.name}.`);
+
+      const entries = parseRosterMarkdown(await file.text());
+      if (entries.length === 0) {
+        setError(
+          'No se encontró ningún estudiante en ese archivo. Se espera una línea por persona con el código y el nombre completo, p. ej. "A00406656 ANDRES FELIPE RIVAS OSPINA".'
+        );
+        return;
+      }
+
+      const previo = rosters.find((r) => r.term === fileTerm);
+      if (
+        previo &&
+        !window.confirm(
+          `Ya hay una lista del semestre ${fileTerm} con ${previo.count} estudiantes. Se reemplaza por las ${entries.length} de "${file.name}". ¿Continuar?`
+        )
+      ) {
+        return;
+      }
+
+      await saveRoster({ term: fileTerm, entries, label: file.name, uid: user?.uid });
+      const meta = { id: `${courseId}-${fileTerm}`, term: fileTerm, count: entries.length, label: file.name, updatedAt: new Date() };
+      setRosters((prev) => [meta, ...prev.filter((r) => r.term !== fileTerm)].sort((a, b) => String(b.term).localeCompare(String(a.term))));
+      setTerm(fileTerm);
+      setRoster({ ...meta, entries });
+      setNotice(`Semestre ${fileTerm}: ${entries.length} estudiantes cargados desde ${file.name}.`);
     } catch (err) {
       console.error('[Admin] Error cargando la lista:', err);
       setError(`No se pudo guardar la lista: ${err?.message ?? err}`);
@@ -122,12 +178,13 @@ const AdminPage = () => {
   const onExport = () => {
     const now = new Date();
     downloadMarkdown(
-      rosterFileName(courseId, now),
+      rosterFileName(courseId, now, term),
       buildRosterMarkdown({
         courseName: loginBranding.courseName,
         roll,
         generatedAt: now,
         rosterLabel: roster?.label,
+        term,
       })
     );
   };
@@ -196,9 +253,31 @@ const AdminPage = () => {
           Volver al curso
         </Button>
         <Box sx={{ flex: 1 }} />
+        {rosters.length > 0 && (
+          <TextField
+            select
+            size="small"
+            label="Semestre"
+            value={term}
+            onChange={(e) => onSelectTerm(e.target.value)}
+            sx={{
+              minWidth: 170,
+              '& .MuiInputBase-input': { color: theme.textPrimary },
+              '& .MuiInputLabel-root': { color: theme.textSecondary },
+              '& .MuiOutlinedInput-notchedOutline': { borderColor: alpha(theme.textSecondary, 0.4) },
+              '& .MuiSvgIcon-root': { color: theme.textSecondary },
+            }}
+          >
+            {rosters.map((r) => (
+              <MenuItem key={r.id} value={r.term}>
+                {r.term || 'Sin semestre'} · {r.count} est.
+              </MenuItem>
+            ))}
+          </TextField>
+        )}
         <Button
           startIcon={<RefreshIcon />}
-          onClick={load}
+          onClick={() => load(term)}
           disabled={loading}
           sx={{ color: theme.textSecondary, textTransform: 'none' }}
         >
@@ -210,7 +289,7 @@ const AdminPage = () => {
           variant="outlined"
           sx={{ textTransform: 'none', color: theme.textPrimary, borderColor: alpha(theme.textSecondary, 0.5) }}
         >
-          {roster ? 'Reemplazar lista' : 'Cargar lista (.md)'}
+          {roster ? 'Cargar otra lista (.md)' : 'Cargar lista (.md)'}
         </Button>
         <Button
           startIcon={<DownloadIcon />}
@@ -225,7 +304,7 @@ const AdminPage = () => {
       </Box>
 
       <Typography variant="h4" sx={{ fontWeight: 800, mb: 0.5, color: theme.textPrimary }}>
-        Estudiantes
+        Estudiantes{term ? ` · semestre ${term}` : ''}
       </Typography>
       <Typography sx={{ color: theme.textSecondary, mb: 2, fontSize: '0.9rem' }}>
         {loginBranding.courseName}
@@ -253,9 +332,11 @@ const AdminPage = () => {
 
           {!roster && (
             <Alert severity="info" sx={{ mb: 2 }}>
-              Todavía no hay lista de clase cargada. Súbela con <strong>Cargar lista (.md)</strong> — es el archivo de la
-              universidad, p. ej. <code>students/262.md</code>. Se guarda en Firestore y solo la lee tu cuenta, así que
-              los nombres y códigos no viajan al sitio público.
+              Todavía no hay lista de clase cargada. Súbela con <strong>Cargar lista (.md)</strong> — un archivo con una
+              persona por línea, <code>código nombre completo</code> y sin encabezado, p. ej.{' '}
+              <code>students/262.md</code>. <strong>El nombre del archivo es el semestre</strong>: se guarda una lista
+              por periodo, así que <code>262.md</code> no pisa la del semestre anterior. Se guarda en Firestore y solo la
+              lee tu cuenta, así que los nombres y códigos no viajan al sitio público.
             </Alert>
           )}
 

@@ -1,5 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { parseRosterMarkdown, normalizeCodigo, normalizeName, nameSetKey } from './rosterParser';
+import {
+  parseRosterMarkdown,
+  parseTermFromFileName,
+  normalizeCodigo,
+  normalizeName,
+  nameSetKey,
+} from './rosterParser';
+
+const PLANO = `A00406656 ANDRES FELIPE RIVAS OSPINA
+A00403756 DAYANNA FERNANDEZ NUÑEZ
+A00404256 XILENA VIDAL RAMIREZ`;
 
 const SAMPLE = `| Código | Nombre |
 |---------|---------|
@@ -7,7 +17,44 @@ const SAMPLE = `| Código | Nombre |
 | A00403756 | DAYANNA FERNANDEZ NUÑEZ |
 | A00404256 | XILENA VIDAL RAMIREZ |`;
 
-describe('parseRosterMarkdown', () => {
+describe('parseRosterMarkdown — formato plano', () => {
+  it('lee una persona por línea: código, espacio, nombre completo', () => {
+    expect(parseRosterMarkdown(PLANO)).toEqual([
+      { codigo: 'A00406656', nombre: 'ANDRES FELIPE RIVAS OSPINA' },
+      { codigo: 'A00403756', nombre: 'DAYANNA FERNANDEZ NUÑEZ' },
+      { codigo: 'A00404256', nombre: 'XILENA VIDAL RAMIREZ' },
+    ]);
+  });
+
+  it('no toma por estudiante un título ni una nota suelta', () => {
+    const md = `# Lista 2026-2\n\nSección 1, salón 4.\n\n${PLANO}\n\nFin.`;
+    expect(parseRosterMarkdown(md)).toHaveLength(3);
+  });
+
+  it('no cuenta dos veces al mismo código', () => {
+    expect(parseRosterMarkdown(`${PLANO}\nA00406656 ANDRES FELIPE RIVAS OSPINA`)).toHaveLength(3);
+  });
+
+  it('acepta el archivo plano y una tabla pegada en el mismo archivo', () => {
+    expect(parseRosterMarkdown(`${PLANO}\n\n| A00408095 | HAROLD ARIAS |`)).toHaveLength(4);
+  });
+});
+
+describe('parseTermFromFileName', () => {
+  it('saca el semestre del nombre del archivo', () => {
+    expect(parseTermFromFileName('262.md')).toBe('262');
+    expect(parseTermFromFileName('students/262.md')).toBe('262');
+    expect(parseTermFromFileName('lista-262.md')).toBe('262');
+    expect(parseTermFromFileName('2026-2.md')).toBe('2026-2');
+  });
+
+  it('devuelve vacío cuando el nombre no dice el semestre', () => {
+    expect(parseTermFromFileName('lista.md')).toBe('');
+    expect(parseTermFromFileName('')).toBe('');
+  });
+});
+
+describe('parseRosterMarkdown — tabla (formato anterior)', () => {
   it('lee la tabla de la universidad sin el encabezado ni el separador', () => {
     expect(parseRosterMarkdown(SAMPLE)).toEqual([
       { codigo: 'A00406656', nombre: 'ANDRES FELIPE RIVAS OSPINA' },

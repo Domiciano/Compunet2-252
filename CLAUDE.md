@@ -192,7 +192,9 @@ Deep-link support for GitHub Pages is handled via `public/404.html` and a `?p=` 
 ### Vista de administrador (`/admin`)
 
 `src/admin/` cruza la **lista de clase** que entrega la universidad (`students/262.md`:
-código + nombre) con los perfiles de Firestore, para responder quién ya entró al visor,
+una línea por estudiante, `código nombre completo`, sin encabezado — el parser también
+acepta la tabla GFM de dos columnas que se usaba antes) con los perfiles de Firestore,
+para responder quién ya entró al visor,
 con qué correo y con qué usuario de GitHub, y **quién falta**. Un botón exporta todo a
 un `.md`. Se llega desde el menú de cuenta → *Estudiantes*.
 
@@ -202,11 +204,18 @@ claim la pantalla lo dice en vez de fallar en silencio (`firestore/README.md`), 
 opción del menú ni siquiera aparece. **Ya está asignado** (2026-07-30) a la cuenta del
 profesor, y solo a ella: es la única cuenta del proyecto con custom claims.
 
-**La lista de clase se guarda en `rosters/{courseId}` de Firestore, no en el repo ni en
-el bundle**, y es lo único que el profesor escribe en toda la base. La razón es que el
-sitio es público: un `import` del `.md` serviría 27 nombres y códigos dentro del JS de
-GitHub Pages, y un `raw.githubusercontent...` los dejaría abiertos a cualquiera. La sube
-el profesor una vez desde la propia vista (*Cargar lista (.md)*).
+**La lista de clase se guarda en `rosters/{courseId}-{semestre}` de Firestore, no en el
+repo ni en el bundle**, y es lo único que el profesor escribe en toda la base. La razón
+es que el sitio es público: un `import` del `.md` serviría 27 nombres y códigos dentro
+del JS de GitHub Pages, y un `raw.githubusercontent...` los dejaría abiertos a
+cualquiera. La sube el profesor una vez desde la propia vista (*Cargar lista (.md)*).
+
+**Una lista por semestre.** El curso se repite cada periodo con otra gente, así que el
+documento lleva el semestre en el id (`rosters/compunet2-262`) y las listas viejas se
+conservan. El semestre **sale del nombre del archivo** que se carga (`262.md` → `262`,
+`parseTermFromFileName`): sin él la carga se rechaza, porque adivinarlo pisaría la lista
+de otro periodo. La vista abre el semestre más reciente y trae un selector para los
+anteriores; el título dice cuál se está mirando.
 
 Por lo mismo, **`students/` no debe commitearse** a ninguno de los dos remotos: los dos
 son repos públicos.

@@ -39,9 +39,16 @@ y la pantalla lo dice explícitamente en vez de fallar en silencio.
 
 ## La lista de clase vive en Firestore, no en el repo
 
-`rosters/{courseId}` guarda la lista que entrega la universidad (`students/262.md`:
-código + nombre de cada estudiante). La sube el profesor desde `/admin` con **Cargar
-lista (.md)**, y es lo único que el profesor escribe en toda la base.
+`rosters/{courseId}-{semestre}` guarda la lista que entrega la universidad
+(`students/262.md`: una línea por estudiante, `código nombre completo`). La sube el
+profesor desde `/admin` con **Cargar lista (.md)**, y es lo único que el profesor
+escribe en toda la base.
+
+**Un documento por semestre** — `rosters/compunet2-262` es la lista del 262. El
+semestre sale del nombre del archivo que se carga, así que empezar un periodo nuevo no
+pisa el anterior, y la vista deja cambiar de semestre con un selector. (`rosters/compunet2`
+a secas, sin sufijo, es el documento heredado de antes de esa separación; se sigue
+leyendo como una lista "sin semestre".)
 
 Está ahí, y no en el bundle ni en el repo de contenido, porque **el sitio es público**:
 un `import` del `.md` lo serviría dentro del JS de GitHub Pages, y un `raw.github...`
@@ -57,7 +64,7 @@ En la consola de Firebase → Firestore → Rules → *Playground*:
 | `create` en `/eventBatches/x` con `uid` distinto al autenticado | **Denegado** |
 | `update` en `/examAttempts/x` siendo el dueño | **Denegado** (solo creación) |
 | `create` en `/eventBatches/x` con el propio `uid` y `count: 20` | Permitido |
-| `get` en `/rosters/compunet2` autenticado como estudiante | **Denegado** |
+| `get` en `/rosters/compunet2-262` autenticado como estudiante | **Denegado** |
 
 Si la primera sale permitida, el proyecto sigue en modo de prueba y el despliegue no
 se aplicó.

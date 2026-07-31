@@ -7,9 +7,11 @@ vi.mock('@/auth/AuthContext', () => ({ useAuth: () => authState }));
 
 const fetchStudents = vi.fn();
 const fetchRoster = vi.fn();
+const listRosters = vi.fn();
 vi.mock('./adminData', () => ({
   fetchStudents: (...a) => fetchStudents(...a),
   fetchRoster: (...a) => fetchRoster(...a),
+  listRosters: (...a) => listRosters(...a),
   saveRoster: vi.fn(),
 }));
 
@@ -31,7 +33,13 @@ describe('AdminPage', () => {
       { uid: 'u1', codigo: 'A00406656', fullName: 'Andrés Rivas', email: 'arivas@icesi.edu.co', githubUsername: 'arivas', role: 'estudiante' },
       { uid: 'p1', fullName: 'Domiciano Rincón', email: 'domi@icesi.edu.co', role: 'profesor' },
     ]);
+    listRosters.mockReset().mockResolvedValue([
+      { id: 'compunet2-262', term: '262', count: 2, label: '262.md', updatedAt: new Date(2026, 6, 30) },
+      { id: 'compunet2-261', term: '261', count: 1, label: '261.md', updatedAt: new Date(2026, 0, 20) },
+    ]);
     fetchRoster.mockReset().mockResolvedValue({
+      id: 'compunet2-262',
+      term: '262',
       entries: [
         { codigo: 'A00406656', nombre: 'ANDRES FELIPE RIVAS OSPINA' },
         { codigo: 'A00403756', nombre: 'DAYANNA FERNANDEZ NUÑEZ' },
@@ -69,9 +77,18 @@ describe('AdminPage', () => {
   });
 
   it('invita a cargar la lista cuando no hay ninguna', async () => {
+    listRosters.mockResolvedValue([]);
     fetchRoster.mockResolvedValue(null);
     mount();
     expect(await screen.findByText(/Todavía no hay lista de clase cargada/i)).toBeTruthy();
+  });
+
+  it('abre el semestre más reciente y deja elegir los anteriores', async () => {
+    mount();
+    await screen.findByText('ANDRES FELIPE RIVAS OSPINA');
+    expect(fetchRoster).toHaveBeenCalledWith('262');
+    expect(screen.getByText(/Estudiantes · semestre 262/)).toBeTruthy();
+    expect(screen.getByText('262 · 2 est.')).toBeTruthy();
   });
 
   it('traduce el rechazo de Firestore a la causa real: falta el claim', async () => {

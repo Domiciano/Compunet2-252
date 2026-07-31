@@ -30,13 +30,14 @@ const fmtDate = (d) => {
  * @param {object} input.roll        salida de matchRoster()
  * @param {Date}   [input.generatedAt]
  * @param {string} [input.rosterLabel] nombre del archivo de lista cargado
+ * @param {string} [input.term]        semestre de la lista, p. ej. `262`
  * @returns {string} markdown
  */
-export function buildRosterMarkdown({ courseName, roll, generatedAt = new Date(), rosterLabel } = {}) {
+export function buildRosterMarkdown({ courseName, roll, generatedAt = new Date(), rosterLabel, term } = {}) {
   const { rows = [], extras = [], stats = {} } = roll ?? {};
   const out = [];
 
-  out.push(`# Lista de estudiantes — ${courseName || 'Curso'}`, '');
+  out.push(`# Lista de estudiantes — ${courseName || 'Curso'}${term ? ` · semestre ${term}` : ''}`, '');
   out.push(
     `Generado el ${fmtDate(generatedAt)}` +
       (rosterLabel ? ` · lista: \`${rosterLabel}\`` : '') +
@@ -87,11 +88,11 @@ export function buildRosterMarkdown({ courseName, roll, generatedAt = new Date()
   return out.join('\n');
 }
 
-/** Nombre de archivo estable y ordenable: `estudiantes-compunet2-2026-07-30.md`. */
-export const rosterFileName = (courseId, date = new Date()) => {
+/** Nombre de archivo estable y ordenable: `estudiantes-compunet2-262-2026-07-30.md`. */
+export const rosterFileName = (courseId, date = new Date(), term = '') => {
   const p = (n) => String(n).padStart(2, '0');
   const stamp = `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}`;
-  return `estudiantes-${courseId || 'curso'}-${stamp}.md`;
+  return `estudiantes-${courseId || 'curso'}-${term ? `${term}-` : ''}${stamp}.md`;
 };
 
 /** Dispara la descarga en el navegador. Sin efecto fuera de él (tests). */

@@ -1,16 +1,25 @@
 // src/admin/rosterParser.js
 //
-// Convierte la lista de clase (el archivo Markdown que entrega la universidad,
-// p. ej. `students/262.md`) en entradas `{ codigo, nombre }`.
+// Convierte la lista de clase (el archivo que entrega la universidad, p. ej.
+// `students/262.md`) en entradas `{ codigo, nombre }`.
 //
-// El archivo es una tabla GFM de dos columnas:
+// Acepta dos formatos, y los dos pueden convivir en el mismo archivo:
 //
-//   | Código | Nombre |
-//   |---------|---------|
-//   | A00406656 | ANDRES FELIPE RIVAS OSPINA |
+//   1. Plano — el formato que usamos hoy: una persona por línea, sin encabezado,
+//      `<código> <nombre completo>`:
 //
-// El parser solo mira las líneas que empiezan por `|`, así que un archivo con
-// títulos, notas o varias tablas pegadas no lo rompe.
+//        A00406656 ANDRES FELIPE RIVAS OSPINA
+//
+//   2. Tabla GFM de dos columnas — como venía antes, y como sale del .md que
+//      exporta esta misma vista, para poder recargarlo:
+//
+//        | Código | Nombre |
+//        |---------|---------|
+//        | A00406656 | ANDRES FELIPE RIVAS OSPINA |
+//
+// Fuera de la tabla, una línea solo cuenta si empieza por algo con pinta de
+// código (letra opcional + al menos tres dígitos). Así un título, una nota o un
+// párrafo suelto en el archivo no se cuela como si fuera un estudiante.
 
 // Claves de comparación. La lista de la universidad viene en mayúsculas y sin
 // tildes; el perfil lo escribe el estudiante (o lo trae Google) con tildes,
@@ -65,8 +74,22 @@ const splitRow = (line) => {
   return inner.split('|').map((c) => c.trim());
 };
 
+// Línea del formato plano: el primer token es el código y el resto es el nombre.
+// El código tiene que traer al menos tres dígitos —los de Icesi son `A00406656`—
+// para que "Nota suelta." o "Lista 2026-2" no pasen por estudiante.
+const PLAIN_ROW = /^\s*([A-Za-zÁÉÍÓÚÑ]{0,3}\d[\d-]{2,}[A-Za-z0-9-]*)[\s,;\t]+(\S.*)$/;
+
+const parsePlainRow = (line) => {
+  const m = PLAIN_ROW.exec(line);
+  if (!m) return null;
+  const nombre = m[2].trim();
+  // Un "nombre" sin ninguna letra es otra cosa (una fecha, un conteo), no una persona.
+  if (!/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(nombre)) return null;
+  return { codigo: m[1].trim(), nombre };
+};
+
 /**
- * @param {string} markdown contenido crudo del .md de la lista
+ * @param {string} markdown contenido crudo del archivo de la lista
  * @returns {{ codigo: string, nombre: string }[]} en el orden del archivo
  */
 export function parseRosterMarkdown(markdown) {
@@ -77,9 +100,19 @@ export function parseRosterMarkdown(markdown) {
   // Cualquier línea que no sea de tabla cierra la tabla en curso.
   let accepting = true;
 
+  const push = (codigo, nombre) => {
+    // La misma persona repetida en el archivo no debe contarse dos veces.
+    const key = normalizeCodigo(codigo) || nameSetKey(nombre);
+    if (seen.has(key)) return;
+    seen.add(key);
+    entries.push({ codigo: codigo.trim(), nombre: nombre.trim() });
+  };
+
   for (const line of lines) {
     if (!line.trim().startsWith('|')) {
       accepting = true;
+      const plain = parsePlainRow(line);
+      if (plain) push(plain.codigo, plain.nombre);
       continue;
     }
     const cells = splitRow(line);
@@ -96,15 +129,28 @@ export function parseRosterMarkdown(markdown) {
     const nombre = cells.length >= 2 ? b : a;
     if (!codigo && !nombre) continue;
 
-    // La misma persona repetida en el archivo no debe contarse dos veces.
-    const key = normalizeCodigo(codigo) || nameSetKey(nombre);
-    if (seen.has(key)) continue;
-    seen.add(key);
-
-    entries.push({ codigo: codigo.trim(), nombre: nombre.trim() });
+    push(codigo, nombre);
   }
 
   return entries;
+}
+
+/**
+ * Saca el semestre del nombre del archivo: `262.md` → `262`, y también
+ * `students/262.md`, `lista-262.md` o `2026-2.md` → `2026-2`.
+ *
+ * El semestre es lo que separa una lista de otra: cada `rosters/{courseId}-{term}`
+ * es la lista de clase de ese periodo, y las de semestres pasados se conservan.
+ *
+ * @returns {string} el semestre, o '' si el nombre no lo dice
+ */
+export function parseTermFromFileName(fileName) {
+  const base = String(fileName ?? '')
+    .split(/[\\/]/)
+    .pop()
+    .replace(/\.[a-z0-9]+$/i, '');
+  const m = /(\d{4}-\d|\d{3,6})/.exec(base);
+  return m ? m[1] : '';
 }
 
 export default parseRosterMarkdown;
