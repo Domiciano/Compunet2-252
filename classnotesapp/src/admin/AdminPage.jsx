@@ -42,6 +42,14 @@ import { parseRosterMarkdown, parseTermFromFileName, normalizeName } from './ros
 import { matchRoster } from './matchRoster';
 import { buildRosterMarkdown, downloadMarkdown, rosterFileName } from './rosterExport';
 
+// Por qué esa fila casó sin que el código coincidiera. El profesor necesita
+// saberlo para decidir si le cree al cruce o va a mirar el perfil.
+const RAZON_DEL_CRUCE = {
+  nombre: 'Casó por el nombre completo.',
+  'codigo-typo': 'Casó porque el código del perfil está a un carácter del de la lista: lo tecleó mal.',
+  'nombre-parcial': 'Casó porque el nombre del perfil es parte del que trae la lista, y no había otro candidato posible.',
+};
+
 const githubOf = (s) =>
   s?.githubUsername ||
   (s?.github ? String(s.github).replace(/^https?:\/\/(www\.)?github\.com\//i, '') : '');
@@ -395,7 +403,11 @@ const AdminPage = () => {
                         {!s ? (
                           <Chip size="small" label="Sin ingresar" sx={{ color: theme.warning, background: alpha(theme.warning, 0.15), fontWeight: 600 }} />
                         ) : r.codigoMismatch ? (
-                          <Tooltip title={`El perfil declara el código "${s.codigo || '(vacío)'}". Casó por nombre.`}>
+                          <Tooltip
+                            title={`El perfil declara el código "${s.codigo || '(vacío)'}". ${
+                              RAZON_DEL_CRUCE[r.matchedBy] ?? 'Casó por nombre.'
+                            }`}
+                          >
                             <Chip
                               size="small"
                               icon={<WarningAmberIcon style={{ color: theme.warning }} />}

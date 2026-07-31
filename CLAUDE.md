@@ -220,11 +220,22 @@ anteriores; el título dice cuál se está mirando.
 Por lo mismo, **`students/` no debe commitearse** a ninguno de los dos remotos: los dos
 son repos públicos.
 
-Los módulos son puros y están probados aparte: `rosterParser.js` (tabla Markdown →
+Los módulos son puros y están probados aparte: `rosterParser.js` (archivo →
 entradas), `matchRoster.js` (el cruce), `rosterExport.js` (el `.md` de salida).
-`adminData.js` aísla las lecturas de Firestore. El emparejamiento va **por código
-primero** y por nombre como respaldo; una fila que casó por nombre se marca *Revisar
-código*, porque significa que el estudiante escribió mal el suyo.
+`adminData.js` aísla las lecturas de Firestore.
+
+**El cruce son cuatro pasadas**, de la señal más fuerte a la más débil, y cada una
+solo mira lo que dejó libre la anterior: `codigo` (idéntico), `nombre` (completo),
+`codigo-typo` (el código del perfil está a un carácter del de la lista) y
+`nombre-parcial` (el nombre del perfil es parte del de la lista). Las dos últimas
+existen porque el formulario lo llena el estudiante y se equivoca de dos formas muy
+repetidas: teclea mal un dígito, o escribe su nombre corto donde la universidad lo
+tiene completo — y entonces aparece a la vez como ausente arriba y como desconocido en
+*Fuera de la lista*. Al ser heurísticas, **solo se aplican cuando la respuesta es única
+en los dos sentidos** (esa fila no admite otro perfil libre y ese perfil no admite otra
+fila); con un "Juan Pablo" suelto —hay dos en la lista— no se adivina. Toda fila que no
+casó por código exacto se marca *Revisar código*, y el tooltip dice por cuál de las
+cuatro pasadas entró.
 
 ### Theme
 
