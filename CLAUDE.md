@@ -220,9 +220,32 @@ anteriores; el título dice cuál se está mirando.
 Por lo mismo, **`students/` no debe commitearse** a ninguno de los dos remotos: los dos
 son repos públicos.
 
+**Panel de actividad por estudiante.** Pulsar un renglón —o el botón de la última
+columna, que es el camino por teclado— abre un `Drawer` con lo que ha hecho esa persona,
+día a día: los **últimos 7 días** arriba y **todo el semestre** debajo, con una barra de
+minutos activos por día en cada bloque. Cuatro grupos: constancia (minutos, días activos,
+racha, `regularityEntropy` de H1), al día con el temario (`scheduleLagDays` y su
+cobertura), profundidad de lectura (lecciones, scroll, marcadas) y práctica + asistente.
+
+Tres cosas que no se pueden romper al tocarlo:
+
+- **El tiempo sale solo de `lesson_dwell`.** `session_end` trae el acumulado de la sesión
+  entera, que ya incluye el de las lecciones: sumar los dos duplica, y además su `ts`
+  puede caer en otro día.
+- **`null` no se pinta como `0`.** Sin un solo evento el panel dice "no dio consentimiento
+  o no ha entrado" en vez de dibujar ceros, que al lado del nombre de una persona serían
+  una acusación falsa.
+- **Retraso medio y cobertura van juntos.** El primero solo promedia lo que abrió: quien
+  abrió únicamente la lección 1 el día que tocaba tiene retraso 0 y ha visto el 4 %.
+
+Solo abre para el semestre en curso (`courseTerm` de `content/config.js`), porque la
+ventana "desde el inicio" se mide contra `courseStartDate`, que es el de ese semestre.
+
 Los módulos son puros y están probados aparte: `rosterParser.js` (archivo →
-entradas), `matchRoster.js` (el cruce), `rosterExport.js` (el `.md` de salida).
-`adminData.js` aísla las lecturas de Firestore.
+entradas), `matchRoster.js` (el cruce), `rosterExport.js` (el `.md` de salida),
+`activityCalendar.js` (días, husos y fechas planeadas) y `studentActivity.js` (todos los
+indicadores, en una pasada). `adminData.js` aísla las lecturas de Firestore y
+`courseSchedule.js` el único `fetch`.
 
 **El cruce son cuatro pasadas**, de la señal más fuerte a la más débil, y cada una
 solo mira lo que dejó libre la anterior: `codigo` (idéntico), `nombre` (completo),

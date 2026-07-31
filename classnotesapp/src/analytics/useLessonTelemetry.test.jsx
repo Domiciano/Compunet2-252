@@ -4,8 +4,17 @@ import { renderHook, act } from '@testing-library/react';
 const track = vi.fn();
 let clock = { activeMs: 0, idleMs: 0 };
 
+// Los flushers que el hook registra en el proveedor. Se guardan aquí para poder
+// dispararlos como haría `pagehide`.
+let flushers = new Set();
+const registerFlusher = (fn) => {
+  flushers.add(fn);
+  return () => flushers.delete(fn);
+};
+const simularCierreDePestana = () => act(() => { for (const f of flushers) f(); });
+
 vi.mock('./AnalyticsProvider', () => ({
-  useAnalytics: () => ({ track, readClock: () => ({ ...clock }) }),
+  useAnalytics: () => ({ track, readClock: () => ({ ...clock }), registerFlusher }),
 }));
 
 let navigationType = 'PUSH';
@@ -37,7 +46,60 @@ describe('useLessonTelemetry', () => {
     track.mockClear();
     clock = { activeMs: 0, idleMs: 0 };
     navigationType = 'PUSH';
+    flushers = new Set();
     setNavigationOrigin(null);
+  });
+
+  // Hasta el 2026-07-31 el resumen solo se emitía en la limpieza del efecto, y
+  // React no ejecuta limpiezas al descargar la página: quien leía una lección y
+  // cerraba la pestaña aportaba 0 minutos. Ver `analitics/schedule.md` § 4.4.
+  describe('cierre de la pestaña', () => {
+    it('emite el resumen con el tiempo acumulado, sin esperar a la limpieza', () => {
+      renderHook(() => useLessonTelemetry({ contentId: '0007', ready: true }));
+      clock = { activeMs: 90_000, idleMs: 10_000 };
+
+      simularCierreDePestana();
+
+      expect(payloads(EVENTS.LESSON_DWELL)).toEqual([
+        { activeMs: 90_000, idleMs: 10_000, maxScrollPct: 0, reachedEnd: false },
+      ]);
+    });
+
+    it('no lo emite dos veces cuando después llega la limpieza', () => {
+      const { unmount } = renderHook(() => useLessonTelemetry({ contentId: '0007', ready: true }));
+      clock = { activeMs: 60_000, idleMs: 0 };
+
+      simularCierreDePestana();
+      unmount();
+
+      expect(of(EVENTS.LESSON_DWELL)).toHaveLength(1);
+    });
+
+    it('arrastra el scroll y los apartados que ya se habían visto', () => {
+      const el = makeScrollable();
+      renderHook(() =>
+        useLessonTelemetry({ contentId: '0007', activeSection: 'intro', scrollRef: { current: el }, ready: true })
+      );
+      scrollTo(el, 600);
+      clock = { activeMs: 45_000, idleMs: 0 };
+
+      simularCierreDePestana();
+
+      expect(payloads(EVENTS.LESSON_DWELL)[0].maxScrollPct).toBe(60);
+      expect(of(EVENTS.SUBSECTION_DWELL)).toHaveLength(1);
+    });
+
+    it('sin ninguna lección abierta no emite nada', () => {
+      renderHook(() => useLessonTelemetry({ contentId: null, ready: true }));
+      simularCierreDePestana();
+      expect(of(EVENTS.LESSON_DWELL)).toHaveLength(0);
+    });
+
+    it('el hook se da de baja al desmontarse', () => {
+      const { unmount } = renderHook(() => useLessonTelemetry({ contentId: '0007', ready: true }));
+      unmount();
+      expect(flushers.size).toBe(0);
+    });
   });
 
   // Regresión del fallo visto en datos reales el 2026-07-26: `LessonPage` hace

@@ -29,7 +29,7 @@ const closeSubsection = (visit, activeMsNow) => {
 };
 
 export function useLessonTelemetry({ contentId, activeSection, scrollRef, ready }) {
-  const { track, readClock } = useAnalytics();
+  const { track, readClock, registerFlusher } = useAnalytics();
   const navigationType = useNavigationType();
 
   // Todo lo que no sea `contentId` se lee por referencia, para que el ciclo de vida
@@ -45,9 +45,50 @@ export function useLessonTelemetry({ contentId, activeSection, scrollRef, ready 
 
   const visitRef = useRef(null);
 
+  // Cierra la visita y emite su resumen. Es idempotente: la marca `closed` existe
+  // porque hay dos caminos que pueden llegar aquí —la limpieza del efecto y el
+  // cierre de la pestaña— y el segundo no cancela al primero.
+  //
+  // Sin el camino de `pagehide`, cerrar la pestaña perdía el dwell entero: React
+  // no ejecuta limpiezas de efecto al descargar la página, así que quien leía una
+  // sola lección y cerraba aportaba 0 minutos. El volcado a `localStorage` no lo
+  // salvaba —solo guarda lo ya emitido— y el sesgo caía justo sobre las sesiones
+  // cortas. Arreglado el 2026-07-31; ver `analitics/schedule.md` § 4.4, porque
+  // parte la serie de minutos por día en dos tramos no comparables.
+  const closeVisit = useRef((visit) => {
+    if (!visit || visit.closed) return;
+    visit.closed = true;
+
+    const closed = api.current.readClock();
+    closeSubsection(visit, closed.activeMs);
+
+    for (const [subsectionId, activeMs] of visit.subsections) {
+      api.current.track(EVENTS.SUBSECTION_DWELL, { activeMs }, { contentId: visit.contentId, subsectionId });
+    }
+
+    api.current.track(
+      EVENTS.LESSON_DWELL,
+      {
+        activeMs: closed.activeMs - visit.openedActiveMs,
+        idleMs: closed.idleMs - visit.openedIdleMs,
+        maxScrollPct: visit.maxScrollPct,
+        reachedEnd: visit.reachedEnd,
+      },
+      { contentId: visit.contentId }
+    );
+  }).current;
+
+  // El cierre por `pagehide` tiene que correr ANTES de que el proveedor vuelque la
+  // cola, o el evento recién emitido se quedaría en memoria justo antes de morir.
+  // Por eso se registra en el proveedor en vez de poner aquí otro listener: dos
+  // listeners se ejecutarían en orden de registro, y el del proveedor va primero.
+  useEffect(() => {
+    if (!registerFlusher) return undefined;
+    return registerFlusher(() => closeVisit(visitRef.current));
+  }, [registerFlusher, closeVisit]);
+
   // Apertura y cierre de la visita. La limpieza del efecto es la que emite el
-  // resumen, así que cubre por igual cambiar de lección, cerrar la pestaña
-  // (el volcado a localStorage lo rescata) y desmontar la página.
+  // resumen al cambiar de lección o desmontar la página.
   //
   // La visita depende SOLO de `contentId`, nunca de si el contenido ya cargó.
   // `LessonPage` llama a `setLoading(true)` en un efecto que corre después de que
@@ -86,27 +127,10 @@ export function useLessonTelemetry({ contentId, activeSection, scrollRef, ready 
     api.current.track(EVENTS.LESSON_OPEN, { origin }, { contentId });
 
     return () => {
-      const closed = api.current.readClock();
-      closeSubsection(visit, closed.activeMs);
-
-      for (const [subsectionId, activeMs] of visit.subsections) {
-        api.current.track(EVENTS.SUBSECTION_DWELL, { activeMs }, { contentId, subsectionId });
-      }
-
-      api.current.track(
-        EVENTS.LESSON_DWELL,
-        {
-          activeMs: closed.activeMs - visit.openedActiveMs,
-          idleMs: closed.idleMs - visit.openedIdleMs,
-          maxScrollPct: visit.maxScrollPct,
-          reachedEnd: visit.reachedEnd,
-        },
-        { contentId }
-      );
-
+      closeVisit(visit);
       visitRef.current = null;
     };
-  }, [contentId]);
+  }, [contentId, closeVisit]);
 
   // Cambio de apartado visible. `useContentSpy` ya calcula cuál lo está; aquí solo
   // se cierra el tramo anterior y se abre el siguiente.

@@ -155,6 +155,58 @@ describe('AnalyticsProvider', () => {
     expect(spilled[0].env.uid).toBe('u1');
   });
 
+  // El orden es el arreglo entero: si el volcado corriera primero, el evento que
+  // acaba de emitir el flusher se quedaría en la cola en memoria justo antes de
+  // que la página muera. Es lo que pasaba con el `lesson_dwell` de la última
+  // lección de cada sesión hasta el 2026-07-31.
+  describe('mediciones abiertas al cerrar la pestaña', () => {
+    it('emite lo pendiente ANTES de volcar la cola, así que se salva', async () => {
+      await mount();
+      const baja = api.registerFlusher(() => {
+        api.track(EVENTS.LESSON_DWELL, { activeMs: 77_000 }, { contentId: '0021' });
+      });
+
+      await act(async () => {
+        window.dispatchEvent(new Event('pagehide'));
+      });
+
+      const spilled = JSON.parse(localStorage.getItem('analytics.spill') ?? '[]');
+      expect(spilled.map((s) => s.ev.type)).toContain(EVENTS.LESSON_DWELL);
+      baja();
+    });
+
+    it('la baja quita el flusher: ya no emite nada', async () => {
+      await mount();
+      const baja = api.registerFlusher(() => {
+        api.track(EVENTS.LESSON_DWELL, { activeMs: 1 }, { contentId: 'x' });
+      });
+      baja();
+
+      await act(async () => {
+        window.dispatchEvent(new Event('pagehide'));
+      });
+
+      const spilled = JSON.parse(localStorage.getItem('analytics.spill') ?? '[]');
+      expect(spilled.map((s) => s.ev.type)).not.toContain(EVENTS.LESSON_DWELL);
+    });
+
+    it('un flusher que revienta no impide que se vuelque el resto', async () => {
+      const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+      await mount();
+      api.registerFlusher(() => { throw new Error('roto'); });
+      api.track(EVENTS.LESSON_OPEN, { origin: 'drawer' }, { contentId: '0030' });
+
+      await act(async () => {
+        window.dispatchEvent(new Event('pagehide'));
+      });
+
+      const spilled = JSON.parse(localStorage.getItem('analytics.spill') ?? '[]');
+      expect(spilled.map((s) => s.ev.type)).toContain(EVENTS.LESSON_OPEN);
+      expect(err).toHaveBeenCalled();
+      err.mockRestore();
+    });
+  });
+
   it('recupera y envía lo volcado en la carga siguiente', async () => {
     await mount();
     await act(async () => {

@@ -54,6 +54,28 @@ Está ahí, y no en el bundle ni en el repo de contenido, porque **el sitio es p
 un `import` del `.md` lo serviría dentro del JS de GitHub Pages, y un `raw.github...`
 lo dejaría abierto a cualquiera. En `rosters/` solo lo lee quien tiene el claim.
 
+## Coste de leer la actividad de un estudiante
+
+El panel de `/admin` lee la traza de una persona con dos consultas, y **las dos usan
+índices que ya están en `firestore.indexes.json`**: `eventBatches` por `uid + serverTs` y
+`prompts` por `uid + createdAt`. No hay que desplegar nada nuevo.
+
+**No añadir `where('courseId','==',…)` a esas consultas.** Pediría un índice compuesto de
+tres campos que no existe, y el fallo solo aparece con datos reales. Es un proyecto
+Firebase por curso: `uid` ya identifica sin ambigüedad.
+
+Se pide **una sola vez el semestre entero** y la ventana de 7 días se recorta en memoria.
+Un lote se cierra a 20 eventos o a 30 s, así que salen ~4–6 documentos por visita a una
+lección: del orden de **150–300 lecturas** por estudiante en la semana 2 y **1 200–2 000**
+en la semana 16. Repasar los 27 estudiantes al final del semestre rozaría las 50 000
+lecturas diarias del plan gratuito, y por eso hay caché en memoria por `uid` (TTL 10 min,
+se invalida con *Recargar*) y **nada de precarga**: la actividad solo se pide al pulsar.
+
+El pie del panel muestra los documentos que costó de verdad. Si esa cifra crece mucho, la
+salida es precalcular un resumen por estudiante en Firestore — pero eso exige Cloud
+Functions, que es plan de pago, porque las reglas prohíben (con razón) que el cliente del
+estudiante escriba fuera de `eventBatches`.
+
 ## Comprobar que quedó bien
 
 En la consola de Firebase → Firestore → Rules → *Playground*:

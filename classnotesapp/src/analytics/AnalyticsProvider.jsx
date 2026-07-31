@@ -83,6 +83,17 @@ export function AnalyticsProvider({ children }) {
     };
   }, []);
 
+  // Mediciones que están abiertas y todavía no son un evento: la permanencia en la
+  // lección que se está leyendo ahora mismo. Al cerrar la pestaña hay que darles
+  // la oportunidad de emitirse, o se pierden enteras. Es un `Set` porque el
+  // registro y la baja van con el ciclo de vida de cada componente que mide.
+  const flushersRef = useRef(new Set());
+
+  const registerFlusher = useCallback((fn) => {
+    flushersRef.current.add(fn);
+    return () => flushersRef.current.delete(fn);
+  }, []);
+
   const queueRef = useRef(null);
   if (queueRef.current === null) {
     queueRef.current = createEventQueue({
@@ -238,15 +249,27 @@ export function AnalyticsProvider({ children }) {
   useEffect(() => {
     if (!enabled) return undefined;
 
-    // Primero recuperar lo que quedó a medias en la carga anterior: ahí está el
-    // `lesson_dwell` de la última lección, que es el evento más valioso y el que
-    // se pierde siempre si no se hace esto.
+    // Primero recuperar lo que quedó a medias en la carga anterior: eventos ya
+    // emitidos que no llegaron a subir porque la pestaña se cerró antes.
     queueRef.current.restore(uid);
     ensureSession();
     queueRef.current.flush();
 
     const intervalId = setInterval(() => queueRef.current.flush(), FLUSH_INTERVAL_MS);
     const handleHide = () => {
+      // Los flushers van ANTES del volcado: son los que emiten lo que todavía no
+      // existe como evento —el `lesson_dwell` de la lección abierta ahora mismo—,
+      // y si corrieran después, ese evento se quedaría en la cola en memoria justo
+      // antes de que la página muera. Sin esto, cerrar la pestaña en vez de
+      // navegar perdía la última lección de cada sesión entera.
+      for (const flush of flushersRef.current) {
+        try {
+          flush();
+        } catch (err) {
+          // Un flusher roto no puede impedir que se vuelque el resto de la cola.
+          console.error('[Analytics] Error cerrando una medición pendiente:', err);
+        }
+      }
       releaseClock();
       queueRef.current.spill();
     };
@@ -267,9 +290,10 @@ export function AnalyticsProvider({ children }) {
       enabled,
       track,
       readClock: activity.read,
+      registerFlusher,
       flush: () => queueRef.current.flush(),
     }),
-    [enabled, track, activity.read]
+    [enabled, track, activity.read, registerFlusher]
   );
 
   return <AnalyticsContext.Provider value={value}>{children}</AnalyticsContext.Provider>;
@@ -284,6 +308,9 @@ const INERT = Object.freeze({
   enabled: false,
   track: () => {},
   readClock: () => ({ activeMs: 0, idleMs: 0 }),
+  // Devuelve su propia baja, como el real: quien lo llame en un efecto usa el
+  // valor de retorno como limpieza, y un `undefined` ahí rompería el render.
+  registerFlusher: () => () => {},
   flush: () => Promise.resolve(),
 });
 

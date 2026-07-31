@@ -29,15 +29,25 @@ import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DownloadIcon from '@mui/icons-material/Download';
+import InsightsIcon from '@mui/icons-material/Insights';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import IconButton from '@mui/material/IconButton';
 
 import { useAuth } from '@/auth/AuthContext';
 import { courseId } from '@/auth/firebaseConfig';
+import courseConfig from '@/content/config';
 import { loginBranding } from '@/auth/loginBranding';
 import { useThemeMode } from '@/theme/ThemeContext';
-import { fetchRoster, fetchStudents, listRosters, saveRoster } from './adminData';
+import {
+  clearStudentActivityCache,
+  fetchRoster,
+  fetchStudents,
+  listRosters,
+  saveRoster,
+} from './adminData';
+import StudentActivityDrawer from './StudentActivityDrawer';
 import { parseRosterMarkdown, parseTermFromFileName, normalizeName } from './rosterParser';
 import { matchRoster } from './matchRoster';
 import { buildRosterMarkdown, downloadMarkdown, rosterFileName } from './rosterExport';
@@ -68,6 +78,10 @@ const AdminPage = () => {
   const [error, setError] = useState(null);
   const [notice, setNotice] = useState(null);
   const [filter, setFilter] = useState('');
+  // El panel de actividad. `abierto` y `seleccionado` van separados para que el
+  // contenido no se vacíe a mitad de la animación de cierre.
+  const [seleccionado, setSeleccionado] = useState(null); // { student, fila }
+  const [panelAbierto, setPanelAbierto] = useState(false);
 
   const describeError = (err) =>
     err?.code === 'permission-denied'
@@ -183,6 +197,17 @@ const AdminPage = () => {
     }
   };
 
+  // El panel mide contra `courseStartDate`, que es el del semestre en curso. Para
+  // un semestre pasado la ventana "desde el inicio" apuntaría a fechas que no son
+  // las suyas y saldría vacía, así que no se abre y se dice por qué.
+  const esSemestreActual = !term || term === courseConfig.courseTerm;
+
+  const abrirActividad = (student, fila = null) => {
+    if (!student?.uid || !esSemestreActual) return;
+    setSeleccionado({ student, fila });
+    setPanelAbierto(true);
+  };
+
   const onExport = () => {
     const now = new Date();
     downloadMarkdown(
@@ -254,6 +279,32 @@ const AdminPage = () => {
   const cellSx = { color: theme.textPrimary, borderColor: alpha(theme.textSecondary, 0.15), fontSize: '0.88rem' };
   const mutedSx = { ...cellSx, color: theme.textSecondary };
 
+  const actividadBtn = (student, fila) => {
+    if (!student?.uid) return <span style={{ color: theme.textSecondary }}>—</span>;
+    const titulo = esSemestreActual
+      ? `Ver actividad de ${fila?.nombre || student.fullName || student.email || 'este estudiante'}`
+      : `La actividad solo se puede ver del semestre en curso (${courseConfig.courseTerm})`;
+    return (
+      <Tooltip title={titulo}>
+        {/* El span deja que el tooltip funcione con el botón deshabilitado. */}
+        <span>
+          <IconButton
+            size="small"
+            aria-label={titulo}
+            disabled={!esSemestreActual}
+            onClick={(e) => {
+              e.stopPropagation(); // si no, el clic del renglón lo abriría dos veces
+              abrirActividad(student, fila);
+            }}
+            sx={{ color: theme.accent }}
+          >
+            <InsightsIcon fontSize="small" />
+          </IconButton>
+        </span>
+      </Tooltip>
+    );
+  };
+
   return shell(
     <>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5, mb: 1 }}>
@@ -285,7 +336,10 @@ const AdminPage = () => {
         )}
         <Button
           startIcon={<RefreshIcon />}
-          onClick={() => load(term)}
+          onClick={() => {
+            clearStudentActivityCache();
+            load(term);
+          }}
           disabled={loading}
           sx={{ color: theme.textSecondary, textTransform: 'none' }}
         >
@@ -371,12 +425,13 @@ const AdminPage = () => {
                   <TableCell sx={headCellSx}>GitHub</TableCell>
                   <TableCell sx={headCellSx}>Nombre en el perfil</TableCell>
                   <TableCell sx={headCellSx}>Estado</TableCell>
+                  <TableCell sx={headCellSx} align="right">Actividad</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {visibleRows.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} sx={{ ...mutedSx, textAlign: 'center', py: 4 }}>
+                    <TableCell colSpan={7} sx={{ ...mutedSx, textAlign: 'center', py: 4 }}>
                       {roster ? 'Ningún estudiante coincide con el filtro.' : 'Carga la lista de clase para ver esta tabla.'}
                     </TableCell>
                   </TableRow>
@@ -384,8 +439,14 @@ const AdminPage = () => {
                 {visibleRows.map((r) => {
                   const s = r.student;
                   const gh = githubOf(s);
+                  const clicable = !!s && esSemestreActual;
                   return (
-                    <TableRow key={`${r.codigo}-${r.nombre}`} hover sx={{ opacity: s ? 1 : 0.72 }}>
+                    <TableRow
+                      key={`${r.codigo}-${r.nombre}`}
+                      hover
+                      onClick={clicable ? () => abrirActividad(s, r) : undefined}
+                      sx={{ opacity: s ? 1 : 0.72, cursor: clicable ? 'pointer' : 'default' }}
+                    >
                       <TableCell sx={{ ...cellSx, fontFamily: 'monospace' }}>{r.codigo || '—'}</TableCell>
                       <TableCell sx={cellSx}>{r.nombre}</TableCell>
                       <TableCell sx={s ? cellSx : mutedSx}>{s?.email || '—'}</TableCell>
@@ -419,6 +480,12 @@ const AdminPage = () => {
                           <Chip size="small" label="Registrado" sx={{ color: theme.success, background: alpha(theme.success, 0.15), fontWeight: 600 }} />
                         )}
                       </TableCell>
+                      <TableCell sx={cellSx} align="right">
+                        {/* El clic en el renglón es el atajo de ratón; este botón es
+                            el único camino por teclado, porque TableRow no es
+                            focalizable. */}
+                        {actividadBtn(s, r)}
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -442,12 +509,13 @@ const AdminPage = () => {
                   <TableCell sx={headCellSx}>Código declarado</TableCell>
                   <TableCell sx={headCellSx}>GitHub</TableCell>
                   <TableCell sx={headCellSx}>Rol</TableCell>
+                  <TableCell sx={headCellSx} align="right">Actividad</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {roll.extras.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} sx={{ ...mutedSx, textAlign: 'center', py: 3 }}>
+                    <TableCell colSpan={6} sx={{ ...mutedSx, textAlign: 'center', py: 3 }}>
                       Nadie por fuera de la lista.
                     </TableCell>
                   </TableRow>
@@ -455,7 +523,12 @@ const AdminPage = () => {
                 {roll.extras.map((s) => {
                   const gh = githubOf(s);
                   return (
-                    <TableRow key={s.uid} hover>
+                    <TableRow
+                      key={s.uid}
+                      hover
+                      onClick={esSemestreActual ? () => abrirActividad(s) : undefined}
+                      sx={{ cursor: esSemestreActual ? 'pointer' : 'default' }}
+                    >
                       <TableCell sx={cellSx}>{s.fullName || s.displayName || '—'}</TableCell>
                       <TableCell sx={cellSx}>{s.email || '—'}</TableCell>
                       <TableCell sx={{ ...mutedSx, fontFamily: 'monospace' }}>{s.codigo || '—'}</TableCell>
@@ -469,6 +542,7 @@ const AdminPage = () => {
                         )}
                       </TableCell>
                       <TableCell sx={mutedSx}>{s.roleOther || s.role || '—'}</TableCell>
+                      <TableCell sx={cellSx} align="right">{actividadBtn(s, null)}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -477,6 +551,13 @@ const AdminPage = () => {
           </TableContainer>
         </>
       )}
+
+      <StudentActivityDrawer
+        open={panelAbierto}
+        student={seleccionado?.student ?? null}
+        fila={seleccionado?.fila ?? null}
+        onClose={() => setPanelAbierto(false)}
+      />
     </>
   );
 };

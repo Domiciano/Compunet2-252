@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 const authState = { configured: true, isTeacher: true, user: { uid: 'p1' } };
 vi.mock('@/auth/AuthContext', () => ({ useAuth: () => authState }));
@@ -8,15 +8,25 @@ vi.mock('@/auth/AuthContext', () => ({ useAuth: () => authState }));
 const fetchStudents = vi.fn();
 const fetchRoster = vi.fn();
 const listRosters = vi.fn();
+const fetchStudentActivity = vi.fn();
+const clearStudentActivityCache = vi.fn();
 vi.mock('./adminData', () => ({
   fetchStudents: (...a) => fetchStudents(...a),
   fetchRoster: (...a) => fetchRoster(...a),
   listRosters: (...a) => listRosters(...a),
+  fetchStudentActivity: (...a) => fetchStudentActivity(...a),
+  clearStudentActivityCache: (...a) => clearStudentActivityCache(...a),
   saveRoster: vi.fn(),
 }));
 
+// El panel real descarga el toc y consulta Firestore; aquí solo interesa si abre.
+vi.mock('./courseSchedule', () => ({ loadCourseSchedule: () => Promise.resolve(null) }));
+
 // El módulo real inicializa Firebase al importarse.
 vi.mock('@/auth/firebaseConfig', () => ({ courseId: 'compunet2', isFirebaseConfigured: true }));
+vi.mock('@/content/config', () => ({
+  default: { courseStartDate: '2026-07-27', courseTerm: '262', tocUrl: 'http://x/toc.md' },
+}));
 
 const navigate = vi.fn();
 vi.mock('react-router-dom', () => ({ useNavigate: () => navigate }));
@@ -29,6 +39,8 @@ const mount = () => render(<ThemeProvider><AdminPage /></ThemeProvider>);
 describe('AdminPage', () => {
   beforeEach(() => {
     Object.assign(authState, { configured: true, isTeacher: true, user: { uid: 'p1' } });
+    fetchStudentActivity.mockReset();
+    clearStudentActivityCache.mockReset();
     fetchStudents.mockReset().mockResolvedValue([
       { uid: 'u1', codigo: 'A00406656', fullName: 'Andrés Rivas', email: 'arivas@icesi.edu.co', githubUsername: 'arivas', role: 'estudiante' },
       { uid: 'p1', fullName: 'Domiciano Rincón', email: 'domi@icesi.edu.co', role: 'profesor' },
@@ -81,6 +93,43 @@ describe('AdminPage', () => {
     fetchRoster.mockResolvedValue(null);
     mount();
     expect(await screen.findByText(/Todavía no hay lista de clase cargada/i)).toBeTruthy();
+  });
+
+  it('al pulsar el renglón de quien sí entró, abre su actividad', async () => {
+    fetchStudentActivity.mockResolvedValue({ batches: [], prompts: [], docsRead: 0, fromCache: false });
+    mount();
+    fireEvent.click(await screen.findByText('ANDRES FELIPE RIVAS OSPINA'));
+    await waitFor(() => expect(fetchStudentActivity).toHaveBeenCalledWith('u1', expect.anything()));
+  });
+
+  it('quien no ha ingresado no tiene actividad que abrir', async () => {
+    mount();
+    fireEvent.click(await screen.findByText('DAYANNA FERNANDEZ NUÑEZ'));
+    expect(fetchStudentActivity).not.toHaveBeenCalled();
+  });
+
+  it('las filas de "fuera de la lista" también abren el panel', async () => {
+    fetchStudentActivity.mockResolvedValue({ batches: [], prompts: [], docsRead: 0, fromCache: false });
+    mount();
+    fireEvent.click(await screen.findByText('Domiciano Rincón'));
+    await waitFor(() => expect(fetchStudentActivity).toHaveBeenCalledWith('p1', expect.anything()));
+  });
+
+  it('un semestre que no es el actual no abre actividad: la ventana no sería la suya', async () => {
+    listRosters.mockResolvedValue([
+      { id: 'compunet2-261', term: '261', count: 2, label: '261.md', updatedAt: new Date(2026, 0, 20) },
+    ]);
+    mount();
+    fireEvent.click(await screen.findByText('ANDRES FELIPE RIVAS OSPINA'));
+    expect(fetchStudentActivity).not.toHaveBeenCalled();
+    expect(screen.getAllByLabelText(/solo se puede ver del semestre en curso/i).length).toBeGreaterThan(0);
+  });
+
+  it('recargar invalida la actividad cacheada', async () => {
+    mount();
+    await screen.findByText('ANDRES FELIPE RIVAS OSPINA');
+    fireEvent.click(screen.getByRole('button', { name: /recargar/i }));
+    expect(clearStudentActivityCache).toHaveBeenCalled();
   });
 
   it('abre el semestre más reciente y deja elegir los anteriores', async () => {

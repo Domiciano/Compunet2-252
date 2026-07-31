@@ -17,7 +17,18 @@
 // cuál mirar. `rosters/{courseId}` a secas es el documento heredado de antes de
 // esta separación, y se lee como una lista "sin semestre".
 
-import { collection, doc, getDoc, getDocs, setDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  setDoc,
+  serverTimestamp,
+  Timestamp,
+  where,
+} from 'firebase/firestore';
 import { db } from '@/auth/firebase';
 import { courseId } from '@/auth/firebaseConfig';
 
@@ -72,6 +83,105 @@ export async function fetchRoster(term) {
   const snap = await getDoc(rosterRef(term));
   if (!snap.exists()) return null;
   return toRoster(snap);
+}
+
+// --- Actividad de un estudiante ---------------------------------------------
+//
+// Alimenta el panel de `/admin`. Dos consultas, las dos sobre índices que **ya
+// existen** en `firestore.indexes.json` (`eventBatches: uid+serverTs` y
+// `prompts: uid+createdAt`): no hay nada que desplegar.
+//
+// **No añadir `where('courseId','==',…)`**: pediría un índice compuesto de tres
+// campos que no existe y la consulta empezaría a fallar en producción con un
+// error que además solo aparece con datos reales. Es un proyecto Firebase por
+// curso, así que `uid` ya identifica sin ambigüedad.
+
+/** Lo que se ha leído en esta carga de página. Ver por qué a nivel de módulo abajo. */
+const activityCache = new Map(); // uid → { at, data }
+
+const ACTIVITY_TTL_MS = 10 * 60_000;
+
+/**
+ * Borra la actividad cacheada. Sin `uid`, toda.
+ *
+ * Está colgado del botón *Recargar* de la vista: es la salida explícita para
+ * cuando el profesor sabe que el estudiante acaba de entrar y quiere el dato
+ * fresco antes de que expire el TTL.
+ */
+export function clearStudentActivityCache(uid) {
+  if (uid) activityCache.delete(uid);
+  else activityCache.clear();
+}
+
+/**
+ * Lotes de eventos y prompts de un estudiante desde una fecha.
+ *
+ * Se pide **una sola vez el semestre entero** y las dos ventanas del panel (7
+ * días y todo) se recortan en memoria: dos consultas costarían el doble y la
+ * corta está contenida en la larga.
+ *
+ * La caché vive a nivel de módulo y no en un `useRef` del panel a propósito: el
+ * `Drawer` se desmonta al cerrarse, que es exactamente lo que pasa cuando el
+ * profesor compara dos estudiantes y vuelve al primero. Muere al recargar la
+ * página, así que no persiste conducta de nadie en disco.
+ *
+ * @param {string} uid
+ * @param {{ since: Date|number }} opts  inicio del semestre
+ * @returns {{ batches, prompts, docsRead: number, fromCache: boolean }}
+ */
+export async function fetchStudentActivity(uid, { since } = {}) {
+  const hit = activityCache.get(uid);
+  if (hit && Date.now() - hit.at < ACTIVITY_TTL_MS) {
+    return { ...hit.data, fromCache: true };
+  }
+
+  const desde = Timestamp.fromDate(since instanceof Date ? since : new Date(since ?? 0));
+
+  const [batchSnap, promptSnap] = await Promise.all([
+    getDocs(
+      query(
+        collection(db, 'eventBatches'),
+        where('uid', '==', uid),
+        where('serverTs', '>=', desde),
+        orderBy('serverTs', 'asc')
+      )
+    ),
+    getDocs(
+      query(
+        collection(db, 'prompts'),
+        where('uid', '==', uid),
+        where('createdAt', '>=', desde),
+        // DESC para casar exactamente el índice que ya existe; el orden da igual
+        // porque el agregador reparte por día.
+        orderBy('createdAt', 'desc')
+      )
+    ),
+  ]);
+
+  const batches = batchSnap.docs.map((d) => {
+    const data = d.data();
+    return {
+      id: d.id,
+      device: data.device ?? null,
+      sessionId: data.sessionId ?? null,
+      events: Array.isArray(data.events) ? data.events : [],
+    };
+  });
+
+  // El agregador es puro y no sabe de Timestamps: se normaliza aquí, en el único
+  // archivo que ya conoce Firestore.
+  const prompts = promptSnap.docs.map((d) => {
+    const data = d.data();
+    return {
+      ts: data.createdAt?.toMillis?.() ?? null,
+      conversationId: data.conversationId ?? null,
+      contentId: data.contentId ?? null,
+    };
+  });
+
+  const data = { batches, prompts, docsRead: batchSnap.size + promptSnap.size };
+  activityCache.set(uid, { at: Date.now(), data });
+  return { ...data, fromCache: false };
 }
 
 export async function saveRoster({ term, entries, label, uid }) {
