@@ -16,6 +16,10 @@ Vamos a trabajar con una base de datos en memoria llamada H2 y veremos cómo int
     <artifactId>h2</artifactId>
     <scope>runtime</scope>
 </dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-h2console</artifactId>
+</dependency>
 ```
 
 Vamos a partir de un modelo de datos convecional y lo transformaremos en una tabla
