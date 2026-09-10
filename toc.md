@@ -25,7 +25,7 @@
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson11.md | Relación muchos a muchos | 0017
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson14improved.md | Query Methods | 0018
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_query_advanced.md | Query Methods: Navegación Avanzada | 0072
-[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/tarea2.md | Tarea 2 | 0019
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/tarea2.md | Laboratorio de QueryMethods | 0019
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson12.md | Postgres y docker | 0020
 [t] SEMANA 6 · Spring Data
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson13.md | Transacciones en Spring Boot | 0021
