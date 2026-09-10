@@ -42,6 +42,3 @@ Estos tres son tan retadores como `findDistinctByStadium_NameAndHomeCountry_Play
 
 18. En `UserRepository`: Encuentra los usuarios que tengan un rol con un nombre específico, y que ese mismo rol tenga asignado al menos un permiso cuyo nombre contenga cierto texto. Navega `User` → `userRoles` → `role` → `name` y `User` → `userRoles` → `role` → `rolePermissions` → `permission` → `name`.
 
-## Classroom
-
-https://classroom.github.com/a/xJAG1tcz
