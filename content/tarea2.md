@@ -34,7 +34,7 @@ Ahora es tu turno. Añade los siguientes métodos a los repositorios correspondi
 
 ## Reto: navegación avanzada
 
-Estos tres son tan retadores como `findDistinctByStadium_NameAndHomeCountry_Players_FifaScoreGreaterThan` de clase: combinan una condición sobre una relación con otra más profunda, sobre una colección, y necesitan `Distinct` para no devolver filas repetidas.
+Estos tres son tan retadores como los ejemplos de la lección de navegación avanzada: combinan una condición sobre una relación con otra más profunda, sobre una colección, y necesitan `Distinct` para no devolver filas repetidas.
 
 16. En `ProfessorRepository`: Encuentra los profesores que dictan un curso cuyo nombre contenga cierto texto (ignorando mayúsculas), y que en ese mismo curso haya al menos un estudiante con un código mayor a un valor dado. Navega `Professor` → `courses` → `name` y, por separado, `Professor` → `courses` → `enrollments` → `student` → `code`.
 

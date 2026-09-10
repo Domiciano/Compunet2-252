@@ -36,14 +36,13 @@ Con los datos de prueba de la lección anterior, "Juan Perez" dicta *Introducci�
 
 Regla práctica: **si tu condición navega una colección (`OneToMany`/`ManyToMany`) y tu método debe devolver la entidad raíz, agrega `Distinct`** — salvo que sepas con certeza que esa relación nunca produce más de un match por fila (como la del ejemplo anterior, donde un estudiante solo puede tener una fila de inscripción por curso).
 
-Esta es exactamente la forma de una consulta como "partidos jugados en un estadio específico, donde el país local tenga al menos un jugador con un `fifaScore` mayor a un valor dado": una condición directa (`Stadium_Name`) combinada con una condición profunda sobre una colección (`HomeCountry_Players_FifaScoreGreaterThan`). El operador de la parte profunda tampoco tiene que ser igualdad — funciona igual con `GreaterThan`, `Between`, `Containing`, cualquiera de los operadores de la lección anterior:
+El operador de la parte profunda tampoco tiene que ser igualdad — funciona igual con `GreaterThan`, `Between`, `Containing`, cualquiera de los operadores de la lección anterior. Por ejemplo, cursos de un profesor específico donde al menos un estudiante inscrito tenga un código mayor a un valor dado:
 
 ```java
 public interface CourseRepository extends JpaRepository<Course, Integer> {
 
     // Condición directa (Professor_Name) + condición profunda con GreaterThan
-    // (Enrollments_Student_Code) — la misma forma que
-    // findDistinctByStadium_NameAndHomeCountry_Players_FifaScoreGreaterThan
+    // (Enrollments_Student_Code)
     List<Course> findDistinctByProfessor_NameAndEnrollments_Student_CodeGreaterThan(
             String professorName, String minCode);
 }
@@ -67,9 +66,9 @@ Aquí también aplica la regla anterior: como `studentCourses` es una colección
 
 ## Dos condiciones sobre el mismo camino: ¿la misma fila o filas distintas?
 
-Hay un caso más sutil: dos condiciones que comparten **exactamente el mismo camino de navegación**, unidas con `And` — el equivalente a pedir "clubes cuyos jugadores hayan jugado entre dos fechas específicas **y** en un estadio específico", donde tanto la fecha como el estadio salen del mismo partido del mismo jugador (`Players_Matches_DateBetween...AndPlayers_Matches_Stadium_Name`). La pregunta que vale la pena hacerse: ¿las dos condiciones tienen que cumplirse en el **mismo** partido, o basta con que cada una se cumpla en un partido distinto de ese jugador?
+Hay un caso más sutil: dos condiciones que comparten **exactamente el mismo camino de navegación**, unidas con `And`. La pregunta que vale la pena hacerse: ¿las dos condiciones tienen que cumplirse sobre la **misma** fila relacionada, o basta con que cada una se cumpla en una fila distinta?
 
-Spring Data JPA reutiliza el `JOIN` que ya generó para un camino de propiedades dentro del mismo método — no crea uno nuevo cada vez que el camino se repite. Eso significa que ambas condiciones quedan atadas a la **misma fila** del lado "muchos": el mismo partido, en el ejemplo del enunciado. Puedes comprobarlo con el modelo de esta lección, repitiendo el camino `StudentCourses_Course`:
+Spring Data JPA reutiliza el `JOIN` que ya generó para un camino de propiedades dentro del mismo método — no crea uno nuevo cada vez que el camino se repite. Eso significa que ambas condiciones quedan atadas a la **misma fila** del lado "muchos": la misma inscripción, en el ejemplo de abajo. Puedes comprobarlo con el modelo de esta lección, repitiendo el camino `StudentCourses_Course`:
 
 ```java
 public interface StudentRepository extends JpaRepository<Student, Integer> {
