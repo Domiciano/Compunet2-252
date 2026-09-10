@@ -1,5 +1,7 @@
 # Query Methods en Spring Data JPA
 
+<!-- tags: Query Methods, GreaterThan, Containing, Between, OrderBy, Distinct, IgnoreCase, findBy, countBy, existsBy, operadores de Query Methods, navegación de relaciones -->
+
 [Spring Data JPA — Query Methods](https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html)
 
 ## ¿Qué son los Query Methods?
@@ -7,6 +9,30 @@
 Spring Data JPA ofrece una funcionalidad llamada **Query Methods**. Permite crear consultas a la base de datos de forma automática simplemente declarando métodos en las interfaces de repositorio.
 
 Spring analiza el nombre del método, lo divide en partes y lo traduce a JPQL automáticamente. La convención sigue el formato `findBy...`, `countBy...`, `existsBy...`, seguido de las propiedades de la entidad y los operadores `And`, `Or`, `GreaterThan`, `Containing`, etc.
+
+## Operadores
+
+Estas son las palabras clave que Spring reconoce al analizar el nombre del método. Se combinan libremente entre sí con `And`/`Or`, y con la navegación de relaciones que ves más abajo — nada impide, por ejemplo, aplicar `GreaterThan` sobre un campo alcanzado con `_`.
+
+| Categoría | Operador | Ejemplo |
+|---|---|---|
+| Texto | `Is` / `Equals` *(implícito si no escribes nada)* | `findByName(String name)` |
+| | `Containing` / `StartingWith` / `EndingWith` | `findByNameContaining(String texto)` |
+| | `IgnoreCase` | `findByNameIgnoreCase(String name)` |
+| | `Like` | `findByNameLike(String patron)` |
+| Números | `GreaterThan` / `GreaterThanEqual` | `findByCreditsGreaterThan(int credits)` |
+| | `LessThan` / `LessThanEqual` | `findByCreditsLessThan(int credits)` |
+| | `Between` | `findByCreditsBetween(int min, int max)` |
+| Lógicos | `And` / `Or` | `findByNameAndCredits(String name, int credits)` |
+| | `Not` | `findByNameNot(String name)` |
+| Nulos y booleanos | `IsNull` / `IsNotNull` | `findByProfessorIsNull()` |
+| | `True` / `False` | `findByActiveTrue()` |
+| Colecciones | `In` / `NotIn` | `findByProgramIn(List<String> programas)` |
+| Orden y límite | `OrderBy...Asc` / `OrderBy...Desc` | `findByProgramOrderByNameAsc(String program)` |
+| | `Top` / `First` | `findTop3ByOrderByCreditsDesc()` |
+| Filas repetidas | `Distinct` | `findDistinctByName(String name)` |
+
+`Distinct` se vuelve imprescindible en cuanto navegas una relación de tipo colección (`OneToMany`/`ManyToMany`): combinar condiciones sobre esas colecciones puede duplicar filas si no lo agregas. Lo ves en detalle, con ejemplos, en la siguiente lección.
 
 ## Preparando el Modelo
 
