@@ -36,7 +36,7 @@ Ahora es tu turno. Añade los siguientes métodos a los repositorios correspondi
 
 Estos tres son tan retadores como los ejemplos de la lección de navegación avanzada: combinan una condición sobre una relación con otra más profunda, sobre una colección, y necesitan `Distinct` para no devolver filas repetidas.
 
-16. En `ProfessorRepository`: Encuentra los profesores que dictan un curso cuyo nombre contenga cierto texto (ignorando mayúsculas), y que en ese mismo curso haya al menos un estudiante con un código mayor a un valor dado. Navega `Professor` → `courses` → `name` y, por separado, `Professor` → `courses` → `enrollments` → `student` → `code`.
+16. En `ProfessorRepository`: Encuentra los profesores que dictan un curso cuyo nombre contenga cierto texto (ignorando mayúsculas), y que en ese mismo curso haya al menos un estudiante cuyo código contenga cierto texto. Navega `Professor` → `courses` → `name` y, por separado, `Professor` → `courses` → `enrollments` → `student` → `code`.
 
 17. En `StudentRepository`: Encuentra los estudiantes inscritos en un curso con créditos entre dos valores, dictado por un profesor cuyo nombre contenga cierto texto (ignorando mayúsculas). Las dos condiciones tienen que cumplirse sobre la **misma** inscripción — navega el mismo camino dos veces: `studentCourses` → `course` → `credits` y `studentCourses` → `course` → `professor` → `name`.
 
