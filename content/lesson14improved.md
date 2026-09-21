@@ -1,6 +1,6 @@
 # Query Methods en Spring Data JPA
 
-<!-- tags: Query Methods, GreaterThan, Containing, Between, OrderBy, Distinct, IgnoreCase, findBy, countBy, existsBy, operadores de Query Methods, navegación de relaciones -->
+<!-- tags: Query Methods, GreaterThan, Containing, Between, After, Before, OrderBy, Distinct, IgnoreCase, findBy, countBy, existsBy, operadores de Query Methods, navegación de relaciones -->
 
 [Spring Data JPA — Query Methods](https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html)
 
@@ -23,6 +23,8 @@ Estas son las palabras clave que Spring reconoce al analizar el nombre del méto
 | Números | `GreaterThan` / `GreaterThanEqual` | `findByCreditsGreaterThan(int credits)` |
 | | `LessThan` / `LessThanEqual` | `findByCreditsLessThan(int credits)` |
 | | `Between` | `findByCreditsBetween(int min, int max)` |
+| Fechas | `After` / `Before` | `findByStartDateAfter(LocalDate date)` |
+| | `Between` | `findByStartDateBetween(LocalDate from, LocalDate to)` |
 | Lógicos | `And` / `Or` | `findByNameAndCredits(String name, int credits)` |
 | | `Not` | `findByNameNot(String name)` |
 | Nulos y booleanos | `IsNull` / `IsNotNull` | `findByProfessorIsNull()` |
@@ -31,6 +33,8 @@ Estas son las palabras clave que Spring reconoce al analizar el nombre del méto
 | Orden y límite | `OrderBy...Asc` / `OrderBy...Desc` | `findByProgramOrderByNameAsc(String program)` |
 | | `Top` / `First` | `findTop3ByOrderByCreditsDesc()` |
 | Filas repetidas | `Distinct` | `findDistinctByName(String name)` |
+
+`After` y `Before` comparan campos de fecha (`LocalDate`, `LocalDateTime`, `Instant`, `Date`) y son estrictos: `After` equivale a `>` y `Before` a `<`, sin incluir la fecha dada. Si necesitas incluirla, usa `GreaterThanEqual` / `LessThanEqual`. `Between` también funciona con fechas, e incluye ambos extremos.
 
 `Distinct` se vuelve imprescindible en cuanto navegas una relación de tipo colección (`OneToMany`/`ManyToMany`): combinar condiciones sobre esas colecciones puede duplicar filas si no lo agregas. Lo ves en detalle, con ejemplos, en la siguiente lección.
 
