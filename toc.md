@@ -36,6 +36,7 @@
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson19.md | MVC en Spring Boot | 0028
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson20.md | Introducción a Thymeleaf para Vistas | 0029
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson201.md | Enviando objetos por formulario | 0073
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson202.md | Integrando CSS y JavaScript | 0074
 [t] SEMANA 8 · Spring MVC
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson21.md | Navegación Dinámica | 0030
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson22.md | Extra: Fragments de Thymeleaf | 0031
