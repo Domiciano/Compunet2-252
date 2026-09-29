@@ -276,21 +276,3 @@ public String listEnrollments(Model model) {
 ```
 
 `student` y `course` son relaciones `FetchType.LAZY`, pero aun así se pueden leer en la vista. Spring Boot deja abierta la sesión de Hibernate hasta que termina de renderizarse la plantilla (`spring.jpa.open-in-view`, activado por defecto; al arrancar lo avisa con un `WARN` en la consola). Si algún día lo desactivas, esta tabla lanzará `LazyInitializationException`, y habrá que traer las relaciones desde el servicio.
-
-## Resumen
-
-| Pieza | Responsabilidad |
-|---|---|
-| `EnrollmentForm` | Transportar los dos ids que envía el formulario. No es una entidad |
-| `GET /enrollments/new` | Poner en el `Model` el formulario vacío y las dos listas |
-| `<select th:field>` + `th:each` | Convertir cada lista en opciones: `th:value` = id, `th:text` = nombre |
-| `POST /enrollments` | Validar, pedirle al servicio que matricule y redirigir |
-| `EnrollmentService.enroll` | Convertir los ids en entidades y guardar el `Enrollment` |
-
-## Ejercicio
-
-Sobre el mismo proyecto:
-
-- Agrega en la tabla de matrículas un botón *Eliminar* que envíe un `POST` a `/enrollments/delete` con los dos ids en campos ocultos (`<input type="hidden">`) y que después redirija a la lista.
-- Haz que el `<select>` de cursos muestre también los créditos: `Bases de Datos · 3 créditos`.
-- Crea una página `/students/{id}/enroll` que ya traiga el estudiante fijo y solo deje elegir el curso. Pista: el `<select>` de estudiantes desaparece y `studentId` viaja en un `<input type="hidden">`.
