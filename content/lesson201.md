@@ -1,4 +1,4 @@
-# Formulario de Matrícula con Thymeleaf
+# Enviando objetos por formulario
 
 <!-- tags: select y option, th:field, formulario de matrícula, Enrollment, @ModelAttribute, objeto de formulario, th:each en option, lista vacía al recargar formulario, redirect después de POST, RedirectAttributes, StudentCourseId, Failed to convert property value -->
 
