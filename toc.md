@@ -33,9 +33,6 @@
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson17.md | Pruebas de Integración con Spring Boot | 0023
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson18.md | Mockito | 0024
 [t] SEMANA 7 · Spring Data
-[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson16.md | Manejo de Fechas + Tarea | 0025
-[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/ejercicio1.md | Ejercicio 1 | 0026
-[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/ejercicio2.md | Ejercicio 2 | 0027
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson19.md | MVC en Spring Boot | 0028
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson20.md | Introducción a Thymeleaf para Vistas | 0029
 [t] SEMANA 8 · Spring MVC
