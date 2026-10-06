@@ -1,7 +1,7 @@
-"""Figuras SVG de «Introducción a Spring Security» (0032) y «Cargando usuario desde la DB» (0075).
+"""Figuras SVG de «Introducción a Spring Security» (0032), «Cargando usuario desde la DB» (0075) y «CSRF Token» (0076).
 
     python3 tools/security_figuras.py <carpeta>     escribe un .svg por figura, para revisarlas
-    python3 tools/security_figuras.py --inject      reemplaza cada bloque ```svg de las dos lecciones
+    python3 tools/security_figuras.py --inject      reemplaza cada bloque ```svg de esas lecciones
                                                     por la figura con el mismo id
 
 No editar los SVG dentro del Markdown: se cambia este script y se vuelve a inyectar.
@@ -14,7 +14,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-LESSONS = ['lesson23.md', 'lesson231.md']
+LESSONS = ['lesson23.md', 'lesson231.md', 'lesson241.md']
 SANS = "ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif"
 MONO = "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace"
 FAM = {
@@ -611,6 +611,113 @@ def ss_autorizadas(freeze=None):
 
 
 FIGS['ssAutorizadas'] = ss_autorizadas
+
+
+def code_pane(cls, tab, lines, marks=(), tab_fill='#9AA3B5'):
+    """Contenido de un panel de código oscuro de 492 px: pestaña, líneas y bandas que resaltan (primera, última, color)."""
+    s = f'  <g class="{cls}"><text class="mono" x="416" y="153" dy="0.35em" font-size="12" fill="{tab_fill}">{tab}</text>'
+    for first, last, color in marks:
+        s += (f'<rect x="408" y="{170 + first*19}" width="484" height="{(last - first + 1)*19 + 2}" rx="5" fill="{color}" fill-opacity=".3" '
+              f'stroke="{color}" stroke-width="1.5"/>')
+    for i, line in enumerate(lines):
+        indent = len(line) - len(line.lstrip())
+        text = line.strip()
+        safe = text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace(chr(34), '&quot;')
+        s += (f'<text class="mono" x="{416 + indent*6.9:.1f}" y="{184 + i*19}" font-size="11.5" fill="#E6EAF2" textLength="{len(text)*6.9:.1f}" '
+              f'lengthAdjust="spacingAndGlyphs">{safe}</text>')
+    return s + '</g>\n'
+
+
+def csrf_mecanismo(freeze=None):
+    """Animada: siete pasos de 4 s. Del 1 al 4, el formulario propio con su token; del 5 al 7, un sitio malicioso sin él. Con freeze=1..7 sale el fotograma fijo."""
+    fid, h, n_steps, secs = 'csrfMecanismo', 602, 7, 4
+    s = head(fid, h, 'CSRF Token: la cookie no basta', 'CSRF Token: la cookie no basta',
+             'El servidor solo acepta un formulario si trae el token que él mismo escribió en esa página.',
+             'Animación en siete pasos con el recorrido del request a la izquierda, la página abierta en el navegador arriba a la derecha '
+             'y la sesión HTTP del servidor debajo. Caso uno, el formulario propio. Uno: el usuario con sesión pide el formulario con un '
+             'GET, que CsrfFilter no verifica. Dos: Spring Security genera un token, lo guarda en la sesión y lo escribe en el formulario '
+             'como campo oculto _csrf. Tres: al enviar, el navegador manda la cookie JSESSIONID y el campo _csrf. Cuatro: CsrfFilter '
+             'compara el token del request con el de la sesión, coinciden y el POST llega al controller. Caso dos, un sitio malicioso. '
+             'Cinco: el usuario abre sitio-malo.com, que trae un formulario escondido dirigido a la aplicación. Seis: el navegador envía '
+             'el POST con la cookie, pero sin _csrf. Siete: CsrfFilter rechaza el request con 403 Forbidden y el controller no se ejecuta.',
+             colors=('teal', 'green'))
+    teal, green, amber, ind, rose = (FAM[c][2] for c in ('teal', 'green', 'amber', 'indigo', 'rose'))
+    spans = {f'a{k}': [(k, k)] for k in range(1, n_steps + 1)}
+    spans.update({'a14': [(1, 4)], 'a24': [(2, 4)], 'a27': [(2, 7)], 'a57': [(5, 7)], 'aW': [(1, 3), (5, 6)],
+                  'aN': [(1, 1), (3, 3)], 'aF': [(1, 1), (3, 4)], 'aC': [(1, 2), (4, 4)]})
+    on = {1: ['a1', 'a14', 'aW', 'aN', 'aF', 'aC'], 2: ['a2', 'a24', 'a27', 'a14', 'aW', 'aC'], 3: ['a3', 'a24', 'a27', 'a14', 'aW', 'aN', 'aF'],
+          4: ['a4', 'a24', 'a27', 'a14', 'aF', 'aC'], 5: ['a5', 'a57', 'a27', 'aW'], 6: ['a6', 'a57', 'a27', 'aW'], 7: ['a7', 'a57', 'a27']}
+    down, up = (0, 20), (0, -20)
+    hops = [(1, 72, 178, down, teal, 'GET /courses/new'), (1, 72, 258, down, teal, 'GET /courses/new'),
+            (2, 88, 298, up, green, 'formulario + _csrf=7f3a9c…'), (2, 88, 218, up, green, 'HTML con _csrf=7f3a9c…'),
+            (3, 72, 178, down, teal, 'POST /courses · _csrf=7f3a9c…'),
+            (4, 72, 258, down, teal, 'POST /courses'), (4, 88, 298, up, green, '302 · /courses'), (4, 88, 218, up, green, '302 · /courses'),
+            (6, 72, 178, down, rose, 'POST /courses · sin _csrf'),
+            (7, 88, 218, up, rose, '403 Forbidden')]
+    s = s.replace('    </style>', anim_css(fid, n_steps, secs, spans, hop_tokens(hops), freeze, on) + '    </style>', 1)
+    s = s.replace(f'<svg id="{fid}"', f'<svg id="{fid}" data-steps="{n_steps}" data-step-seconds="{secs}"', 1)
+
+    s += '  <g class="ls a14">' + box(692, 36, 220, 28, 'green', 'CASO 1 · SU FORMULARIO', mono=False, fs=12).strip() + '</g>\n'
+    s += '  <g class="an a57">' + box(692, 36, 220, 28, 'rose', 'CASO 2 · SITIO MALICIOSO', mono=False, fs=12).strip() + '</g>\n'
+    for x, y, pw, ph, label in ((48, 104, 316, 366, 'EL RECORRIDO DEL REQUEST'), (388, 104, 524, 236, 'LA PÁGINA ABIERTA EN EL NAVEGADOR'),
+                                (388, 354, 524, 116, 'EN EL SERVIDOR · SESIÓN HTTP')):
+        s += f'  <rect x="{x}" y="{y}" width="{pw}" height="{ph}" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>\n'
+        s += f'  <text class="h" x="{x+16}" y="{y+24}" data-fit="{pw-32}">{label}</text>\n'
+
+    s += '  ' + box(64, 140, 284, 36, 'slate', 'Navegador · JSESSIONID=ABC123…', mono=False, fs=13)
+    s += '  ' + box(64, 220, 284, 36, 'indigo', 'CsrfFilter', hero=True)
+    s += '  ' + box(64, 300, 284, 36, 'amber', 'CoursesController')
+    for top in (176, 256):
+        s += f'  <path class="ar-teal" d="M72,{top+2} V{top+42}"/><path class="ar-green" d="M88,{top+42} V{top+2}"/>\n'
+    s += '  <text class="h" x="64" y="366">LO QUE COMPARA CSRFFILTER</text>\n'
+    s += ('  <g class="an aW"><rect x="64" y="376" width="284" height="78" rx="10" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.5" stroke-dasharray="5 5"/>'
+          '<text x="206" y="415" dy="0.35em" text-anchor="middle" font-size="12.5" fill="#79809A">nada por ahora</text></g>\n')
+    for cls, color, sent, verdict in (('ls a4', 'green', '_csrf=7f3a9c…', 'Coinciden: el request pasa'), ('an a7', 'rose', 'sin _csrf', 'No coinciden: 403 Forbidden')):
+        soft, border, strong = FAM[color]
+        s += (f'  <g class="{cls}"><rect x="64" y="376" width="284" height="78" rx="10" fill="{soft}" stroke="{border}" stroke-width="1.5"/>'
+              f'<text class="mono" x="78" y="397" font-size="12" fill="#161A26">request:  {sent}</text>'
+              '<text class="mono" x="78" y="415" font-size="12" fill="#161A26">sesión:   7f3a9c…</text>'
+              f'<text x="78" y="440" font-size="13" font-weight="700" fill="{strong}">{verdict}</text></g>\n')
+
+    s += '  <rect x="404" y="140" width="492" height="186" rx="10" fill="#1F2430"/>\n'
+    s += '  <path d="M404,150 A10,10 0 0 1 414,140 H886 A10,10 0 0 1 896,150 V166 H404 Z" fill="#2A3040"/>\n'
+    s += code_pane('an a1', 'localhost:8080/courses/new', ['cargando…'])
+    s += code_pane('ls a24', 'localhost:8080/courses/new',
+                   ['<form action="/courses" method="post">', '  <input type="hidden" name="_csrf"', '         value="7f3a9c…"/>',
+                    '  <input type="text" name="name"/>', '  <button type="submit">Crear</button>', '</form>'], marks=[(1, 2, FAM['amber'][1])])
+    s += code_pane('an a57', 'sitio-malo.com',
+                   ['<h1>¡Ganaste un premio!</h1>', '<form action="http://localhost:8080/courses"', '      method="post">',
+                    '  <input type="hidden" name="name" value="spam"/>', '</form>', '<script>document.forms[0].submit()</script>'],
+                   marks=[(1, 2, FAM['rose'][1])], tab_fill=FAM['rose'][1])
+
+    s += '  <g class="an a1">' + box(404, 390, 492, 60, 'slate', 'Sesión ABC123XYZ456', sub='usuario ana · todavía sin token CSRF').strip() + '</g>\n'
+    s += '  <g class="ls a27">' + box(404, 390, 492, 60, 'amber', 'Sesión ABC123XYZ456', sub='usuario ana · token CSRF 7f3a9c…').strip() + '</g>\n'
+
+    rings = [('aN', 60, 136, 292, 44, teal), ('a6', 60, 136, 292, 44, rose), ('aF', 60, 216, 292, 44, ind), ('a7', 60, 216, 292, 44, rose),
+             ('aC', 60, 296, 292, 44, amber), ('a2', 398, 384, 504, 72, amber), ('a4', 398, 384, 504, 72, green),
+             ('a7', 398, 384, 504, 72, rose), ('a5', 398, 134, 504, 198, rose)]
+    for cls, x, y, rw, rh, color in rings:
+        s += f'  <rect class="an {cls}" x="{x}" y="{y}" width="{rw}" height="{rh}" rx="12" fill="none" stroke="{color}" stroke-width="3"/>\n'
+    s += hop_pills(hops)
+
+    s += '  <rect x="48" y="486" width="864" height="56" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>\n'
+    caps = [(1, 'teal', 'Caso 1 · El usuario, ya con sesión, abre el formulario para crear un curso.', 'Es un GET: CsrfFilter no verifica nada en las peticiones que solo leen.'),
+            (2, 'amber', 'Spring Security genera un token aleatorio, lo guarda en la sesión y Thymeleaf lo escribe en el formulario.', 'Viaja como un campo oculto llamado _csrf: el usuario no lo ve, pero está en el HTML.'),
+            (3, 'teal', 'Al enviar el formulario, el navegador manda la cookie JSESSIONID y, en el cuerpo, el campo _csrf.', 'La cookie la pone el navegador; el token solo lo tiene quien recibió esa página.'),
+            (4, 'green', 'CsrfFilter compara el token del request con el de la sesión: coinciden.', 'El POST llega al controller y el curso se crea.'),
+            (5, 'rose', 'Caso 2 · Sin cerrar sesión, el usuario abre otra página: sitio-malo.com.', 'Esa página trae un formulario escondido que apunta a su aplicación y se envía solo.'),
+            (6, 'rose', 'El navegador envía el POST con la cookie JSESSIONID, porque va dirigido a localhost:8080.', 'Pero el sitio malicioso no pudo leer el token: el request llega sin _csrf.'),
+            (7, 'rose', 'CsrfFilter no encuentra el token y rechaza el request con 403 Forbidden.', 'El controller nunca se ejecuta: tener la cookie no fue suficiente.')]
+    for n, color, l1, l2 in caps:
+        s += (f'  <g class="an a{n}">' + chip(76, 514, n, color).strip() +
+              f'<text x="100" y="509" font-size="13" font-weight="600" fill="#161A26" data-fit="790">{l1}</text>'
+              f'<text x="100" y="527" font-size="13" fill="#454C61" data-fit="790">{l2}</text></g>\n')
+    s += ('  <g class="st"><text x="68" y="509" font-size="13" font-weight="600" fill="#161A26" data-fit="820">La cookie viaja sola en cada request; el token CSRF solo viaja en los formularios que entregó su aplicación.</text>'
+          '<text x="68" y="527" font-size="13" fill="#454C61" data-fit="820">La animación recorre los dos casos.</text></g>\n')
+    return s + tail(h, 'CsrfFilter verifica POST, PUT, PATCH y DELETE; las peticiones GET pasan sin token.')
+
+
+FIGS['csrfMecanismo'] = csrf_mecanismo
 
 
 def main():
