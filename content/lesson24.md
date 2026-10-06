@@ -1,4 +1,4 @@
-# Autenticación y Autorización
+# Creando un usuario
 
 La autenticación es el proceso mediante el cual el sistema verifica la identidad de un usuario, servicio o dispositivo, normalmente a través de credenciales como contraseñas, tokens, certificados o datos biométricos, asegurándose de que quien intenta acceder es realmente quien dice ser. 
 
