@@ -261,6 +261,30 @@ def anim_css(fid, n_steps, secs, spans, tokens, freeze, on):
                   f'      @media (prefers-reduced-motion: reduce){{#{fid} .an,#{fid} .ls,#{fid} .st{{animation:none}}}}\n')
 
 
+HOP_SLOTS = {1: [(.12, .55)], 2: [(.1, .35), (.42, .67)], 3: [(.08, .27), (.31, .5), (.54, .73)], 4: [(.06, .21), (.24, .39), (.42, .57), (.6, .75)]}
+
+
+def hop_tokens(hops):
+    """Un token por salto (paso, x, y, (dx, dy), color, texto): los de un mismo paso salen uno tras otro y quedan visibles hasta el final."""
+    tokens, seen = [], {}
+    for n, (step, _, _, (dx, dy), _, _) in enumerate(hops):
+        start, arrive = HOP_SLOTS[sum(1 for hp in hops if hp[0] == step)][seen.setdefault(step, 0)]
+        seen[step] += 1
+        tokens.append((f'hp{n}', step, [(start, '0,0'), (arrive, f'{dx}px,{dy}px'), (.88, f'{dx}px,{dy}px')]))
+    return tokens
+
+
+def hop_pills(hops):
+    """La etiqueta que viaja con cada punto: lo que entra o sale del bloque."""
+    s = ''
+    for n, (_, x, y, _, color, text) in enumerate(hops):
+        safe = text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace(chr(34), '&quot;')
+        s += (f'  <g class="an hp{n}"><rect x="{x-10}" y="{y-10}" width="{30 + len(text) * 6.6:.0f}" height="20" rx="10" fill="#FFFFFF" stroke="{color}" stroke-width="1.5"/>'
+              f'<circle cx="{x}" cy="{y}" r="5" fill="{color}"/>'
+              f'<text class="mono" x="{x+11}" y="{y}" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">{safe}</text></g>\n')
+    return s
+
+
 def ss_carga_db(freeze=None):
     """Animada: siete pasos de 4 s, del POST /login al usuario cargado de la base de datos. Con freeze=1..7 sale el fotograma fijo de ese paso."""
     fid, h, n_steps, secs = 'ssCargaDb', 738, 7, 4
@@ -292,13 +316,7 @@ def ss_carga_db(freeze=None):
             (6, 72, 426, near, teal, 'matches("123456", "123456")'), (6, 88, 450, (0, -24), green, 'true'),
             (7, 88, 378, up, green, 'Authentication autenticada'), (7, 88, 298, up, green, 'Authentication autenticada'),
             (7, 88, 218, up, green, 'Set-Cookie: JSESSIONID=ABC123…')]
-    slots = {1: [(.12, .55)], 2: [(.1, .35), (.42, .67)], 3: [(.08, .27), (.31, .5), (.54, .73)], 4: [(.06, .21), (.24, .39), (.42, .57), (.6, .75)]}
-    tokens, seen = [], {}
-    for n, (step, _, _, (dx, dy), _, _) in enumerate(hops):
-        start, arrive = slots[sum(1 for hp in hops if hp[0] == step)][seen.setdefault(step, 0)]
-        seen[step] += 1
-        tokens.append((f'hp{n}', step, [(start, '0,0'), (arrive, f'{dx}px,{dy}px'), (.88, f'{dx}px,{dy}px')]))
-    s = s.replace('    </style>', anim_css(fid, n_steps, secs, spans, tokens, freeze, on) + '    </style>', 1)
+    s = s.replace('    </style>', anim_css(fid, n_steps, secs, spans, hop_tokens(hops), freeze, on) + '    </style>', 1)
     s = s.replace(f'<svg id="{fid}"', f'<svg id="{fid}" data-steps="{n_steps}" data-step-seconds="{secs}"', 1)
 
     for x, pw, label in ((48, 316, 'SPRING SECURITY'), (388, 524, 'SU CÓDIGO')):
@@ -359,11 +377,7 @@ def ss_carga_db(freeze=None):
     for x, y, n, color in ((350, 238, 1, 'indigo'), (350, 318, 2, 'indigo'), (610, 398, 3, 'amber'), (610, 478, 4, 'amber'),
                            (644, 162, 5, 'green'), (350, 478, 6, 'amber'), (350, 158, 7, 'green')):
         s += '  ' + chip(x, y, n, color)
-    for n, (_, x, y, _, color, text) in enumerate(hops):
-        pw = 30 + len(text) * 6.6
-        s += (f'  <g class="an hp{n}"><rect x="{x-10}" y="{y-10}" width="{pw:.0f}" height="20" rx="10" fill="#FFFFFF" stroke="{color}" stroke-width="1.5"/>'
-              f'<circle cx="{x}" cy="{y}" r="5" fill="{color}"/>'
-              f'<text class="mono" x="{x+11}" y="{y}" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">{text.replace(chr(34), "&quot;")}</text></g>\n')
+    s += hop_pills(hops)
 
     s += '  <rect x="48" y="622" width="864" height="56" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>\n'
     caps = [(1, 'indigo', 'Llega el POST /login: UsernamePasswordAuthenticationFilter saca el usuario y la contraseña del formulario.', 'Con ellos arma un objeto Authentication, todavía sin autenticar.'),
@@ -483,6 +497,120 @@ def ss_in_memory(freeze=None):
 
 
 FIGS['ssInMemory'] = ss_in_memory
+
+
+def ss_autorizadas(freeze=None):
+    """Animada: nueve pasos de 4 s. Del 1 al 3, un request sin sesión; del 4 al 9, el mismo request con sesión. Con freeze=1..9 sale el fotograma fijo."""
+    fid, h, n_steps, secs = 'ssAutorizadas', 656, 9, 4
+    s = head(fid, h, 'Un request, dos finales: sin sesión y con sesión', 'Un request, dos finales: sin sesión y con sesión',
+             'Los filtros de seguridad deciden si el request llega a los beans o se devuelve al login.',
+             'Animación en nueve pasos con los filtros de seguridad a la izquierda, las HTTP Sessions del servidor arriba a la derecha y, '
+             'debajo, los beans del Application Context y la base de datos. Caso uno, sin sesión. Uno: llega GET /courses sin cookie. '
+             'Dos: el SecurityContextHolder queda vacío y AuthorizationFilter lo consulta. Tres: AuthorizationFilter corta el request y '
+             'responde 302 a /login; los beans y la base de datos no se tocan. Caso dos, con sesión. Cuatro: el mismo GET lleva la cookie '
+             'JSESSIONID. Cinco: SecurityContextPersistenceFilter busca la sesión y carga su SecurityContext en el '
+             'SecurityContextHolder. Seis: AuthorizationFilter verifica el acceso y deja pasar el request al controller. Siete: '
+             'controller, service y repository consultan la base de datos. Ocho: los datos vuelven al controller. Nueve: la respuesta '
+             'atraviesa los filtros y llega al navegador con 200 OK.',
+             colors=('teal', 'green'))
+    teal, green, amber, ind, rose = (FAM[c][2] for c in ('teal', 'green', 'amber', 'indigo', 'rose'))
+    spans = {f'a{k}': [(k, k)] for k in range(1, n_steps + 1)}
+    spans.update({'a13': [(1, 3)], 'a14': [(1, 4)], 'a49': [(4, 9)], 'a59': [(5, 9)], 'a23': [(2, 3)], 'a56': [(5, 6)],
+                  'aN': [(1, 1), (4, 4)], 'aS': [(1, 1), (4, 5)], 'aC': [(6, 6), (8, 8)]})
+    on = {1: ['a1', 'a13', 'a14', 'aN', 'aS'], 2: ['a2', 'a13', 'a14', 'a23'], 3: ['a3', 'a13', 'a14', 'a23'],
+          4: ['a4', 'a14', 'a49', 'aN', 'aS'], 5: ['a5', 'a49', 'a59', 'aS', 'a56'], 6: ['a6', 'a49', 'a59', 'a56', 'aC'],
+          7: ['a7', 'a49', 'a59'], 8: ['a8', 'a49', 'a59', 'aC'], 9: ['a9', 'a49', 'a59']}
+    down, up = (0, 20), (0, -20)
+    hops = [(1, 72, 178, down, teal, 'GET /courses · sin cookie'),
+            (2, 72, 258, down, teal, 'request sin usuario'),
+            (3, 88, 298, up, rose, '302 · Location: /login'), (3, 88, 218, up, rose, '302 · Location: /login'),
+            (4, 72, 178, down, teal, 'GET /courses · JSESSIONID=ABC123…'),
+            (5, 354, 228, (34, 0), teal, 'JSESSIONID=ABC123XYZ456'), (5, 392, 248, (-34, 0), green, 'SecurityContext de ana'),
+            (6, 72, 258, down, teal, 'request de ana'), (6, 352, 283, (46, 0), teal, 'GET /courses'),
+            (7, 412, 338, down, teal, 'findAll()'), (7, 412, 418, down, teal, 'findAll()'), (7, 616, 470, (34, 0), teal, 'SELECT'),
+            (8, 676, 482, (-48, 0), green, 'filas'), (8, 428, 458, up, green, 'List<Course>'), (8, 428, 378, up, green, 'List<Course>'),
+            (9, 398, 283, (-46, 0), green, 'vista courses (HTML)'), (9, 88, 298, up, green, '200 OK · HTML'), (9, 88, 218, up, green, '200 OK · HTML')]
+    s = s.replace('    </style>', anim_css(fid, n_steps, secs, spans, hop_tokens(hops), freeze, on) + '    </style>', 1)
+    s = s.replace(f'<svg id="{fid}"', f'<svg id="{fid}" data-steps="{n_steps}" data-step-seconds="{secs}"', 1)
+
+    s += '  <g class="an a13">' + box(712, 36, 200, 28, 'rose', 'CASO 1 · SIN SESIÓN', mono=False, fs=12).strip() + '</g>\n'
+    s += '  <g class="ls a49">' + box(712, 36, 200, 28, 'green', 'CASO 2 · CON SESIÓN', mono=False, fs=12).strip() + '</g>\n'
+
+    panels = [(48, 104, 316, 420, 'FILTROS DE SEGURIDAD', 128), (388, 104, 524, 166, 'HTTP SESSIONS · EN EL SERVIDOR', 128),
+              (388, 284, 304, 240, 'APPLICATION CONTEXT · BEANS', 515), (708, 284, 204, 240, 'BASE DE DATOS', 308)]
+    for x, y, pw, ph, label, ty in panels:
+        s += f'  <rect x="{x}" y="{y}" width="{pw}" height="{ph}" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>\n'
+        s += f'  <text class="h" x="{x+16}" y="{ty}" data-fit="{pw-32}">{label}</text>\n'
+
+    def pair(x, top):
+        return f'  <path class="ar-teal" d="M{x},{top+2} V{top+42}"/><path class="ar-green" d="M{x+16},{top+42} V{top+2}"/>\n'
+
+    s += '  <rect x="64" y="140" width="284" height="36" rx="10" fill="#EFF1F5" stroke="#C4CBD8" stroke-width="1.5"/>\n'
+    for cls, text in (('an a13', 'Navegador · sin cookie'), ('ls a49', 'Navegador · JSESSIONID=ABC123…')):
+        s += f'  <text class="{cls}" x="206" y="158" dy="0.35em" text-anchor="middle" font-size="13" font-weight="700" fill="#556074">{text}</text>\n'
+    s += '  ' + box(64, 220, 284, 36, 'indigo', 'SecurityContextPersistenceFilter', fs=11.5)
+    s += '  ' + box(64, 300, 284, 36, 'indigo', 'AuthorizationFilter', hero=True)
+    s += pair(72, 176) + pair(72, 256)
+    s += '  <path d="M206,338 V390" stroke="#556074" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>\n'
+    s += '  <text x="216" y="368" font-size="12" font-weight="600" fill="#556074">consulta</text>\n'
+    soft, border, _ = FAM['indigo']
+    s += f'  <rect x="64" y="392" width="284" height="88" rx="10" fill="{soft}" stroke="{border}" stroke-width="1.5"/>\n'
+    s += f'  <text class="mono" x="76" y="413" font-size="12.5" font-weight="700" fill="{ind}">SecurityContextHolder</text>\n'
+    s += ('  <g class="an a14"><rect x="76" y="424" width="260" height="44" rx="8" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.5" stroke-dasharray="5 5"/>'
+          '<text x="206" y="446" dy="0.35em" text-anchor="middle" font-size="12.5" fill="#79809A">vacío: nadie autenticado</text></g>\n')
+    s += '  <g class="ls a59">' + box(76, 424, 260, 44, 'green', 'ana@icesi.edu.co', sub='authorities: read', fs=12.5).strip() + '</g>\n'
+
+    s += '  ' + box(404, 146, 240, 52, 'slate', 'ABC123XYZ456', sub='SecurityContext de ana')
+    s += '  ' + box(656, 146, 240, 52, 'slate', 'QRS789LMN012', sub='SecurityContext de luis')
+    s += '  <path class="ar-teal" d="M350,228 H386"/><path class="ar-green" d="M386,248 H350"/>\n'
+
+    s += '  ' + box(404, 300, 200, 36, 'amber', 'CoursesController', fs=12.5)
+    s += '  ' + box(404, 380, 200, 36, 'amber', 'CourseService', fs=12.5)
+    s += '  ' + box(404, 460, 200, 36, 'amber', 'CourseRepository', fs=12.5)
+    s += '  <path class="ar-teal" d="M350,311 H402"/><path class="ar-green" d="M402,325 H350"/>\n'
+    s += pair(412, 336) + pair(412, 416)
+    s += '  <text class="h" x="720" y="428">TABLA COURSES</text>\n'
+    s += '  <rect x="720" y="438" width="180" height="72" rx="8" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.5"/>\n'
+    s += '  <path d="M720,462 H900 V446 A8,8 0 0 0 892,438 H728 A8,8 0 0 0 720,446 Z" fill="#EFF1F5"/>\n'
+    s += '  <path d="M720,462 H900 M720,486 H900 M760,438 V510" stroke="#D9DEE8" stroke-width="1.25" fill="none"/>\n'
+    for i, (cid, name) in enumerate((('id', 'name'), ('1', 'Computación II'), ('2', 'Apps Móviles'))):
+        weight, fill = ('700', '#556074') if i == 0 else ('400', '#161A26')
+        s += (f'  <text class="mono" x="730" y="{450 + i*24}" dy="0.35em" font-size="10.5" font-weight="{weight}" fill="{fill}">{cid}</text>'
+              f'<text class="mono" x="770" y="{450 + i*24}" dy="0.35em" font-size="10.5" font-weight="{weight}" fill="{fill}">{name}</text>\n')
+    s += '  <path class="ar-teal" d="M606,470 H718"/><path class="ar-green" d="M718,482 H606"/>\n'
+    s += ('  <g class="an a13"><rect x="389" y="285" width="302" height="238" rx="11" fill="#FBFBFD" fill-opacity=".82"/>'
+          '<rect x="709" y="285" width="202" height="238" rx="11" fill="#FBFBFD" fill-opacity=".82"/>'
+          f'<text x="540" y="358" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="{rose}">El request no llega hasta aquí</text>'
+          f'<text x="810" y="358" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="{rose}">No se consulta</text></g>\n')
+
+    rings = [('aN', 60, 136, 292, 44, teal), ('a3', 60, 136, 292, 44, rose), ('a9', 60, 136, 292, 44, green), ('aS', 60, 216, 292, 44, ind),
+             ('a23', 60, 296, 292, 44, rose), ('a6', 60, 296, 292, 44, ind), ('a2', 60, 388, 292, 96, rose), ('a56', 60, 388, 292, 96, green),
+             ('a5', 400, 142, 248, 60, green), ('aC', 400, 296, 208, 44, amber), ('a7', 400, 376, 208, 44, amber), ('a7', 400, 456, 208, 44, amber)]
+    for cls, x, y, rw, rh, color in rings:
+        s += f'  <rect class="an {cls}" x="{x}" y="{y}" width="{rw}" height="{rh}" rx="12" fill="none" stroke="{color}" stroke-width="3"/>\n'
+    s += f'  <rect class="an a7" x="720" y="462" width="180" height="48" fill="{teal}" fill-opacity=".12" stroke="{teal}" stroke-width="2"/>\n'
+    s += hop_pills(hops)
+
+    s += '  <rect x="48" y="540" width="864" height="56" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>\n'
+    caps = [(1, 'teal', 'Caso 1 · Llega GET /courses sin la cookie JSESSIONID.', 'SecurityContextPersistenceFilter no tiene con qué buscar una sesión.'),
+            (2, 'rose', 'El SecurityContextHolder queda vacío: para Spring Security, este request no es de nadie.', 'AuthorizationFilter lo consulta para decidir si la ruta se puede atender.'),
+            (3, 'rose', 'Como /courses exige un usuario autenticado, AuthorizationFilter corta el request.', 'El navegador recibe una redirección a /login; ni los beans ni la base de datos se enteran.'),
+            (4, 'teal', 'Caso 2 · Después del login, el mismo GET /courses lleva la cookie JSESSIONID.', 'El navegador la envía automáticamente en cada request.'),
+            (5, 'green', 'SecurityContextPersistenceFilter busca esa sesión entre las HTTP Sessions y recupera su SecurityContext.', 'Lo carga en el SecurityContextHolder: mientras dure este request, el usuario es ana.'),
+            (6, 'indigo', 'AuthorizationFilter verifica que ana puede acceder a /courses y deja pasar el request.', 'Solo ahora llega al controller.'),
+            (7, 'amber', 'El controller usa el service, y este el repository, que consulta la base de datos.', 'Son los beans del Application Context, como en cualquier request.'),
+            (8, 'green', 'Los datos vuelven por el mismo camino hasta el controller.', 'Con ellos arma la vista.'),
+            (9, 'green', 'La respuesta atraviesa los filtros de regreso y llega al navegador.', 'Al terminar se limpia el SecurityContextHolder: el siguiente request vuelve a empezar por la cookie.')]
+    for n, color, l1, l2 in caps:
+        s += (f'  <g class="an a{n}">' + chip(76, 568, n, color).strip() +
+              f'<text x="100" y="563" font-size="13" font-weight="600" fill="#161A26" data-fit="790">{l1}</text>'
+              f'<text x="100" y="581" font-size="13" fill="#454C61" data-fit="790">{l2}</text></g>\n')
+    s += ('  <g class="st"><text x="68" y="563" font-size="13" font-weight="600" fill="#161A26" data-fit="820">Sin sesión, el request muere en los filtros; con sesión, llega a los beans y a la base de datos.</text>'
+          '<text x="68" y="581" font-size="13" fill="#454C61" data-fit="820">La animación recorre los dos casos.</text></g>\n')
+    return s + tail(h, 'El SecurityContext vive en la sesión HTTP; el SecurityContextHolder solo lo sostiene mientras dura el request.')
+
+
+FIGS['ssAutorizadas'] = ss_autorizadas
 
 
 def main():
