@@ -9,9 +9,9 @@
 Ya hemos visto cómo se carga un in-memory user. Pero ahora, tenemos que llevar esta forma en la que funcionan los usuarios en SpringBoot para habilitar los usuarios almacenados en base de datos.
 
 ```svg
-<svg id="ssCargaDb" data-steps="7" data-step-seconds="3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 738" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="ssCargaDb-ttl ssCargaDb-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
+<svg id="ssCargaDb" data-steps="7" data-step-seconds="4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 738" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="ssCargaDb-ttl ssCargaDb-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
   <title id="ssCargaDb-ttl">Del formulario a la base de datos: quién carga el usuario</title>
-  <desc id="ssCargaDb-dsc">Animación en siete pasos y dos columnas: las piezas de Spring Security a la izquierda y el código propio a la derecha. Entre cada par de bloques se lee lo que entra y lo que sale. Uno: del navegador llega POST /login con el correo y la contraseña, y UsernamePasswordAuthenticationFilter arma una Authentication sin autenticar. Dos: el filtro se la pasa al AuthenticationManager, que se la entrega a DaoAuthenticationProvider. Tres: el provider llama a loadUserByUsername de CustomUserDetailsService con el correo. Cuatro: ese servicio llama a findByEmail de UserService, este al de UserRepository, y el repositorio hace un SELECT en la tabla users. Cinco: vuelve un User, que se envuelve en un SecurityUser, el UserDetails que sale de loadUserByUsername. Seis: el provider le entrega las dos contraseñas al PasswordEncoder, que responde true. Siete: sube una Authentication autenticada, se crea la sesión HTTP y la respuesta sale con Set-Cookie JSESSIONID.</desc>
+  <desc id="ssCargaDb-dsc">Animación en siete pasos y dos columnas: las piezas de Spring Security a la izquierda y el código propio a la derecha. En cada paso, un punto viaja de bloque en bloque con lo que entra o lo que sale. Uno: del navegador llega POST /login con el correo y la contraseña, y UsernamePasswordAuthenticationFilter arma una Authentication sin autenticar. Dos: el filtro se la pasa al AuthenticationManager, que se la entrega a DaoAuthenticationProvider. Tres: el provider llama a loadUserByUsername de CustomUserDetailsService con el correo. Cuatro: ese servicio llama a findByEmail de UserService, este al de UserRepository, y el repositorio hace un SELECT en la tabla users. Cinco: vuelve un User, que se envuelve en un SecurityUser, el UserDetails que sale de loadUserByUsername. Seis: el provider le entrega las dos contraseñas al PasswordEncoder, que responde true. Siete: sube una Authentication autenticada, se crea la sesión HTTP y la respuesta sale con Set-Cookie JSESSIONID.</desc>
   <defs>
     <style>
       #ssCargaDb .title{fill:#161A26;font-size:22px;font-weight:700}
@@ -21,7 +21,7 @@ Ya hemos visto cómo se carga un in-memory user. Pero ahora, tenemos que llevar 
       #ssCargaDb .mono{font-family:ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace}
       #ssCargaDb .ar-teal{fill:none;stroke:#0F8478;stroke-width:1.75;marker-end:url(#ssCargaDb-ar-teal)}
       #ssCargaDb .ar-green{fill:none;stroke:#3A8235;stroke-width:1.75;marker-end:url(#ssCargaDb-ar-green)}
-      #ssCargaDb .an,#ssCargaDb .ls,#ssCargaDb .st{animation-duration:21s;animation-iteration-count:infinite;animation-timing-function:linear}
+      #ssCargaDb .an,#ssCargaDb .ls,#ssCargaDb .st{animation-duration:28s;animation-iteration-count:infinite;animation-timing-function:linear}
       #ssCargaDb .an{opacity:0}
       #ssCargaDb .st{animation-name:ssCargaDb-hide}
       #ssCargaDb .a1{animation-name:ssCargaDb-a1}
@@ -46,20 +46,38 @@ Ya hemos visto cómo se carga un in-memory user. Pero ahora, tenemos que llevar 
       @keyframes ssCargaDb-a57{0%{opacity:0} 57.14%{opacity:0} 59.14%{opacity:1} 98%{opacity:1} 100%{opacity:0}}
       #ssCargaDb .aD{animation-name:ssCargaDb-aD}
       @keyframes ssCargaDb-aD{0%{opacity:0} 14.29%{opacity:0} 16.29%{opacity:1} 40.86%{opacity:1} 42.86%{opacity:0} 71.43%{opacity:0} 73.43%{opacity:1} 83.71%{opacity:1} 85.71%{opacity:0} 100%{opacity:0}}
-      #ssCargaDb .tk1{animation-name:ssCargaDb-tk1}
-      @keyframes ssCargaDb-tk1{0%,1.14%{opacity:0;transform:translate(0,0)}2.86%{opacity:1;transform:translate(0,0)}8.57%{opacity:1;transform:translate(0,40px)}13.14%,100%{opacity:0;transform:translate(0,40px)}}
-      #ssCargaDb .tk2{animation-name:ssCargaDb-tk2}
-      @keyframes ssCargaDb-tk2{0%,15.43%{opacity:0;transform:translate(0,0)}17.14%{opacity:1;transform:translate(0,0)}20%{opacity:1;transform:translate(0,40px)}25%{opacity:1;transform:translate(0,120px)}27.43%,100%{opacity:0;transform:translate(0,120px)}}
-      #ssCargaDb .tk3{animation-name:ssCargaDb-tk3}
-      @keyframes ssCargaDb-tk3{0%,29.71%{opacity:0;transform:translate(0,0)}31.43%{opacity:1;transform:translate(0,0)}38.57%{opacity:1;transform:translate(52px,0)}41.71%,100%{opacity:0;transform:translate(52px,0)}}
-      #ssCargaDb .tk4{animation-name:ssCargaDb-tk4}
-      @keyframes ssCargaDb-tk4{0%,44%{opacity:0;transform:translate(0,0)}45.71%{opacity:1;transform:translate(0,0)}49.29%{opacity:1;transform:translate(0,134px)}53.57%{opacity:1;transform:translate(270px,134px)}56%,100%{opacity:0;transform:translate(270px,134px)}}
-      #ssCargaDb .tk5{animation-name:ssCargaDb-tk5}
-      @keyframes ssCargaDb-tk5{0%,58.29%{opacity:0;transform:translate(0,0)}60%{opacity:1;transform:translate(0,0)}62.86%{opacity:1;transform:translate(-254px,0)}65.71%{opacity:1;transform:translate(-254px,-161px)}67.86%{opacity:1;transform:translate(-332px,-161px)}70.29%,100%{opacity:0;transform:translate(-332px,-161px)}}
-      #ssCargaDb .tk6{animation-name:ssCargaDb-tk6}
-      @keyframes ssCargaDb-tk6{0%,72.57%{opacity:0;transform:translate(0,0)}74.29%{opacity:1;transform:translate(0,0)}80%{opacity:1;transform:translate(0,40px)}84.57%,100%{opacity:0;transform:translate(0,40px)}}
-      #ssCargaDb .tk7{animation-name:ssCargaDb-tk7}
-      @keyframes ssCargaDb-tk7{0%,86.86%{opacity:0;transform:translate(0,0)}88.57%{opacity:1;transform:translate(0,0)}96.43%{opacity:1;transform:translate(0,-200px)}98.86%,100%{opacity:0;transform:translate(0,-200px)}}
+      #ssCargaDb .hp0{animation-name:ssCargaDb-hp0}
+      @keyframes ssCargaDb-hp0{0%,1.14%{opacity:0;transform:translate(0,0)}1.71%{opacity:1;transform:translate(0,0)}7.86%{opacity:1;transform:translate(0px,20px)}12.57%{opacity:1;transform:translate(0px,20px)}13.14%,100%{opacity:0;transform:translate(0px,20px)}}
+      #ssCargaDb .hp1{animation-name:ssCargaDb-hp1}
+      @keyframes ssCargaDb-hp1{0%,15.14%{opacity:0;transform:translate(0,0)}15.71%{opacity:1;transform:translate(0,0)}19.29%{opacity:1;transform:translate(0px,20px)}26.86%{opacity:1;transform:translate(0px,20px)}27.43%,100%{opacity:0;transform:translate(0px,20px)}}
+      #ssCargaDb .hp2{animation-name:ssCargaDb-hp2}
+      @keyframes ssCargaDb-hp2{0%,19.71%{opacity:0;transform:translate(0,0)}20.29%{opacity:1;transform:translate(0,0)}23.86%{opacity:1;transform:translate(0px,20px)}26.86%{opacity:1;transform:translate(0px,20px)}27.43%,100%{opacity:0;transform:translate(0px,20px)}}
+      #ssCargaDb .hp3{animation-name:ssCargaDb-hp3}
+      @keyframes ssCargaDb-hp3{0%,29.71%{opacity:0;transform:translate(0,0)}30.29%{opacity:1;transform:translate(0,0)}36.43%{opacity:1;transform:translate(46px,0px)}41.14%{opacity:1;transform:translate(46px,0px)}41.71%,100%{opacity:0;transform:translate(46px,0px)}}
+      #ssCargaDb .hp4{animation-name:ssCargaDb-hp4}
+      @keyframes ssCargaDb-hp4{0%,43.43%{opacity:0;transform:translate(0,0)}44%{opacity:1;transform:translate(0,0)}46.71%{opacity:1;transform:translate(0px,20px)}55.43%{opacity:1;transform:translate(0px,20px)}56%,100%{opacity:0;transform:translate(0px,20px)}}
+      #ssCargaDb .hp5{animation-name:ssCargaDb-hp5}
+      @keyframes ssCargaDb-hp5{0%,46.71%{opacity:0;transform:translate(0,0)}47.29%{opacity:1;transform:translate(0,0)}50%{opacity:1;transform:translate(0px,20px)}55.43%{opacity:1;transform:translate(0px,20px)}56%,100%{opacity:0;transform:translate(0px,20px)}}
+      #ssCargaDb .hp6{animation-name:ssCargaDb-hp6}
+      @keyframes ssCargaDb-hp6{0%,50%{opacity:0;transform:translate(0,0)}50.57%{opacity:1;transform:translate(0,0)}53.29%{opacity:1;transform:translate(34px,0px)}55.43%{opacity:1;transform:translate(34px,0px)}56%,100%{opacity:0;transform:translate(34px,0px)}}
+      #ssCargaDb .hp7{animation-name:ssCargaDb-hp7}
+      @keyframes ssCargaDb-hp7{0%,57.43%{opacity:0;transform:translate(0,0)}58%{opacity:1;transform:translate(0,0)}60.14%{opacity:1;transform:translate(-48px,0px)}69.71%{opacity:1;transform:translate(-48px,0px)}70.29%,100%{opacity:0;transform:translate(-48px,0px)}}
+      #ssCargaDb .hp8{animation-name:ssCargaDb-hp8}
+      @keyframes ssCargaDb-hp8{0%,60%{opacity:0;transform:translate(0,0)}60.57%{opacity:1;transform:translate(0,0)}62.71%{opacity:1;transform:translate(0px,-20px)}69.71%{opacity:1;transform:translate(0px,-20px)}70.29%,100%{opacity:0;transform:translate(0px,-20px)}}
+      #ssCargaDb .hp9{animation-name:ssCargaDb-hp9}
+      @keyframes ssCargaDb-hp9{0%,62.57%{opacity:0;transform:translate(0,0)}63.14%{opacity:1;transform:translate(0,0)}65.29%{opacity:1;transform:translate(0px,-20px)}69.71%{opacity:1;transform:translate(0px,-20px)}70.29%,100%{opacity:0;transform:translate(0px,-20px)}}
+      #ssCargaDb .hp10{animation-name:ssCargaDb-hp10}
+      @keyframes ssCargaDb-hp10{0%,65.14%{opacity:0;transform:translate(0,0)}65.71%{opacity:1;transform:translate(0,0)}67.86%{opacity:1;transform:translate(-46px,0px)}69.71%{opacity:1;transform:translate(-46px,0px)}70.29%,100%{opacity:0;transform:translate(-46px,0px)}}
+      #ssCargaDb .hp11{animation-name:ssCargaDb-hp11}
+      @keyframes ssCargaDb-hp11{0%,72.29%{opacity:0;transform:translate(0,0)}72.86%{opacity:1;transform:translate(0,0)}76.43%{opacity:1;transform:translate(0px,24px)}84%{opacity:1;transform:translate(0px,24px)}84.57%,100%{opacity:0;transform:translate(0px,24px)}}
+      #ssCargaDb .hp12{animation-name:ssCargaDb-hp12}
+      @keyframes ssCargaDb-hp12{0%,76.86%{opacity:0;transform:translate(0,0)}77.43%{opacity:1;transform:translate(0,0)}81%{opacity:1;transform:translate(0px,-24px)}84%{opacity:1;transform:translate(0px,-24px)}84.57%,100%{opacity:0;transform:translate(0px,-24px)}}
+      #ssCargaDb .hp13{animation-name:ssCargaDb-hp13}
+      @keyframes ssCargaDb-hp13{0%,86.29%{opacity:0;transform:translate(0,0)}86.86%{opacity:1;transform:translate(0,0)}89.57%{opacity:1;transform:translate(0px,-20px)}98.29%{opacity:1;transform:translate(0px,-20px)}98.86%,100%{opacity:0;transform:translate(0px,-20px)}}
+      #ssCargaDb .hp14{animation-name:ssCargaDb-hp14}
+      @keyframes ssCargaDb-hp14{0%,89.57%{opacity:0;transform:translate(0,0)}90.14%{opacity:1;transform:translate(0,0)}92.86%{opacity:1;transform:translate(0px,-20px)}98.29%{opacity:1;transform:translate(0px,-20px)}98.86%,100%{opacity:0;transform:translate(0px,-20px)}}
+      #ssCargaDb .hp15{animation-name:ssCargaDb-hp15}
+      @keyframes ssCargaDb-hp15{0%,92.86%{opacity:0;transform:translate(0,0)}93.43%{opacity:1;transform:translate(0,0)}96.14%{opacity:1;transform:translate(0px,-20px)}98.29%{opacity:1;transform:translate(0px,-20px)}98.86%,100%{opacity:0;transform:translate(0px,-20px)}}
       @keyframes ssCargaDb-hide{from{opacity:0}to{opacity:0}}
       @media (prefers-reduced-motion: reduce){#ssCargaDb .an,#ssCargaDb .ls,#ssCargaDb .st{animation:none}}
     </style>
@@ -78,35 +96,31 @@ Ya hemos visto cómo se carga un in-memory user. Pero ahora, tenemos que llevar 
   <rect x="64" y="300" width="284" height="36" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text class="mono" x="206" y="318" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#4453C9" data-fit="268">AuthenticationManager</text>
   <rect x="64" y="380" width="284" height="36" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="2.5"/><text class="mono" x="206" y="398" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#4453C9" data-fit="268">DaoAuthenticationProvider</text>
   <rect x="64" y="460" width="284" height="36" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text class="mono" x="206" y="478" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#A96C05" data-fit="268">PasswordEncoder</text>
-  <path class="ar-teal" d="M72,178 V218"/><path class="ar-green" d="M88,218 V178"/><text class="mono" x="102" y="193" font-size="11" font-weight="600" fill="#0F8478">POST /login: ana@icesi.edu.co, 123456</text><text class="mono" x="102" y="208" font-size="11" font-weight="600" fill="#3A8235">Set-Cookie: JSESSIONID=ABC123…</text>
-  <path class="ar-teal" d="M72,258 V298"/><path class="ar-green" d="M88,298 V258"/><text class="mono" x="102" y="273" font-size="11" font-weight="600" fill="#0F8478">Authentication sin autenticar</text><text class="mono" x="102" y="288" font-size="11" font-weight="600" fill="#3A8235">Authentication autenticada</text>
-  <path class="ar-teal" d="M72,338 V378"/><path class="ar-green" d="M88,378 V338"/><text class="mono" x="102" y="353" font-size="11" font-weight="600" fill="#0F8478">la misma Authentication</text><text class="mono" x="102" y="368" font-size="11" font-weight="600" fill="#3A8235">Authentication autenticada</text>
-  <path class="ar-teal" d="M72,418 V458"/><path class="ar-green" d="M88,458 V418"/><text class="mono" x="102" y="433" font-size="11" font-weight="600" fill="#0F8478">matches(&quot;123456&quot;, &quot;123456&quot;)</text><text class="mono" x="102" y="448" font-size="11" font-weight="600" fill="#3A8235">true</text>
-  <text class="h" x="404" y="148">USUARIO AUTENTICADO</text><text class="h" x="668" y="148">CÓMO LEER LAS FLECHAS</text>
+  <path class="ar-teal" d="M72,178 V218"/><path class="ar-green" d="M88,218 V178"/>
+  <path class="ar-teal" d="M72,258 V298"/><path class="ar-green" d="M88,298 V258"/>
+  <path class="ar-teal" d="M72,338 V378"/><path class="ar-green" d="M88,378 V338"/>
+  <path class="ar-teal" d="M72,418 V458"/><path class="ar-green" d="M88,458 V418"/>
+  <text class="h" x="404" y="148">USUARIO AUTENTICADO</text><text class="h" x="668" y="148">CÓMO LEER LOS PUNTOS</text>
   <g class="an a14"><rect x="404" y="162" width="240" height="96" rx="10" fill="none" stroke="#C4CBD8" stroke-width="1.5" stroke-dasharray="5 5"/><text x="524" y="210" dy="0.35em" text-anchor="middle" font-size="12.5" fill="#79809A">todavía no hay un UserDetails</text></g>
   <g class="ls a57"><rect x="404" y="162" width="240" height="96" rx="10" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text class="mono" x="416" y="183" font-size="13" font-weight="700" fill="#3A8235">SecurityUser</text><text x="628" y="183" text-anchor="end" font-size="11.5" fill="#454C61">es un UserDetails</text><rect x="416" y="194" width="216" height="52" rx="10" fill="#EFF1F5" stroke="#C4CBD8" stroke-width="1.5"/><text class="mono" x="524" y="211" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#556074" data-fit="200">User</text><text x="524" y="230" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="200">ana@icesi.edu.co · 123456</text></g>
   <rect x="668" y="162" width="228" height="96" rx="10" fill="#FBFBFD" stroke="#D9DEE8" stroke-width="1.5"/>
-  <path class="ar-teal" d="M684,194 H716"/><path class="ar-green" d="M716,228 H684"/>
-  <text x="728" y="194" dy="0.35em" font-size="12.5" font-weight="600" fill="#0F8478">lo que entra al bloque</text>
-  <text x="728" y="228" dy="0.35em" font-size="12.5" font-weight="600" fill="#3A8235">lo que sale del bloque</text>
+  <circle cx="700" cy="194" r="7" fill="#0F8478"/><circle cx="700" cy="228" r="7" fill="#3A8235"/>
+  <text x="720" y="194" dy="0.35em" font-size="12.5" font-weight="600" fill="#161A26">lo que entra al bloque</text>
+  <text x="720" y="228" dy="0.35em" font-size="12.5" font-weight="600" fill="#161A26">lo que sale del bloque</text>
   <rect x="404" y="380" width="200" height="36" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text class="mono" x="504" y="398" dy="0.35em" text-anchor="middle" font-size="12" font-weight="700" fill="#A96C05" data-fit="184">CustomUserDetailsService</text>
   <rect x="404" y="460" width="200" height="36" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text class="mono" x="504" y="478" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#A96C05" data-fit="184">UserService</text>
   <rect x="404" y="540" width="200" height="36" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text class="mono" x="504" y="558" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#A96C05" data-fit="184">UserRepository</text>
   <path class="ar-teal" d="M350,391 H402"/><path class="ar-green" d="M402,405 H350"/>
-  <text class="mono" x="404" y="354" font-size="11" font-weight="600" fill="#0F8478">loadUserByUsername(&quot;ana@icesi.edu.co&quot;)</text>
-  <text class="mono" x="404" y="369" font-size="11" font-weight="600" fill="#3A8235">UserDetails: el SecurityUser</text>
-  <path class="ar-teal" d="M412,418 V458"/><path class="ar-green" d="M428,458 V418"/><text class="mono" x="442" y="433" font-size="11" font-weight="600" fill="#0F8478">findByEmail(&quot;ana@icesi.edu.co&quot;)</text><text class="mono" x="442" y="448" font-size="11" font-weight="600" fill="#3A8235">User(ana@icesi.edu.co, 123456)</text>
-  <path class="ar-teal" d="M412,498 V538"/><path class="ar-green" d="M428,538 V498"/><text class="mono" x="442" y="513" font-size="11" font-weight="600" fill="#0F8478">findByEmail(&quot;ana@icesi.edu.co&quot;)</text><text class="mono" x="442" y="528" font-size="11" font-weight="600" fill="#3A8235">User(ana@icesi.edu.co, 123456)</text>
-  <text class="h" x="684" y="514">TABLA USERS</text>
-  <rect x="684" y="522" width="212" height="72" rx="8" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.5"/>
-  <path d="M684,546 H896 V530 A8,8 0 0 0 888,522 H692 A8,8 0 0 0 684,530 Z" fill="#EFF1F5"/>
-  <path d="M684,546 H896 M684,570 H896 M812,522 V594" stroke="#D9DEE8" stroke-width="1.25" fill="none"/>
-  <text class="mono" x="692" y="534" dy="0.35em" font-size="11" font-weight="700" fill="#556074">email</text><text class="mono" x="820" y="534" dy="0.35em" font-size="11" font-weight="700" fill="#556074">pass</text>
-  <text class="mono" x="692" y="558" dy="0.35em" font-size="11" font-weight="400" fill="#161A26">ana@icesi.edu.co</text><text class="mono" x="820" y="558" dy="0.35em" font-size="11" font-weight="400" fill="#161A26">123456</text>
-  <text class="mono" x="692" y="582" dy="0.35em" font-size="11" font-weight="400" fill="#161A26">luis@icesi.edu.co</text><text class="mono" x="820" y="582" dy="0.35em" font-size="11" font-weight="400" fill="#161A26">qwerty</text>
-  <path class="ar-teal" d="M606,552 H682"/><path class="ar-green" d="M682,566 H606"/>
-  <text class="mono" x="646" y="545" text-anchor="middle" font-size="11" font-weight="600" fill="#0F8478">SELECT</text>
-  <text class="mono" x="646" y="581" text-anchor="middle" font-size="11" font-weight="600" fill="#3A8235">fila</text>
+  <path class="ar-teal" d="M412,418 V458"/><path class="ar-green" d="M428,458 V418"/>
+  <path class="ar-teal" d="M412,498 V538"/><path class="ar-green" d="M428,538 V498"/>
+  <text class="h" x="716" y="514">TABLA USERS</text>
+  <rect x="716" y="522" width="180" height="72" rx="8" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.5"/>
+  <path d="M716,546 H896 V530 A8,8 0 0 0 888,522 H724 A8,8 0 0 0 716,530 Z" fill="#EFF1F5"/>
+  <path d="M716,546 H896 M716,570 H896 M840,522 V594" stroke="#D9DEE8" stroke-width="1.25" fill="none"/>
+  <text class="mono" x="724" y="534" dy="0.35em" font-size="10.5" font-weight="700" fill="#556074">email</text><text class="mono" x="848" y="534" dy="0.35em" font-size="10.5" font-weight="700" fill="#556074">pass</text>
+  <text class="mono" x="724" y="558" dy="0.35em" font-size="10.5" font-weight="400" fill="#161A26">ana@icesi.edu.co</text><text class="mono" x="848" y="558" dy="0.35em" font-size="10.5" font-weight="400" fill="#161A26">123456</text>
+  <text class="mono" x="724" y="582" dy="0.35em" font-size="10.5" font-weight="400" fill="#161A26">luis@icesi.edu.co</text><text class="mono" x="848" y="582" dy="0.35em" font-size="10.5" font-weight="400" fill="#161A26">qwerty</text>
+  <path class="ar-teal" d="M606,552 H714"/><path class="ar-green" d="M714,566 H606"/>
   <rect class="an a1" x="60" y="136" width="292" height="44" rx="12" fill="none" stroke="#0F8478" stroke-width="3"/>
   <rect class="an a1" x="60" y="216" width="292" height="44" rx="12" fill="none" stroke="#4453C9" stroke-width="3"/>
   <rect class="an a2" x="60" y="296" width="292" height="44" rx="12" fill="none" stroke="#4453C9" stroke-width="3"/>
@@ -117,7 +131,7 @@ Ya hemos visto cómo se carga un in-memory user. Pero ahora, tenemos que llevar 
   <rect class="an a5" x="398" y="156" width="252" height="108" rx="12" fill="none" stroke="#3A8235" stroke-width="3"/>
   <rect class="an a6" x="60" y="456" width="292" height="44" rx="12" fill="none" stroke="#A96C05" stroke-width="3"/>
   <rect class="an a7" x="60" y="136" width="292" height="44" rx="12" fill="none" stroke="#3A8235" stroke-width="3"/>
-  <rect class="an a4" x="684" y="546" width="212" height="24" fill="#0F8478" fill-opacity=".12" stroke="#0F8478" stroke-width="2"/>
+  <rect class="an a4" x="716" y="546" width="180" height="24" fill="#0F8478" fill-opacity=".12" stroke="#0F8478" stroke-width="2"/>
   <circle cx="350" cy="238" r="12" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text x="350" y="238" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4453C9">1</text>
   <circle cx="350" cy="318" r="12" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text x="350" y="318" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4453C9">2</text>
   <circle cx="610" cy="398" r="12" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text x="610" y="398" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A96C05">3</text>
@@ -125,13 +139,22 @@ Ya hemos visto cómo se carga un in-memory user. Pero ahora, tenemos que llevar 
   <circle cx="644" cy="162" r="12" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text x="644" y="162" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#3A8235">5</text>
   <circle cx="350" cy="478" r="12" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text x="350" y="478" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A96C05">6</text>
   <circle cx="350" cy="158" r="12" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text x="350" y="158" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#3A8235">7</text>
-  <circle class="an tk1" cx="72" cy="178" r="8" fill="#0F8478" stroke="#FFFFFF" stroke-width="2"/>
-  <circle class="an tk2" cx="72" cy="258" r="8" fill="#0F8478" stroke="#FFFFFF" stroke-width="2"/>
-  <circle class="an tk3" cx="350" cy="391" r="8" fill="#0F8478" stroke="#FFFFFF" stroke-width="2"/>
-  <circle class="an tk4" cx="412" cy="418" r="8" fill="#0F8478" stroke="#FFFFFF" stroke-width="2"/>
-  <circle class="an tk5" cx="682" cy="566" r="8" fill="#3A8235" stroke="#FFFFFF" stroke-width="2"/>
-  <circle class="an tk6" cx="72" cy="418" r="8" fill="#0F8478" stroke="#FFFFFF" stroke-width="2"/>
-  <circle class="an tk7" cx="88" cy="378" r="8" fill="#3A8235" stroke="#FFFFFF" stroke-width="2"/>
+  <g class="an hp0"><rect x="62" y="168" width="287" height="20" rx="10" fill="#FFFFFF" stroke="#0F8478" stroke-width="1.5"/><circle cx="72" cy="178" r="5" fill="#0F8478"/><text class="mono" x="83" y="178" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">POST /login · ana@icesi.edu.co · 123456</text></g>
+  <g class="an hp1"><rect x="62" y="248" width="221" height="20" rx="10" fill="#FFFFFF" stroke="#0F8478" stroke-width="1.5"/><circle cx="72" cy="258" r="5" fill="#0F8478"/><text class="mono" x="83" y="258" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">Authentication sin autenticar</text></g>
+  <g class="an hp2"><rect x="62" y="328" width="221" height="20" rx="10" fill="#FFFFFF" stroke="#0F8478" stroke-width="1.5"/><circle cx="72" cy="338" r="5" fill="#0F8478"/><text class="mono" x="83" y="338" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">Authentication sin autenticar</text></g>
+  <g class="an hp3"><rect x="342" y="354" width="281" height="20" rx="10" fill="#FFFFFF" stroke="#0F8478" stroke-width="1.5"/><circle cx="352" cy="364" r="5" fill="#0F8478"/><text class="mono" x="363" y="364" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">loadUserByUsername(&quot;ana@icesi.edu.co&quot;)</text></g>
+  <g class="an hp4"><rect x="402" y="408" width="235" height="20" rx="10" fill="#FFFFFF" stroke="#0F8478" stroke-width="1.5"/><circle cx="412" cy="418" r="5" fill="#0F8478"/><text class="mono" x="423" y="418" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">findByEmail(&quot;ana@icesi.edu.co&quot;)</text></g>
+  <g class="an hp5"><rect x="402" y="488" width="235" height="20" rx="10" fill="#FFFFFF" stroke="#0F8478" stroke-width="1.5"/><circle cx="412" cy="498" r="5" fill="#0F8478"/><text class="mono" x="423" y="498" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">findByEmail(&quot;ana@icesi.edu.co&quot;)</text></g>
+  <g class="an hp6"><rect x="606" y="542" width="70" height="20" rx="10" fill="#FFFFFF" stroke="#0F8478" stroke-width="1.5"/><circle cx="616" cy="552" r="5" fill="#0F8478"/><text class="mono" x="627" y="552" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">SELECT</text></g>
+  <g class="an hp7"><rect x="660" y="556" width="56" height="20" rx="10" fill="#FFFFFF" stroke="#3A8235" stroke-width="1.5"/><circle cx="670" cy="566" r="5" fill="#3A8235"/><text class="mono" x="681" y="566" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">fila</text></g>
+  <g class="an hp8"><rect x="418" y="528" width="241" height="20" rx="10" fill="#FFFFFF" stroke="#3A8235" stroke-width="1.5"/><circle cx="428" cy="538" r="5" fill="#3A8235"/><text class="mono" x="439" y="538" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">User · ana@icesi.edu.co · 123456</text></g>
+  <g class="an hp9"><rect x="418" y="448" width="241" height="20" rx="10" fill="#FFFFFF" stroke="#3A8235" stroke-width="1.5"/><circle cx="428" cy="458" r="5" fill="#3A8235"/><text class="mono" x="439" y="458" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">User · ana@icesi.edu.co · 123456</text></g>
+  <g class="an hp10"><rect x="388" y="354" width="195" height="20" rx="10" fill="#FFFFFF" stroke="#3A8235" stroke-width="1.5"/><circle cx="398" cy="364" r="5" fill="#3A8235"/><text class="mono" x="409" y="364" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">UserDetails: SecurityUser</text></g>
+  <g class="an hp11"><rect x="62" y="416" width="208" height="20" rx="10" fill="#FFFFFF" stroke="#0F8478" stroke-width="1.5"/><circle cx="72" cy="426" r="5" fill="#0F8478"/><text class="mono" x="83" y="426" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">matches(&quot;123456&quot;, &quot;123456&quot;)</text></g>
+  <g class="an hp12"><rect x="78" y="440" width="56" height="20" rx="10" fill="#FFFFFF" stroke="#3A8235" stroke-width="1.5"/><circle cx="88" cy="450" r="5" fill="#3A8235"/><text class="mono" x="99" y="450" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">true</text></g>
+  <g class="an hp13"><rect x="78" y="368" width="202" height="20" rx="10" fill="#FFFFFF" stroke="#3A8235" stroke-width="1.5"/><circle cx="88" cy="378" r="5" fill="#3A8235"/><text class="mono" x="99" y="378" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">Authentication autenticada</text></g>
+  <g class="an hp14"><rect x="78" y="288" width="202" height="20" rx="10" fill="#FFFFFF" stroke="#3A8235" stroke-width="1.5"/><circle cx="88" cy="298" r="5" fill="#3A8235"/><text class="mono" x="99" y="298" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">Authentication autenticada</text></g>
+  <g class="an hp15"><rect x="78" y="208" width="228" height="20" rx="10" fill="#FFFFFF" stroke="#3A8235" stroke-width="1.5"/><circle cx="88" cy="218" r="5" fill="#3A8235"/><text class="mono" x="99" y="218" dy="0.35em" font-size="11" font-weight="600" fill="#161A26">Set-Cookie: JSESSIONID=ABC123…</text></g>
   <rect x="48" y="622" width="864" height="56" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
   <g class="an a1"><circle cx="76" cy="650" r="12" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text x="76" y="650" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4453C9">1</text><text x="100" y="645" font-size="13" font-weight="600" fill="#161A26" data-fit="790">Llega el POST /login: UsernamePasswordAuthenticationFilter saca el usuario y la contraseña del formulario.</text><text x="100" y="663" font-size="13" fill="#454C61" data-fit="790">Con ellos arma un objeto Authentication, todavía sin autenticar.</text></g>
   <g class="an a2"><circle cx="76" cy="650" r="12" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text x="76" y="650" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4453C9">2</text><text x="100" y="645" font-size="13" font-weight="600" fill="#161A26" data-fit="790">El filtro le entrega esa Authentication al AuthenticationManager, que se la pasa a DaoAuthenticationProvider.</text><text x="100" y="663" font-size="13" fill="#454C61" data-fit="790">Este provider sabe autenticar, pero no sabe dónde están los usuarios.</text></g>

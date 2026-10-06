@@ -300,11 +300,11 @@ La animación recorre ese código y muestra qué queda en memoria después de ca
       #ssInMemory .aM{animation-name:ssInMemory-aM}
       @keyframes ssInMemory-aM{0%{opacity:0} 16.67%{opacity:0} 18.67%{opacity:1} 31.33%{opacity:1} 33.33%{opacity:0} 83.33%{opacity:0} 85.33%{opacity:1} 98%{opacity:1} 100%{opacity:0}}
       #ssInMemory .tk2{animation-name:ssInMemory-tk2}
-      @keyframes ssInMemory-tk2{0%,18%{opacity:0;transform:translate(0,0)}20%{opacity:1;transform:translate(0,0)}28.33%{opacity:1;transform:translate(52px,0)}32%,100%{opacity:0;transform:translate(52px,0)}}
+      @keyframes ssInMemory-tk2{0%,19.33%{opacity:0;transform:translate(0,0)}20%{opacity:1;transform:translate(0,0)}28.33%{opacity:1;transform:translate(52px,0)}32%,100%{opacity:0;transform:translate(52px,0)}}
       #ssInMemory .tk4{animation-name:ssInMemory-tk4}
-      @keyframes ssInMemory-tk4{0%,51.33%{opacity:0;transform:translate(0,0)}53.33%{opacity:1;transform:translate(0,0)}61.67%{opacity:1;transform:translate(0,-40px)}65.33%,100%{opacity:0;transform:translate(0,-40px)}}
+      @keyframes ssInMemory-tk4{0%,52.67%{opacity:0;transform:translate(0,0)}53.33%{opacity:1;transform:translate(0,0)}61.67%{opacity:1;transform:translate(0,-40px)}65.33%,100%{opacity:0;transform:translate(0,-40px)}}
       #ssInMemory .tk6{animation-name:ssInMemory-tk6}
-      @keyframes ssInMemory-tk6{0%,84.67%{opacity:0;transform:translate(0,0)}86.67%{opacity:1;transform:translate(0,0)}95.83%{opacity:1;transform:translate(0,-120px)}98.67%,100%{opacity:0;transform:translate(0,-120px)}}
+      @keyframes ssInMemory-tk6{0%,86%{opacity:0;transform:translate(0,0)}86.67%{opacity:1;transform:translate(0,0)}95.83%{opacity:1;transform:translate(0,-120px)}98.67%,100%{opacity:0;transform:translate(0,-120px)}}
       @keyframes ssInMemory-hide{from{opacity:0}to{opacity:0}}
       @media (prefers-reduced-motion: reduce){#ssInMemory .an,#ssInMemory .ls,#ssInMemory .st{animation:none}}
     </style>
