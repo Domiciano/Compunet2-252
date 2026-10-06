@@ -1,7 +1,7 @@
-"""Figuras SVG de la lección «Spring Security» (0032).
+"""Figuras SVG de «Introducción a Spring Security» (0032) y «Cargando usuario desde la DB» (0075).
 
     python3 tools/security_figuras.py <carpeta>     escribe un .svg por figura, para revisarlas
-    python3 tools/security_figuras.py --inject      reemplaza cada bloque ```svg de content/lesson23.md
+    python3 tools/security_figuras.py --inject      reemplaza cada bloque ```svg de las dos lecciones
                                                     por la figura con el mismo id
 
 No editar los SVG dentro del Markdown: se cambia este script y se vuelve a inyectar.
@@ -14,7 +14,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-LESSONS = ['lesson23.md']
+LESSONS = ['lesson23.md', 'lesson231.md']
 SANS = "ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif"
 MONO = "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace"
 FAM = {
@@ -263,42 +263,52 @@ def anim_css(fid, n_steps, secs, spans, tokens, freeze, on):
 
 def ss_carga_db(freeze=None):
     """Animada: siete pasos de 3 s, del POST /login al usuario cargado de la base de datos. Con freeze=1..7 sale el fotograma fijo de ese paso."""
-    fid, h, n_steps, secs = 'ssCargaDb', 632, 7, 3
+    fid, h, n_steps, secs = 'ssCargaDb', 738, 7, 3
     s = head(fid, h, 'Del formulario a la base de datos: quién carga el usuario', 'Del formulario a la base de datos: quién carga el usuario',
              'Spring Security sabe autenticar, pero no sabe dónde están los usuarios: eso se lo dice su código.',
              'Animación en siete pasos y dos columnas: las piezas de Spring Security a la izquierda y el código propio a la derecha. '
-             'Uno: llega POST /login y UsernamePasswordAuthenticationFilter saca usuario y contraseña. Dos: el filtro se los pasa al '
-             'AuthenticationManager, que delega en DaoAuthenticationProvider. Tres: el provider llama a loadUserByUsername de '
-             'CustomUserDetailsService. Cuatro: ese servicio usa UserService y UserRepository para buscar el usuario en la tabla '
-             'users. Cinco: el User que vuelve se envuelve en un SecurityUser, que implementa UserDetails. Seis: el provider compara '
-             'la contraseña con el PasswordEncoder. Siete: coinciden, se crea la sesión HTTP y la respuesta sale con la cookie JSESSIONID.',
+             'Entre cada par de bloques se lee lo que entra y lo que sale. Uno: del navegador llega POST /login con el correo y la '
+             'contraseña, y UsernamePasswordAuthenticationFilter arma una Authentication sin autenticar. Dos: el filtro se la pasa '
+             'al AuthenticationManager, que se la entrega a DaoAuthenticationProvider. Tres: el provider llama a loadUserByUsername '
+             'de CustomUserDetailsService con el correo. Cuatro: ese servicio llama a findByEmail de UserService, este al de '
+             'UserRepository, y el repositorio hace un SELECT en la tabla users. Cinco: vuelve un User, que se envuelve en un '
+             'SecurityUser, el UserDetails que sale de loadUserByUsername. Seis: el provider le entrega las dos contraseñas al '
+             'PasswordEncoder, que responde true. Siete: sube una Authentication autenticada, se crea la sesión HTTP y la respuesta '
+             'sale con Set-Cookie JSESSIONID.',
              colors=('teal', 'green'))
-    teal, green, amber, ind = (FAM[c][2] for c in ('teal', 'green', 'amber', 'indigo'))
+    teal, green, amber, ind, slate = (FAM[c][2] for c in ('teal', 'green', 'amber', 'indigo', 'slate'))
     spans = {f'a{k}': [(k, k)] for k in range(1, n_steps + 1)}
-    spans.update({'a14': [(1, 4)], 'a16': [(1, 6)], 'a35': [(3, 5)], 'a57': [(5, 7)], 'aD': [(2, 3), (6, 6)]})
-    on = {1: ['a1', 'a16', 'a14'], 2: ['a2', 'aD', 'a16', 'a14'], 3: ['a3', 'aD', 'a35', 'a16', 'a14'], 4: ['a4', 'a35', 'a16', 'a14'],
-          5: ['a5', 'a35', 'a57', 'a16'], 6: ['a6', 'aD', 'a57', 'a16'], 7: ['a7', 'a57']}
-    tokens = [('tk1', 1, [(.2, '0,0'), (.6, '0,24px')]), ('tk2', 2, [(.2, '0,0'), (.4, '0,24px'), (.75, '0,92px')]),
-              ('tk3', 3, [(.2, '0,0'), (.7, '52px,0')]), ('tk4', 4, [(.2, '0,0'), (.5, '218px,0'), (.75, '218px,-108px')]),
-              ('tk5', 5, [(.2, '0,0'), (.4, '0,128px'), (.75, '-494px,128px')]), ('tk6', 6, [(.2, '0,0'), (.6, '0,24px')]),
-              ('tk7', 7, [(.2, '0,0'), (.75, '0,-160px')])]
+    spans.update({'a14': [(1, 4)], 'a35': [(3, 5)], 'a57': [(5, 7)], 'aD': [(2, 3), (6, 6)]})
+    on = {1: ['a1', 'a14'], 2: ['a2', 'aD', 'a14'], 3: ['a3', 'aD', 'a35', 'a14'], 4: ['a4', 'a35', 'a14'],
+          5: ['a5', 'a35', 'a57'], 6: ['a6', 'aD', 'a57'], 7: ['a7', 'a57']}
+    tokens = [('tk1', 1, [(.2, '0,0'), (.6, '0,40px')]), ('tk2', 2, [(.2, '0,0'), (.4, '0,40px'), (.75, '0,120px')]),
+              ('tk3', 3, [(.2, '0,0'), (.7, '52px,0')]), ('tk4', 4, [(.2, '0,0'), (.45, '0,134px'), (.75, '270px,134px')]),
+              ('tk5', 5, [(.2, '0,0'), (.4, '-254px,0'), (.6, '-254px,-161px'), (.75, '-332px,-161px')]),
+              ('tk6', 6, [(.2, '0,0'), (.6, '0,40px')]), ('tk7', 7, [(.2, '0,0'), (.75, '0,-200px')])]
     s = s.replace('    </style>', anim_css(fid, n_steps, secs, spans, tokens, freeze, on) + '    </style>', 1)
     s = s.replace(f'<svg id="{fid}"', f'<svg id="{fid}" data-steps="{n_steps}" data-step-seconds="{secs}"', 1)
 
     for x, pw, label in ((48, 316, 'SPRING SECURITY'), (388, 524, 'SU CÓDIGO')):
-        s += f'  <rect x="{x}" y="104" width="{pw}" height="396" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>\n'
+        s += f'  <rect x="{x}" y="104" width="{pw}" height="502" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>\n'
         s += f'  <text class="h" x="{x+16}" y="128" data-fit="{pw-32}">{label}</text>\n'
 
-    s += '  <g class="an a16">' + box(64, 140, 284, 48, 'teal', 'POST /login', sub='ana@icesi.edu.co · 123456').strip() + '</g>\n'
-    s += '  <g class="ls a7">' + box(64, 140, 284, 48, 'green', 'Set-Cookie: JSESSIONID=…', sub='usuario autenticado · sesión creada').strip() + chip(348, 140, 7, 'green').strip() + '</g>\n'
-    s += '  ' + box(64, 216, 284, 40, 'indigo', 'UsernamePasswordAuthenticationFilter', fs=12)
-    s += '  ' + box(64, 284, 284, 40, 'indigo', 'AuthenticationManager')
-    s += '  ' + box(64, 352, 284, 52, 'indigo', 'DaoAuthenticationProvider', sub='pide el usuario y compara la contraseña', hero=True)
-    s += '  ' + box(64, 432, 284, 52, 'amber', 'PasswordEncoder', sub='el @Bean de WebSecurityConfig')
-    s += '  <path class="ar-teal" d="M176,190 V214"/><path class="ar-teal" d="M176,258 V282"/><path class="ar-teal" d="M176,326 V350"/><path class="ar-teal" d="M176,406 V430"/>\n'
-    s += '  <path class="ar-green" d="M236,430 V406"/><path class="ar-green" d="M236,350 V326"/><path class="ar-green" d="M236,282 V258"/><path class="ar-green" d="M236,214 V190"/>\n'
+    def hop(x, top, enters, leaves):
+        """Dos bloques apilados: flecha de ida y de vuelta en el hueco, con lo que entra y lo que sale del de abajo."""
+        return (f'  <path class="ar-teal" d="M{x},{top+2} V{top+42}"/><path class="ar-green" d="M{x+16},{top+42} V{top+2}"/>'
+                f'<text class="mono" x="{x+30}" y="{top+17}" font-size="11" font-weight="600" fill="{teal}">{enters}</text>'
+                f'<text class="mono" x="{x+30}" y="{top+32}" font-size="11" font-weight="600" fill="{green}">{leaves}</text>\n')
 
-    s += '  <text class="h" x="404" y="148">USUARIO AUTENTICADO</text><text class="h" x="668" y="148">TABLA USERS</text>\n'
+    s += '  ' + box(64, 140, 284, 36, 'slate', 'Navegador', mono=False)
+    s += '  ' + box(64, 220, 284, 36, 'indigo', 'UsernamePasswordAuthenticationFilter', fs=11.5)
+    s += '  ' + box(64, 300, 284, 36, 'indigo', 'AuthenticationManager')
+    s += '  ' + box(64, 380, 284, 36, 'indigo', 'DaoAuthenticationProvider', hero=True)
+    s += '  ' + box(64, 460, 284, 36, 'amber', 'PasswordEncoder')
+    s += hop(72, 176, 'POST /login: ana@icesi.edu.co, 123456', 'Set-Cookie: JSESSIONID=ABC123…')
+    s += hop(72, 256, 'Authentication sin autenticar', 'Authentication autenticada')
+    s += hop(72, 336, 'la misma Authentication', 'Authentication autenticada')
+    s += hop(72, 416, 'matches(&quot;123456&quot;, &quot;123456&quot;)', 'true')
+
+    s += '  <text class="h" x="404" y="148">USUARIO AUTENTICADO</text><text class="h" x="668" y="148">CÓMO LEER LAS FLECHAS</text>\n'
     s += ('  <g class="an a14"><rect x="404" y="162" width="240" height="96" rx="10" fill="none" stroke="#C4CBD8" stroke-width="1.5" stroke-dasharray="5 5"/>'
           '<text x="524" y="210" dy="0.35em" text-anchor="middle" font-size="12.5" fill="#79809A">todavía no hay un UserDetails</text></g>\n')
     soft, border, _ = FAM['green']
@@ -306,52 +316,60 @@ def ss_carga_db(freeze=None):
           f'<text class="mono" x="416" y="183" font-size="13" font-weight="700" fill="{green}">SecurityUser</text>'
           '<text x="628" y="183" text-anchor="end" font-size="11.5" fill="#454C61">es un UserDetails</text>' +
           box(416, 194, 216, 52, 'slate', 'User', sub='ana@icesi.edu.co · 123456').strip() + '</g>\n')
-    s += '  <rect x="668" y="162" width="228" height="96" rx="8" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.5"/>\n'
-    s += '  <path d="M668,186 H896 V170 A8,8 0 0 0 888,162 H676 A8,8 0 0 0 668,170 Z" fill="#EFF1F5"/>\n'
-    s += '  <path d="M668,186 H896 M668,210 H896 M668,234 H896 M816,162 V258" stroke="#D9DEE8" stroke-width="1.25" fill="none"/>\n'
-    for i, (email, pw) in enumerate((('email', 'pass'), ('ana@icesi.edu.co', '123456'), ('luis@icesi.edu.co', 'qwerty'), ('sara@icesi.edu.co', 'abc123'))):
+    s += '  <rect x="668" y="162" width="228" height="96" rx="10" fill="#FBFBFD" stroke="#D9DEE8" stroke-width="1.5"/>\n'
+    s += '  <path class="ar-teal" d="M684,194 H716"/><path class="ar-green" d="M716,228 H684"/>\n'
+    s += f'  <text x="728" y="194" dy="0.35em" font-size="12.5" font-weight="600" fill="{teal}">lo que entra al bloque</text>\n'
+    s += f'  <text x="728" y="228" dy="0.35em" font-size="12.5" font-weight="600" fill="{green}">lo que sale del bloque</text>\n'
+
+    s += '  ' + box(404, 380, 200, 36, 'amber', 'CustomUserDetailsService', fs=12)
+    s += '  ' + box(404, 460, 200, 36, 'amber', 'UserService')
+    s += '  ' + box(404, 540, 200, 36, 'amber', 'UserRepository')
+    s += '  <path class="ar-teal" d="M350,391 H402"/><path class="ar-green" d="M402,405 H350"/>\n'
+    s += f'  <text class="mono" x="404" y="354" font-size="11" font-weight="600" fill="{teal}">loadUserByUsername(&quot;ana@icesi.edu.co&quot;)</text>\n'
+    s += f'  <text class="mono" x="404" y="369" font-size="11" font-weight="600" fill="{green}">UserDetails: el SecurityUser</text>\n'
+    s += hop(412, 416, 'findByEmail(&quot;ana@icesi.edu.co&quot;)', 'User(ana@icesi.edu.co, 123456)')
+    s += hop(412, 496, 'findByEmail(&quot;ana@icesi.edu.co&quot;)', 'User(ana@icesi.edu.co, 123456)')
+
+    s += '  <text class="h" x="684" y="514">TABLA USERS</text>\n'
+    s += '  <rect x="684" y="522" width="212" height="72" rx="8" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.5"/>\n'
+    s += '  <path d="M684,546 H896 V530 A8,8 0 0 0 888,522 H692 A8,8 0 0 0 684,530 Z" fill="#EFF1F5"/>\n'
+    s += '  <path d="M684,546 H896 M684,570 H896 M812,522 V594" stroke="#D9DEE8" stroke-width="1.25" fill="none"/>\n'
+    for i, (email, pw) in enumerate((('email', 'pass'), ('ana@icesi.edu.co', '123456'), ('luis@icesi.edu.co', 'qwerty'))):
         weight, fill = ('700', '#556074') if i == 0 else ('400', '#161A26')
-        s += (f'  <text class="mono" x="678" y="{174 + i*24}" dy="0.35em" font-size="11" font-weight="{weight}" fill="{fill}">{email}</text>'
-              f'<text class="mono" x="826" y="{174 + i*24}" dy="0.35em" font-size="11" font-weight="{weight}" fill="{fill}">{pw}</text>\n')
+        s += (f'  <text class="mono" x="692" y="{534 + i*24}" dy="0.35em" font-size="11" font-weight="{weight}" fill="{fill}">{email}</text>'
+              f'<text class="mono" x="820" y="{534 + i*24}" dy="0.35em" font-size="11" font-weight="{weight}" fill="{fill}">{pw}</text>\n')
+    s += '  <path class="ar-teal" d="M606,552 H682"/><path class="ar-green" d="M682,566 H606"/>\n'
+    s += f'  <text class="mono" x="646" y="545" text-anchor="middle" font-size="11" font-weight="600" fill="{teal}">SELECT</text>\n'
+    s += f'  <text class="mono" x="646" y="581" text-anchor="middle" font-size="11" font-weight="600" fill="{green}">fila</text>\n'
 
-    s += '  ' + box(404, 352, 196, 52, 'amber', 'CustomUserDetailsService', sub='implements UserDetailsService', fs=12)
-    s += '  ' + box(624, 352, 120, 52, 'amber', 'UserService', sub='su servicio', fs=12.5)
-    s += '  ' + box(768, 352, 128, 52, 'amber', 'UserRepository', sub='su repositorio', fs=12.5)
-    s += '  <path class="ar-teal" d="M350,370 H402"/><path class="ar-teal" d="M602,370 H622"/><path class="ar-teal" d="M746,370 H766"/><path class="ar-teal" d="M820,350 V262"/>\n'
-    s += '  <path class="ar-green" d="M402,388 H350"/><path class="ar-green" d="M622,388 H602"/><path class="ar-green" d="M766,388 H746"/><path class="ar-green" d="M844,260 V350"/>\n'
-    s += f'  <text class="mono" x="812" y="308" text-anchor="end" font-size="12" font-weight="600" fill="{teal}">SELECT</text>\n'
-    s += f'  <text class="mono" x="852" y="308" font-size="12" font-weight="600" fill="{green}">User</text>\n'
-    s += f'  <text class="mono" x="404" y="432" font-size="12" font-weight="600" fill="{teal}" data-fit="480">→ loadUserByUsername("ana@icesi.edu.co")</text>\n'
-    s += f'  <text class="mono" x="404" y="454" font-size="12" font-weight="600" fill="{green}" data-fit="480">← devuelve un UserDetails: el SecurityUser</text>\n'
-
-    rings = [('a1', 58, 134, 296, 60, teal), ('a1', 58, 210, 296, 52, ind), ('a2', 58, 278, 296, 52, ind), ('aD', 58, 346, 296, 64, ind),
-             ('a35', 398, 346, 208, 64, amber), ('a4', 618, 346, 132, 64, amber), ('a4', 762, 346, 140, 64, amber),
-             ('a5', 398, 156, 252, 108, green), ('a6', 58, 426, 296, 64, amber), ('a7', 58, 134, 296, 60, green)]
+    rings = [('a1', 60, 136, 292, 44, teal), ('a1', 60, 216, 292, 44, ind), ('a2', 60, 296, 292, 44, ind), ('aD', 60, 376, 292, 44, ind),
+             ('a35', 400, 376, 208, 44, amber), ('a4', 400, 456, 208, 44, amber), ('a4', 400, 536, 208, 44, amber),
+             ('a5', 398, 156, 252, 108, green), ('a6', 60, 456, 292, 44, amber), ('a7', 60, 136, 292, 44, green)]
     for cls, x, y, rw, rh, color in rings:
-        s += f'  <rect class="an {cls}" x="{x}" y="{y}" width="{rw}" height="{rh}" rx="14" fill="none" stroke="{color}" stroke-width="3"/>\n'
-    s += f'  <rect class="an a4" x="668" y="186" width="228" height="24" fill="{teal}" fill-opacity=".12" stroke="{teal}" stroke-width="2"/>\n'
-    for x, y, n, color in ((348, 216, 1, 'indigo'), (348, 284, 2, 'indigo'), (404, 352, 3, 'amber'), (896, 352, 4, 'amber'),
-                           (644, 162, 5, 'green'), (348, 432, 6, 'amber')):
+        s += f'  <rect class="an {cls}" x="{x}" y="{y}" width="{rw}" height="{rh}" rx="12" fill="none" stroke="{color}" stroke-width="3"/>\n'
+    s += f'  <rect class="an a4" x="684" y="546" width="212" height="24" fill="{teal}" fill-opacity=".12" stroke="{teal}" stroke-width="2"/>\n'
+    for x, y, n, color in ((350, 238, 1, 'indigo'), (350, 318, 2, 'indigo'), (610, 398, 3, 'amber'), (610, 478, 4, 'amber'),
+                           (644, 162, 5, 'green'), (350, 478, 6, 'amber'), (350, 158, 7, 'green')):
         s += '  ' + chip(x, y, n, color)
-    for cls, cx, cy, color in (('tk1', 176, 190, teal), ('tk2', 176, 258, teal), ('tk3', 350, 370, teal), ('tk4', 602, 370, teal),
-                               ('tk5', 844, 260, green), ('tk6', 176, 406, teal), ('tk7', 236, 350, green)):
+    for cls, cx, cy, color in (('tk1', 72, 178, teal), ('tk2', 72, 258, teal), ('tk3', 350, 391, teal), ('tk4', 412, 418, teal),
+                               ('tk5', 682, 566, green), ('tk6', 72, 418, teal), ('tk7', 88, 378, green)):
         s += f'  <circle class="an {cls}" cx="{cx}" cy="{cy}" r="8" fill="{color}" stroke="#FFFFFF" stroke-width="2"/>\n'
 
-    s += '  <rect x="48" y="516" width="864" height="56" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>\n'
-    caps = [(1, 'indigo', 'Llega el POST /login: UsernamePasswordAuthenticationFilter saca el usuario y la contraseña del formulario.', 'Es uno de los filtros de Spring Security: usted no lo escribe.'),
-            (2, 'indigo', 'El filtro le pasa las credenciales al AuthenticationManager, que delega en DaoAuthenticationProvider.', 'Este provider sabe autenticar, pero no sabe dónde están los usuarios.'),
-            (3, 'amber', 'Por eso llama a loadUserByUsername(username) de un UserDetailsService.', 'Aquí entra su código: CustomUserDetailsService es el servicio que implementa esa interfaz.'),
-            (4, 'amber', 'CustomUserDetailsService usa UserService, y este a UserRepository, para buscar el usuario en la tabla users.', 'Son el servicio y el repositorio de usuarios, como los de cualquier otra entidad.'),
-            (5, 'green', 'El User que vuelve de la base de datos se envuelve en un SecurityUser, la clase que implementa UserDetails.', 'Eso es lo que devuelve loadUserByUsername.'),
-            (6, 'amber', 'DaoAuthenticationProvider compara la contraseña del formulario con getPassword(), usando el PasswordEncoder.', 'Si el usuario no existe o la contraseña no coincide, la autenticación falla.'),
-            (7, 'green', 'Coinciden: el usuario queda autenticado y se crea su sesión HTTP.', 'La respuesta sale con la cookie JSESSIONID, igual que con el usuario en memoria.')]
+    s += '  <rect x="48" y="622" width="864" height="56" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>\n'
+    caps = [(1, 'indigo', 'Llega el POST /login: UsernamePasswordAuthenticationFilter saca el usuario y la contraseña del formulario.', 'Con ellos arma un objeto Authentication, todavía sin autenticar.'),
+            (2, 'indigo', 'El filtro le entrega esa Authentication al AuthenticationManager, que se la pasa a DaoAuthenticationProvider.', 'Este provider sabe autenticar, pero no sabe dónde están los usuarios.'),
+            (3, 'amber', 'Por eso llama a loadUserByUsername con el nombre de usuario y espera de vuelta un UserDetails.', 'Aquí entra su código: CustomUserDetailsService implementa UserDetailsService.'),
+            (4, 'amber', 'CustomUserDetailsService le pasa el correo a UserService, y este a UserRepository, que consulta la tabla users.', 'Son el servicio y el repositorio de usuarios, como los de cualquier otra entidad.'),
+            (5, 'green', 'De vuelta sube un User; CustomUserDetailsService lo envuelve en un SecurityUser, que implementa UserDetails.', 'Eso es lo que sale de loadUserByUsername.'),
+            (6, 'amber', 'DaoAuthenticationProvider le entrega al PasswordEncoder la contraseña del formulario y la de getPassword().', 'Si el usuario no existe o las contraseñas no coinciden, la autenticación falla.'),
+            (7, 'green', 'Coinciden: sube una Authentication ya autenticada y se crea la sesión HTTP.', 'La respuesta sale con la cookie JSESSIONID, igual que con el usuario en memoria.')]
     for n, color, l1, l2 in caps:
-        s += (f'  <g class="an a{n}">' + chip(76, 544, n, color).strip() +
-              f'<text x="100" y="539" font-size="13" font-weight="600" fill="#161A26" data-fit="790">{l1}</text>'
-              f'<text x="100" y="557" font-size="13" fill="#454C61" data-fit="790">{l2}</text></g>\n')
-    s += ('  <g class="st"><text x="68" y="539" font-size="13" font-weight="600" fill="#161A26" data-fit="820">Spring Security trae el filtro, el manager y el provider; usted escribe quién carga el usuario y qué lo representa.</text>'
-          '<text x="68" y="557" font-size="13" fill="#454C61" data-fit="820">Los números marcan el orden de los siete pasos.</text></g>\n')
-    return s + tail(h, 'En índigo, lo que ya trae Spring Security; en ámbar, lo que escribe usted.')
+        s += (f'  <g class="an a{n}">' + chip(76, 650, n, color).strip() +
+              f'<text x="100" y="645" font-size="13" font-weight="600" fill="#161A26" data-fit="790">{l1}</text>'
+              f'<text x="100" y="663" font-size="13" fill="#454C61" data-fit="790">{l2}</text></g>\n')
+    s += ('  <g class="st"><text x="68" y="645" font-size="13" font-weight="600" fill="#161A26" data-fit="820">Spring Security trae el filtro, el manager y el provider; usted escribe quién carga el usuario y qué lo representa.</text>'
+          '<text x="68" y="663" font-size="13" fill="#454C61" data-fit="820">Los números marcan el orden de los siete pasos.</text></g>\n')
+    return s + tail(h, 'Bloques índigo: los trae Spring Security. Bloques ámbar: los escribe usted.')
 
 
 FIGS['ssCargaDb'] = ss_carga_db
