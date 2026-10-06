@@ -257,7 +257,136 @@ public class WebSecurityConfig {
 
 Ya hemos visto cómo se carga un in-memory user. Pero ahora, tenemos que llevar esta forma en la que funcionan los usuarios en SpringBoot para habilitar los usuarios almacenados en base de datos.
 
-![Imagen](image15.png "icon")
+```svg
+<svg id="ssCargaDb" data-steps="7" data-step-seconds="3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 632" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="ssCargaDb-ttl ssCargaDb-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
+  <title id="ssCargaDb-ttl">Del formulario a la base de datos: quién carga el usuario</title>
+  <desc id="ssCargaDb-dsc">Animación en siete pasos y dos columnas: las piezas de Spring Security a la izquierda y el código propio a la derecha. Uno: llega POST /login y UsernamePasswordAuthenticationFilter saca usuario y contraseña. Dos: el filtro se los pasa al AuthenticationManager, que delega en DaoAuthenticationProvider. Tres: el provider llama a loadUserByUsername de CustomUserDetailsService. Cuatro: ese servicio usa UserService y UserRepository para buscar el usuario en la tabla users. Cinco: el User que vuelve se envuelve en un SecurityUser, que implementa UserDetails. Seis: el provider compara la contraseña con el PasswordEncoder. Siete: coinciden, se crea la sesión HTTP y la respuesta sale con la cookie JSESSIONID.</desc>
+  <defs>
+    <style>
+      #ssCargaDb .title{fill:#161A26;font-size:22px;font-weight:700}
+      #ssCargaDb .sub{fill:#79809A;font-size:13.5px}
+      #ssCargaDb .h{font-size:12px;font-weight:700;letter-spacing:.08em;fill:#556074}
+      #ssCargaDb .foot{fill:#79809A;font-size:12px}
+      #ssCargaDb .mono{font-family:ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace}
+      #ssCargaDb .ar-teal{fill:none;stroke:#0F8478;stroke-width:1.75;marker-end:url(#ssCargaDb-ar-teal)}
+      #ssCargaDb .ar-green{fill:none;stroke:#3A8235;stroke-width:1.75;marker-end:url(#ssCargaDb-ar-green)}
+      #ssCargaDb .an,#ssCargaDb .ls,#ssCargaDb .st{animation-duration:21s;animation-iteration-count:infinite;animation-timing-function:linear}
+      #ssCargaDb .an{opacity:0}
+      #ssCargaDb .st{animation-name:ssCargaDb-hide}
+      #ssCargaDb .a1{animation-name:ssCargaDb-a1}
+      @keyframes ssCargaDb-a1{0%{opacity:0} 2%{opacity:1} 12.29%{opacity:1} 14.29%{opacity:0} 100%{opacity:0}}
+      #ssCargaDb .a2{animation-name:ssCargaDb-a2}
+      @keyframes ssCargaDb-a2{0%{opacity:0} 14.29%{opacity:0} 16.29%{opacity:1} 26.57%{opacity:1} 28.57%{opacity:0} 100%{opacity:0}}
+      #ssCargaDb .a3{animation-name:ssCargaDb-a3}
+      @keyframes ssCargaDb-a3{0%{opacity:0} 28.57%{opacity:0} 30.57%{opacity:1} 40.86%{opacity:1} 42.86%{opacity:0} 100%{opacity:0}}
+      #ssCargaDb .a4{animation-name:ssCargaDb-a4}
+      @keyframes ssCargaDb-a4{0%{opacity:0} 42.86%{opacity:0} 44.86%{opacity:1} 55.14%{opacity:1} 57.14%{opacity:0} 100%{opacity:0}}
+      #ssCargaDb .a5{animation-name:ssCargaDb-a5}
+      @keyframes ssCargaDb-a5{0%{opacity:0} 57.14%{opacity:0} 59.14%{opacity:1} 69.43%{opacity:1} 71.43%{opacity:0} 100%{opacity:0}}
+      #ssCargaDb .a6{animation-name:ssCargaDb-a6}
+      @keyframes ssCargaDb-a6{0%{opacity:0} 71.43%{opacity:0} 73.43%{opacity:1} 83.71%{opacity:1} 85.71%{opacity:0} 100%{opacity:0}}
+      #ssCargaDb .a7{animation-name:ssCargaDb-a7}
+      @keyframes ssCargaDb-a7{0%{opacity:0} 85.71%{opacity:0} 87.71%{opacity:1} 98%{opacity:1} 100%{opacity:0}}
+      #ssCargaDb .a14{animation-name:ssCargaDb-a14}
+      @keyframes ssCargaDb-a14{0%{opacity:0} 2%{opacity:1} 55.14%{opacity:1} 57.14%{opacity:0} 100%{opacity:0}}
+      #ssCargaDb .a16{animation-name:ssCargaDb-a16}
+      @keyframes ssCargaDb-a16{0%{opacity:0} 2%{opacity:1} 83.71%{opacity:1} 85.71%{opacity:0} 100%{opacity:0}}
+      #ssCargaDb .a35{animation-name:ssCargaDb-a35}
+      @keyframes ssCargaDb-a35{0%{opacity:0} 28.57%{opacity:0} 30.57%{opacity:1} 69.43%{opacity:1} 71.43%{opacity:0} 100%{opacity:0}}
+      #ssCargaDb .a57{animation-name:ssCargaDb-a57}
+      @keyframes ssCargaDb-a57{0%{opacity:0} 57.14%{opacity:0} 59.14%{opacity:1} 98%{opacity:1} 100%{opacity:0}}
+      #ssCargaDb .aD{animation-name:ssCargaDb-aD}
+      @keyframes ssCargaDb-aD{0%{opacity:0} 14.29%{opacity:0} 16.29%{opacity:1} 40.86%{opacity:1} 42.86%{opacity:0} 71.43%{opacity:0} 73.43%{opacity:1} 83.71%{opacity:1} 85.71%{opacity:0} 100%{opacity:0}}
+      #ssCargaDb .tk1{animation-name:ssCargaDb-tk1}
+      @keyframes ssCargaDb-tk1{0%,1.14%{opacity:0;transform:translate(0,0)}2.86%{opacity:1;transform:translate(0,0)}8.57%{opacity:1;transform:translate(0,24px)}13.14%,100%{opacity:0;transform:translate(0,24px)}}
+      #ssCargaDb .tk2{animation-name:ssCargaDb-tk2}
+      @keyframes ssCargaDb-tk2{0%,15.43%{opacity:0;transform:translate(0,0)}17.14%{opacity:1;transform:translate(0,0)}20%{opacity:1;transform:translate(0,24px)}25%{opacity:1;transform:translate(0,92px)}27.43%,100%{opacity:0;transform:translate(0,92px)}}
+      #ssCargaDb .tk3{animation-name:ssCargaDb-tk3}
+      @keyframes ssCargaDb-tk3{0%,29.71%{opacity:0;transform:translate(0,0)}31.43%{opacity:1;transform:translate(0,0)}38.57%{opacity:1;transform:translate(52px,0)}41.71%,100%{opacity:0;transform:translate(52px,0)}}
+      #ssCargaDb .tk4{animation-name:ssCargaDb-tk4}
+      @keyframes ssCargaDb-tk4{0%,44%{opacity:0;transform:translate(0,0)}45.71%{opacity:1;transform:translate(0,0)}50%{opacity:1;transform:translate(218px,0)}53.57%{opacity:1;transform:translate(218px,-108px)}56%,100%{opacity:0;transform:translate(218px,-108px)}}
+      #ssCargaDb .tk5{animation-name:ssCargaDb-tk5}
+      @keyframes ssCargaDb-tk5{0%,58.29%{opacity:0;transform:translate(0,0)}60%{opacity:1;transform:translate(0,0)}62.86%{opacity:1;transform:translate(0,128px)}67.86%{opacity:1;transform:translate(-494px,128px)}70.29%,100%{opacity:0;transform:translate(-494px,128px)}}
+      #ssCargaDb .tk6{animation-name:ssCargaDb-tk6}
+      @keyframes ssCargaDb-tk6{0%,72.57%{opacity:0;transform:translate(0,0)}74.29%{opacity:1;transform:translate(0,0)}80%{opacity:1;transform:translate(0,24px)}84.57%,100%{opacity:0;transform:translate(0,24px)}}
+      #ssCargaDb .tk7{animation-name:ssCargaDb-tk7}
+      @keyframes ssCargaDb-tk7{0%,86.86%{opacity:0;transform:translate(0,0)}88.57%{opacity:1;transform:translate(0,0)}96.43%{opacity:1;transform:translate(0,-160px)}98.86%,100%{opacity:0;transform:translate(0,-160px)}}
+      @keyframes ssCargaDb-hide{from{opacity:0}to{opacity:0}}
+      @media (prefers-reduced-motion: reduce){#ssCargaDb .an,#ssCargaDb .ls,#ssCargaDb .st{animation:none}}
+    </style>
+    <marker id="ssCargaDb-ar-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#0F8478"/></marker>
+    <marker id="ssCargaDb-ar-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#3A8235"/></marker>
+  </defs>
+  <rect width="960" height="632" rx="16" fill="#FBFBFD"/>
+  <text class="title" x="48" y="56">Del formulario a la base de datos: quién carga el usuario</text>
+  <text class="sub" x="48" y="80" data-fit="860">Spring Security sabe autenticar, pero no sabe dónde están los usuarios: eso se lo dice su código.</text>
+  <rect x="48" y="104" width="316" height="396" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
+  <text class="h" x="64" y="128" data-fit="284">SPRING SECURITY</text>
+  <rect x="388" y="104" width="524" height="396" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
+  <text class="h" x="404" y="128" data-fit="492">SU CÓDIGO</text>
+  <g class="an a16"><rect x="64" y="140" width="284" height="48" rx="10" fill="#E3F6F3" stroke="#86D3CA" stroke-width="1.5"/><text class="mono" x="206" y="155" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#0F8478" data-fit="268">POST /login</text><text x="206" y="174" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="268">ana@icesi.edu.co · 123456</text></g>
+  <g class="ls a7"><rect x="64" y="140" width="284" height="48" rx="10" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text class="mono" x="206" y="155" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#3A8235" data-fit="268">Set-Cookie: JSESSIONID=…</text><text x="206" y="174" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="268">usuario autenticado · sesión creada</text><circle cx="348" cy="140" r="12" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text x="348" y="140" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#3A8235">7</text></g>
+  <rect x="64" y="216" width="284" height="40" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text class="mono" x="206" y="236" dy="0.35em" text-anchor="middle" font-size="12" font-weight="700" fill="#4453C9" data-fit="268">UsernamePasswordAuthenticationFilter</text>
+  <rect x="64" y="284" width="284" height="40" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text class="mono" x="206" y="304" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#4453C9" data-fit="268">AuthenticationManager</text>
+  <rect x="64" y="352" width="284" height="52" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="2.5"/><text class="mono" x="206" y="369" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#4453C9" data-fit="268">DaoAuthenticationProvider</text><text x="206" y="388" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="268">pide el usuario y compara la contraseña</text>
+  <rect x="64" y="432" width="284" height="52" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text class="mono" x="206" y="449" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#A96C05" data-fit="268">PasswordEncoder</text><text x="206" y="468" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="268">el @Bean de WebSecurityConfig</text>
+  <path class="ar-teal" d="M176,190 V214"/><path class="ar-teal" d="M176,258 V282"/><path class="ar-teal" d="M176,326 V350"/><path class="ar-teal" d="M176,406 V430"/>
+  <path class="ar-green" d="M236,430 V406"/><path class="ar-green" d="M236,350 V326"/><path class="ar-green" d="M236,282 V258"/><path class="ar-green" d="M236,214 V190"/>
+  <text class="h" x="404" y="148">USUARIO AUTENTICADO</text><text class="h" x="668" y="148">TABLA USERS</text>
+  <g class="an a14"><rect x="404" y="162" width="240" height="96" rx="10" fill="none" stroke="#C4CBD8" stroke-width="1.5" stroke-dasharray="5 5"/><text x="524" y="210" dy="0.35em" text-anchor="middle" font-size="12.5" fill="#79809A">todavía no hay un UserDetails</text></g>
+  <g class="ls a57"><rect x="404" y="162" width="240" height="96" rx="10" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text class="mono" x="416" y="183" font-size="13" font-weight="700" fill="#3A8235">SecurityUser</text><text x="628" y="183" text-anchor="end" font-size="11.5" fill="#454C61">es un UserDetails</text><rect x="416" y="194" width="216" height="52" rx="10" fill="#EFF1F5" stroke="#C4CBD8" stroke-width="1.5"/><text class="mono" x="524" y="211" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#556074" data-fit="200">User</text><text x="524" y="230" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="200">ana@icesi.edu.co · 123456</text></g>
+  <rect x="668" y="162" width="228" height="96" rx="8" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.5"/>
+  <path d="M668,186 H896 V170 A8,8 0 0 0 888,162 H676 A8,8 0 0 0 668,170 Z" fill="#EFF1F5"/>
+  <path d="M668,186 H896 M668,210 H896 M668,234 H896 M816,162 V258" stroke="#D9DEE8" stroke-width="1.25" fill="none"/>
+  <text class="mono" x="678" y="174" dy="0.35em" font-size="11" font-weight="700" fill="#556074">email</text><text class="mono" x="826" y="174" dy="0.35em" font-size="11" font-weight="700" fill="#556074">pass</text>
+  <text class="mono" x="678" y="198" dy="0.35em" font-size="11" font-weight="400" fill="#161A26">ana@icesi.edu.co</text><text class="mono" x="826" y="198" dy="0.35em" font-size="11" font-weight="400" fill="#161A26">123456</text>
+  <text class="mono" x="678" y="222" dy="0.35em" font-size="11" font-weight="400" fill="#161A26">luis@icesi.edu.co</text><text class="mono" x="826" y="222" dy="0.35em" font-size="11" font-weight="400" fill="#161A26">qwerty</text>
+  <text class="mono" x="678" y="246" dy="0.35em" font-size="11" font-weight="400" fill="#161A26">sara@icesi.edu.co</text><text class="mono" x="826" y="246" dy="0.35em" font-size="11" font-weight="400" fill="#161A26">abc123</text>
+  <rect x="404" y="352" width="196" height="52" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text class="mono" x="502" y="369" dy="0.35em" text-anchor="middle" font-size="12" font-weight="700" fill="#A96C05" data-fit="180">CustomUserDetailsService</text><text x="502" y="388" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="180">implements UserDetailsService</text>
+  <rect x="624" y="352" width="120" height="52" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text class="mono" x="684" y="369" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A96C05" data-fit="104">UserService</text><text x="684" y="388" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="104">su servicio</text>
+  <rect x="768" y="352" width="128" height="52" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text class="mono" x="832" y="369" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A96C05" data-fit="112">UserRepository</text><text x="832" y="388" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="112">su repositorio</text>
+  <path class="ar-teal" d="M350,370 H402"/><path class="ar-teal" d="M602,370 H622"/><path class="ar-teal" d="M746,370 H766"/><path class="ar-teal" d="M820,350 V262"/>
+  <path class="ar-green" d="M402,388 H350"/><path class="ar-green" d="M622,388 H602"/><path class="ar-green" d="M766,388 H746"/><path class="ar-green" d="M844,260 V350"/>
+  <text class="mono" x="812" y="308" text-anchor="end" font-size="12" font-weight="600" fill="#0F8478">SELECT</text>
+  <text class="mono" x="852" y="308" font-size="12" font-weight="600" fill="#3A8235">User</text>
+  <text class="mono" x="404" y="432" font-size="12" font-weight="600" fill="#0F8478" data-fit="480">→ loadUserByUsername("ana@icesi.edu.co")</text>
+  <text class="mono" x="404" y="454" font-size="12" font-weight="600" fill="#3A8235" data-fit="480">← devuelve un UserDetails: el SecurityUser</text>
+  <rect class="an a1" x="58" y="134" width="296" height="60" rx="14" fill="none" stroke="#0F8478" stroke-width="3"/>
+  <rect class="an a1" x="58" y="210" width="296" height="52" rx="14" fill="none" stroke="#4453C9" stroke-width="3"/>
+  <rect class="an a2" x="58" y="278" width="296" height="52" rx="14" fill="none" stroke="#4453C9" stroke-width="3"/>
+  <rect class="an aD" x="58" y="346" width="296" height="64" rx="14" fill="none" stroke="#4453C9" stroke-width="3"/>
+  <rect class="an a35" x="398" y="346" width="208" height="64" rx="14" fill="none" stroke="#A96C05" stroke-width="3"/>
+  <rect class="an a4" x="618" y="346" width="132" height="64" rx="14" fill="none" stroke="#A96C05" stroke-width="3"/>
+  <rect class="an a4" x="762" y="346" width="140" height="64" rx="14" fill="none" stroke="#A96C05" stroke-width="3"/>
+  <rect class="an a5" x="398" y="156" width="252" height="108" rx="14" fill="none" stroke="#3A8235" stroke-width="3"/>
+  <rect class="an a6" x="58" y="426" width="296" height="64" rx="14" fill="none" stroke="#A96C05" stroke-width="3"/>
+  <rect class="an a7" x="58" y="134" width="296" height="60" rx="14" fill="none" stroke="#3A8235" stroke-width="3"/>
+  <rect class="an a4" x="668" y="186" width="228" height="24" fill="#0F8478" fill-opacity=".12" stroke="#0F8478" stroke-width="2"/>
+  <circle cx="348" cy="216" r="12" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text x="348" y="216" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4453C9">1</text>
+  <circle cx="348" cy="284" r="12" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text x="348" y="284" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4453C9">2</text>
+  <circle cx="404" cy="352" r="12" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text x="404" y="352" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A96C05">3</text>
+  <circle cx="896" cy="352" r="12" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text x="896" y="352" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A96C05">4</text>
+  <circle cx="644" cy="162" r="12" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text x="644" y="162" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#3A8235">5</text>
+  <circle cx="348" cy="432" r="12" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text x="348" y="432" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A96C05">6</text>
+  <circle class="an tk1" cx="176" cy="190" r="8" fill="#0F8478" stroke="#FFFFFF" stroke-width="2"/>
+  <circle class="an tk2" cx="176" cy="258" r="8" fill="#0F8478" stroke="#FFFFFF" stroke-width="2"/>
+  <circle class="an tk3" cx="350" cy="370" r="8" fill="#0F8478" stroke="#FFFFFF" stroke-width="2"/>
+  <circle class="an tk4" cx="602" cy="370" r="8" fill="#0F8478" stroke="#FFFFFF" stroke-width="2"/>
+  <circle class="an tk5" cx="844" cy="260" r="8" fill="#3A8235" stroke="#FFFFFF" stroke-width="2"/>
+  <circle class="an tk6" cx="176" cy="406" r="8" fill="#0F8478" stroke="#FFFFFF" stroke-width="2"/>
+  <circle class="an tk7" cx="236" cy="350" r="8" fill="#3A8235" stroke="#FFFFFF" stroke-width="2"/>
+  <rect x="48" y="516" width="864" height="56" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
+  <g class="an a1"><circle cx="76" cy="544" r="12" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text x="76" y="544" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4453C9">1</text><text x="100" y="539" font-size="13" font-weight="600" fill="#161A26" data-fit="790">Llega el POST /login: UsernamePasswordAuthenticationFilter saca el usuario y la contraseña del formulario.</text><text x="100" y="557" font-size="13" fill="#454C61" data-fit="790">Es uno de los filtros de Spring Security: usted no lo escribe.</text></g>
+  <g class="an a2"><circle cx="76" cy="544" r="12" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text x="76" y="544" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4453C9">2</text><text x="100" y="539" font-size="13" font-weight="600" fill="#161A26" data-fit="790">El filtro le pasa las credenciales al AuthenticationManager, que delega en DaoAuthenticationProvider.</text><text x="100" y="557" font-size="13" fill="#454C61" data-fit="790">Este provider sabe autenticar, pero no sabe dónde están los usuarios.</text></g>
+  <g class="an a3"><circle cx="76" cy="544" r="12" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text x="76" y="544" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A96C05">3</text><text x="100" y="539" font-size="13" font-weight="600" fill="#161A26" data-fit="790">Por eso llama a loadUserByUsername(username) de un UserDetailsService.</text><text x="100" y="557" font-size="13" fill="#454C61" data-fit="790">Aquí entra su código: CustomUserDetailsService es el servicio que implementa esa interfaz.</text></g>
+  <g class="an a4"><circle cx="76" cy="544" r="12" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text x="76" y="544" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A96C05">4</text><text x="100" y="539" font-size="13" font-weight="600" fill="#161A26" data-fit="790">CustomUserDetailsService usa UserService, y este a UserRepository, para buscar el usuario en la tabla users.</text><text x="100" y="557" font-size="13" fill="#454C61" data-fit="790">Son el servicio y el repositorio de usuarios, como los de cualquier otra entidad.</text></g>
+  <g class="an a5"><circle cx="76" cy="544" r="12" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text x="76" y="544" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#3A8235">5</text><text x="100" y="539" font-size="13" font-weight="600" fill="#161A26" data-fit="790">El User que vuelve de la base de datos se envuelve en un SecurityUser, la clase que implementa UserDetails.</text><text x="100" y="557" font-size="13" fill="#454C61" data-fit="790">Eso es lo que devuelve loadUserByUsername.</text></g>
+  <g class="an a6"><circle cx="76" cy="544" r="12" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text x="76" y="544" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A96C05">6</text><text x="100" y="539" font-size="13" font-weight="600" fill="#161A26" data-fit="790">DaoAuthenticationProvider compara la contraseña del formulario con getPassword(), usando el PasswordEncoder.</text><text x="100" y="557" font-size="13" fill="#454C61" data-fit="790">Si el usuario no existe o la contraseña no coincide, la autenticación falla.</text></g>
+  <g class="an a7"><circle cx="76" cy="544" r="12" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text x="76" y="544" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#3A8235">7</text><text x="100" y="539" font-size="13" font-weight="600" fill="#161A26" data-fit="790">Coinciden: el usuario queda autenticado y se crea su sesión HTTP.</text><text x="100" y="557" font-size="13" fill="#454C61" data-fit="790">La respuesta sale con la cookie JSESSIONID, igual que con el usuario en memoria.</text></g>
+  <g class="st"><text x="68" y="539" font-size="13" font-weight="600" fill="#161A26" data-fit="820">Spring Security trae el filtro, el manager y el provider; usted escribe quién carga el usuario y qué lo representa.</text><text x="68" y="557" font-size="13" fill="#454C61" data-fit="820">Los números marcan el orden de los siete pasos.</text></g>
+  <text class="foot" x="48" y="604" data-fit="860">En índigo, lo que ya trae Spring Security; en ámbar, lo que escribe usted.</text>
+</svg>
+```
 
 Requerimos varios ingredientes
 
