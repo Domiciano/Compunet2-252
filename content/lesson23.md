@@ -253,6 +253,139 @@ public class WebSecurityConfig {
 }
 ```
 
+La animación recorre ese código y muestra qué queda en memoria después de cada parte.
+
+```svg
+<svg id="ssInMemory" data-steps="6" data-step-seconds="3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 668" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="ssInMemory-ttl ssInMemory-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
+  <title id="ssInMemory-ttl">Del usuario por defecto a su propio usuario en memoria</title>
+  <desc id="ssInMemory-dsc">Animación en seis pasos y dos columnas: el código de WebSecurityConfig a la izquierda y lo que queda en memoria a la derecha. Uno: sin configuración, Spring Boot crea el usuario user con una contraseña generada. Dos: al declarar un Bean de tipo UserDetailsService ese usuario deja de crearse y el InMemoryUserDetailsManager arranca vacío. Tres: User.withUsername construye un UserDetails con nombre, contraseña y authorities. Cuatro: createUser lo agrega al manager. Cinco: el Bean de PasswordEncoder, con NoOpPasswordEncoder, compara la contraseña sin cifrar. Seis: al iniciar sesión entra miUsuario con 123456 y el usuario user ya no existe.</desc>
+  <defs>
+    <style>
+      #ssInMemory .title{fill:#161A26;font-size:22px;font-weight:700}
+      #ssInMemory .sub{fill:#79809A;font-size:13.5px}
+      #ssInMemory .h{font-size:12px;font-weight:700;letter-spacing:.08em;fill:#556074}
+      #ssInMemory .foot{fill:#79809A;font-size:12px}
+      #ssInMemory .mono{font-family:ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace}
+      #ssInMemory .an,#ssInMemory .ls,#ssInMemory .st{animation-duration:18s;animation-iteration-count:infinite;animation-timing-function:linear}
+      #ssInMemory .an{opacity:0}
+      #ssInMemory .st{animation-name:ssInMemory-hide}
+      #ssInMemory .a1{animation-name:ssInMemory-a1}
+      @keyframes ssInMemory-a1{0%{opacity:0} 2%{opacity:1} 14.67%{opacity:1} 16.67%{opacity:0} 100%{opacity:0}}
+      #ssInMemory .a2{animation-name:ssInMemory-a2}
+      @keyframes ssInMemory-a2{0%{opacity:0} 16.67%{opacity:0} 18.67%{opacity:1} 31.33%{opacity:1} 33.33%{opacity:0} 100%{opacity:0}}
+      #ssInMemory .a3{animation-name:ssInMemory-a3}
+      @keyframes ssInMemory-a3{0%{opacity:0} 33.33%{opacity:0} 35.33%{opacity:1} 48%{opacity:1} 50%{opacity:0} 100%{opacity:0}}
+      #ssInMemory .a4{animation-name:ssInMemory-a4}
+      @keyframes ssInMemory-a4{0%{opacity:0} 50%{opacity:0} 52%{opacity:1} 64.67%{opacity:1} 66.67%{opacity:0} 100%{opacity:0}}
+      #ssInMemory .a5{animation-name:ssInMemory-a5}
+      @keyframes ssInMemory-a5{0%{opacity:0} 66.67%{opacity:0} 68.67%{opacity:1} 81.33%{opacity:1} 83.33%{opacity:0} 100%{opacity:0}}
+      #ssInMemory .a6{animation-name:ssInMemory-a6}
+      @keyframes ssInMemory-a6{0%{opacity:0} 83.33%{opacity:0} 85.33%{opacity:1} 98%{opacity:1} 100%{opacity:0}}
+      #ssInMemory .a13{animation-name:ssInMemory-a13}
+      @keyframes ssInMemory-a13{0%{opacity:0} 2%{opacity:1} 48%{opacity:1} 50%{opacity:0} 100%{opacity:0}}
+      #ssInMemory .a23{animation-name:ssInMemory-a23}
+      @keyframes ssInMemory-a23{0%{opacity:0} 16.67%{opacity:0} 18.67%{opacity:1} 48%{opacity:1} 50%{opacity:0} 100%{opacity:0}}
+      #ssInMemory .a26{animation-name:ssInMemory-a26}
+      @keyframes ssInMemory-a26{0%{opacity:0} 16.67%{opacity:0} 18.67%{opacity:1} 98%{opacity:1} 100%{opacity:0}}
+      #ssInMemory .a34{animation-name:ssInMemory-a34}
+      @keyframes ssInMemory-a34{0%{opacity:0} 33.33%{opacity:0} 35.33%{opacity:1} 64.67%{opacity:1} 66.67%{opacity:0} 100%{opacity:0}}
+      #ssInMemory .a46{animation-name:ssInMemory-a46}
+      @keyframes ssInMemory-a46{0%{opacity:0} 50%{opacity:0} 52%{opacity:1} 98%{opacity:1} 100%{opacity:0}}
+      #ssInMemory .a56{animation-name:ssInMemory-a56}
+      @keyframes ssInMemory-a56{0%{opacity:0} 66.67%{opacity:0} 68.67%{opacity:1} 98%{opacity:1} 100%{opacity:0}}
+      #ssInMemory .aM{animation-name:ssInMemory-aM}
+      @keyframes ssInMemory-aM{0%{opacity:0} 16.67%{opacity:0} 18.67%{opacity:1} 31.33%{opacity:1} 33.33%{opacity:0} 83.33%{opacity:0} 85.33%{opacity:1} 98%{opacity:1} 100%{opacity:0}}
+      #ssInMemory .tk2{animation-name:ssInMemory-tk2}
+      @keyframes ssInMemory-tk2{0%,18%{opacity:0;transform:translate(0,0)}20%{opacity:1;transform:translate(0,0)}28.33%{opacity:1;transform:translate(52px,0)}32%,100%{opacity:0;transform:translate(52px,0)}}
+      #ssInMemory .tk4{animation-name:ssInMemory-tk4}
+      @keyframes ssInMemory-tk4{0%,51.33%{opacity:0;transform:translate(0,0)}53.33%{opacity:1;transform:translate(0,0)}61.67%{opacity:1;transform:translate(0,-40px)}65.33%,100%{opacity:0;transform:translate(0,-40px)}}
+      #ssInMemory .tk6{animation-name:ssInMemory-tk6}
+      @keyframes ssInMemory-tk6{0%,84.67%{opacity:0;transform:translate(0,0)}86.67%{opacity:1;transform:translate(0,0)}95.83%{opacity:1;transform:translate(0,-120px)}98.67%,100%{opacity:0;transform:translate(0,-120px)}}
+      @keyframes ssInMemory-hide{from{opacity:0}to{opacity:0}}
+      @media (prefers-reduced-motion: reduce){#ssInMemory .an,#ssInMemory .ls,#ssInMemory .st{animation:none}}
+    </style>
+  </defs>
+  <rect width="960" height="668" rx="16" fill="#FBFBFD"/>
+  <text class="title" x="48" y="56">Del usuario por defecto a su propio usuario en memoria</text>
+  <text class="sub" x="48" y="80" data-fit="860">Dos @Bean en WebSecurityConfig: uno dice quiénes son los usuarios y el otro cómo se compara la contraseña.</text>
+  <rect x="48" y="104" width="432" height="432" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
+  <text class="h" x="64" y="128" data-fit="400">EL CÓDIGO</text>
+  <rect x="504" y="104" width="408" height="432" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
+  <text class="h" x="520" y="128" data-fit="376">LO QUE QUEDA EN MEMORIA</text>
+  <rect x="60" y="140" width="408" height="382" rx="10" fill="#1F2430"/>
+  <path d="M60,150 A10,10 0 0 1 70,140 H458 A10,10 0 0 1 468,150 V166 H60 Z" fill="#2A3040"/>
+  <text class="mono" x="72" y="153" dy="0.35em" font-size="12" fill="#9AA3B5">WebSecurityConfig.java</text>
+  <rect class="an a2" x="64" y="208" width="400" height="78" rx="5" fill="#A9B4F2" fill-opacity=".3" stroke="#A9B4F2" stroke-width="1.5"/>
+  <rect class="an a3" x="64" y="284" width="400" height="78" rx="5" fill="#86D3CA" fill-opacity=".3" stroke="#86D3CA" stroke-width="1.5"/>
+  <rect class="an a4" x="64" y="360" width="400" height="21" rx="5" fill="#9FD68D" fill-opacity=".3" stroke="#9FD68D" stroke-width="1.5"/>
+  <rect class="an a5" x="64" y="417" width="400" height="59" rx="5" fill="#F0C572" fill-opacity=".3" stroke="#F0C572" stroke-width="1.5"/>
+  <rect class="an a6" x="64" y="379" width="400" height="21" rx="5" fill="#A9B4F2" fill-opacity=".3" stroke="#A9B4F2" stroke-width="1.5"/>
+  <text class="mono" x="72.0" y="184" font-size="11.5" fill="#E6EAF2" textLength="96.6" lengthAdjust="spacingAndGlyphs">@Configuration</text>
+  <text class="mono" x="72.0" y="203" font-size="11.5" fill="#E6EAF2" textLength="220.8" lengthAdjust="spacingAndGlyphs">public class WebSecurityConfig {</text>
+  <text class="mono" x="85.8" y="222" font-size="11.5" fill="#E6EAF2" textLength="34.5" lengthAdjust="spacingAndGlyphs">@Bean</text>
+  <text class="mono" x="85.8" y="241" font-size="11.5" fill="#E6EAF2" textLength="331.2" lengthAdjust="spacingAndGlyphs">public UserDetailsService userDetailsService() {</text>
+  <text class="mono" x="99.6" y="260" font-size="11.5" fill="#E6EAF2" textLength="303.6" lengthAdjust="spacingAndGlyphs">InMemoryUserDetailsManager userDetailsMngr =</text>
+  <text class="mono" x="127.2" y="279" font-size="11.5" fill="#E6EAF2" textLength="227.7" lengthAdjust="spacingAndGlyphs">new InMemoryUserDetailsManager();</text>
+  <text class="mono" x="99.6" y="298" font-size="11.5" fill="#E6EAF2" textLength="338.1" lengthAdjust="spacingAndGlyphs">UserDetails user = User.withUsername(&quot;miUsuario&quot;)</text>
+  <text class="mono" x="127.2" y="317" font-size="11.5" fill="#E6EAF2" textLength="131.1" lengthAdjust="spacingAndGlyphs">.password(&quot;123456&quot;)</text>
+  <text class="mono" x="127.2" y="336" font-size="11.5" fill="#E6EAF2" textLength="138.0" lengthAdjust="spacingAndGlyphs">.authorities(&quot;read&quot;)</text>
+  <text class="mono" x="127.2" y="355" font-size="11.5" fill="#E6EAF2" textLength="62.1" lengthAdjust="spacingAndGlyphs">.build();</text>
+  <text class="mono" x="99.6" y="374" font-size="11.5" fill="#E6EAF2" textLength="227.7" lengthAdjust="spacingAndGlyphs">userDetailsMngr.createUser(user);</text>
+  <text class="mono" x="99.6" y="393" font-size="11.5" fill="#E6EAF2" textLength="158.7" lengthAdjust="spacingAndGlyphs">return userDetailsMngr;</text>
+  <text class="mono" x="85.8" y="412" font-size="11.5" fill="#E6EAF2" textLength="6.9" lengthAdjust="spacingAndGlyphs">}</text>
+  <text class="mono" x="85.8" y="431" font-size="11.5" fill="#E6EAF2" textLength="34.5" lengthAdjust="spacingAndGlyphs">@Bean</text>
+  <text class="mono" x="85.8" y="450" font-size="11.5" fill="#E6EAF2" textLength="289.8" lengthAdjust="spacingAndGlyphs">public PasswordEncoder passwordEncoder() {</text>
+  <text class="mono" x="99.6" y="469" font-size="11.5" fill="#E6EAF2" textLength="282.9" lengthAdjust="spacingAndGlyphs">return NoOpPasswordEncoder.getInstance();</text>
+  <text class="mono" x="85.8" y="488" font-size="11.5" fill="#E6EAF2" textLength="6.9" lengthAdjust="spacingAndGlyphs">}</text>
+  <text class="mono" x="72.0" y="507" font-size="11.5" fill="#E6EAF2" textLength="6.9" lengthAdjust="spacingAndGlyphs">}</text>
+  <g class="an a1"><path d="M60,166 H468 V512 A10,10 0 0 1 458,522 H70 A10,10 0 0 1 60,512 Z" fill="#1F2430" fill-opacity=".92"/><text x="264" y="330" text-anchor="middle" font-size="14" font-weight="700" fill="#FFFFFF">Todavía no existe WebSecurityConfig</text><text x="264" y="352" text-anchor="middle" font-size="12.5" fill="#9AA3B5">Solo está la dependencia de Spring Security</text></g>
+  <rect x="520" y="150" width="376" height="138" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="2.5"/>
+  <text class="mono" x="536" y="174" font-size="13.5" font-weight="700" fill="#4453C9">InMemoryUserDetailsManager</text>
+  <text class="an a1" x="536" y="194" font-size="12" fill="#454C61">lo configura Spring Boot por su cuenta</text>
+  <text class="ls a26" x="536" y="194" font-size="12" fill="#454C61">lo crea su método userDetailsService()</text>
+  <g class="an a1"><rect x="536" y="208" width="344" height="64" rx="10" fill="#EFF1F5" stroke="#C4CBD8" stroke-width="1.5"/><text class="mono" x="708" y="231" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#556074" data-fit="328">user</text><text x="708" y="250" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="328">contraseña generada: 0be98d58-…</text></g>
+  <g class="an a23"><rect x="536" y="208" width="344" height="64" rx="10" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.5" stroke-dasharray="5 5"/><text x="708" y="240" dy="0.35em" text-anchor="middle" font-size="12.5" fill="#79809A">sin usuarios</text></g>
+  <g class="ls a46"><rect x="536" y="208" width="344" height="64" rx="10" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text class="mono" x="708" y="231" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#3A8235" data-fit="328">miUsuario</text><text x="708" y="250" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="328">password 123456 · authorities read</text></g>
+  <g class="an a1"><rect x="520" y="312" width="376" height="52" rx="10" fill="#1F2430"/><text class="mono" x="534" y="333" font-size="11.5" fill="#E6EAF2">Using generated security password:</text><text class="mono" x="534" y="352" font-size="11.5" fill="#F0C572">0be98d58-3edd-49c4-b73a-e0a3fdda1809</text></g>
+  <g class="an a2"><rect x="520" y="312" width="376" height="52" rx="10" fill="#FFEBEF" stroke="#F3A3B2" stroke-width="1.5"/><text x="708" y="329" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#C2354F" data-fit="360">El usuario por defecto ya no se crea</text><text x="708" y="348" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="360">Spring Boot cede ante su @Bean</text></g>
+  <g class="an a34"><rect x="520" y="312" width="376" height="52" rx="10" fill="#E3F6F3" stroke="#86D3CA" stroke-width="1.5"/><text class="mono" x="708" y="329" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#0F8478" data-fit="360">UserDetails</text><text x="708" y="348" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="360">miUsuario · 123456 · read</text></g>
+  <g class="ls a56"><rect x="520" y="312" width="376" height="52" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text class="mono" x="708" y="329" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#A96C05" data-fit="360">NoOpPasswordEncoder</text><text x="708" y="348" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="360">compara la contraseña tal cual, sin cifrar</text></g>
+  <text class="h" x="520" y="398">QUIÉN PUEDE INICIAR SESIÓN</text>
+  <rect x="520" y="408" width="180" height="52" rx="10" fill="#EFF1F5" stroke="#C4CBD8" stroke-width="1.5"/><text class="mono" x="610" y="425" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#556074" data-fit="164">user</text><text x="610" y="444" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="164">la contraseña de la consola</text>
+  <rect x="716" y="408" width="180" height="52" rx="10" fill="#EFF1F5" stroke="#C4CBD8" stroke-width="1.5"/><text class="mono" x="806" y="425" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#556074" data-fit="164">miUsuario</text><text x="806" y="444" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="164">contraseña 123456</text>
+  <g class="an a1"><rect x="520" y="470" width="180" height="28" rx="10" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text x="610" y="484" dy="0.35em" text-anchor="middle" font-size="12" font-weight="700" fill="#3A8235" data-fit="164">entra</text></g>
+  <g class="ls a26"><rect x="520" y="470" width="180" height="28" rx="10" fill="#FFEBEF" stroke="#F3A3B2" stroke-width="1.5"/><text x="610" y="484" dy="0.35em" text-anchor="middle" font-size="12" font-weight="700" fill="#C2354F" data-fit="164">ya no existe</text></g>
+  <g class="an a13"><rect x="716" y="470" width="180" height="28" rx="10" fill="#FFEBEF" stroke="#F3A3B2" stroke-width="1.5"/><text x="806" y="484" dy="0.35em" text-anchor="middle" font-size="12" font-weight="700" fill="#C2354F" data-fit="164">no existe</text></g>
+  <g class="an a4"><rect x="716" y="470" width="180" height="28" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text x="806" y="484" dy="0.35em" text-anchor="middle" font-size="12" font-weight="700" fill="#A96C05" data-fit="164">falta el PasswordEncoder</text></g>
+  <g class="ls a56"><rect x="716" y="470" width="180" height="28" rx="10" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text x="806" y="484" dy="0.35em" text-anchor="middle" font-size="12" font-weight="700" fill="#3A8235" data-fit="164">entra</text></g>
+  <rect class="an a1" x="530" y="202" width="356" height="76" rx="14" fill="none" stroke="#556074" stroke-width="3"/>
+  <rect class="an a1" x="514" y="402" width="192" height="64" rx="14" fill="none" stroke="#3A8235" stroke-width="3"/>
+  <rect class="an aM" x="514" y="144" width="388" height="150" rx="14" fill="none" stroke="#4453C9" stroke-width="3"/>
+  <rect class="an a3" x="514" y="306" width="388" height="64" rx="14" fill="none" stroke="#0F8478" stroke-width="3"/>
+  <rect class="an a4" x="530" y="202" width="356" height="76" rx="14" fill="none" stroke="#3A8235" stroke-width="3"/>
+  <rect class="an a5" x="514" y="306" width="388" height="64" rx="14" fill="none" stroke="#A96C05" stroke-width="3"/>
+  <rect class="an a6" x="710" y="402" width="192" height="64" rx="14" fill="none" stroke="#3A8235" stroke-width="3"/>
+  <g class="an a1"><circle cx="880" cy="208" r="12" fill="#EFF1F5" stroke="#C4CBD8" stroke-width="1.5"/><text x="880" y="208" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#556074">1</text></g>
+  <g><circle cx="896" cy="150" r="12" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text x="896" y="150" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4453C9">2</text></g>
+  <g class="an a34"><circle cx="896" cy="312" r="12" fill="#E3F6F3" stroke="#86D3CA" stroke-width="1.5"/><text x="896" y="312" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0F8478">3</text></g>
+  <g class="ls a46"><circle cx="880" cy="208" r="12" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text x="880" y="208" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#3A8235">4</text></g>
+  <g class="ls a56"><circle cx="896" cy="312" r="12" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text x="896" y="312" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A96C05">5</text></g>
+  <g><circle cx="896" cy="408" r="12" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text x="896" y="408" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#3A8235">6</text></g>
+  <circle class="an tk2" cx="468" cy="218" r="8" fill="#4453C9" stroke="#FFFFFF" stroke-width="2"/>
+  <circle class="an tk4" cx="708" cy="312" r="8" fill="#3A8235" stroke="#FFFFFF" stroke-width="2"/>
+  <circle class="an tk6" cx="806" cy="408" r="8" fill="#0F8478" stroke="#FFFFFF" stroke-width="2"/>
+  <rect x="48" y="552" width="864" height="56" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
+  <g class="an a1"><circle cx="76" cy="580" r="12" fill="#EFF1F5" stroke="#C4CBD8" stroke-width="1.5"/><text x="76" y="580" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#556074">1</text><text x="100" y="575" font-size="13" font-weight="600" fill="#161A26" data-fit="790">Sin configuración, Spring Boot crea un usuario por defecto: user, con una contraseña que imprime en la consola.</text><text x="100" y="593" font-size="13" fill="#454C61" data-fit="790">Vive en memoria y la contraseña cambia cada vez que se reinicia la aplicación.</text></g>
+  <g class="an a2"><circle cx="76" cy="580" r="12" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text x="76" y="580" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4453C9">2</text><text x="100" y="575" font-size="13" font-weight="600" fill="#161A26" data-fit="790">Al declarar un @Bean de tipo UserDetailsService, Spring Boot deja de crear ese usuario.</text><text x="100" y="593" font-size="13" fill="#454C61" data-fit="790">El InMemoryUserDetailsManager nuevo arranca vacío: es una lista de usuarios en memoria.</text></g>
+  <g class="an a3"><circle cx="76" cy="580" r="12" fill="#E3F6F3" stroke="#86D3CA" stroke-width="1.5"/><text x="76" y="580" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0F8478">3</text><text x="100" y="575" font-size="13" font-weight="600" fill="#161A26" data-fit="790">User.withUsername(...) construye un UserDetails: nombre, contraseña y authorities.</text><text x="100" y="593" font-size="13" fill="#454C61" data-fit="790">Las authorities representan los roles o permisos del usuario.</text></g>
+  <g class="an a4"><circle cx="76" cy="580" r="12" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text x="76" y="580" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#3A8235">4</text><text x="100" y="575" font-size="13" font-weight="600" fill="#161A26" data-fit="790">createUser(user) lo agrega a la lista del manager.</text><text x="100" y="593" font-size="13" fill="#454C61" data-fit="790">El usuario ya existe, pero todavía no puede entrar: falta decir cómo se compara la contraseña.</text></g>
+  <g class="an a5"><circle cx="76" cy="580" r="12" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text x="76" y="580" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A96C05">5</text><text x="100" y="575" font-size="13" font-weight="600" fill="#161A26" data-fit="790">El segundo @Bean es el PasswordEncoder: NoOpPasswordEncoder compara la contraseña tal cual, sin cifrar.</text><text x="100" y="593" font-size="13" fill="#454C61" data-fit="790">Sirve para aprender; una aplicación real usa un encoder que sí la protege, como BCryptPasswordEncoder.</text></g>
+  <g class="an a6"><circle cx="76" cy="580" r="12" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text x="76" y="580" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#3A8235">6</text><text x="100" y="575" font-size="13" font-weight="600" fill="#161A26" data-fit="790">Al iniciar sesión, Spring Security le pide el usuario al manager y compara la contraseña con el encoder.</text><text x="100" y="593" font-size="13" fill="#454C61" data-fit="790">Ahora entra miUsuario con 123456; el usuario user ya no existe.</text></g>
+  <g class="st"><text x="68" y="575" font-size="13" font-weight="600" fill="#161A26" data-fit="820">Su @Bean de UserDetailsService reemplaza al usuario por defecto; el PasswordEncoder dice cómo comparar la contraseña.</text><text x="68" y="593" font-size="13" fill="#454C61" data-fit="820">Los números marcan el orden de los seis pasos.</text></g>
+  <text class="foot" x="48" y="640" data-fit="860">Los usuarios en memoria se pierden al reiniciar: por eso el siguiente paso es cargarlos de la base de datos.</text>
+</svg>
+```
+
 ## Cargando usuario de DB
 
 Ya hemos visto cómo se carga un in-memory user. Pero ahora, tenemos que llevar esta forma en la que funcionan los usuarios en SpringBoot para habilitar los usuarios almacenados en base de datos.

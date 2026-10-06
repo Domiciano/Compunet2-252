@@ -357,6 +357,106 @@ def ss_carga_db(freeze=None):
 FIGS['ssCargaDb'] = ss_carga_db
 
 
+IN_MEMORY_CODE = ['@Configuration', 'public class WebSecurityConfig {', '  @Bean', '  public UserDetailsService userDetailsService() {',
+                  '    InMemoryUserDetailsManager userDetailsMngr =', '        new InMemoryUserDetailsManager();',
+                  '    UserDetails user = User.withUsername("miUsuario")', '        .password("123456")', '        .authorities("read")',
+                  '        .build();', '    userDetailsMngr.createUser(user);', '    return userDetailsMngr;', '  }', '  @Bean',
+                  '  public PasswordEncoder passwordEncoder() {', '    return NoOpPasswordEncoder.getInstance();', '  }', '}']
+
+
+def ss_in_memory(freeze=None):
+    """Animada: seis pasos de 3 s, del usuario por defecto al usuario propio en memoria. Con freeze=1..6 sale el fotograma fijo de ese paso."""
+    fid, h, n_steps, secs = 'ssInMemory', 668, 6, 3
+    s = head(fid, h, 'Del usuario por defecto a su propio usuario en memoria', 'Del usuario por defecto a su propio usuario en memoria',
+             'Dos @Bean en WebSecurityConfig: uno dice quiénes son los usuarios y el otro cómo se compara la contraseña.',
+             'Animación en seis pasos y dos columnas: el código de WebSecurityConfig a la izquierda y lo que queda en memoria a la '
+             'derecha. Uno: sin configuración, Spring Boot crea el usuario user con una contraseña generada. Dos: al declarar un Bean '
+             'de tipo UserDetailsService ese usuario deja de crearse y el InMemoryUserDetailsManager arranca vacío. Tres: '
+             'User.withUsername construye un UserDetails con nombre, contraseña y authorities. Cuatro: createUser lo agrega al '
+             'manager. Cinco: el Bean de PasswordEncoder, con NoOpPasswordEncoder, compara la contraseña sin cifrar. Seis: al '
+             'iniciar sesión entra miUsuario con 123456 y el usuario user ya no existe.')
+    teal, green, amber, ind, slate = (FAM[c][2] for c in ('teal', 'green', 'amber', 'indigo', 'slate'))
+    spans = {f'a{k}': [(k, k)] for k in range(1, n_steps + 1)}
+    spans.update({'a13': [(1, 3)], 'a23': [(2, 3)], 'a26': [(2, 6)], 'a34': [(3, 4)], 'a46': [(4, 6)], 'a56': [(5, 6)], 'aM': [(2, 2), (6, 6)]})
+    on = {1: ['a1', 'a13'], 2: ['a2', 'a23', 'a26', 'a13', 'aM'], 3: ['a3', 'a23', 'a26', 'a13', 'a34'], 4: ['a4', 'a26', 'a34', 'a46'],
+          5: ['a5', 'a26', 'a46', 'a56'], 6: ['a6', 'a26', 'a46', 'a56', 'aM']}
+    tokens = [('tk2', 2, [(.2, '0,0'), (.7, '52px,0')]), ('tk4', 4, [(.2, '0,0'), (.7, '0,-40px')]), ('tk6', 6, [(.2, '0,0'), (.75, '0,-120px')])]
+    s = s.replace('    </style>', anim_css(fid, n_steps, secs, spans, tokens, freeze, on) + '    </style>', 1)
+    s = s.replace(f'<svg id="{fid}"', f'<svg id="{fid}" data-steps="{n_steps}" data-step-seconds="{secs}"', 1)
+
+    for x, pw, label in ((48, 432, 'EL CÓDIGO'), (504, 408, 'LO QUE QUEDA EN MEMORIA')):
+        s += f'  <rect x="{x}" y="104" width="{pw}" height="432" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>\n'
+        s += f'  <text class="h" x="{x+16}" y="128" data-fit="{pw-32}">{label}</text>\n'
+
+    s += '  <rect x="60" y="140" width="408" height="382" rx="10" fill="#1F2430"/>\n'
+    s += '  <path d="M60,150 A10,10 0 0 1 70,140 H458 A10,10 0 0 1 468,150 V166 H60 Z" fill="#2A3040"/>\n'
+    s += '  <text class="mono" x="72" y="153" dy="0.35em" font-size="12" fill="#9AA3B5">WebSecurityConfig.java</text>\n'
+    for cls, first, last, color in (('a2', 2, 5, FAM['indigo'][1]), ('a3', 6, 9, FAM['teal'][1]), ('a4', 10, 10, FAM['green'][1]),
+                                    ('a5', 13, 15, FAM['amber'][1]), ('a6', 11, 11, FAM['indigo'][1])):
+        s += (f'  <rect class="an {cls}" x="64" y="{170 + first*19}" width="400" height="{(last - first + 1)*19 + 2}" rx="5" fill="{color}" '
+              f'fill-opacity=".3" stroke="{color}" stroke-width="1.5"/>\n')
+    for i, line in enumerate(IN_MEMORY_CODE):
+        indent = len(line) - len(line.lstrip())
+        text = line.strip()
+        s += (f'  <text class="mono" x="{72 + indent*6.9:.1f}" y="{184 + i*19}" font-size="11.5" fill="#E6EAF2" textLength="{len(text)*6.9:.1f}" '
+              f'lengthAdjust="spacingAndGlyphs">{text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace(chr(34), "&quot;")}</text>\n')
+    s += ('  <g class="an a1"><path d="M60,166 H468 V512 A10,10 0 0 1 458,522 H70 A10,10 0 0 1 60,512 Z" fill="#1F2430" fill-opacity=".92"/>'
+          '<text x="264" y="330" text-anchor="middle" font-size="14" font-weight="700" fill="#FFFFFF">Todavía no existe WebSecurityConfig</text>'
+          '<text x="264" y="352" text-anchor="middle" font-size="12.5" fill="#9AA3B5">Solo está la dependencia de Spring Security</text></g>\n')
+
+    soft, border, _ = FAM['indigo']
+    s += f'  <rect x="520" y="150" width="376" height="138" rx="10" fill="{soft}" stroke="{border}" stroke-width="2.5"/>\n'
+    s += f'  <text class="mono" x="536" y="174" font-size="13.5" font-weight="700" fill="{ind}">InMemoryUserDetailsManager</text>\n'
+    s += '  <text class="an a1" x="536" y="194" font-size="12" fill="#454C61">lo configura Spring Boot por su cuenta</text>\n'
+    s += '  <text class="ls a26" x="536" y="194" font-size="12" fill="#454C61">lo crea su método userDetailsService()</text>\n'
+    s += '  <g class="an a1">' + box(536, 208, 344, 64, 'slate', 'user', sub='contraseña generada: 0be98d58-…').strip() + '</g>\n'
+    s += ('  <g class="an a23"><rect x="536" y="208" width="344" height="64" rx="10" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.5" stroke-dasharray="5 5"/>'
+          '<text x="708" y="240" dy="0.35em" text-anchor="middle" font-size="12.5" fill="#79809A">sin usuarios</text></g>\n')
+    s += '  <g class="ls a46">' + box(536, 208, 344, 64, 'green', 'miUsuario', sub='password 123456 · authorities read').strip() + '</g>\n'
+
+    s += ('  <g class="an a1"><rect x="520" y="312" width="376" height="52" rx="10" fill="#1F2430"/>'
+          '<text class="mono" x="534" y="333" font-size="11.5" fill="#E6EAF2">Using generated security password:</text>'
+          f'<text class="mono" x="534" y="352" font-size="11.5" fill="{FAM["amber"][1]}">0be98d58-3edd-49c4-b73a-e0a3fdda1809</text></g>\n')
+    s += '  <g class="an a2">' + box(520, 312, 376, 52, 'rose', 'El usuario por defecto ya no se crea', sub='Spring Boot cede ante su @Bean', mono=False).strip() + '</g>\n'
+    s += '  <g class="an a34">' + box(520, 312, 376, 52, 'teal', 'UserDetails', sub='miUsuario · 123456 · read').strip() + '</g>\n'
+    s += '  <g class="ls a56">' + box(520, 312, 376, 52, 'amber', 'NoOpPasswordEncoder', sub='compara la contraseña tal cual, sin cifrar').strip() + '</g>\n'
+
+    s += '  <text class="h" x="520" y="398">QUIÉN PUEDE INICIAR SESIÓN</text>\n'
+    s += '  ' + box(520, 408, 180, 52, 'slate', 'user', sub='la contraseña de la consola')
+    s += '  ' + box(716, 408, 180, 52, 'slate', 'miUsuario', sub='contraseña 123456')
+    for cls, x, color, text in (('an a1', 520, 'green', 'entra'), ('ls a26', 520, 'rose', 'ya no existe'), ('an a13', 716, 'rose', 'no existe'),
+                                ('an a4', 716, 'amber', 'falta el PasswordEncoder'), ('ls a56', 716, 'green', 'entra')):
+        s += f'  <g class="{cls}">' + box(x, 470, 180, 28, color, text, mono=False, fs=12).strip() + '</g>\n'
+
+    rings = [('a1', 530, 202, 356, 76, slate), ('a1', 514, 402, 192, 64, green), ('aM', 514, 144, 388, 150, ind), ('a3', 514, 306, 388, 64, teal),
+             ('a4', 530, 202, 356, 76, green), ('a5', 514, 306, 388, 64, amber), ('a6', 710, 402, 192, 64, green)]
+    for cls, x, y, rw, rh, color in rings:
+        s += f'  <rect class="an {cls}" x="{x}" y="{y}" width="{rw}" height="{rh}" rx="14" fill="none" stroke="{color}" stroke-width="3"/>\n'
+    for cls, x, y, n, color in (('an a1', 880, 208, 1, 'slate'), ('', 896, 150, 2, 'indigo'), ('an a34', 896, 312, 3, 'teal'),
+                                ('ls a46', 880, 208, 4, 'green'), ('ls a56', 896, 312, 5, 'amber'), ('', 896, 408, 6, 'green')):
+        s += (f'  <g class="{cls}">' if cls else '  <g>') + chip(x, y, n, color).strip() + '</g>\n'
+    for cls, cx, cy, color in (('tk2', 468, 218, ind), ('tk4', 708, 312, green), ('tk6', 806, 408, teal)):
+        s += f'  <circle class="an {cls}" cx="{cx}" cy="{cy}" r="8" fill="{color}" stroke="#FFFFFF" stroke-width="2"/>\n'
+
+    s += '  <rect x="48" y="552" width="864" height="56" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>\n'
+    caps = [(1, 'slate', 'Sin configuración, Spring Boot crea un usuario por defecto: user, con una contraseña que imprime en la consola.', 'Vive en memoria y la contraseña cambia cada vez que se reinicia la aplicación.'),
+            (2, 'indigo', 'Al declarar un @Bean de tipo UserDetailsService, Spring Boot deja de crear ese usuario.', 'El InMemoryUserDetailsManager nuevo arranca vacío: es una lista de usuarios en memoria.'),
+            (3, 'teal', 'User.withUsername(...) construye un UserDetails: nombre, contraseña y authorities.', 'Las authorities representan los roles o permisos del usuario.'),
+            (4, 'green', 'createUser(user) lo agrega a la lista del manager.', 'El usuario ya existe, pero todavía no puede entrar: falta decir cómo se compara la contraseña.'),
+            (5, 'amber', 'El segundo @Bean es el PasswordEncoder: NoOpPasswordEncoder compara la contraseña tal cual, sin cifrar.', 'Sirve para aprender; una aplicación real usa un encoder que sí la protege, como BCryptPasswordEncoder.'),
+            (6, 'green', 'Al iniciar sesión, Spring Security le pide el usuario al manager y compara la contraseña con el encoder.', 'Ahora entra miUsuario con 123456; el usuario user ya no existe.')]
+    for n, color, l1, l2 in caps:
+        s += (f'  <g class="an a{n}">' + chip(76, 580, n, color).strip() +
+              f'<text x="100" y="575" font-size="13" font-weight="600" fill="#161A26" data-fit="790">{l1}</text>'
+              f'<text x="100" y="593" font-size="13" fill="#454C61" data-fit="790">{l2}</text></g>\n')
+    s += ('  <g class="st"><text x="68" y="575" font-size="13" font-weight="600" fill="#161A26" data-fit="820">Su @Bean de UserDetailsService reemplaza al usuario por defecto; el PasswordEncoder dice cómo comparar la contraseña.</text>'
+          '<text x="68" y="593" font-size="13" fill="#454C61" data-fit="820">Los números marcan el orden de los seis pasos.</text></g>\n')
+    return s + tail(h, 'Los usuarios en memoria se pierden al reiniciar: por eso el siguiente paso es cargarlos de la base de datos.')
+
+
+FIGS['ssInMemory'] = ss_in_memory
+
+
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == '--inject':
         done = set()
