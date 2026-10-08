@@ -1,6 +1,6 @@
 # Registro de usuarios
 
-<!-- tags: signup, registro de usuarios, BCryptPasswordEncoder, PasswordEncoder, contraseña hasheada, requestMatchers, permitAll, @Order, securityMatcher, consola H2, Authentication, @AuthenticationPrincipal, SecurityContextHolder, ruta de registro bloqueada, redirige al login al registrarse -->
+<!-- tags: signup, registro de usuarios, BCryptPasswordEncoder, PasswordEncoder, contraseña hasheada, requestMatchers, permitAll, consola H2, Authentication, @AuthenticationPrincipal, SecurityContextHolder, ruta de registro bloqueada, redirige al login al registrarse -->
 
 La autenticación es el proceso mediante el cual el sistema verifica la identidad de un usuario, servicio o dispositivo, normalmente a través de credenciales como contraseñas, tokens, certificados o datos biométricos, asegurándose de que quien intenta acceder es realmente quien dice ser. 
 
@@ -39,50 +39,9 @@ Con lo que ya sabe del `SecurityFilterChain`, la ruta de registro debe ser públ
 
 Una vez conseguido, almacene el usuario, pero con contraseña hasheada.
 
-## Varias cadenas con @Order
+## Varias cadenas
 
-Si requiere varios `SecurityFilterChain`, por ejemplo uno para la consola H2 y otro para el resto de la aplicación, ordénelos con `@Order`. Gana la primera cadena cuyo `securityMatcher` coincide con el request.
-
-```java
-@Configuration
-@EnableWebSecurity
-public class WebSecurityConfig {
-    @Bean
-    @Order(1)
-    public SecurityFilterChain h2SecurityFilterChain(HttpSecurity http) throws Exception {
-        ...
-    }
-
-    @Bean
-    @Order(2)
-    public SecurityFilterChain appSecurityFilterChain(HttpSecurity http) throws Exception {
-        ...
-    }
-}
-```
-
-En este caso requerimos que todas las rutas que dependen de H2 tengan acceso sin la autenticación propia de la aplicación. Cuando queremos referenciar a un conjunto de requests y no a toda la aplicación, usamos `securityMatcher`:
-
-```java
-@Bean
-@Order(1)
-public SecurityFilterChain h2SecurityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .securityMatcher(toH2Console())
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers(toH2Console()).permitAll()
-        )
-        .csrf(csrf -> csrf
-            .ignoringRequestMatchers(toH2Console())
-        )
-        .headers(headers -> headers
-            .frameOptions(frameOptions -> frameOptions.sameOrigin())
-        );
-    return http.build();
-}
-```
-
-En este caso `toH2Console()` devuelve la ruta configurada hacia la consola de H2. La segunda cadena, la de la aplicación, es la que ya conoce, con su `formLogin` personalizado.
+Recuerde que la consola de H2 tiene su propio `SecurityFilterChain` con `@Order(1)`, visto en la lección de configuración de la seguridad. La cadena de la aplicación, con las reglas de registro y su `formLogin` personalizado, es la `@Order(2)`.
 
 ## Información de prueba
 

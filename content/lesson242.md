@@ -69,7 +69,8 @@ En el `SecurityFilterChain` de la lección anterior se reemplaza `Customizer.wit
 public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/public/**", "/css/**", "/js/**").permitAll()
+            .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+            .requestMatchers("/public/**").permitAll()
             .anyRequest().authenticated()
         )
         .formLogin(login -> login
@@ -89,7 +90,7 @@ Qué hace cada línea:
 
 Además, al fijar `loginPage`, Spring ajusta solo dos destinos: si las credenciales fallan vuelve a `/auth/login?error`, y tras cerrar sesión va a `/auth/login?logout`. Esos dos parámetros son los que lee la plantilla del paso 3.
 
-Fíjese también en `/css/**` y `/js/**` dentro de `permitAll`. Si su login usa una hoja de estilos y esa ruta está protegida, el navegador la pedirá sin sesión, recibirá una redirección al login y la página se verá sin estilos.
+Fíjese también en la regla de recursos estáticos, vista en la lección anterior. Si su login usa una hoja de estilos y esa ruta está protegida, el navegador la pedirá sin sesión, recibirá una redirección al login y la página se verá sin estilos.
 
 ## Paso 2: un controller que sirva la plantilla
 
@@ -188,9 +189,3 @@ Cómo personalizar el logout (URL, cookie, sesión) se ve en la lección de auto
 - **403 Forbidden al enviar el formulario**: falta el token CSRF; revise que use `th:action`.
 - **405 Method Not Allowed**: el formulario envía a una URL distinta de `loginPage` o el método no es `post`.
 - **Siempre aparece `?error` con credenciales correctas**: los `name` de los inputs no son `username` y `password`, o la contraseña de la base de datos no está hasheada con el `PasswordEncoder` configurado.
-
-## Ejercicio
-
-1. Reemplace el login por defecto por el suyo, con su propio CSS.
-2. Muestre el mensaje de error y el de cierre de sesión.
-3. Provoque a propósito cada uno de los errores de la lista anterior (cambie un `name`, quite `th:action`, quite `permitAll()`) y compruebe que obtiene lo que describe la lección.
