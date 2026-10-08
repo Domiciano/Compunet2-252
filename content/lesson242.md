@@ -69,8 +69,7 @@ En el `SecurityFilterChain` de la lección anterior se reemplaza `Customizer.wit
 public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-            .requestMatchers("/public/**").permitAll()
+            .requestMatchers("/css/**", "/js/**").permitAll()
             .anyRequest().authenticated()
         )
         .formLogin(login -> login
@@ -90,7 +89,7 @@ Qué hace cada línea:
 
 Además, al fijar `loginPage`, Spring ajusta solo dos destinos: si las credenciales fallan vuelve a `/auth/login?error`, y tras cerrar sesión va a `/auth/login?logout`. Esos dos parámetros son los que lee la plantilla del paso 3.
 
-Fíjese también en la regla de recursos estáticos, vista en la lección anterior. Si su login usa una hoja de estilos y esa ruta está protegida, el navegador la pedirá sin sesión, recibirá una redirección al login y la página se verá sin estilos.
+Fíjese también en la regla de `/css/**` y `/js/**`, vista en la lección anterior. Si su login usa una hoja de estilos y esa ruta está protegida, el navegador la pedirá sin sesión, recibirá una redirección al login y la página se verá sin estilos.
 
 ## Paso 2: un controller que sirva la plantilla
 

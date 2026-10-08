@@ -1,6 +1,6 @@
 # Configurando la seguridad con SecurityFilterChain
 
-<!-- tags: SecurityFilterChain, @Configuration, @EnableWebSecurity, @Bean, HttpSecurity, authorizeHttpRequests, requestMatchers, permitAll, authenticated, anyRequest, PathRequest.toStaticResources, CSS sin estilos en el login, consola H2, h2-console, securityMatcher, @Order, X-Frame-Options, frameOptions sameOrigin, ignoringRequestMatchers, cadena de filtros, el orden de las reglas importa, todas las rutas piden login, 403 en ruta pública -->
+<!-- tags: SecurityFilterChain, @Configuration, @EnableWebSecurity, @Bean, HttpSecurity, authorizeHttpRequests, requestMatchers, permitAll, authenticated, anyRequest, formLogin, CSS sin estilos en el login, consola H2, h2-console, securityMatcher, @Order, frameOptions sameOrigin, ignoringRequestMatchers, el orden de las reglas importa, todas las rutas piden login -->
 
 Al agregar Spring Security, todas las rutas quedan protegidas y el login lo pone el framework. Para cambiar ese comportamiento hay que decirle a Spring qué reglas queremos. Esas reglas viven en un objeto llamado `SecurityFilterChain`.
 
@@ -51,11 +51,11 @@ Cada request que llega a su aplicación pasa primero por una **cadena de filtros
 </svg>
 ```
 
-Varios ya los ha visto trabajar: `AuthorizationFilter` en el recorrido de un request autorizado y `CsrfFilter` en la lección del token CSRF. Usted no escribe esos filtros; Spring Security los arma por defecto. Lo que sí escribe es la **configuración** de la cadena, y eso es un `SecurityFilterChain`.
+Varios ya los ha visto trabajar: `AuthorizationFilter` en el recorrido de un request autorizado y `CsrfFilter` en la lección del token CSRF. Usted no escribe esos filtros; Spring Security los arma por defecto. Lo que sí escribe es la **configuración** de la cadena.
 
 ## Un bean en una clase de configuración
 
-El `SecurityFilterChain` es un **bean**: lo declara un método anotado con `@Bean` dentro de una clase `@Configuration`, igual que cualquier otro bean que ya conoce del IoC Container. Va en la misma `WebSecurityConfig` donde ya declaró el `UserDetailsService` y el `PasswordEncoder`: es un tercer bean de esa clase.
+El `SecurityFilterChain` es un **bean**: lo declara un método anotado con `@Bean` dentro de una clase `@Configuration`. Va en la misma `WebSecurityConfig` donde ya declaró el `UserDetailsService` y el `PasswordEncoder`: es un tercer bean de esa clase.
 
 ```java
 @Configuration
@@ -66,8 +66,6 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                .requestMatchers("/public/**").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(Customizer.withDefaults());
@@ -76,81 +74,48 @@ public class WebSecurityConfig {
 }
 ```
 
-- `@Configuration` marca la clase como fuente de beans.
-- `@EnableWebSecurity` declara que esta clase configura la seguridad web. Con Spring Boot la seguridad ya se activa sola, pero es costumbre dejarla para que se lea de un vistazo.
-- `HttpSecurity` es el constructor de la cadena. Spring se lo inyecta como parámetro; usted le encadena reglas y al final llama `http.build()` para obtener el `SecurityFilterChain`.
-- Mientras no declare este bean, Spring usa una cadena por defecto: todo autenticado y login automático. Al declararlo, **su** cadena reemplaza a la de por defecto **completa**.
+- `HttpSecurity` es el constructor de la cadena. Spring se lo inyecta; usted le encadena reglas y al final llama `http.build()`.
+- Al declarar este bean, **su** cadena reemplaza a la de por defecto completa. Por eso hay que pedir otra vez el login con `formLogin(Customizer.withDefaults())`; sin esa línea no hay formulario y quien no tiene sesión recibe `403 Forbidden`.
 
-## Las reglas: permitAll y authenticated
+## permitAll y authenticated
 
-Dentro de `authorizeHttpRequests` usted decide, ruta por ruta, quién puede entrar. Esas reglas las aplica el último filtro de la cadena, `AuthorizationFilter`.
+Dentro de `authorizeHttpRequests` usted decide, ruta por ruta, quién puede entrar:
 
-- `requestMatchers("/public/**")` elige un grupo de rutas. `**` significa "esta ruta y todo lo que cuelgue de ella".
+- `requestMatchers(...)` elige un grupo de rutas.
 - `permitAll()` deja pasar a cualquiera, con o sin sesión.
 - `authenticated()` exige que el usuario haya iniciado sesión.
 - `anyRequest()` es "todo lo demás".
 
-Lea el ejemplo como una frase: *los recursos estáticos y las rutas bajo `/public` las puede ver cualquiera; todo lo demás requiere sesión.*
-
-## Liberar el CSS y el JavaScript
-
-Con `anyRequest().authenticated()`, también los archivos de `static/` quedan protegidos. Una página pública, como el login, se vería sin estilos porque el navegador pide el CSS sin sesión y recibe una redirección.
-
-Una salida es mover los archivos a una carpeta `public/` y liberarla con `/public/**`, pero eso obliga a organizar el proyecto según la seguridad. Spring Boot ofrece algo mejor: `PathRequest.toStaticResources().atCommonLocations()`, que ya conoce las carpetas estándar de recursos y las libera todas de una vez.
-
-```java
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
-
-.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-```
-
-Libera `/css/**`, `/js/**`, `/images/**`, `/webjars/**` y `favicon.ico`, es decir, lo que está en `src/main/resources/static/` bajo esos nombres. Sus archivos quedan donde estaban y no depende de una ruta inventada. Si alguna de esas carpetas no debe ser pública, se excluye:
-
-```java
-PathRequest.toStaticResources().atCommonLocations()
-    .excluding(StaticResourceLocation.IMAGES)
-```
-
-Esta regla va **antes** de `anyRequest()`, como cualquier otra.
-
-## Por qué aparece formLogin
-
-Como su cadena reemplaza a la de por defecto completa, el formulario de login también desaparece a menos que lo pida. `formLogin(Customizer.withDefaults())` vuelve a activar la página de login que Spring genera sola. Sin esa línea, quien no tenga sesión recibe un `403 Forbidden` en vez de una redirección al login. En la siguiente lección cambiamos esa página por una propia.
-
-## El orden de las reglas importa
-
-Spring evalúa las reglas **de arriba hacia abajo y se queda con la primera que coincide**. Por eso `anyRequest()` va siempre al final: si lo pone primero, atrapa todo y las reglas siguientes nunca se evalúan.
+Con `anyRequest().authenticated()` también quedan protegidos los archivos de `static/`: el navegador pide el CSS sin sesión, recibe una redirección al login y la página se ve sin estilos. Basta con liberarlos:
 
 ```java
 .authorizeHttpRequests(auth -> auth
+    .requestMatchers("/css/**", "/js/**").permitAll()
     .anyRequest().authenticated()
-    .requestMatchers("/public/**").permitAll()
 )
 ```
 
-Esta versión parece igual a la anterior pero no lo es: `/public/**` seguiría pidiendo login. Spring incluso lo rechaza al arrancar con un error de configuración.
+Lea el ejemplo como una frase: *el CSS y el JavaScript los puede pedir cualquiera; todo lo demás requiere sesión.* El `**` significa "esta ruta y todo lo que cuelgue de ella".
+
+## El orden de las reglas importa
+
+Spring evalúa las reglas **de arriba hacia abajo y se queda con la primera que coincide**. Por eso `anyRequest()` va siempre al final: si lo pone primero, atrapa todo y las reglas siguientes nunca se evalúan. Spring incluso lo rechaza al arrancar con un error de configuración.
 
 ## Una segunda cadena para la consola de H2
 
-Hasta aquí, una sola cadena protege toda la aplicación y libera el CSS y el JavaScript con `permitAll`. La consola de H2 (`/h2-console`) no se lleva bien con esa cadena, por tres razones:
-
-- Tiene su propio login, así que la regla `anyRequest().authenticated()` la manda al login de su aplicación, que no es el de H2.
-- Sus formularios no llevan token CSRF, y `CsrfFilter` los rechaza con `403`.
-- Se dibuja dentro de `frames`, y Spring Security manda por defecto la cabecera `X-Frame-Options: DENY`, que impide que el navegador los muestre.
-
-No conviene aflojar estas reglas para toda la aplicación solo por la consola. La solución es declarar **otro `SecurityFilterChain`**, que solo atienda las rutas de H2:
+La consola de H2 (`/h2-console`) no se lleva bien con la cadena de la aplicación: tiene su propio login, sus formularios no llevan token CSRF y se dibuja dentro de `frames`, que Spring Security bloquea por defecto. En vez de aflojar la seguridad de toda la aplicación, se declara **otro `SecurityFilterChain`** que solo atienda esas rutas:
 
 ```java
 @Bean
 @Order(1)
 public SecurityFilterChain h2SecurityFilterChain(HttpSecurity http) throws Exception {
     http
-        .securityMatcher(PathRequest.toH2Console())
+        .securityMatcher("/h2-console/**")
         .authorizeHttpRequests(auth -> auth
             .anyRequest().permitAll()
         )
         .csrf(csrf -> csrf
-            .ignoringRequestMatchers(PathRequest.toH2Console())
+            .ignoringRequestMatchers("/h2-console/**")
         )
         .headers(headers -> headers
             .frameOptions(frameOptions -> frameOptions.sameOrigin())
@@ -159,14 +124,12 @@ public SecurityFilterChain h2SecurityFilterChain(HttpSecurity http) throws Excep
 }
 ```
 
-Cada línea resuelve una de las tres razones:
-
-- `securityMatcher(PathRequest.toH2Console())` limita esta cadena a las rutas de la consola. Cualquier otro request ignora esta cadena.
-- `permitAll()` deja entrar sin la autenticación de la aplicación; H2 pide su propio usuario y contraseña.
-- `csrf(... ignoringRequestMatchers ...)` apaga la verificación del token solo para esas rutas.
+- `securityMatcher("/h2-console/**")` limita esta cadena a las rutas de la consola.
+- `permitAll()` deja entrar sin el login de la aplicación; H2 pide el suyo.
+- `csrf(... ignoringRequestMatchers ...)` apaga el token solo para esas rutas.
 - `frameOptions(... sameOrigin())` permite los frames, pero solo desde la misma aplicación.
 
-La cadena de la aplicación se queda como estaba, solo que ahora debe ir **después**:
+La cadena de la aplicación es la de antes, con `@Order(2)`:
 
 ```java
 @Bean
@@ -174,8 +137,7 @@ La cadena de la aplicación se queda como estaba, solo que ahora debe ir **despu
 public SecurityFilterChain appSecurityFilterChain(HttpSecurity http) throws Exception {
     http
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-            .requestMatchers("/public/**").permitAll()
+            .requestMatchers("/css/**", "/js/**").permitAll()
             .anyRequest().authenticated()
         )
         .formLogin(Customizer.withDefaults());
@@ -183,12 +145,10 @@ public SecurityFilterChain appSecurityFilterChain(HttpSecurity http) throws Exce
 }
 ```
 
-`@Order` fija en qué orden se consultan las cadenas: gana **la primera cuyo `securityMatcher` coincide** con el request. La cadena de H2 tiene `@Order(1)` y solo coincide con `/h2-console/**`. La de la aplicación no tiene `securityMatcher`, o sea que coincide con todo, y por eso va siempre última. Si invierte los números, la cadena de la aplicación atrapa también las rutas de H2 y la consola vuelve a pedir login.
+`@Order` fija en qué orden se consultan las cadenas: gana **la primera cuyo `securityMatcher` coincide** con el request. La de H2 solo coincide con `/h2-console/**`; la de la aplicación no tiene `securityMatcher`, coincide con todo y por eso va última.
 
-La consola debe estar activa en `application.properties`:
+La consola debe estar activa en `application.properties` y solo debe usarse en desarrollo:
 
 ```properties
 spring.h2.console.enabled=true
 ```
-
-Use esta cadena solo en desarrollo. Una consola de base de datos sin autenticación de la aplicación no debe llegar a producción.
