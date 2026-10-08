@@ -6,7 +6,7 @@ Cuando agrega Spring Security, el servidor genera por usted una página de login
 
 ## Qué hace el login por defecto
 
-Con `formLogin(Customizer.withDefaults())` Spring Security registra tres cosas a la vez:
+Mientras no configure nada, Spring Security registra tres cosas a la vez:
 
 - Un `GET /login` que devuelve una página HTML escrita por el propio framework.
 - Un `POST /login` que recibe las credenciales y las verifica.
@@ -62,7 +62,7 @@ Personalizar el login significa reemplazar **solo la primera**: la página que s
 
 ## Paso 1: decirle a Spring dónde está su login
 
-En el `SecurityFilterChain` de la lección anterior se reemplaza `Customizer.withDefaults()` por una configuración explícita:
+Al `SecurityFilterChain` de la lección anterior se le agrega `formLogin` con la ruta de su página:
 
 ```java
 @Bean
@@ -111,38 +111,22 @@ Si olvida este controller, al abrir `/auth/login` obtiene un 404 aunque la confi
 
 ## Paso 3: la plantilla
 
-Estos son los mínimos que Spring Security exige a la plantilla `templates/auth/login.html`:
+Este es el mínimo que Spring Security exige a la plantilla `templates/auth/login.html`; el resto de la página (`<html>`, estilos, etiquetas) es suyo:
 
 ```html
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Ingresar</title>
-    <link rel="stylesheet" th:href="@{/css/login.css}">
-</head>
-<body>
 <form th:action="@{/auth/login}" method="post">
-    <h1>Ingresar</h1>
-
-    <label for="username">Correo</label>
-    <input type="text" id="username" name="username" required autofocus>
-
-    <label for="password">Contraseña</label>
-    <input type="password" id="password" name="password" required>
-
+    <input type="text" name="username">
+    <input type="password" name="password">
     <button type="submit">Ingresar</button>
-
-    <div th:if="${param.error}">
-        <p style="color: red;">Usuario o contraseña incorrectos</p>
-    </div>
-
-    <div th:if="${param.logout}">
-        <p style="color: green;">Has cerrado sesión correctamente</p>
-    </div>
 </form>
-</body>
-</html>
+
+<div th:if="${param.error}">
+    <p style="color: red;">Usuario o contraseña incorrectos</p>
+</div>
+
+<div th:if="${param.logout}">
+    <p style="color: green;">Has cerrado sesión correctamente</p>
+</div>
 ```
 
 Lo que **no es negociable**:

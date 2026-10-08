@@ -1,6 +1,6 @@
 # Configurando la seguridad con SecurityFilterChain
 
-<!-- tags: SecurityFilterChain, @Configuration, @EnableWebSecurity, @Bean, HttpSecurity, authorizeHttpRequests, requestMatchers, permitAll, authenticated, anyRequest, formLogin, CSS sin estilos en el login, consola H2, h2-console, securityMatcher, @Order, frameOptions sameOrigin, ignoringRequestMatchers, el orden de las reglas importa, todas las rutas piden login -->
+<!-- tags: SecurityFilterChain, @Configuration, @EnableWebSecurity, @Bean, HttpSecurity, authorizeHttpRequests, requestMatchers, permitAll, authenticated, anyRequest, CSS sin estilos en el login, consola H2, h2-console, securityMatcher, @Order, frameOptions sameOrigin, ignoringRequestMatchers, el orden de las reglas importa, todas las rutas piden login -->
 
 Al agregar Spring Security, todas las rutas quedan protegidas y el login lo pone el framework. Para cambiar ese comportamiento hay que decirle a Spring qué reglas queremos. Esas reglas viven en un objeto llamado `SecurityFilterChain`.
 
@@ -67,15 +67,14 @@ public class WebSecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .anyRequest().authenticated()
-            )
-            .formLogin(Customizer.withDefaults());
+            );
         return http.build();
     }
 }
 ```
 
 - `HttpSecurity` es el constructor de la cadena. Spring se lo inyecta; usted le encadena reglas y al final llama `http.build()`.
-- Al declarar este bean, **su** cadena reemplaza a la de por defecto completa. Por eso hay que pedir otra vez el login con `formLogin(Customizer.withDefaults())`; sin esa línea no hay formulario y quien no tiene sesión recibe `403 Forbidden`.
+- Al declarar este bean, **su** cadena reemplaza a la de por defecto.
 
 ## permitAll y authenticated
 
@@ -139,8 +138,7 @@ public SecurityFilterChain appSecurityFilterChain(HttpSecurity http) throws Exce
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/css/**", "/js/**").permitAll()
             .anyRequest().authenticated()
-        )
-        .formLogin(Customizer.withDefaults());
+        );
     return http.build();
 }
 ```
