@@ -6,26 +6,6 @@ La autenticación es el proceso mediante el cual el sistema verifica la identida
 
 La autorización, en cambio, ocurre después de la autenticación y consiste en determinar qué acciones, recursos o información tiene permitido usar ese usuario dentro del sistema, según los roles, permisos o políticas asignadas. En conjunto, autenticación responde a la pregunta “¿quién sos?”, mientras que autorización responde a “¿qué podés hacer?”.
 
-## Registro de usuarios
-
-Para dar de alta a un usuario, debemos insertar el registro en la tabla `User`. Para lograrlo, grosso modo, hay que elaborar una plantilla `signup.html`con Thymeleaf para dar de alta al usuario. Luego, definir la ruta `/signup` como pública para permitir a un usuario registrarse.
-
-En Service desarrolle un método de almacenamiento del usario donde guarde la constraseña hasheada. No la contraseña legible. Vamos entonces a definir un `BCryptPasswordEncoder` como `PasswordEncoder`, que reemplaza al `NoOpPasswordEncoder` que usamos al principio.
-
-```java
-@Configuration
-public class WebSecurityConfig {
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-    
-}
-```
-
-`BCrypt` es un algoritmo de hashing. 
-
 ## Permitiendo el registro público
 
 Con lo que ya sabe del `SecurityFilterChain`, la ruta de registro debe ser pública: nadie puede iniciar sesión para registrarse si todavía no tiene cuenta. Agregue la regla **antes** de `anyRequest()`.
