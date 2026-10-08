@@ -1,5 +1,7 @@
 # Permisos en métodos
 
+<!-- tags: @PreAuthorize, @EnableMethodSecurity, SpEL, hasRole, hasAuthority, authentication.principal, isAuthenticated, seguridad en métodos, AccessDeniedException, @PreAuthorize no funciona -->
+
 ## Anotaciones de Seguridad en Métodos
 
 Además de configurar la seguridad en el `SecurityFilterChain`, puede aplicar reglas de autorización directamente en los métodos de sus controladores o servicios. Esto se hace habilitando la seguridad de métodos y usando anotaciones como `@PreAuthorize`.

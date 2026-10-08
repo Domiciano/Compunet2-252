@@ -1,6 +1,6 @@
 # Customizar el login
 
-<!-- tags: formLogin, loginPage, loginProcessingUrl, login personalizado, username y password, usernameParameter, th:action, _csrf, param.error, param.logout, logoutSuccessUrl, el login se queda en bucle, 405 Method Not Allowed, 403 Forbidden al hacer login -->
+<!-- tags: formLogin, loginPage, loginProcessingUrl, login personalizado, username y password, usernameParameter, th:action, _csrf, param.error, param.logout, el login se queda en bucle, 405 Method Not Allowed, 403 Forbidden al hacer login -->
 
 Cuando agrega Spring Security, el servidor genera por usted una página de login. Funciona, pero es la misma para todas las aplicaciones del mundo. En esta lección cambiamos esa página por la nuestra y vemos qué debe tener la plantilla para que Spring Security la acepte como suya.
 
@@ -62,26 +62,19 @@ Personalizar el login significa reemplazar **solo la primera**: la página que s
 
 ## Paso 1: decirle a Spring dónde está su login
 
-En el `SecurityFilterChain` se reemplaza `Customizer.withDefaults()` por una configuración explícita:
+En el `SecurityFilterChain` de la lección anterior se reemplaza `Customizer.withDefaults()` por una configuración explícita:
 
 ```java
 @Bean
-@Order(2)
-public SecurityFilterChain appSecurityFilterChain(HttpSecurity http) throws Exception {
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/public/**", "/signup", "/css/**", "/js/**").permitAll()
+            .requestMatchers("/public/**", "/css/**", "/js/**").permitAll()
             .anyRequest().authenticated()
         )
         .formLogin(login -> login
             .loginPage("/auth/login")
             .defaultSuccessUrl("/home", true)
-            .failureUrl("/auth/login?error")
-            .permitAll()
-        )
-        .logout(logout -> logout
-            .logoutUrl("/auth/logout")
-            .logoutSuccessUrl("/auth/login?logout")
             .permitAll()
         );
     return http.build();
@@ -92,9 +85,9 @@ Qué hace cada línea:
 
 - `loginPage("/auth/login")`: cuando alguien sin sesión pide una ruta protegida, Spring lo redirige aquí en vez de a `/login`.
 - `defaultSuccessUrl("/home", true)`: a dónde va después de autenticarse. Con `true` siempre va a `/home`; sin él, vuelve a la ruta que originalmente quería visitar.
-- `failureUrl("/auth/login?error")`: a dónde vuelve si las credenciales son incorrectas. Ese `?error` es el que lee la plantilla.
 - `permitAll()`: sin esto, la página de login quedaría protegida por la misma regla `anyRequest().authenticated()`, y el usuario nunca podría verla para autenticarse.
-- `logoutSuccessUrl("/auth/login?logout")`: tras cerrar sesión, vuelve al login con el parámetro `logout`.
+
+Además, al fijar `loginPage`, Spring ajusta solo dos destinos: si las credenciales fallan vuelve a `/auth/login?error`, y tras cerrar sesión va a `/auth/login?logout`. Esos dos parámetros son los que lee la plantilla del paso 3.
 
 Fíjese también en `/css/**` y `/js/**` dentro de `permitAll`. Si su login usa una hoja de estilos y esa ruta está protegida, el navegador la pedirá sin sesión, recibirá una redirección al login y la página se verá sin estilos.
 
@@ -159,7 +152,7 @@ Lo que **no es negociable**:
 - **Los campos se llaman exactamente `username` y `password`**. Aunque en su dominio el usuario se identifique por correo, el `name` del input sigue siendo `username`. Si usa `name="email"`, Spring recibirá el usuario vacío y todo intento fallará con `?error`.
 - **El token CSRF**. Con `th:action`, Thymeleaf agrega solo un `<input type="hidden" name="_csrf" ...>`. Si usa `action="..."` a secas, el token no viaja y el servidor responde `403 Forbidden`. Es el error más frecuente al copiar un HTML de una plantilla de internet.
 
-Lo que **sí es opcional**: el CSS, el diseño, el texto de los mensajes y la forma de mostrar `param.error` y `param.logout`. Esos dos parámetros aparecen en la URL gracias a `failureUrl` y `logoutSuccessUrl`; si usted cambia esas URL, cambie también lo que lee la plantilla.
+Lo que **sí es opcional**: el CSS, el diseño, el texto de los mensajes y la forma de mostrar `param.error` y `param.logout`. Esos dos parámetros aparecen en la URL por los destinos que Spring fijó al declarar `loginPage`.
 
 ## Si quiere otros nombres de campo
 
@@ -178,13 +171,15 @@ Aun así, recuerde que el valor que llegue como "username" es lo que `UserDetail
 
 ## Cerrar sesión desde la plantilla
 
-Con CSRF activo, cerrar sesión también es un `POST`. Un enlace `<a href="/auth/logout">` no sirve: debe ser un formulario.
+Con CSRF activo, cerrar sesión también es un `POST` a `/logout`. Un enlace `<a href="/logout">` no sirve: debe ser un formulario.
 
 ```html
-<form th:action="@{/auth/logout}" method="post">
+<form th:action="@{/logout}" method="post">
     <button type="submit">Cerrar sesión</button>
 </form>
 ```
+
+Cómo personalizar el logout (URL, cookie, sesión) se ve en la lección de autorización.
 
 ## Errores típicos y cómo leerlos
 

@@ -51,11 +51,11 @@ Cada request que llega a su aplicación pasa primero por una **cadena de filtros
 </svg>
 ```
 
-Usted no escribe esos filtros. Spring Security los arma por defecto. Lo que sí escribe es la **configuración** de la cadena, y eso es un `SecurityFilterChain`.
+Varios ya los ha visto trabajar: `AuthorizationFilter` en el recorrido de un request autorizado y `CsrfFilter` en la lección del token CSRF. Usted no escribe esos filtros; Spring Security los arma por defecto. Lo que sí escribe es la **configuración** de la cadena, y eso es un `SecurityFilterChain`.
 
 ## Un bean en una clase de configuración
 
-El `SecurityFilterChain` es un **bean**: lo declara un método anotado con `@Bean` dentro de una clase `@Configuration`, igual que cualquier otro bean que ya conoce del IoC Container.
+El `SecurityFilterChain` es un **bean**: lo declara un método anotado con `@Bean` dentro de una clase `@Configuration`, igual que cualquier otro bean que ya conoce del IoC Container. Va en la misma `WebSecurityConfig` donde ya declaró el `UserDetailsService` y el `PasswordEncoder`: es un tercer bean de esa clase.
 
 ```java
 @Configuration
@@ -68,16 +68,17 @@ public class WebSecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/public/**").permitAll()
                 .anyRequest().authenticated()
-            );
+            )
+            .formLogin(Customizer.withDefaults());
         return http.build();
     }
 }
 ```
 
 - `@Configuration` marca la clase como fuente de beans.
-- `@EnableWebSecurity` activa la seguridad web de Spring Security sobre esta configuración.
+- `@EnableWebSecurity` declara que esta clase configura la seguridad web. Con Spring Boot la seguridad ya se activa sola, pero es costumbre dejarla para que se lea de un vistazo.
 - `HttpSecurity` es el constructor de la cadena. Spring se lo inyecta como parámetro; usted le encadena reglas y al final llama `http.build()` para obtener el `SecurityFilterChain`.
-- Mientras no declare este bean, Spring usa una cadena por defecto: todo autenticado y login automático. Al declararlo, **su** cadena reemplaza a la de por defecto.
+- Mientras no declare este bean, Spring usa una cadena por defecto: todo autenticado y login automático. Al declararlo, **su** cadena reemplaza a la de por defecto **completa**.
 
 ## Las reglas: permitAll y authenticated
 
@@ -89,6 +90,10 @@ Dentro de `authorizeHttpRequests` usted decide, ruta por ruta, quién puede entr
 - `anyRequest()` es "todo lo demás".
 
 Lea el ejemplo como una frase: *las rutas bajo `/public` las puede ver cualquiera; todo lo demás requiere sesión.*
+
+## Por qué aparece formLogin
+
+Como su cadena reemplaza a la de por defecto completa, el formulario de login también desaparece a menos que lo pida. `formLogin(Customizer.withDefaults())` vuelve a activar la página de login que Spring genera sola. Sin esa línea, quien no tenga sesión recibe un `403 Forbidden` en vez de una redirección al login. En la siguiente lección cambiamos esa página por una propia.
 
 ## El orden de las reglas importa
 
@@ -107,7 +112,6 @@ Esta versión parece igual a la anterior pero no lo es: `/public/**` seguiría p
 
 1. Declare la clase `WebSecurityConfig` con su `SecurityFilterChain`.
 2. Cree dos rutas en un controller: `/public/hello` y `/private/hello`. Haga que la primera sea pública y la segunda exija sesión.
-3. Compruebe desde una ventana de incógnito que la primera responde sin login y la segunda lo redirige.
+3. Compruebe desde una ventana de incógnito que la primera responde sin login y la segunda lo redirige al login. Luego quite `formLogin` y observe el `403`.
 4. Mueva `anyRequest().authenticated()` al principio y observe qué pasa.
 
-En la siguiente lección cambiamos la página de login por una propia.

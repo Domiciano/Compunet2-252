@@ -1,5 +1,7 @@
 # Registro de usuarios
 
+<!-- tags: signup, registro de usuarios, BCryptPasswordEncoder, PasswordEncoder, contraseña hasheada, requestMatchers, permitAll, @Order, securityMatcher, consola H2, Authentication, @AuthenticationPrincipal, SecurityContextHolder, ruta de registro bloqueada, redirige al login al registrarse -->
+
 La autenticación es el proceso mediante el cual el sistema verifica la identidad de un usuario, servicio o dispositivo, normalmente a través de credenciales como contraseñas, tokens, certificados o datos biométricos, asegurándose de que quien intenta acceder es realmente quien dice ser. 
 
 La autorización, en cambio, ocurre después de la autenticación y consiste en determinar qué acciones, recursos o información tiene permitido usar ese usuario dentro del sistema, según los roles, permisos o políticas asignadas. En conjunto, autenticación responde a la pregunta “¿quién sos?”, mientras que autorización responde a “¿qué podés hacer?”.
@@ -8,7 +10,7 @@ La autorización, en cambio, ocurre después de la autenticación y consiste en 
 
 Para dar de alta a un usuario, debemos insertar el registro en la tabla `User`. Para lograrlo, grosso modo, hay que elaborar una plantilla `signup.html`con Thymeleaf para dar de alta al usuario. Luego, definir la ruta `/signup` como pública para permitir a un usuario registrarse.
 
-En Service desarrolle un método de almacenamiento del usario donde guarde la constraseña hasheada. No la contraseña legible. Vamos entonces a definir un `BCryptPasswordEncoder` como `PasswordEncoder`.
+En Service desarrolle un método de almacenamiento del usario donde guarde la constraseña hasheada. No la contraseña legible. Vamos entonces a definir un `BCryptPasswordEncoder` como `PasswordEncoder`, que reemplaza al `NoOpPasswordEncoder` que usamos al principio.
 
 ```java
 @Configuration
@@ -24,40 +26,26 @@ public class WebSecurityConfig {
 
 `BCrypt` es un algoritmo de hashing. 
 
-## SecurityFilterChain
+## Permitiendo el registro público
 
-Como sabe, cuando usamos Spring Boot Security, por defecto todas la rutas de la applicación web estarán protegidas de modo que solo clientes autenticado podrán hacer request.
-
-Esto lo podemos cambiar por medio de un `SecurityFilterChain`.
+Con lo que ya sabe del `SecurityFilterChain`, la ruta de registro debe ser pública: nadie puede iniciar sesión para registrarse si todavía no tiene cuenta. Agregue la regla **antes** de `anyRequest()`.
 
 ```java
-@Configuration 
-@EnableWebSecurity
-public class WebSecurityConfig {
-    ...
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .authorizeHttpRequests(
-                auth -> auth
-                    .requestMatchers("/public/**").permitAll() 
-                    .anyRequest().authenticated() 
-            );
-            return http.build();
-    }
-    ...
-}
+.authorizeHttpRequests(auth -> auth
+    .requestMatchers("/public/**", "/signup").permitAll()
+    .anyRequest().authenticated()
+)
 ```
 
-Observe que usamos el método `authorizeHttpRequest` que recibe un lambda. Este nos permite definir qué rutas son públicas (por medio de `permitAll()`) y qué rutas requieren autenticación (por medio de `authenticated()`).
+Una vez conseguido, almacene el usuario, pero con contraseña hasheada.
 
-Podemos definir `signup` como ruta publica con `requestMatchers("/signup")`
+## Varias cadenas con @Order
 
-Adicionalmente si requiere varios securityFilterChain, por ejemplo, uno para la consola H2 y otro para el resto de la aplicación, use los órdenes
+Si requiere varios `SecurityFilterChain`, por ejemplo uno para la consola H2 y otro para el resto de la aplicación, ordénelos con `@Order`. Gana la primera cadena cuyo `securityMatcher` coincide con el request.
 
 ```java
-@Configuration @EnableWebSecurity
+@Configuration
+@EnableWebSecurity
 public class WebSecurityConfig {
     @Bean
     @Order(1)
@@ -73,12 +61,12 @@ public class WebSecurityConfig {
 }
 ```
 
-En este caso requerimos que todas las rutas que dependen de h2 tengan acceso sin la autenticación propia de la aplicación. Cuando queremos referenciar a un conjunto de request y no a toda la aplicación, podemos usar `requestMatchers`
+En este caso requerimos que todas las rutas que dependen de H2 tengan acceso sin la autenticación propia de la aplicación. Cuando queremos referenciar a un conjunto de requests y no a toda la aplicación, usamos `securityMatcher`:
 
 ```java
 @Bean
 @Order(1)
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+public SecurityFilterChain h2SecurityFilterChain(HttpSecurity http) throws Exception {
     http
         .securityMatcher(toH2Console())
         .authorizeHttpRequests(auth -> auth
@@ -88,35 +76,13 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
             .ignoringRequestMatchers(toH2Console())
         )
         .headers(headers -> headers
-                        .frameOptions(frameOptions -> frameOptions.sameOrigin())
+            .frameOptions(frameOptions -> frameOptions.sameOrigin())
         );
-        return http.build();
+    return http.build();
 }
 ```
 
-En este caso `toH2Console()` devuelve la ruta configurada hacia la consola de h2
-
-Finalmente, usted puede ofrecer al usuario un login por defecto usando en la últmo filterchain usando el método .withDefaults().
-
-```java
-@Bean
-@Order(2)
-public SecurityFilterChain appSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .authorizeHttpRequests(
-                    auth -> auth
-                                .requestMatchers("/public/**").permitAll()
-                                .anyRequest().authenticated()
-            ).formLogin(Customizer.withDefaults()); //<--- Quítelo y observe qué pasa
-        return http.build();
-}
-```
-
-## Permitiendo registro público
-
-Ya que conoce lo escencial de las reglas de seguridad, aplique una regla que de acceso libre a su ruta de registro.
-
-Una vez conseguido, almacene el usuario, pero con contraseña hasheada
+En este caso `toH2Console()` devuelve la ruta configurada hacia la consola de H2. La segunda cadena, la de la aplicación, es la que ya conoce, con su `formLogin` personalizado.
 
 ## Información de prueba
 
@@ -128,51 +94,6 @@ INSERT INTO users (id, email, password)
 VALUES (estudiante@gmail.com', '$2a$12$LE5wWF2zJKLfE98E4KgJPO.buVfS0xHlSg2F2ciQMnk5kdgEBx506'),
        ('profesor@gmail.com', '$2a$12$LE5wWF2zJKLfE98E4KgJPO.buVfS0xHlSg2F2ciQMnk5kdgEBx506');
 ```
-
-## Login personalizado
-
-Si usted piensa "Qué login tan feo el que da springboot", este apartado es para usted. Cree un plantilla de `login.html`.
-
-```java
-@Configuration
-@EnableWebSecurity
-public class SecurityConfig {
-    @Bean
-    public SecurityFilterChain appSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .formLogin(login -> login
-                .loginPage("/auth/login")
-                .defaultSuccessUrl("/home", true)
-                .permitAll()
-            );
-        return http.build();
-    }
-}
-```
-
-En este caso se utiliza `formLogin` que recibe un lambda. Este permite definir la `loginPage`, la `defaultSuccessUrl` y definir si es público por medio de `permitAll`.
-
-En el caso de `defaultSuccessUrl` la bandera en true permite que siempre redirija a `/home` sin importar la ruta a la que inicialmente se dirigía el usuario.
-
-Su login debe tener al menos este form
-
-```html
-<form th:action="@{/auth/login}" method="post">
-    <input type="text" id="username" name="username" required>
-    <input type="password" id="password" name="password" required>
-    <button type="submit">Ingresar</button>
-
-    <div th:if="${param.error}">
-        <p style="color: red;">Usuario o contraseña incorrectos</p>
-    </div>
-
-    <div th:if="${param.logout}">
-        <p style="color: green;">Has cerrado sesión correctamente</p>
-    </div>
-</form>
-```
-
-Note que se nombran las variables `username` y `password`. Además se accede a variables de Request Param como `error` y `logout` en caso de username o password incorrectos y cierre de sesión respectivamente.
 
 ## Acceder a mis propios detalles
 
