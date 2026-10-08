@@ -15,11 +15,8 @@ Registrar a alguien son dos requests: un `GET` que muestra el formulario y un `P
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final UserService userService;
-
-    public AuthController(UserService userService) {
-        this.userService = userService;
-    }
+    @Autowired
+    UserService userService;
 
     @GetMapping("/signup")
     public String signup() {
