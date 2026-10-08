@@ -43,9 +43,10 @@
 [t] SEMANA 9 · Spring MVC
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson23.md | Introducción a Spring Security | 0032
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson231.md | Cargando usuario desde la DB | 0075
-[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson24.md | Creando un usuario | 0033
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson241.md | CSRF Token | 0076
 [t] SEMANA 10 · Security
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson24.md | Creando un usuario | 0033
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson242.md | Customizar el login | 0077
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson25.md | Autorización | 0034
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson26.md | Permisos en métodos | 0035
 [t] SEMANA 11 · Rest
