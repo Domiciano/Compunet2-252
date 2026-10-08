@@ -45,6 +45,7 @@
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson231.md | Cargando usuario desde la DB | 0075
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson241.md | CSRF Token | 0076
 [t] SEMANA 10 · Security
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson243.md | Configurando la seguridad con SecurityFilterChain | 0078
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson242.md | Customizar el login | 0077
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson24.md | Registro de usuarios | 0033
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson25.md | Autorización | 0034
