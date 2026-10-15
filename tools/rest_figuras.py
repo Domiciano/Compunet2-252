@@ -40,7 +40,7 @@ def pane_bg(x, y, w, h):
             f'  <path d="M{x},{y+10} A10,10 0 0 1 {x+10},{y} H{x+w-10} A10,10 0 0 1 {x+w},{y+10} V{y+26} H{x} Z" fill="#2A3040"/>\n')
 
 
-def pane_text(x, y, tab, lines, marks=(), fs=11.5, lh=19, cls=None, w=None, tab_fill='#9AA3B5', top=48):
+def pane_text(x, y, tab, lines, marks=(), fs=11.5, lh=19, cls=None, w=None, tab_fill='#9AA3B5', top=48, dim=()):
     """Pestaña y líneas de un panel oscuro. marks: (línea, col, largo, color); col None resalta la línea entera."""
     cw = fs * 0.6
     s = f'<g class="{cls}">' if cls else ''
@@ -58,7 +58,7 @@ def pane_text(x, y, tab, lines, marks=(), fs=11.5, lh=19, cls=None, w=None, tab_
         if not text:
             continue
         indent = len(line) - len(line.lstrip())
-        fill = '#8C95AA' if text.startswith('(') else '#E6EAF2'
+        fill = '#8C95AA' if text.startswith('(') or i in dim else '#E6EAF2'
         s += (f'<text class="mono" x="{x + 12 + indent * cw:.1f}" y="{y + top + i * lh}" font-size="{fs}" fill="{fill}" '
               f'textLength="{len(text) * cw:.1f}" lengthAdjust="spacingAndGlyphs">{esc(text)}</text>')
     return '  ' + s + ('</g>' if cls else '') + '\n'
@@ -367,58 +367,77 @@ FIGS['restIdempotencia'] = rest_idempotencia
 
 
 def rest_stateless(freeze=None):
-    """Animada: cuatro pasos de 4 s. Dos instancias detrás de un balanceador: la sesión se pierde, el token no."""
+    """Animada: cuatro pasos de 4 s. El servidor se reinicia entre dos requests: la sesión se pierde, el token no."""
     fid, h, n, secs = 'restStateless', 560, 4, 4
-    teal, green = FAM['teal'][2], FAM['green'][2]
+    teal, green, rose = FAM['teal'][2], FAM['green'][2], FAM['rose'][2]
     spans = {f'a{k}': [(k, k)] for k in range(1, n + 1)}
-    spans.update({'a12': [(1, 2)], 'a34': [(3, 4)]})
-    on = {1: ['a1', 'a12'], 2: ['a2', 'a12'], 3: ['a3', 'a34'], 4: ['a4', 'a34']}
-    hops = [(1, 228, 264, (60, 0), teal, 'ABC123'), (1, 544, 256, (72, -92), teal, 'ABC123'),
-            (2, 228, 264, (60, 0), teal, 'ABC123'), (2, 544, 272, (72, 64), teal, 'ABC123'),
-            (3, 228, 264, (60, 0), green, 'eyJ…'), (3, 544, 256, (72, -92), green, 'eyJ…'),
-            (4, 228, 264, (60, 0), green, 'eyJ…'), (4, 544, 272, (72, 64), green, 'eyJ…')]
+    spans.update({'a12': [(1, 2)], 'a34': [(3, 4)], 'a24': [(2, 2), (4, 4)]})
+    on = {1: ['a1', 'a12'], 2: ['a2', 'a12', 'a24'], 3: ['a3', 'a34'], 4: ['a4', 'a34', 'a24']}
+    hops = [(1, 316, 132, (200, 0), teal, 'Cookie ABC123'), (1, 520, 156, (-196, 0), green, '200 OK'),
+            (2, 316, 132, (200, 0), teal, 'Cookie ABC123'), (2, 520, 156, (-196, 0), rose, '401'),
+            (3, 316, 132, (200, 0), green, 'Bearer eyJ…'), (3, 520, 156, (-196, 0), green, '200 OK'),
+            (4, 316, 132, (200, 0), green, 'Bearer eyJ…'), (4, 520, 156, (-196, 0), green, '200 OK')]
     s = anim_head(fid, h, n, secs, spans, on, hops, freeze,
-                  'Stateless: cualquier servidor puede responder', 'Stateless: cualquier servidor puede responder',
-                  'Si el request trae todo lo que hace falta, no importa a cuál instancia de la aplicación le toque.',
-                  'Animación en cuatro pasos con un cliente, un balanceador y dos instancias de la misma aplicación. Caso con '
-                  'sesión: el primer request con la cookie ABC123 llega a A, que guarda esa sesión, y responde 200; el siguiente '
-                  'cae en B, que no conoce la sesión, y responde 401. Caso stateless: el request trae un token firmado; A lo '
-                  'verifica y responde 200, y cuando el siguiente cae en B, B también lo verifica y responde 200.',
-                  colors=('teal', 'slate'))
+                  'Stateless: el servidor no recuerda nada', 'Stateless: el servidor no recuerda nada',
+                  'Si cada request trae todo lo que hace falta, no importa lo que el servidor haya olvidado.',
+                  'Animación en cuatro pasos con el cliente a la izquierda, el request en el centro y la memoria del servidor a '
+                  'la derecha. Caso con sesión: el cliente envía la cookie ABC123, el servidor la encuentra en su memoria y '
+                  'responde 200; después el servidor se reinicia, la memoria se borra y el mismo request recibe 401. Caso '
+                  'stateless: el request trae un token firmado, el servidor verifica la firma y responde 200; después de '
+                  'reiniciarse, el mismo token sigue funcionando.', colors=('teal', 'green'))
     s += badge_case('an a12', 'rose', 'CASO 1 · CON SESIÓN')
     s += badge_case('ls a34', 'green', 'CASO 2 · STATELESS')
-    s += pane_bg(48, 104, 312, 104)
-    s += pane_text(48, 104, 'request', ['GET /cursos HTTP/1.1', 'Cookie: JSESSIONID=ABC123'],
-                   marks=[(1, None, 0, FAM['teal'][1])], cls='an a12', w=312)
-    s += pane_text(48, 104, 'request', ['GET /cursos HTTP/1.1', 'Authorization: Bearer eyJhbGci…'],
-                   marks=[(1, None, 0, FAM['green'][1])], cls='ls a34', w=312)
-    s += '  ' + box(48, 232, 168, 64, 'teal', 'Cliente', mono=False, fs=15)
-    s += '  ' + box(360, 232, 168, 64, 'slate', 'Balanceador', sub='reparte los requests', mono=False)
-    s += '  <text class="h" x="704" y="104">DOS INSTANCIAS DE LA APP</text>\n'
-    s += '  ' + box(704, 120, 208, 56, 'indigo', 'Servidor A', sub='instancia 1', mono=False, fs=14)
-    s += '  ' + box(704, 312, 208, 56, 'indigo', 'Servidor B', sub='instancia 2', mono=False, fs=14)
-    s += '  <path class="ar-teal" d="M216,264 H356"/>\n'
-    s += '  <path class="ar-slate" d="M528,256 C616,256 616,148 700,148"/><path class="ar-slate" d="M528,272 C616,272 616,340 700,340"/>\n'
-    s += '  <g class="an a12">' + box(704, 184, 208, 48, 'green', 'ABC123 → ana', sub='sesión en memoria', fs=12.5).strip() + '</g>\n'
-    s += '  <g class="an a12">' + box(704, 376, 208, 48, 'slate', 'ninguna sesión', sub='memoria vacía', mono=False, fs=12.5).strip() + '</g>\n'
-    for y in (184, 376):
-        s += '  <g class="ls a34">' + box(704, y, 208, 48, 'slate', 'clave de firma', sub='ninguna sesión', mono=False, fs=12.5).strip() + '</g>\n'
-    res = [(1, 'green', '200 OK', 'A tenía la sesión'), (2, 'rose', '401', 'B no conoce ABC123'),
-           (3, 'green', '200 OK', 'A verificó el token'), (4, 'green', '200 OK', 'B verificó el token')]
+    s += '  ' + box(48, 112, 248, 64, 'teal', 'Cliente', sub='ya hizo login', mono=False, fs=15)
+    s += '  ' + box(664, 112, 248, 64, 'indigo', 'Servidor REST', sub='Spring Boot', mono=False, fs=15, hero=True)
+    s += '  <path class="ar-teal" d="M304,132 H654"/><path class="ar-green" d="M656,156 H306"/>\n'
+    s += '  <text class="h" x="480" y="116" text-anchor="middle">REQUEST →</text>\n'
+    s += '  <text class="h" x="480" y="180" text-anchor="middle">← RESPONSE</text>\n'
+
+    s += panel(48, 192, 248, 240, 'LO QUE RECIBE EL CLIENTE')
+    res = [(1, 'green', '200 OK', 'los cursos de ana'), (2, 'rose', '401 Unauthorized', '¿quién es usted?'),
+           (3, 'green', '200 OK', 'los cursos de ana'), (4, 'green', '200 OK', 'los cursos de ana')]
     for k, color, code, sub in res:
-        s += f'  <g class="{"ls" if k == 4 else "an"} a{k}">' + box(48, 312, 168, 60, color, code, sub=sub, fs=15).strip() + '</g>\n'
-    s += ring('an a1', 698, 114, 220, 124, 'green')
-    s += ring('an a2', 698, 306, 220, 124, 'rose')
-    s += ring('an a3', 698, 114, 220, 124, 'green')
-    s += ring('an a4', 698, 306, 220, 124, 'green')
+        s += f'  <g class="{"ls" if k == 4 else "an"} a{k}">' + box(64, 232, 216, 64, color, code, sub=sub, fs=14).strip() + '</g>\n'
+    notes = [(1, 'El servidor lo reconoce', 'por la sesión guardada.'), (2, 'La cookie llegó, pero la', 'sesión ya no existe.'),
+             (3, 'El servidor lo reconoce', 'por el token firmado.'), (4, 'El reinicio no cambió nada:', 'el token trae la identidad.')]
+    for k, l1, l2 in notes:
+        s += (f'  <g class="{"ls" if k == 4 else "an"} a{k}"><text x="64" y="330" font-size="12.5" fill="#454C61" data-fit="216">{l1}</text>'
+              f'<text x="64" y="348" font-size="12.5" fill="#454C61" data-fit="216">{l2}</text></g>\n')
+
+    s += pane_bg(312, 192, 336, 240)
+    s += pane_text(312, 192, 'request', ['GET /cursos HTTP/1.1', 'Cookie: JSESSIONID=ABC123', '', '(solo un identificador;',
+                                         ' lo demás está en el servidor)'],
+                   marks=[(1, None, 0, FAM['teal'][1])], cls='an a12', w=336, dim=(4,))
+    s += pane_text(312, 192, 'request', ['GET /cursos HTTP/1.1', 'Authorization: Bearer eyJhbGci…', '', '(el token dice quién es',
+                                         ' y lleva la firma del servidor)'],
+                   marks=[(1, None, 0, FAM['green'][1])], cls='ls a34', w=336, dim=(4,))
+
+    s += panel(664, 192, 248, 240, 'MEMORIA DEL SERVIDOR')
+    s += '  <g class="an a1">' + box(680, 232, 216, 56, 'green', 'ABC123 → ana', sub='sesión creada en el login', fs=13).strip() + '</g>\n'
+    rsoft, rborder, _ = FAM['rose']
+    s += (f'  <g class="an a2"><rect x="680" y="232" width="216" height="56" rx="10" fill="#FFFFFF" stroke="{rborder}" stroke-width="1.5" stroke-dasharray="5 5"/>'
+          f'<text x="788" y="251" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="{rose}">vacía</text>'
+          '<text x="788" y="270" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61">la sesión se perdió</text></g>\n')
+    s += '  <g class="ls a34">' + box(680, 232, 216, 56, 'slate', 'clave de firma', sub='ninguna sesión guardada', mono=False, fs=13).strip() + '</g>\n'
+    asoft, aborder, astrong = FAM['amber']
+    s += (f'  <g class="an a24"><rect x="680" y="304" width="216" height="56" rx="10" fill="{asoft}" stroke="{aborder}" stroke-width="1.5"/>'
+          f'<path d="M708,322 A10,10 0 1 0 718,332" fill="none" stroke="{astrong}" stroke-width="2"/>'
+          f'<path d="M703,317 L708,322 L713,317" fill="none" stroke="{astrong}" stroke-width="2"/>'
+          f'<text x="732" y="323" dy="0.35em" font-size="13.5" font-weight="700" fill="{astrong}">Se reinició</text>'
+          '<text x="732" y="342" dy="0.35em" font-size="12" fill="#454C61">la app arrancó de nuevo</text></g>\n')
+
+    s += ring('an a1', 674, 226, 228, 68, 'green')
+    s += ring('an a2', 674, 226, 228, 68, 'rose')
+    s += ring('an a3', 58, 226, 228, 76, 'green')
+    s += ring('an a4', 58, 226, 228, 76, 'green')
     s += hop_pills(hops)
     s += captions(448, [
-        (1, 'teal', 'Caso 1 · Con sesión. El cliente envía su cookie y el balanceador lo manda a A.', 'A guardó la sesión ABC123 en su memoria al hacer login: responde 200.'),
-        (2, 'rose', 'El siguiente request cae en B, con la misma cookie.', 'La sesión vive en la memoria de A; B no la conoce y responde 401.'),
-        (3, 'green', 'Caso 2 · Stateless. El request trae un token firmado en Authorization.', 'A verifica la firma con su clave: no necesita recordar nada.'),
-        (4, 'green', 'El siguiente request cae en B, y B también lo acepta.', 'Cualquier instancia puede responder, porque el request trae todo lo que hace falta.')],
+        (1, 'teal', 'Caso 1 · Con sesión. El cliente envía la cookie que recibió al hacer login.', 'El servidor busca ABC123 en su memoria, encuentra a ana y responde 200.'),
+        (2, 'rose', 'El servidor se reinicia y el cliente envía la misma cookie.', 'La sesión vivía en memoria y se borró: el servidor ya no sabe quién es y responde 401.'),
+        (3, 'green', 'Caso 2 · Stateless. El request trae un token firmado en Authorization.', 'El servidor verifica la firma con su clave: no necesita recordar nada.'),
+        (4, 'green', 'El servidor se reinicia y el cliente envía el mismo token.', 'Sigue funcionando: el request trae todo lo que hace falta.')],
         ('Stateless: el servidor no guarda nada entre requests; cada uno trae todo lo que necesita.',
-         'Por eso una API REST escala agregando instancias.'))
+         'Por eso un reinicio no afecta al cliente: no había nada que perder.'))
     return s + tail(h, 'El token firmado (JWT) se ve en detalle en «Auth en REST», la semana 12.')
 
 
