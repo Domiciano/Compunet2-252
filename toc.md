@@ -56,6 +56,7 @@
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson271.md | RestControllers y HTTP Mappings | 0037
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson272.md | Parámetros HTTP | 0038
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson273.md | Ejercicio: Semántica REST | 0039
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson274.md | Data Transfer Object (DTO) | 0093
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson28.md | MapStruct | 0040
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson281.md | Lombok | 0041
 [t] SEMANA 12 · Rest

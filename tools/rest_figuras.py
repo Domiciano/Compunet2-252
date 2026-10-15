@@ -1,5 +1,5 @@
 """Figuras SVG de la Semana 11 · Rest: ¿Qué es REST? (0036), REST en movimiento (0092), RestControllers (0037), Parámetros HTTP (0038),
-MapStruct (0040) y Lombok (0041).
+DTO (0093), MapStruct (0040) y Lombok (0041).
 
     python3 tools/rest_figuras.py <carpeta>     escribe un .svg por figura, para revisarlas
     python3 tools/rest_figuras.py --inject      reemplaza cada bloque ```svg de esas lecciones
@@ -19,7 +19,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from security_figuras import FAM, anim_css, box, chip, head, hop_pills, hop_tokens, rows, tail  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-LESSONS = ['lesson27.md', 'lesson270.md', 'lesson271.md', 'lesson272.md', 'lesson28.md', 'lesson281.md']
+LESSONS = ['lesson27.md', 'lesson270.md', 'lesson271.md', 'lesson272.md', 'lesson274.md', 'lesson28.md', 'lesson281.md']
 VERB = {'GET': 'green', 'POST': 'amber', 'PUT': 'violet', 'PATCH': 'violet', 'DELETE': 'rose'}
 FIGS = {}
 
@@ -700,6 +700,84 @@ def rest_dto():
 
 
 FIGS['restDto'] = rest_dto
+
+
+def rest_dto_mapeo(freeze=None):
+    """Animada: cuatro pasos de 4 s. La entidad sale de la BD, se crea el DTO, se copian los campos y Jackson lo escribe en JSON."""
+    fid, h, n, secs = 'restDtoMapeo', 680, 4, 4
+    spans = {f'a{k}': [(k, k)] for k in range(1, n + 1)}
+    spans.update({'a13': [(1, 3)], 'a24': [(2, 4)], 'a34': [(3, 4)]})
+    on = {1: ['a1', 'a13'], 2: ['a2', 'a13', 'a24'], 3: ['a3', 'a13', 'a24', 'a34'], 4: ['a4', 'a24', 'a34']}
+    green, rose = FAM['green'][2], FAM['rose'][2]
+    vals = [('id', '7'), ('nombre', 'Ana Ruiz'), ('email', 'ana@icesi.edu.co')]
+    hops = [(3, 380, 207 + i * 38, (72, 0), green, v) for i, (_, v) in enumerate(vals)]
+    s = anim_head(fid, h, n, secs, spans, on, hops, freeze,
+                  'De Entity a DTO: se copia solo lo que sale', 'De Entity a DTO: se copia solo lo que sale',
+                  'La entidad se queda en el servidor; al cliente le llega un DTO con los campos que sí debe ver.',
+                  'Animación en cuatro pasos para GET /usuarios/7. A la izquierda la entidad Usuario, a la derecha el '
+                  'UsuarioResponseDTO y abajo el código del controller y la respuesta HTTP. Uno: el repository trae la entidad '
+                  'con id, nombre, email y password. Dos: se crea un DTO vacío con id, nombre y email en null. Tres: se copian '
+                  'id, nombre y email; el password no se copia porque el DTO no tiene ese campo. Cuatro: el controller retorna '
+                  'el DTO y Jackson lo escribe como JSON, sin password.')
+    s += panel(48, 104, 320, 248, 'ADENTRO · @Entity')
+    s += '  ' + box(64, 136, 288, 40, 'amber', 'Usuario', fs=13.5)
+    ents = vals + [('password', '$2a$10$Xk9…')]
+    for i, (f, v) in enumerate(ents):
+        y = 192 + i * 38
+        s += (f'  <rect x="64" y="{y}" width="288" height="30" rx="7" fill="#FFFFFF" stroke="{FAM["amber"][1]}" stroke-width="1.25"/>'
+              f'<text class="mono" x="78" y="{y+15}" dy="0.35em" font-size="13" fill="#454C61">{f}</text>'
+              f'<text class="mono" x="338" y="{y+15}" dy="0.35em" text-anchor="end" font-size="13" font-weight="600" fill="#161A26">{esc(v)}</text>\n')
+    s += ring('an a1', 60, 133, 296, 46, 'amber')
+    s += ring('ls a34', 58, 300, 300, 42, 'rose')
+    s += f'  <g class="ls a34"><text x="480" y="321" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="{rose}">✕ no se copia</text></g>\n'
+    s += '  <g class="ls a34"><text class="h" x="480" y="168" text-anchor="middle">SE COPIA →</text></g>\n'
+
+    s += panel(592, 104, 320, 248, 'SALE · DTO')
+    ssoft, sborder, _ = FAM['slate']
+    s += (f'  <g class="an a1"><rect x="608" y="136" width="288" height="200" rx="10" fill="#FFFFFF" stroke="{sborder}" stroke-width="1.5" stroke-dasharray="5 5"/>'
+          '<text x="752" y="236" dy="0.35em" text-anchor="middle" font-size="13" fill="#79809A">todavía no existe</text></g>\n')
+    s += '  <g class="ls a24">' + box(608, 136, 288, 40, 'green', 'UsuarioResponseDTO', hero=True, fs=13.5).strip()
+    for i, (f, _) in enumerate(vals):
+        y = 192 + i * 38
+        s += (f'<rect x="608" y="{y}" width="288" height="30" rx="7" fill="#FFFFFF" stroke="{FAM["green"][1]}" stroke-width="1.25"/>'
+              f'<text class="mono" x="622" y="{y+15}" dy="0.35em" font-size="13" fill="#454C61">{f}</text>')
+    s += (f'<text x="752" y="321" dy="0.35em" text-anchor="middle" font-size="12" fill="#79809A">(sin campo password)</text></g>\n')
+    s += '  <g class="an a2">' + ''.join(
+        f'<text class="mono" x="882" y="{207 + i * 38}" dy="0.35em" text-anchor="end" font-size="13" fill="#9AA3B5">null</text>'
+        for i in range(3)) + '</g>\n'
+    s += '  <g class="ls a34">' + ''.join(
+        f'<text class="mono" x="882" y="{207 + i * 38}" dy="0.35em" text-anchor="end" font-size="13" font-weight="600" fill="{green}">{esc(v)}</text>'
+        for i, (_, v) in enumerate(vals)) + '</g>\n'
+    s += ring('an a2', 604, 133, 296, 46, 'green')
+
+    code = ['Usuario u = repository.findById(7L).orElseThrow();',
+            'UsuarioResponseDTO dto = new UsuarioResponseDTO();',
+            'dto.setId(u.getId());', 'dto.setNombre(u.getNombre());', 'dto.setEmail(u.getEmail());',
+            '// el password no se copia', 'return ResponseEntity.ok(dto);']
+    s += pane_bg(48, 368, 520, 184)
+    lh, top = 19, 48
+    for cls, a, b, color in [('an a1', 0, 0, 'amber'), ('an a2', 1, 1, 'green'), ('an a3', 2, 4, 'green'), ('ls a4', 6, 6, 'green')]:
+        y0 = 368 + top + a * lh - round(lh * .74)
+        s += (f'  <rect class="{cls}" x="52" y="{y0}" width="512" height="{(b - a + 1) * lh + 2}" rx="5" fill="{FAM[color][1]}" '
+              f'fill-opacity=".3" stroke="{FAM[color][1]}" stroke-width="1.5"/>\n')
+    s += pane_text(48, 368, 'UsuarioController.java', code, w=520, dim=(5,))
+    s += pane_bg(584, 368, 328, 184)
+    s += pane_text(584, 368, 'respuesta HTTP', ['(todavía no hay respuesta)'], cls='an a13', w=328)
+    s += pane_text(584, 368, 'respuesta HTTP · la escribe Jackson',
+                   ['HTTP/1.1 200 OK', 'Content-Type: application/json', '', '{"id": 7,', ' "nombre": "Ana Ruiz",',
+                    ' "email": "ana@icesi.edu.co"}'], marks=[(0, 9, 6, FAM['green'][1])], cls='ls a4', w=328)
+    s += hop_pills(hops)
+    s += captions(568, [
+        (1, 'amber', 'El repository trae de la base de datos la entidad Usuario con id 7.', 'Trae todas sus columnas, incluido el password cifrado.'),
+        (2, 'green', 'Se crea un UsuarioResponseDTO vacío.', 'Es otra clase, con solo los campos que el cliente debe ver: id, nombre y email.'),
+        (3, 'green', 'Se copian los campos uno por uno, de la entidad al DTO.', 'El password se queda: el DTO no tiene un campo para él.'),
+        (4, 'green', 'El controller retorna el DTO y Jackson lo convierte en JSON.', 'El cliente recibe id, nombre y email; la entidad nunca salió del servidor.')],
+        ('Entity → DTO: se copia solo lo que el cliente debe ver.',
+         'La entidad se queda en el servidor; lo que viaja en el JSON es el DTO.'))
+    return s + tail(h, 'Esta copia campo por campo es la que MapStruct escribe por usted, en la lección siguiente.')
+
+
+FIGS['restDtoMapeo'] = rest_dto_mapeo
 
 
 def rest_mapstruct():
