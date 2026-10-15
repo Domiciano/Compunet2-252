@@ -52,6 +52,7 @@
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson26.md | Permisos en métodos | 0035
 [t] SEMANA 11 · Rest
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson27.md | ¿Qué es REST? | 0036
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson270.md | REST en movimiento | 0092
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson271.md | RestControllers y HTTP Mappings | 0037
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson272.md | Parámetros HTTP | 0038
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson273.md | Ejercicio: Semántica REST | 0039
