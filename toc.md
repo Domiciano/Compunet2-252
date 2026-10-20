@@ -20,6 +20,7 @@
 [t] SEMANA 4 · Spring Boot
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson7.md | Spring Boot | 0014
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson71.md | Persistencia | 0015
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson281.md | Lombok | 0041
 [t] SEMANA 5 · Spring Data
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson8.md | Relaciones de tabla | 0016
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson11.md | Relación muchos a muchos | 0017
@@ -58,7 +59,6 @@
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson273.md | Ejercicio: Semántica REST | 0039
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson274.md | Data Transfer Object (DTO) | 0093
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson28.md | MapStruct | 0040
-[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson281.md | Lombok | 0041
 [t] SEMANA 12 · Rest
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson29.md | Auth en REST | 0042
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson30.md | Filtros por Request | 0043

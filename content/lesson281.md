@@ -1,5 +1,7 @@
 # Lombok
 
+<!-- tags: Lombok, @Data, @Getter @Setter, @RequiredArgsConstructor, @Builder, getters y setters automáticos, annotationProcessorPaths, cannot find symbol getNombre, @Data en entidades JPA, StackOverflowError en toString, orden Lombok y MapStruct, scope provided -->
+
 Lombok es una librería de Java que genera automáticamente en tiempo de compilación el código repetitivo de las clases: getters, setters, constructores, `equals`, `hashCode` y `toString`. Elimina el boilerplate sin cambiar el comportamiento del programa.
 
 ## ¿Por qué Lombok?
@@ -52,7 +54,7 @@ Agregue la dependencia al `pom.xml` con scope `provided` — Lombok solo se nece
 </dependency>
 ```
 
-Si su proyecto ya usa el plugin `maven-compiler-plugin` con `annotationProcessorPaths` (por ejemplo para MapStruct), agregue Lombok también en ese bloque para que ambos procesadores convivan:
+Y además indíquele al compilador de Maven que procese las anotaciones de Lombok, agregando esto dentro de `<build><plugins>`:
 
 ```xml
 <plugin>
@@ -68,14 +70,26 @@ Si su proyecto ya usa el plugin `maven-compiler-plugin` con `annotationProcessor
                 <artifactId>lombok</artifactId>
                 <version>1.18.42</version>
             </path>
-            <path>
-                <groupId>org.mapstruct</groupId>
-                <artifactId>mapstruct-processor</artifactId>
-                <version>${mapstruct.version}</version>
-            </path>
         </annotationProcessorPaths>
     </configuration>
 </plugin>
+```
+
+Más adelante, cuando agregue MapStruct, su procesador va en este mismo bloque `annotationProcessorPaths`, **después** de Lombok, para que ambos procesadores convivan:
+
+```xml
+<annotationProcessorPaths>
+    <path>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>1.18.42</version>
+    </path>
+    <path>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct-processor</artifactId>
+        <version>${mapstruct.version}</version>
+    </path>
+</annotationProcessorPaths>
 ```
 
 El orden importa: Lombok debe declararse antes que MapStruct para que los getters y setters generados por Lombok estén disponibles cuando MapStruct construye los mappers.

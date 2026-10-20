@@ -53,39 +53,7 @@ public class Student {
 
 Note `@Entity`, `@Table`, `@Id`, `@GeneratedValue`
 
-## Lombok
-
-Lombok permite generar automáticamente getters, setters y constructores con anotaciones, evitando escribirlos a mano. Para usarlo hay que agregar la dependencia al `pom.xml`
-
-```xml
-<dependency>
-    <groupId>org.projectlombok</groupId>
-    <artifactId>lombok</artifactId>
-    <version>1.18.42</version>
-    <scope>provided</scope>
-</dependency>
-```
-
-Y además indicarle al compilador de Maven que procese las anotaciones de Lombok, agregando esto dentro de `<build><plugins>`
-
-```xml
-<plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-compiler-plugin</artifactId>
-    <version>3.8.1</version>
-    <configuration>
-        <source>${java.version}</source>
-        <target>${java.version}</target>
-        <annotationProcessorPaths>
-            <path>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>1.18.42</version>
-            </path>
-        </annotationProcessorPaths>
-    </configuration>
-</plugin>
-```
+Los getters, setters y constructores no tiene que escribirlos a mano: en la siguiente lección, Lombok, verá cómo generarlos con anotaciones.
 
 ## Conceptos clave: Connection Pool y ORM
 
