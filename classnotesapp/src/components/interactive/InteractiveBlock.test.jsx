@@ -103,6 +103,12 @@ describe('jwtSteps', () => {
     expect(jwtSteps(SCENARIOS['posts con token alterado']).some((step) => step.rule)).toBe(false);
   });
 
+  it('empties the SecurityContext as the last step of an authenticated request', () => {
+    const steps = jwtSteps(SCENARIOS['posts con token']);
+    expect(steps.at(-1).clearContext).toBe(true);
+    expect(steps.at(-1).hot).toEqual(['ctx']);
+  });
+
   it('only issues a token for good credentials', () => {
     expect(jwtSteps(SCENARIOS['login ok']).at(-1).saveToken).toBe(true);
     const bad = jwtSteps(SCENARIOS['login con contraseña mala']);
@@ -127,7 +133,7 @@ describe('jwt-flow', () => {
     fireEvent.click(screen.getByTestId('call-posts'));
     runAll();
     expect(screen.getByTestId('client-response').textContent).toContain('200');
-    expect(screen.getByTestId('security-context').textContent).toContain('profesor@gmail.com');
+    expect(screen.getByTestId('security-context').textContent).toContain('clearContext()');
     expect(container.querySelector('[data-testid="status-jwt"]').textContent).toContain('válido');
   });
 

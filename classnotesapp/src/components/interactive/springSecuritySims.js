@@ -330,7 +330,12 @@ export const jwtSteps = ({ endpoint, token, password }) => {
     add({
       hot: ['client'],
       response: ['ok', '200 OK · 2 posts'],
-      caption: 'El cliente recibe los posts. El servidor no guardó ninguna sesión: el próximo request tendrá que traer el token otra vez.',
+      caption: 'El cliente recibe los posts.',
+    });
+    add({
+      hot: ['ctx'],
+      clearContext: true,
+      caption: 'El request terminó: SecurityContextHolderFilter llama a clearContext() y el SecurityContext queda vacío. No hay sesión que guardar; el próximo request tendrá que traer el token otra vez.',
     });
     return steps;
   }
@@ -564,10 +569,10 @@ const mountJwtFlow = (root) => {
     tamperButton.disabled = running || token !== 'ok';
     clearButton.disabled = running || !token;
   };
-  const renderContext = (who) => {
+  const renderContext = (who, cleared = false) => {
     ctxWho.replaceChildren(...(who
       ? [el('div', { class: 'js-who', text: who[0] }), el('div', { text: `[${who[1]}]` })]
-      : [el('div', { text: 'vacío: nadie autenticado' })]));
+      : [el('div', { text: cleared ? 'vacío: clearContext()' : 'vacío: nadie autenticado' })]));
   };
   const setStatus = (key, [kind, text] = ['', '']) => {
     statuses[key].className = `js-st${kind ? ` js-${kind}` : ''}`;
@@ -648,6 +653,10 @@ const mountJwtFlow = (root) => {
     if (step.read) markRead(step.read);
     if (step.context) {
       renderContext(step.context);
+      flash(ctxBox);
+    }
+    if (step.clearContext) {
+      renderContext(null, true);
       flash(ctxBox);
     }
     if (step.response) {

@@ -169,7 +169,10 @@ Se portó desde FlutterLearning el 2026-10-20: `InteractiveBlock.jsx` y la líne
   filtros en **un solo paso**: `permitAll()` no salta la cadena (eso sería
   `web.ignoring()`), solo hace que la regla no exija autenticación; el profesor eligió
   mostrarlo así, fiel a Spring. Cada tramo recorrido deja una flecha (azul de ida, verde de
-  vuelta, roja si es error; `⇄` entre capas cuando ya se recorrió en los dos sentidos). Tiene modo *Paso a paso*. Los pasos son datos puros
+  vuelta, roja si es error; `⇄` entre capas cuando ya se recorrió en los dos sentidos).
+  El `/posts` autenticado termina con un paso propio: `SecurityContextHolderFilter` llama a
+  `clearContext()` y el SecurityContext queda vacío (con JWT no hay sesión; pedido del
+  profesor para que se vea que el servidor no recuerda nada entre requests). Tiene modo *Paso a paso*. Los pasos son datos puros
   (`jwtSteps`) y sus reglas están probadas en `InteractiveBlock.test.jsx`: un solo mensaje
   entre capas por paso, y cada paso empieza donde llegó el anterior o en una capa vecina.
   Si cambian las lecciones 0096–0098 (rutas, códigos de error), hay que actualizarlo.
