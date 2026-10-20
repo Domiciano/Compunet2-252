@@ -1,208 +1,138 @@
 # Filtros por Request
 
-Una vez tenemos los filtros deberíamos poder verificar el token antes de que el request siga su camino normal. Debemos pensarnos en estos filtros por request o `OncePerRequestFilter` como interceptores que podemos ubicar dentro de la ejecución de un `SecurityFilterChain`
+<!-- tags: OncePerRequestFilter, SecurityFilterChain, cadena de filtros, addFilterBefore, filterChain.doFilter, UsernamePasswordAuthenticationFilter, AuthorizationFilter, header Authorization, el request no llega al controller, doFilterInternal -->
 
-```plain
-Request
-  ↓
-[CorsFilter]                            // Maneja CORS (si está habilitado)
-  ↓
-[CsrfFilter]                            // Verifica token CSRF (para formularios o sesiones)
-  ↓
-[LogoutFilter]                          // Maneja logout antes que cualquier autenticación
-  ↓
-[UsernamePasswordAuthenticationFilter]  // Procesa login form (solo si usas formLogin)
-  ↓
-[AnonymousAuthenticationFilter]         // Asigna Authentication anónimo si no hay uno
-  ↓
-[ExceptionTranslationFilter]            // Maneja excepciones de seguridad (403, etc.)
-  ↓
-[FilterSecurityInterceptor]             // Aplica reglas de acceso (.authorizeHttpRequests)
-  ↓
-[Controller]                            // Si todo está ok, llega al endpoint
+Para validar el token tenemos que revisarlo **antes** de que el request llegue al controller. Spring Security ya funciona así: cada request pasa por una cadena de filtros, la `SecurityFilterChain`, y nosotros podemos insertar los nuestros en ella.
+
+## La cadena de filtros
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="460" font-family="Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="ad-chain3" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
+      <polygon points="0 0,6 2.5,0 5" fill="#546E7A"/>
+    </marker>
+    <marker id="ado-chain3" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
+      <polygon points="0 0,6 2.5,0 5" fill="#FFA726"/>
+    </marker>
+  </defs>
+  <rect width="680" height="460" fill="#12121f" rx="12"/>
+  <text x="340" y="28" text-anchor="middle" fill="#e0e0e0" font-size="15" font-weight="bold">Security Filter Chain — Insercion del JwtAuthFilter</text>
+  <rect x="270" y="40" width="140" height="28" rx="14" fill="#263238"/>
+  <text x="340" y="58" text-anchor="middle" fill="#90A4AE" font-size="12">Request HTTP</text>
+  <line x1="340" y1="68" x2="340" y2="76" stroke="#546E7A" stroke-width="1.5" marker-end="url(#ad-chain3)"/>
+  <rect x="140" y="78" width="400" height="28" rx="5" fill="#1e2d3a" stroke="#37474F" stroke-width="1"/>
+  <text x="340" y="96" text-anchor="middle" fill="#78909C" font-size="12">CorsFilter</text>
+  <line x1="340" y1="106" x2="340" y2="114" stroke="#546E7A" stroke-width="1.5" marker-end="url(#ad-chain3)"/>
+  <rect x="140" y="116" width="400" height="28" rx="5" fill="#1a2020" stroke="#2a3a2a" stroke-width="1"/>
+  <text x="340" y="134" text-anchor="middle" fill="#455A64" font-size="12">CsrfFilter  (deshabilitado para REST)</text>
+  <line x1="340" y1="144" x2="340" y2="152" stroke="#546E7A" stroke-width="1.5" marker-end="url(#ad-chain3)"/>
+  <rect x="140" y="154" width="400" height="28" rx="5" fill="#1e2d3a" stroke="#37474F" stroke-width="1"/>
+  <text x="340" y="172" text-anchor="middle" fill="#78909C" font-size="12">LogoutFilter</text>
+  <line x1="340" y1="182" x2="340" y2="190" stroke="#FFA726" stroke-width="1.5" marker-end="url(#ado-chain3)"/>
+  <rect x="110" y="192" width="460" height="36" rx="6" fill="#1a1500" stroke="#FFA726" stroke-width="2"/>
+  <text x="310" y="213" text-anchor="middle" fill="#FFA726" font-size="13" font-weight="bold">JwtAuthFilter</text>
+  <text x="500" y="213" text-anchor="middle" fill="#FFA726" font-size="11">NUEVO</text>
+  <line x1="340" y1="228" x2="340" y2="236" stroke="#546E7A" stroke-width="1.5" marker-end="url(#ad-chain3)"/>
+  <rect x="140" y="238" width="400" height="28" rx="5" fill="#1e2d3a" stroke="#37474F" stroke-width="1"/>
+  <text x="340" y="256" text-anchor="middle" fill="#78909C" font-size="11">UsernamePasswordAuthenticationFilter</text>
+  <line x1="340" y1="266" x2="340" y2="274" stroke="#546E7A" stroke-width="1.5" marker-end="url(#ad-chain3)"/>
+  <rect x="140" y="276" width="400" height="28" rx="5" fill="#1e2d3a" stroke="#37474F" stroke-width="1"/>
+  <text x="340" y="294" text-anchor="middle" fill="#78909C" font-size="12">AnonymousAuthenticationFilter</text>
+  <line x1="340" y1="304" x2="340" y2="312" stroke="#546E7A" stroke-width="1.5" marker-end="url(#ad-chain3)"/>
+  <rect x="140" y="314" width="400" height="28" rx="5" fill="#1e2d3a" stroke="#37474F" stroke-width="1"/>
+  <text x="340" y="332" text-anchor="middle" fill="#78909C" font-size="12">ExceptionTranslationFilter</text>
+  <line x1="340" y1="342" x2="340" y2="350" stroke="#546E7A" stroke-width="1.5" marker-end="url(#ad-chain3)"/>
+  <rect x="140" y="352" width="400" height="28" rx="5" fill="#1e2d3a" stroke="#37474F" stroke-width="1"/>
+  <text x="340" y="370" text-anchor="middle" fill="#78909C" font-size="12">AuthorizationFilter</text>
+  <line x1="340" y1="380" x2="340" y2="388" stroke="#546E7A" stroke-width="1.5" marker-end="url(#ad-chain3)"/>
+  <rect x="240" y="390" width="200" height="32" rx="8" fill="#1B5E20" stroke="#2E7D32" stroke-width="1.5"/>
+  <text x="340" y="410" text-anchor="middle" fill="#66BB6A" font-size="13" font-weight="bold">Controller (Endpoint)</text>
+  <text x="340" y="445" text-anchor="middle" fill="#546E7A" font-size="11">El JwtAuthFilter valida el token antes de que el request llegue al resto de la cadena</text>
+</svg>
 ```
 
 `CorsFilter`
-Maneja las solicitudes de orígenes cruzados agregando los encabezados Access-Control-Allow-* antes de que se realice cualquier validación de seguridad.
+Maneja las solicitudes de orígenes cruzados agregando los encabezados `Access-Control-Allow-*` antes de cualquier validación de seguridad.
 
-`CsrfFilter` protege contra ataques de tipo CSRF, aunque solo aplica si la aplicación usa cookies y sesiones.
+`CsrfFilter`
+Protege contra ataques CSRF. Solo tiene sentido si la aplicación usa cookies y sesiones; en la API lo deshabilitamos.
 
-`LogoutFilter` detecta las solicitudes al endpoint /logout y se encarga de limpiar la sesión o el contexto de autenticación.
+`LogoutFilter`
+Detecta las solicitudes a `/logout` y limpia la sesión o el contexto de autenticación.
 
-`UsernamePasswordAuthenticationFilter` 
-Valida sesiones iniciadas a través de `username` y `password`
+`UsernamePasswordAuthenticationFilter`
+Procesa el login con formulario (`username` y `password`). Solo actúa si la cadena usa `formLogin`.
 
 `AnonymousAuthenticationFilter`
-Si ningún filtro anterior autenticó la solicitud, asigna automáticamente un usuario “anónimo” para que el flujo de seguridad continúe sin romperse.
+Si ningún filtro anterior autenticó la solicitud, le asigna un usuario "anónimo" para que la cadena continúe.
 
-`ExceptionTranslationFilter` 
-Captura excepciones de seguridad, como AccessDeniedException o AuthenticationException, y responde con un código 403 (Forbidden) o redirige a la página de login.
+`ExceptionTranslationFilter`
+Captura las excepciones de seguridad (`AuthenticationException`, `AccessDeniedException`) y las convierte en una respuesta: 401, 403 o una redirección al login.
 
-`FilterSecurityInterceptor`
-Es el filtro final del SecurityFilterChain; evalúa las reglas configuradas con .authorizeHttpRequests() o las restricciones establecidas mediante anotaciones como @PreAuthorize.
+`AuthorizationFilter`
+Es el último filtro. Evalúa las reglas de `.authorizeHttpRequests()`: decide si el usuario, autenticado o anónimo, puede llegar al endpoint. En versiones anteriores de Spring Security se llamaba `FilterSecurityInterceptor`.
 
-## Verificador de auth headers
+El filtro que valide el token, `JwtAuthFilter`, va **antes** de `UsernamePasswordAuthenticationFilter`: tiene que autenticar al usuario antes de que los filtros siguientes decidan si puede pasar.
 
-Vamos a analizar este filtro
+## OncePerRequestFilter
+
+Un filtro propio se escribe extendiendo `OncePerRequestFilter`, que garantiza que se ejecuta una sola vez por request. Empecemos con uno que solo muestra el encabezado `Authorization`:
 
 ```java
 @Component
 public class HeaderLoggingFilter extends OncePerRequestFilter {
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null) {
-            System.out.println("Authorization Header: " + authHeader);
+            System.out.println("Authorization: " + authHeader);
         } else {
-            System.out.println("No Authorization header present for " + request.getRequestURI());
+            System.out.println("Sin Authorization en "
+                    + request.getRequestURI());
         }
 
-        // Esta línea permite seguir al siguiente eslabón de la cadena
         filterChain.doFilter(request, response);
     }
 }
 ```
 
-Una vez con esto, ponga el filtro antes del UsernamePasswordAuthenticationFilter
+`filterChain.doFilter(request, response)` le pasa el request al siguiente filtro de la cadena. Si un filtro **no** lo llama, el request se detiene ahí y nunca llega al controller: así es como un filtro puede rechazar una solicitud.
+
+## Insertarlo en la cadena
+
+Inyecte el filtro en su `WebSecurityConfig` y agréguelo con `addFilterBefore`:
 
 ```java
-//@Bean
-//@Order(2)
-//public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
-//    http
-//        .securityMatcher("/api/v1/**")
-//        .authorizeHttpRequests(auth -> auth
-//            .requestMatchers("/api/v1/**").permitAll()
-//            .anyRequest().authenticated()
-//        )
-        .addFilterBefore(headerLoggingFilter, UsernamePasswordAuthenticationFilter.class) //<-- Así
-//      .csrf(csrf -> csrf.disable())
-//        .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-//    return http.build();
-}
-```
-
-Verifique qué pasa 
-
-## Extracción de información y verificación
-
-Ya entendiendo como interceptamos request http, vamos a hacer el siguiente flujo: interceptamos el request, verificamos que el header llamado `Authorization` tenga la siguiente sencuencia: `Bearer <access_token>` donde `<access_token>` es el token que el cliente envia al servidor. Si el token es válido, lo dejamos pasar y si no es válido contestamos con 403.
-
-Lo primero es saber cómo extraer la información del token, que debería esta en el `JwtService`
-
-```java
-public Claims extractAllClaims(String token) {
-  try{
-    Claims claims = Jwts.parserBuilder()
-            .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes()))
-            .build()
-            .parseClaimsJws(token)
-            .getBody();
-    return claims;
-  } catch (ExpiredJwtException e) {
-    System.out.println("Token expirado: " + e.getMessage());
-    throw e;
-  } catch (UnsupportedJwtException e) {
-    System.out.println("Token no soportado: " + e.getMessage());
-    throw e;
-  } catch (MalformedJwtException e) {
-    System.out.println("Token mal formado: " + e.getMessage());
-    throw e;
-  } catch (SignatureException e) {
-    System.out.println("Firma JWT inválida: " + e.getMessage());
-    throw e;
-  } catch (IllegalArgumentException e) {
-    System.out.println("Token vacío o nulo: " + e.getMessage());
-    throw e;
-  }
-}
-```
-
-Este método devuelve un objeto `Claims`. Que principalmente tiene el subject que es el `username` y los `authorities`.
-
-```java
-Claims claims = jwtService.extractAllClaims(jwt);
-String username = claims.getSubject();
-List<String> authorities = claims.get("authorities", List.class);
-```
-
-## Autenticación con Token
-
-Ya una vez con esto y antes de dejar que el request vaya al siguiente filtro, debemos finalmente autenticarnos.
-
-```java
-UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-  email, null, authorities
-);
-```
-
-Y finalmente ...
-
-```java
-SecurityContextHolder.getContext().setAuthentication(authToken);
-```
-
-Esta última linea nos permite autenticarnos, asi que podemos enviar la request al siguiente eslabón de la cadena
-
-```java
-filterChain.doFilter(request, response);
-```
-
-## Manejo de errores
-
-En el OncePerRequestFilter permite devolver la solicitud
-
-```java
-@Autowired
-private ObjectMapper objectMapper;
-
-...
-
-response.setStatus(status);
-response.setContentType("application/json");
-
-ApiResponse errorResponse = new ApiResponse("Error de autenticación", message);
-String json = objectMapper.writeValueAsString(errorResponse);
-
-response.getWriter().write(json);
-response.getWriter().flush();
-```
-
-## Exception Handling
-
-Podemos manejar excepciones en el filter chain orden 2
-
-```java
-//@Bean
-//@Order(2)
-//public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
-//    http
-//        .securityMatcher("/api/v1/**")
-//        .authorizeHttpRequests(auth -> auth
-//            .requestMatchers("/api/v1/auth/**").permitAll()
-//            .anyRequest().authenticated()
-//        )
-//        .addFilterBefore(tokenValitationFilter, UsernamePasswordAuthenticationFilter.class)
-//        .sessionManagement(session -> session
-//            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//        )
-//        .csrf(csrf -> csrf.disable())
-        .exceptionHandling(ex -> ex
-            .authenticationEntryPoint((request, response, authException) -> {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType("application/json");
-                response.getWriter().write("{\"error\": \"Unauthorized\"}");
-            })
-            .accessDeniedHandler((request, response, accessDeniedException) -> {
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                response.setContentType("application/json");
-                response.getWriter().write("{\"error\": \"Forbidden\"}");
-            })
+@Bean
+@Order(2)
+public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http)
+        throws Exception {
+    http
+        .securityMatcher("/api/v1/**")
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/v1/auth/**").permitAll()
+            .anyRequest().authenticated()
+        )
+        .addFilterBefore(headerLoggingFilter,
+                UsernamePasswordAuthenticationFilter.class)
+        .csrf(csrf -> csrf.disable())
+        .sessionManagement(sm -> sm
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
-//    return http.build();
-//}
+    return http.build();
+}
 ```
 
-Donde `authenticationEntryPoint` se ejecuta cuando no hay token válido. En lugar de redirigir al filtro orden 3, responde `Unauthorized`.
+## Pruébelo
 
-Y `accessDeniedHandler` cuando el usuario sí tiene token válido pero no con los authorities suficientes.
+1. Haga una solicitud a cualquier endpoint de `/api/v1/` sin encabezado `Authorization`.
+2. Repítala con `Authorization: Bearer <el token del login>`.
+3. Compare lo que imprime la consola en los dos casos.
+
+En la siguiente lección cambiamos este filtro de prueba por uno que valida el token de verdad.
