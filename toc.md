@@ -66,8 +66,8 @@
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson293.md | Endpoint de login | 0096
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson30.md | Filtros por Request | 0043
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson301.md | Validar el token en un filtro | 0097
-[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson302.md | Errores 401 y 403 | 0098
 [t] SEMANA 13 · API everywhere
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson302.md | Errores 401 y 403 | 0098
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson31.md | Postman | 0045
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lessonIA0.md | LLMs, Agentes y MCP Servers | 0046
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lessonIA2.md | Skills en Herramientas de IA | 0047
