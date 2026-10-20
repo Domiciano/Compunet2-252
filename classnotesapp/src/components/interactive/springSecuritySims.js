@@ -9,7 +9,7 @@ const CSS = `
   --js-ok:#3A8235;--js-err:#C2354F;--js-hot:#F2C069;
   background:var(--js-bg);color:var(--js-ink);border:1px solid var(--js-line);border-radius:16px;padding:16px;
   font-family:Roboto,Arial,sans-serif;font-size:14px;line-height:1.4;box-sizing:border-box;max-width:960px;
-  margin:0 auto;display:flex;flex-direction:column;gap:0}
+  margin:0 auto;display:flex;flex-direction:column;gap:0;container-type:inline-size}
 .jsim *{box-sizing:border-box}
 .jsim .js-title{font-size:17px;font-weight:700;margin:0 0 2px}
 .jsim .js-sub{font-size:12.5px;color:#79809A;margin:0 0 12px}
@@ -17,8 +17,8 @@ const CSS = `
   padding:8px 12px;transition:box-shadow .3s,opacity .3s;opacity:.78;min-width:0}
 .jsim .js-band.js-on{opacity:1;box-shadow:0 0 0 3px var(--js-hot)}
 .jsim .js-band.js-client{--b:#C9A6EE;--bg:#F4EBFF;--ink:#7439B8;opacity:1}
-.jsim .js-band.js-chain{--b:#A9B4F2;--bg:#EEF1FF;--ink:#4453C9;flex:1 1 360px}
-.jsim .js-band.js-context{--b:#F0C572;--bg:#FFF8E6;--ink:#A96C05;flex:0 1 220px;align-self:center}
+.jsim .js-band.js-chain{--b:#A9B4F2;--bg:#EEF1FF;--ink:#4453C9;flex:1 1 0}
+.jsim .js-band.js-context{--b:#F0C572;--bg:#FFF8E6;--ink:#A96C05;flex:0 1 190px;align-self:center}
 .jsim .js-band.js-ctrl{--b:#9FD68D;--bg:#E8F6E3;--ink:#3A8235}
 .jsim .js-band.js-svc{--b:#86D3CA;--bg:#E3F6F3;--ink:#0F8478}
 .jsim .js-band.js-repo{--b:#9DB8F2;--bg:#E8EFFE;--ink:#2F5BC4}
@@ -53,8 +53,8 @@ const CSS = `
 .jsim .js-slot{flex:1 1 0;min-width:0;min-height:34px;display:flex;align-items:center;justify-content:center;padding:4px 0;position:relative}
 .jsim .js-slot::before{content:'';position:absolute;top:0;bottom:0;left:50%;border-left:1.5px dashed #C4CBD8}
 .jsim .js-gap.js-free .js-slot::before{display:none}
-.jsim .js-midrow{display:flex;flex-wrap:wrap;align-items:stretch;gap:0}
-.jsim .js-hgap{flex:0 0 180px;display:flex;align-items:center;justify-content:center;position:relative;min-height:34px;padding:0 4px}
+.jsim .js-midrow{display:flex;flex-wrap:nowrap;align-items:stretch;gap:0}
+.jsim .js-hgap{flex:0 0 140px;display:flex;align-items:center;justify-content:center;position:relative;min-height:34px;padding:0 4px}
 .jsim .js-hgap::before{content:'';position:absolute;left:0;right:0;top:50%;border-top:1.5px dashed #C4CBD8}
 .jsim .js-msg{position:relative;z-index:1;font:11.5px 'JetBrains Mono',Menlo,Consolas,monospace;background:#fff;
   border:1.5px solid #556074;color:var(--js-ink);border-radius:12px;padding:2px 10px;max-width:96%;text-align:center;
@@ -62,7 +62,7 @@ const CSS = `
 .jsim .js-msg.js-up{border-color:#1F9D68;color:#14724B;--from:8px}
 .jsim .js-msg.js-fail{border-color:#D64545;color:#B23434;--from:8px}
 .jsim .js-msg.js-side{border-color:#A96C05;color:#8A5A04;--from:0}
-.jsim .js-hgap .js-msg{white-space:nowrap;font-size:11px;padding:2px 8px}
+.jsim .js-hgap .js-msg{white-space:nowrap;font-size:10.5px;padding:2px 7px}
 @keyframes jsIn{0%{opacity:0;transform:translateY(var(--from,-8px))}100%{opacity:1;transform:none}}
 .jsim .js-stack{display:flex;flex-direction:column}
 .jsim .js-link{height:10px;margin-left:22px;border-left:1.5px solid #A9B4F2}
@@ -109,7 +109,9 @@ const CSS = `
 .jsim .js-flash{animation:jsFlash .9s ease-out}
 @keyframes jsFlash{0%{transform:scale(.96);box-shadow:0 0 0 0 rgba(58,130,53,.5)}60%{transform:scale(1.03)}
   100%{transform:none;box-shadow:0 0 0 8px rgba(58,130,53,0)}}
-@media (max-width:640px){.jsim .js-hgap{flex:1 1 100%}.jsim .js-hgap::before{left:50%;right:auto;top:0;bottom:0;border-top:0;
+@container (max-width:760px){.jsim .js-hgap{flex-basis:130px}.jsim .js-hgap .js-msg{font-size:10px;padding:2px 6px}
+  .jsim .js-band.js-context{flex-basis:160px}.jsim .js-band.js-chain .js-node b{font-size:11.5px}}
+@container (max-width:540px){.jsim .js-midrow{flex-wrap:wrap}.jsim .js-band.js-chain{flex:1 1 100%}.jsim .js-hgap{flex:1 1 100%}.jsim .js-hgap::before{left:50%;right:auto;top:0;bottom:0;border-top:0;
   border-left:1.5px dashed #C4CBD8}.jsim .js-band.js-context{flex:1 1 100%}}
 @media (max-width:520px){.jsim{padding:12px}.jsim .js-node b{font-size:11px}.jsim .js-msg{font-size:10.5px}
   .jsim .js-call{font-size:12px;padding:5px 8px}.jsim .js-cols,.jsim .js-gap{gap:6px}.jsim .js-gap{padding:0 4px}}
@@ -221,7 +223,7 @@ export const jwtSteps = ({ endpoint, token, password }) => {
     });
     add({
       hot: ['jwt'],
-      gap: ['gx', 'side', 'setAuthentication(…)'],
+      gap: ['gx', 'side', 'setAuthentication'],
       caption: 'Con los claims del token, el filtro guarda la autenticación en el SecurityContext. Sin consultar la base de datos.',
     });
     add({
