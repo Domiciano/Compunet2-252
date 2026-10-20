@@ -163,7 +163,13 @@ Se portó desde FlutterLearning el 2026-10-20: `InteractiveBlock.jsx` y la líne
   `PostRepository` → tabla `posts`. Cubre `/posts` sin token (401 en
   `AuthorizationFilter`), login bueno y malo, `/posts` con token válido y con token
   alterado (401 en el propio filtro). `ExceptionTranslationFilter` se dejó fuera a
-  propósito (pedido del profesor, 2026-10-20). Tiene modo *Paso a paso*. Los pasos son datos puros
+  propósito (pedido del profesor, 2026-10-20).
+  `AuthorizationFilter` muestra sus dos reglas (`requestMatchers("/api/v1/auth/**").permitAll()`
+  y `anyRequest().authenticated()`) e ilumina la que aplica. El login cruza los demás
+  filtros en **un solo paso**: `permitAll()` no salta la cadena (eso sería
+  `web.ignoring()`), solo hace que la regla no exija autenticación; el profesor eligió
+  mostrarlo así, fiel a Spring. Cada tramo recorrido deja una flecha (azul de ida, verde de
+  vuelta, roja si es error; `⇄` entre capas cuando ya se recorrió en los dos sentidos). Tiene modo *Paso a paso*. Los pasos son datos puros
   (`jwtSteps`) y sus reglas están probadas en `InteractiveBlock.test.jsx`: un solo mensaje
   entre capas por paso, y cada paso empieza donde llegó el anterior o en una capa vecina.
   Si cambian las lecciones 0096–0098 (rutas, códigos de error), hay que actualizarlo.

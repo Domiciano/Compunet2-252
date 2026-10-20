@@ -89,6 +89,19 @@ describe('jwtSteps', () => {
     });
   });
 
+  it('crosses the filters in one step on login and decides permitAll in AuthorizationFilter', () => {
+    const steps = jwtSteps(SCENARIOS['login ok']);
+    expect(steps[1].hot).toEqual(['others', 'jwt', 'upaf']);
+    expect(steps[2].hot).toEqual(['authz']);
+    expect(steps[2].rule).toEqual(['permit', 'pass']);
+  });
+
+  it('checks authenticated() for /posts, and only there', () => {
+    expect(jwtSteps(SCENARIOS['posts con token']).find((step) => step.rule).rule).toEqual(['auth', 'pass']);
+    expect(jwtSteps(SCENARIOS['posts sin token']).find((step) => step.rule).rule).toEqual(['auth', 'stop']);
+    expect(jwtSteps(SCENARIOS['posts con token alterado']).some((step) => step.rule)).toBe(false);
+  });
+
   it('only issues a token for good credentials', () => {
     expect(jwtSteps(SCENARIOS['login ok']).at(-1).saveToken).toBe(true);
     const bad = jwtSteps(SCENARIOS['login con contraseña mala']);

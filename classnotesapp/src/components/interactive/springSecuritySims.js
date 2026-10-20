@@ -36,7 +36,10 @@ const CSS = `
 .jsim .js-cell .js-node{padding:4px 8px}
 .jsim .js-cell .js-node b{font-size:11.5px}
 .jsim .js-conn{display:flex;align-items:center;justify-content:center;color:#C4CBD8;font-size:15px;font-weight:700}
-.jsim .js-conn.js-act{color:#556074}
+.jsim .js-conn.js-act{text-shadow:0 0 6px var(--js-hot)}
+.jsim .js-conn.js-down{color:#4453C9}
+.jsim .js-conn.js-back{color:#1F9D68}
+.jsim .js-conn.js-bad{color:#D64545}
 .jsim .js-head{display:flex;justify-content:space-between;align-items:baseline;gap:4px 10px;flex-wrap:wrap;margin-bottom:6px}
 .jsim .js-name{font-size:11.5px;font-weight:700;letter-spacing:.08em;color:var(--ink)}
 .jsim .js-role{font-size:11.5px;color:var(--js-muted)}
@@ -79,7 +82,27 @@ const CSS = `
 .jsim .js-strip .js-msg{font-size:11px}
 @keyframes jsIn{0%{opacity:0;transform:translateY(var(--from,-8px))}100%{opacity:1;transform:none}}
 .jsim .js-stack{display:flex;flex-direction:column}
-.jsim .js-link{height:10px;margin-left:22px;border-left:1.5px solid #A9B4F2}
+.jsim .js-link{height:14px;margin-left:22px;border-left:1.5px solid #A9B4F2;position:relative}
+.jsim .js-link.js-down{border-left:2.5px solid #4453C9}
+.jsim .js-link.js-down::after{content:'';position:absolute;left:-6.25px;bottom:-1px;border-left:5px solid transparent;
+  border-right:5px solid transparent;border-top:7px solid #4453C9}
+.jsim .js-slot.js-down::before{border-left:2.5px solid #4453C9}
+.jsim .js-slot.js-back::before{border-left:2.5px solid #1F9D68}
+.jsim .js-slot.js-bad::before{border-left:2.5px solid #D64545}
+.jsim .js-slot.js-down::after,.jsim .js-slot.js-back::after,.jsim .js-slot.js-bad::after{content:'';position:absolute;
+  left:calc(50% - 4px);border-left:5px solid transparent;border-right:5px solid transparent}
+.jsim .js-slot.js-down::after{bottom:0;border-top:7px solid #4453C9}
+.jsim .js-slot.js-back::after{top:0;border-bottom:7px solid #1F9D68}
+.jsim .js-slot.js-bad::after{top:0;border-bottom:7px solid #D64545}
+.jsim .js-varrow{grid-column:1;min-height:20px;padding:0}
+.jsim .js-hgap.js-side::before{border-top:2.5px solid #A96C05}
+.jsim .js-hgap.js-side::after{content:'';position:absolute;right:0;top:calc(50% - 4px);border-top:5px solid transparent;
+  border-bottom:5px solid transparent;border-left:7px solid #A96C05}
+.jsim .js-rules{flex-basis:100%;display:flex;flex-direction:column;gap:3px;margin-top:2px}
+.jsim .js-rule{font:10.5px 'JetBrains Mono',Menlo,Consolas,monospace;padding:2px 6px;border-radius:6px;background:#F4F6F9;
+  color:#79809A;border:1px solid #E3E7EE;overflow-wrap:anywhere;transition:background .3s,color .3s}
+.jsim .js-rule.js-pass{background:#D9F2D0;color:#245C21;border-color:#7CC56A;font-weight:700}
+.jsim .js-rule.js-stop{background:#FFEBEF;color:var(--js-err);border-color:#F3A3B2;font-weight:700}
 .jsim .js-node{display:flex;align-items:center;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;background:#fff;
   border:1.5px solid var(--b,#A9B4F2);border-radius:10px;padding:5px 10px;transition:box-shadow .3s,opacity .3s;min-width:0}
 .jsim .js-node b{font:700 12.5px 'JetBrains Mono',Menlo,Consolas,monospace;color:var(--ink,#4453C9);overflow-wrap:anywhere}
@@ -193,68 +216,77 @@ export const jwtSteps = ({ endpoint, token, password }) => {
         ? 'El cliente pide los posts y adjunta el token en el encabezado Authorization.'
         : 'El cliente pide los posts sin token: no ha iniciado sesión.',
   });
-  add({
-    hot: ['others'],
-    status: { others: ['pass', 'pasa'] },
-    caption: 'El request entra a la SecurityFilterChain. Los primeros filtros (CORS, logout…) no tienen nada que objetar.',
-  });
-
-  if (login || !token) {
+  if (login) {
     add({
-      hot: ['jwt'],
-      status: { jwt: ['info', 'sin token: sigue'] },
-      caption: 'JwtAuthFilter no encuentra «Bearer …». No hay nada que validar: deja seguir el request sin autenticar.',
+      hot: ['others', 'jwt', 'upaf'],
+      status: { others: ['pass', 'pasa'], jwt: ['info', 'sin token: sigue'], upaf: ['info', 'no actúa'] },
+      caption: 'El login cruza los filtros sin que ninguno lo detenga: no trae token, así que JwtAuthFilter no tiene nada que validar. permitAll() no se salta estos filtros; la regla se revisa al final, en AuthorizationFilter.',
     });
-  } else if (token === 'bad') {
-    add({
-      hot: ['jwt'],
-      status: { jwt: ['stop', '✗ firma inválida'] },
-      warn: true,
-      caption: 'JwtAuthFilter recalcula la firma con el secreto y no coincide con la del token: alguien lo modificó.',
-    });
-    add({
-      hot: ['jwt'],
-      gap: ['g1', 'fail', '401 · { "message": "Token inválido" }'],
-      warn: true,
-      caption: 'El filtro responde 401 y no llama a filterChain.doFilter: el request se detiene aquí.',
-    });
-    add({
-      hot: ['client'],
-      response: ['fail', '401 Unauthorized · Token inválido'],
-      warn: true,
-      caption: 'El cliente recibe el 401. Ni los filtros siguientes ni ningún controller se ejecutaron.',
-    });
-    return steps;
   } else {
     add({
-      hot: ['jwt'],
-      status: { jwt: ['pass', '✓ token válido'] },
-      caption: 'JwtAuthFilter verifica la firma con el secreto y revisa que no haya vencido. El token es auténtico.',
+      hot: ['others'],
+      status: { others: ['pass', 'pasa'] },
+      caption: 'El request entra a la SecurityFilterChain. Los primeros filtros (CORS, logout…) no tienen nada que objetar.',
     });
+
+    if (!token) {
+      add({
+        hot: ['jwt'],
+        status: { jwt: ['info', 'sin token: sigue'] },
+        caption: 'JwtAuthFilter no encuentra «Bearer …». No hay nada que validar: deja seguir el request sin autenticar.',
+      });
+    } else if (token === 'bad') {
+      add({
+        hot: ['jwt'],
+        status: { jwt: ['stop', '✗ firma inválida'] },
+        warn: true,
+        caption: 'JwtAuthFilter recalcula la firma con el secreto y no coincide con la del token: alguien lo modificó.',
+      });
+      add({
+        hot: ['jwt'],
+        gap: ['g1', 'fail', '401 · { "message": "Token inválido" }'],
+        warn: true,
+        caption: 'El filtro responde 401 y no llama a filterChain.doFilter: el request se detiene aquí.',
+      });
+      add({
+        hot: ['client'],
+        response: ['fail', '401 Unauthorized · Token inválido'],
+        warn: true,
+        caption: 'El cliente recibe el 401. Ni los filtros siguientes ni ningún controller se ejecutaron.',
+      });
+      return steps;
+    } else {
+      add({
+        hot: ['jwt'],
+        status: { jwt: ['pass', '✓ token válido'] },
+        caption: 'JwtAuthFilter verifica la firma con el secreto y revisa que no haya vencido. El token es auténtico.',
+      });
+      add({
+        hot: ['jwt'],
+        gap: ['gx', 'side', 'setAuthentication'],
+        caption: 'Con los claims del token, el filtro guarda la autenticación en el SecurityContext. Sin consultar la base de datos.',
+      });
+      add({
+        hot: ['ctx'],
+        context: [USER.username, USER.authority],
+        caption: 'El SecurityContext ahora dice quién hace este request y con qué authorities. Lo leen los filtros siguientes y el controller.',
+      });
+    }
+
     add({
-      hot: ['jwt'],
-      gap: ['gx', 'side', 'setAuthentication'],
-      caption: 'Con los claims del token, el filtro guarda la autenticación en el SecurityContext. Sin consultar la base de datos.',
-    });
-    add({
-      hot: ['ctx'],
-      context: [USER.username, USER.authority],
-      caption: 'El SecurityContext ahora dice quién hace este request y con qué authorities. Lo leen los filtros siguientes y el controller.',
+      hot: ['upaf'],
+      status: { upaf: ['info', 'sin formLogin: no actúa'] },
+      caption: 'UsernamePasswordAuthenticationFilter procesa el login con formulario. La API no usa formLogin, así que no hace nada. JwtAuthFilter se registró antes que él con addFilterBefore.',
     });
   }
-
-  add({
-    hot: ['upaf'],
-    status: { upaf: ['info', 'sin formLogin: no actúa'] },
-    caption: 'UsernamePasswordAuthenticationFilter procesa el login con formulario. La API no usa formLogin, así que no hace nada. JwtAuthFilter se registró antes que él con addFilterBefore.',
-  });
 
   if (!login && !token) {
     add({
       hot: ['authz', 'ctx'],
       status: { authz: ['stop', '✗ anónimo'] },
+      rule: ['auth', 'stop'],
       warn: true,
-      caption: 'AuthorizationFilter consulta el SecurityContext: /api/v1/posts exige un usuario autenticado y no hay ninguno.',
+      caption: 'AuthorizationFilter revisa sus reglas: /api/v1/posts cae en anyRequest().authenticated(). Consulta el SecurityContext y no hay nadie autenticado.',
     });
     add({
       hot: ['authz'],
@@ -274,9 +306,10 @@ export const jwtSteps = ({ endpoint, token, password }) => {
   add({
     hot: login ? ['authz'] : ['authz', 'ctx'],
     status: { authz: ['pass', login ? '✓ permitAll' : '✓ autenticado'] },
+    rule: [login ? 'permit' : 'auth', 'pass'],
     caption: login
-      ? 'AuthorizationFilter: /api/v1/auth/** es permitAll. Pasa aunque nadie esté autenticado: nadie tiene token antes del login.'
-      : `AuthorizationFilter consulta el SecurityContext: /api/v1/posts exige un usuario autenticado y ahí está ${USER.username}. Pasa.`,
+      ? 'AuthorizationFilter revisa sus reglas: /api/v1/auth/login cae en permitAll(). Pasa sin que nadie esté autenticado; nadie tiene token antes del login.'
+      : `AuthorizationFilter revisa sus reglas: /api/v1/posts cae en anyRequest().authenticated(). En el SecurityContext está ${USER.username}, así que pasa.`,
   });
 
   if (!login) {
@@ -443,7 +476,15 @@ const mountJwtFlow = (root) => {
     posts: el('div', { class: 'js-table' }, el('b', { text: 'posts' }), ...rows.posts),
   };
 
-  const link = () => el('div', { class: 'js-link' });
+  const links = {};
+  const link = (key) => {
+    links[key] = el('div', { class: 'js-link' });
+    return links[key];
+  };
+  const rules = {
+    permit: el('div', { class: 'js-rule', text: 'requestMatchers("/api/v1/auth/**").permitAll()' }),
+    auth: el('div', { class: 'js-rule', text: 'anyRequest().authenticated()' }),
+  };
   const client = band('client', 'client', 'CLIENTE', 'pulse un endpoint',
     el('div', { class: 'js-req' }, loginButton, postsButton),
     el('div', { class: 'js-creds' }, el('span', { class: 'js-mono', text: `username: ${USER.username}` }),
@@ -452,10 +493,11 @@ const mountJwtFlow = (root) => {
     el('div', { class: 'js-row' }, 'Última respuesta:', responseBox));
   const chain = band('chain', 'chain', 'SECURITYFILTERCHAIN · /api/v1/**', 'cada request pasa por sus filtros, en orden',
     el('div', { class: 'js-stack' },
-      node('others', 'CorsFilter · LogoutFilter · …', '', 'js-dim'), link(),
-      node('jwt', 'JwtAuthFilter', 'valida el token', 'js-jwt'), link(),
-      node('upaf', 'UsernamePasswordAuthenticationFilter', 'login con formulario'), link(),
-      node('authz', 'AuthorizationFilter', '¿puede llegar al endpoint?')));
+      node('others', 'CorsFilter · LogoutFilter · …', '', 'js-dim'), link('jwt'),
+      node('jwt', 'JwtAuthFilter', 'valida el token', 'js-jwt'), link('upaf'),
+      node('upaf', 'UsernamePasswordAuthenticationFilter', 'login con formulario'), link('authz'),
+      node('authz', 'AuthorizationFilter', 'revisa las reglas de acceso')));
+  nodes.authz.append(el('div', { class: 'js-rules' }, rules.permit, rules.auth));
   const hgap = el('div', { class: 'js-hgap', 'data-gap': 'gx' });
   gaps.gx = [hgap];
   const context = band('context', 'context', 'SECURITYCONTEXT', 'del request actual',
@@ -464,7 +506,7 @@ const mountJwtFlow = (root) => {
   const SPAN = { g2: '1 / 4', g3: '1 / 4', g4: '3 / 6', g5: '5 / 8' };
   const CONN = { g3: 0, g4: 1, g5: 2 };
   const cell = (kind, ...children) => el('div', { class: `js-cell js-${kind}` }, ...children);
-  const conn = () => el('div', { class: 'js-conn', text: '⇄' });
+  const conn = () => el('div', { class: 'js-conn', text: '⇢' });
   const strip = () => el('div', { class: 'js-strip' });
   const cells = {
     l: [cell('ctrl', node('auth', 'RestAuthController')),
@@ -477,8 +519,9 @@ const mountJwtFlow = (root) => {
   const strips = { g2: strip(), l: strip(), r: strip() };
   const layerRow = (side) => cells[side].flatMap((item, index) => (index ? [conns[side][index - 1], item] : [item]));
   const head = (kind, text) => el('div', { class: `js-ghead js-${kind}`, text });
+  const g2Arrow = el('div', { class: 'js-slot js-varrow' });
   const layers = el('div', { class: 'js-gridwrap' }, el('div', { class: 'js-grid' },
-    strips.g2,
+    g2Arrow, strips.g2,
     head('ctrl', 'CONTROLLERS'), el('div'), head('svc', 'SERVICIOS'), el('div'), head('repo', 'REPOSITORIOS'), el('div'), head('db', 'BASE DE DATOS'),
     ...layerRow('l'), strips.l, ...layerRow('r'), strips.r));
   const cellOf = {
@@ -570,9 +613,37 @@ const mountJwtFlow = (root) => {
     });
   };
 
+  const TRAIL = ['js-down', 'js-back', 'js-bad', 'js-side'];
+  const trailItems = () => [gaps.g1[0], hgap, g2Arrow, ...Object.values(links), ...conns.l, ...conns.r];
+  const mark = (item, state) => {
+    const wentDown = item.classList.contains('js-down') || item.dataset.went === 'down';
+    item.classList.remove(...TRAIL);
+    item.classList.add(`js-${state}`);
+    if (!item.classList.contains('js-conn')) return;
+    if (state === 'down') item.dataset.went = 'down';
+    item.textContent = state === 'down' ? '→' : wentDown ? '⇄' : '←';
+  };
+  const clearTrail = () => trailItems().forEach((item) => {
+    item.classList.remove(...TRAIL);
+    if (item.classList.contains('js-conn')) item.textContent = '⇢';
+    delete item.dataset.went;
+  });
+  const connectorFor = ([where, , , side]) => {
+    if (where === 'g1') return gaps.g1[0];
+    if (where === 'gx') return hgap;
+    if (where === 'g2') return g2Arrow;
+    return conns[side === 'r' ? 'r' : 'l'][CONN[where]];
+  };
+  const leaveTrail = (step) => {
+    ['jwt', 'upaf', 'authz'].filter((key) => step.hot.includes(key)).forEach((key) => mark(links[key], 'down'));
+    if (step.gap) mark(connectorFor(step.gap), { down: 'down', up: 'back', fail: 'bad', side: 'side' }[step.gap[1]]);
+  };
+
   const runStep = (step) => {
     highlight(step.hot);
     showGap(step.gap);
+    leaveTrail(step);
+    if (step.rule) rules[step.rule[0]].classList.add(`js-${step.rule[1]}`);
     Object.entries(step.status || {}).forEach(([key, value]) => setStatus(key, value));
     if (step.read) markRead(step.read);
     if (step.context) {
@@ -628,6 +699,8 @@ const mountJwtFlow = (root) => {
     tables.users.classList.toggle('js-idle', endpoint === 'posts');
     tables.posts.classList.toggle('js-idle', endpoint === 'login');
     markRead(null);
+    clearTrail();
+    Object.values(rules).forEach((item) => item.classList.remove('js-pass', 'js-stop'));
     renderContext(null);
     responseBox.className = 'js-resp';
     responseBox.textContent = 'esperando…';
