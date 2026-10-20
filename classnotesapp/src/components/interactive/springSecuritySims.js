@@ -730,8 +730,387 @@ const mountJwtFlow = (root) => {
   };
 };
 
+const ANATOMY_STYLE_ID = 'jsim-anatomy-style';
+
+const ANATOMY_CSS = `
+.jsim .ja-token{font:12.5px 'JetBrains Mono',Menlo,Consolas,monospace;background:#fff;border:1px solid var(--js-line);border-radius:10px;
+  padding:10px 12px;overflow-wrap:anywhere;line-height:1.6}
+.jsim .ja-part{cursor:pointer;border-radius:4px;padding:1px 0;transition:background .3s}
+.jsim .ja-part:hover{background:#F2F4F8}
+.jsim .ja-h{color:#C2354F}
+.jsim .ja-p{color:#7439B8}
+.jsim .ja-s{color:#2F5BC4}
+.jsim .ja-dot{color:#79809A;font-weight:700}
+.jsim .ja-legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11.5px;color:var(--js-muted);margin:6px 2px 12px}
+.jsim .ja-legend b{font-weight:700}
+.jsim .ja-cards{display:flex;flex-wrap:wrap;gap:10px}
+.jsim .ja-card{--b:#C4CBD8;--bg:#fff;--ink:#556074;flex:1 1 190px;min-width:0;border:1.5px solid var(--b);border-radius:12px;background:var(--bg);
+  padding:8px 10px;display:flex;flex-direction:column;gap:6px;transition:box-shadow .3s}
+.jsim .ja-card.js-hot{box-shadow:0 0 0 3px var(--js-hot)}
+.jsim .ja-card.ja-h{--b:#F3A3B2;--bg:#FFF5F7;--ink:#C2354F}
+.jsim .ja-card.ja-p{--b:#C9A6EE;--bg:#F8F2FF;--ink:#7439B8}
+.jsim .ja-card.ja-s{--b:#9DB8F2;--bg:#F1F5FF;--ink:#2F5BC4}
+.jsim .ja-card h5{margin:0;font-size:11.5px;font-weight:700;letter-spacing:.08em;color:var(--ink)}
+.jsim .ja-card small{font-size:11.5px;color:var(--js-muted)}
+.jsim .ja-pre{margin:0;font:11.5px 'JetBrains Mono',Menlo,Consolas,monospace;background:#fff;border:1px solid #E3E7EE;border-radius:8px;
+  padding:6px 8px;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--js-ink)}
+.jsim .ja-field{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--js-muted)}
+.jsim .ja-field input,.jsim .ja-field select{border:1px solid #DDE1E8;border-radius:8px;padding:4px 6px;background:#fff;color:var(--js-ink);
+  font:12px 'JetBrains Mono',Menlo,Consolas,monospace;min-width:0;width:100%}
+.jsim .ja-changed{background:#FFF3DC;border-color:#F0C572}
+.jsim .ja-verify{margin-top:12px;border:1.5px solid var(--js-line);border-radius:12px;background:#fff;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.jsim .ja-verify h5{margin:0;font-size:11.5px;font-weight:700;letter-spacing:.08em;color:var(--js-muted)}
+.jsim .ja-cmp{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;font-size:12px;color:var(--js-muted);align-items:center}
+.jsim .ja-cmp code{font:11.5px 'JetBrains Mono',Menlo,Consolas,monospace;overflow-wrap:anywhere;color:var(--js-ink)}
+.jsim .ja-result{font-weight:700;font-size:13.5px;border-radius:10px;padding:6px 10px}
+.jsim .ja-result.ja-ok{background:#E8F6E3;color:#245C21}
+.jsim .ja-result.ja-bad{background:#FFEBEF;color:var(--js-err)}
+.jsim .ja-attack{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:12px;color:var(--js-muted);margin-top:10px}
+.jsim .ja-attack input{flex:1 1 200px;min-width:0;border:1px solid #DDE1E8;border-radius:8px;padding:4px 8px;
+  font:12px 'JetBrains Mono',Menlo,Consolas,monospace;color:var(--js-ink);background:#fff}
+`;
+
+const ensureAnatomyStyle = () => {
+  ensureStyle();
+  if (typeof document === 'undefined' || document.getElementById(ANATOMY_STYLE_ID)) return;
+  const style = document.createElement('style');
+  style.id = ANATOMY_STYLE_ID;
+  style.textContent = ANATOMY_CSS;
+  document.head.appendChild(style);
+};
+
+export const JWT_SECRET = 'universidadicesiuniversidadicesiuniversidadicesi';
+const IAT = 1744298415;
+const NOW = IAT + 600;
+const HEADER_JSON = '{"alg":"HS384"}';
+const ROLES = ['ROLE_ESTUDIANTE', 'ROLE_PROFESOR', 'ROLE_ADMIN'];
+const ORIGINAL = { sub: 'estudiante@icesi.edu.co', role: 'ROLE_ESTUDIANTE', expired: false };
+
+const bytesToB64url = (bytes) => {
+  let binary = '';
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+};
+export const b64url = (text) => bytesToB64url(new TextEncoder().encode(text));
+export const payloadJson = ({ sub, role, expired }) =>
+  JSON.stringify({ authorities: [role], sub, iat: IAT, exp: expired ? IAT + 300 : IAT + 1800 });
+export const signJwt = async (data, secret, subtle = globalThis.crypto && globalThis.crypto.subtle) => {
+  if (!subtle) return null;
+  const encoder = new TextEncoder();
+  const key = await subtle.importKey('raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-384' }, false, ['sign']);
+  return bytesToB64url(new Uint8Array(await subtle.sign('HMAC', key, encoder.encode(data))));
+};
+const pretty = (json) => JSON.stringify(JSON.parse(json), null, 2);
+const short = (text) => (text && text.length > 26 ? `${text.slice(0, 26)}…` : text || '…');
+
+const mountJwtAnatomy = (root) => {
+  ensureAnatomyStyle();
+  const container = el('div', { class: 'jsim', 'data-testid': 'jwt-anatomy' });
+  root.replaceChildren(container);
+
+  const fields = { ...ORIGINAL };
+  let originalSignature = null;
+  let signature = null;
+  let alive = true;
+
+  const parts = {
+    h: el('span', { class: 'ja-part ja-h', text: b64url(HEADER_JSON) }),
+    p: el('span', { class: 'ja-part ja-p' }),
+    s: el('span', { class: 'ja-part ja-s' }),
+  };
+  const token = el('div', { class: 'ja-token', 'data-testid': 'jwt-token' },
+    parts.h, el('span', { class: 'ja-dot', text: '.' }), parts.p, el('span', { class: 'ja-dot', text: '.' }), parts.s);
+
+  const subInput = el('input', { type: 'text', value: fields.sub, 'aria-label': 'sub', autocomplete: 'off' });
+  const roleSelect = el('select', { 'aria-label': 'authorities' }, ...ROLES.map((role) => el('option', { value: role, text: role })));
+  const expSelect = el('select', { 'aria-label': 'exp' },
+    el('option', { value: 'no', text: 'vence en 20 min' }), el('option', { value: 'yes', text: 'venció hace 5 min' }));
+  const payloadPre = el('pre', { class: 'ja-pre' });
+  const signaturePre = el('pre', { class: 'ja-pre', 'data-testid': 'jwt-signature' });
+
+  const cards = {
+    h: el('div', { class: 'ja-card ja-h' }, el('h5', { text: 'HEADER' }), el('small', { text: 'Con qué algoritmo se firmó.' }),
+      el('pre', { class: 'ja-pre', text: pretty(HEADER_JSON) })),
+    p: el('div', { class: 'ja-card ja-p' }, el('h5', { text: 'PAYLOAD · cámbielo' }),
+      el('label', { class: 'ja-field' }, 'sub', subInput),
+      el('label', { class: 'ja-field' }, 'authorities', roleSelect),
+      el('label', { class: 'ja-field' }, 'exp', expSelect),
+      payloadPre),
+    s: el('div', { class: 'ja-card ja-s' }, el('h5', { text: 'SIGNATURE' }),
+      el('pre', { class: 'ja-pre', text: 'HMACSHA384(\n  base64url(header) + "." +\n  base64url(payload),\n  secret\n)' }),
+      el('small', { text: 'La que trae el token:' }), signaturePre),
+  };
+  Object.entries(parts).forEach(([key, part]) => part.addEventListener('click', () => {
+    Object.values(cards).forEach((item) => item.classList.remove('js-hot'));
+    cards[key].classList.add('js-hot');
+    flash(cards[key]);
+  }));
+
+  const brought = el('code', { 'data-testid': 'jwt-brought' });
+  const computed = el('code', { 'data-testid': 'jwt-computed' });
+  const result = el('div', { class: 'ja-result', 'data-testid': 'jwt-result' });
+  const guessInput = el('input', { type: 'text', 'aria-label': 'Secreto para firmar', placeholder: 'escriba un secreto…', autocomplete: 'off' });
+  const resignButton = el('button', { class: 'js-mini', type: 'button', text: 'Firmar de nuevo con este secreto' });
+  const resetButton = el('button', { class: 'js-mini', type: 'button', text: 'Restaurar el token original' });
+
+  container.append(
+    el('div', { class: 'js-title', text: 'Anatomía de un JWT' }),
+    el('div', { class: 'js-sub', text: 'Pulse cada parte del token. Después cambie el payload, por ejemplo authorities a ROLE_PROFESOR, y vea qué hace el servidor.' }),
+    token,
+    el('div', { class: 'ja-legend' },
+      el('span', {}, el('b', { class: 'ja-h', text: 'header' }), ' . '),
+      el('span', {}, el('b', { class: 'ja-p', text: 'payload' }), ' . '),
+      el('span', {}, el('b', { class: 'ja-s', text: 'signature' }), ' · cada parte es Base64URL, no está cifrada')),
+    el('div', { class: 'ja-cards' }, cards.h, cards.p, cards.s),
+    el('div', { class: 'ja-verify' },
+      el('h5', { text: 'LO QUE HACE EL SERVIDOR AL RECIBIRLO' }),
+      el('div', { class: 'ja-cmp' },
+        'Firma que trae el token', brought,
+        'Firma que calcula con su secreto', computed),
+      result),
+    el('div', { class: 'ja-attack' }, '¿Y si el atacante lo vuelve a firmar?', guessInput, resignButton, resetButton));
+
+  const headerB64 = b64url(HEADER_JSON);
+  const data = () => `${headerB64}.${b64url(payloadJson(fields))}`;
+
+  const render = async () => {
+    const json = payloadJson(fields);
+    parts.p.textContent = b64url(json);
+    parts.s.textContent = signature || '…';
+    payloadPre.textContent = pretty(json);
+    signaturePre.textContent = signature || '…';
+    subInput.classList.toggle('ja-changed', fields.sub !== ORIGINAL.sub);
+    roleSelect.classList.toggle('ja-changed', fields.role !== ORIGINAL.role);
+    expSelect.classList.toggle('ja-changed', fields.expired !== ORIGINAL.expired);
+    brought.textContent = short(signature);
+    if (!signature) {
+      result.className = 'ja-result';
+      result.textContent = 'Calculando…';
+    }
+    const expected = await signJwt(data(), JWT_SECRET);
+    if (!alive) return;
+    if (expected === null) {
+      computed.textContent = '—';
+      result.className = 'ja-result ja-bad';
+      result.textContent = 'Este navegador no permite calcular la firma aquí.';
+      return;
+    }
+    computed.textContent = short(expected);
+    if (!signature) return;
+    const signatureOk = expected === signature;
+    const expired = JSON.parse(payloadJson(fields)).exp < NOW;
+    result.className = `ja-result ${signatureOk && !expired ? 'ja-ok' : 'ja-bad'}`;
+    if (!signatureOk) {
+      result.textContent = '✗ Rechazado: la firma no coincide (SignatureException). Alguien cambió el header o el payload sin conocer el secreto.';
+    } else if (expired) {
+      result.textContent = '✗ Rechazado: la firma es válida, pero el token ya venció (ExpiredJwtException).';
+    } else if (fields.sub !== ORIGINAL.sub || fields.role !== ORIGINAL.role) {
+      result.textContent = '✓ Aceptado: la firma coincide. Quien firmó conocía el secreto, así que el servidor confía en estos claims.';
+    } else {
+      result.textContent = '✓ Aceptado: la firma coincide y no ha vencido. El servidor confía en estos claims.';
+    }
+  };
+
+  const update = () => {
+    fields.sub = subInput.value;
+    fields.role = roleSelect.value;
+    fields.expired = expSelect.value === 'yes';
+    render();
+    flash(parts.p);
+  };
+  subInput.addEventListener('input', update);
+  roleSelect.addEventListener('change', update);
+  expSelect.addEventListener('change', update);
+  resignButton.addEventListener('click', async () => {
+    const next = await signJwt(data(), guessInput.value);
+    if (!alive || next === null) return;
+    signature = next;
+    render();
+    flash(parts.s);
+  });
+  resetButton.addEventListener('click', () => {
+    Object.assign(fields, ORIGINAL);
+    subInput.value = ORIGINAL.sub;
+    roleSelect.value = ORIGINAL.role;
+    expSelect.value = 'no';
+    guessInput.value = '';
+    signature = originalSignature;
+    render();
+  });
+
+  roleSelect.value = ORIGINAL.role;
+  signJwt(data(), JWT_SECRET).then((value) => {
+    if (!alive) return;
+    originalSignature = value;
+    signature = value;
+    render();
+  });
+  render();
+
+  return () => {
+    alive = false;
+    root.replaceChildren();
+  };
+};
+
+const CHAIN_STYLE_ID = 'jsim-chain-style';
+
+const CHAIN_CSS = `
+.jsim .jc-body{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start}
+.jsim .jc-list{flex:1 1 270px;min-width:0;display:flex;flex-direction:column;align-items:stretch}
+.jsim .jc-end{align-self:center;font:600 12px Roboto,Arial,sans-serif;border-radius:14px;padding:4px 14px;background:#EFF1F5;color:var(--js-muted)}
+.jsim .jc-end.jc-ctrl{background:#E8F6E3;color:#3A8235}
+.jsim .jc-arrow{align-self:center;color:#A9B4F2;font-size:13px;line-height:1;padding:3px 0}
+.jsim .jc-filter{display:flex;justify-content:space-between;align-items:center;gap:6px 10px;flex-wrap:wrap;width:100%;text-align:left;
+  background:#fff;border:1.5px solid #A9B4F2;border-radius:10px;padding:6px 10px;cursor:pointer;color:var(--js-ink);
+  font:700 12px 'JetBrains Mono',Menlo,Consolas,monospace;transition:box-shadow .2s,background .2s}
+.jsim .jc-filter:hover{background:#F5F7FF}
+.jsim .jc-filter b{font:inherit;color:#4453C9;overflow-wrap:anywhere;min-width:0}
+.jsim .jc-filter.jc-off{border-style:dashed;border-color:#C4CBD8;background:#F7F8FA}
+.jsim .jc-filter.jc-off b{color:#9AA1B2;text-decoration:line-through}
+.jsim .jc-filter.jc-new{border:2.5px solid #F0C572;background:#FFFBF1}
+.jsim .jc-filter.jc-new b{color:#A96C05}
+.jsim .jc-filter.jc-sel{box-shadow:0 0 0 3px var(--js-hot)}
+.jsim .jc-badge{font:700 10.5px Roboto,Arial,sans-serif;border-radius:10px;padding:1px 8px;background:#EFF1F5;color:var(--js-muted);white-space:nowrap}
+.jsim .jc-badge.jc-new{background:#FFF3DC;color:#A96C05}
+.jsim .jc-badge.jc-off{background:#FFEBEF;color:var(--js-err)}
+.jsim .jc-badge.jc-on{background:#E8F6E3;color:var(--js-ok)}
+.jsim .jc-panel{flex:1 1 260px;min-width:0;background:#fff;border:1.5px solid var(--js-line);border-radius:12px;padding:12px 14px;
+  display:flex;flex-direction:column;gap:8px}
+.jsim .jc-panel h4{margin:0;font:700 14px 'JetBrains Mono',Menlo,Consolas,monospace;color:#4453C9;overflow-wrap:anywhere}
+.jsim .jc-panel h5{margin:4px 0 0;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--js-muted)}
+.jsim .jc-panel p{margin:0;font-size:13.5px;line-height:1.5}
+.jsim .jc-panel pre{margin:0;font:11.5px 'JetBrains Mono',Menlo,Consolas,monospace;background:#1F2430;color:#E6EAF2;border-radius:8px;
+  padding:8px 10px;white-space:pre-wrap;overflow-wrap:anywhere}
+.jsim .jc-foot{font-size:11.5px;color:#79809A;margin-top:10px}
+`;
+
+const ensureChainStyle = () => {
+  ensureStyle();
+  if (typeof document === 'undefined' || document.getElementById(CHAIN_STYLE_ID)) return;
+  const style = document.createElement('style');
+  style.id = CHAIN_STYLE_ID;
+  style.textContent = CHAIN_CSS;
+  document.head.appendChild(style);
+};
+
+// In Spring Security 6 order. Minor filters (HeaderWriterFilter, RequestCacheAwareFilter…) are left out.
+export const CHAIN_FILTERS = [
+  {
+    key: 'context', name: 'SecurityContextHolderFilter', state: 'on', badge: 'activo',
+    what: 'Prepara el SecurityContext del request al principio de la cadena y lo limpia cuando el request termina, para que no se filtre al siguiente request que atienda el mismo hilo.',
+    api: 'En la API stateless el SecurityContext arranca vacío: no hay sesión de donde cargarlo. Lo llena JwtAuthFilter más adelante.',
+  },
+  {
+    key: 'cors', name: 'CorsFilter', state: 'on', badge: 'si hay .cors()',
+    what: 'Atiende las solicitudes de orígenes cruzados, incluido el preflight OPTIONS que envía el navegador, y agrega los encabezados Access-Control-Allow-*. Va antes de cualquier validación de seguridad.',
+    api: 'Solo existe si la cadena configura .cors(...). Lo necesita un frontend servido desde otro dominio, como una app de React.',
+    config: '.cors(Customizer.withDefaults())',
+  },
+  {
+    key: 'csrf', name: 'CsrfFilter', state: 'off', badge: 'deshabilitado',
+    what: 'Protege contra CSRF: que otro sitio envíe un request aprovechando que el navegador adjunta solo las cookies de sesión. Exige un token CSRF en cada POST, PUT o DELETE.',
+    api: 'Deshabilitado, así que no está en la cadena. La API no usa cookies de sesión: el token viaja en el encabezado Authorization, que el navegador no agrega por su cuenta.',
+    config: '.csrf(csrf -> csrf.disable())',
+  },
+  {
+    key: 'logout', name: 'LogoutFilter', state: 'on', badge: 'activo',
+    what: 'Intercepta las solicitudes a /logout: invalida la sesión y limpia el SecurityContext.',
+    api: 'Con JWT no hay sesión que cerrar. Cerrar sesión es que el cliente borre su token, que sigue siendo válido hasta su exp.',
+  },
+  {
+    key: 'jwt', name: 'JwtAuthFilter', state: 'new', badge: 'nuevo · nuestro',
+    what: 'El filtro que escribimos. Busca Authorization: Bearer <token>, verifica la firma y la expiración y, si el token es válido, guarda la autenticación en el SecurityContext.',
+    api: 'Sin token no decide nada y deja seguir el request. Con un token inválido o vencido lo corta con 401.',
+    config: '.addFilterBefore(jwtAuthFilter,\n    UsernamePasswordAuthenticationFilter.class)',
+  },
+  {
+    key: 'form', name: 'UsernamePasswordAuthenticationFilter', state: 'off', badge: 'solo con formLogin',
+    what: 'Procesa el POST /login de un formulario HTML: lee username y password, los autentica y crea la sesión.',
+    api: 'Solo existe si la cadena usa formLogin(), y la API no lo usa. Aun así importa: addFilterBefore ubica a JwtAuthFilter en la posición de este filtro, justo antes de él.',
+  },
+  {
+    key: 'anonymous', name: 'AnonymousAuthenticationFilter', state: 'on', badge: 'activo',
+    what: 'Si al llegar aquí nadie autenticó el request, pone en el SecurityContext un usuario anónimo (AnonymousAuthenticationToken).',
+    api: 'Por eso un request sin token no llega vacío al final: llega como anónimo, y las reglas deciden qué puede hacer un anónimo.',
+  },
+  {
+    key: 'exceptions', name: 'ExceptionTranslationFilter', state: 'on', badge: 'activo',
+    what: 'Envuelve a los filtros que siguen. Si alguno lanza AuthenticationException o AccessDeniedException, la convierte en una respuesta: 401 con el authenticationEntryPoint o 403 con el accessDeniedHandler.',
+    api: 'Sin configurar, en una API sin formLogin responde 403 a todo. En «Errores 401 y 403» lo configuramos para que diga 401 cuando falta el token.',
+    config: '.exceptionHandling(ex -> ex\n    .authenticationEntryPoint(...)\n    .accessDeniedHandler(...))',
+  },
+  {
+    key: 'authorization', name: 'AuthorizationFilter', state: 'on', badge: 'activo',
+    what: 'El último filtro. Evalúa las reglas de .authorizeHttpRequests() contra el SecurityContext y decide si el usuario, autenticado o anónimo, puede llegar al endpoint. En versiones anteriores se llamaba FilterSecurityInterceptor.',
+    api: '/api/v1/auth/** pasa con permitAll(). Todo lo demás exige authenticated().',
+    config: '.authorizeHttpRequests(auth -> auth\n    .requestMatchers("/api/v1/auth/**").permitAll()\n    .anyRequest().authenticated())',
+  },
+];
+
+const mountFilterChain = (root, args = []) => {
+  ensureChainStyle();
+  const container = el('div', { class: 'jsim', 'data-testid': 'filter-chain' });
+  root.replaceChildren(container);
+
+  const title = el('h4');
+  const badge = el('span', { class: 'jc-badge' });
+  const what = el('p');
+  const api = el('p');
+  const config = el('pre');
+  const configBox = el('div', {}, el('h5', { text: 'CÓMO SE CONFIGURA' }), config);
+  const panel = el('div', { class: 'jc-panel', 'aria-live': 'polite', 'data-testid': 'filter-detail' },
+    el('div', { style: 'display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center' }, title, badge),
+    el('h5', { text: 'QUÉ HACE' }), what, el('h5', { text: 'EN NUESTRA API' }), api, configBox);
+
+  const buttons = {};
+  const select = (key) => {
+    const filter = CHAIN_FILTERS.find((item) => item.key === key);
+    Object.entries(buttons).forEach(([itemKey, button]) => {
+      button.classList.toggle('jc-sel', itemKey === key);
+      button.setAttribute('aria-pressed', itemKey === key ? 'true' : 'false');
+    });
+    title.textContent = filter.name;
+    badge.className = `jc-badge jc-${filter.state}`;
+    badge.textContent = filter.badge;
+    what.textContent = filter.what;
+    api.textContent = filter.api;
+    configBox.hidden = !filter.config;
+    config.textContent = filter.config || '';
+    flash(panel);
+  };
+
+  const list = el('div', { class: 'jc-list' }, el('div', { class: 'jc-end', text: 'Request HTTP' }));
+  CHAIN_FILTERS.forEach((filter) => {
+    const button = el('button', {
+      class: `jc-filter${filter.state === 'off' ? ' jc-off' : filter.state === 'new' ? ' jc-new' : ''}`,
+      type: 'button',
+      'data-filter': filter.key,
+      onclick: () => select(filter.key),
+    }, el('b', {}, ...filter.name.split(/(?=[A-Z][a-z])/).flatMap((part, index) => (index ? [el('wbr'), part] : [part]))),
+    el('span', { class: `jc-badge jc-${filter.state}`, text: filter.badge }));
+    buttons[filter.key] = button;
+    list.append(el('div', { class: 'jc-arrow', text: '▼' }), button);
+  });
+  list.append(el('div', { class: 'jc-arrow', text: '▼' }), el('div', { class: 'jc-end jc-ctrl', text: 'Controller (endpoint)' }));
+
+  container.append(
+    el('div', { class: 'js-title', text: 'La SecurityFilterChain de la API' }),
+    el('div', { class: 'js-sub', text: 'Pulse un filtro para ver qué hace. Los tachados no están en nuestra cadena.' }),
+    el('div', { class: 'jc-body' }, list, panel),
+    el('div', { class: 'jc-foot', text: 'En orden de Spring Security 6. Se omiten filtros menores como HeaderWriterFilter o RequestCacheAwareFilter.' }));
+
+  const first = CHAIN_FILTERS.some((item) => item.key === args[0]) ? args[0] : 'jwt';
+  select(first);
+  return () => root.replaceChildren();
+};
+
 export const SIMS = Object.freeze({
   'jwt-flow': mountJwtFlow,
+  'jwt-anatomy': mountJwtAnatomy,
+  'filter-chain': mountFilterChain,
 });
 
 export const parseSpec = (spec) => {

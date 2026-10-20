@@ -173,6 +173,18 @@ Se portó desde FlutterLearning el 2026-10-20: `InteractiveBlock.jsx` y la líne
   (`jwtSteps`) y sus reglas están probadas en `InteractiveBlock.test.jsx`: un solo mensaje
   entre capas por paso, y cada paso empieza donde llegó el anterior o en una capa vecina.
   Si cambian las lecciones 0096–0098 (rutas, códigos de error), hay que actualizarlo.
+- `jwt-anatomy` («Anatomía de un JWT», 0094): el token con sus tres partes en color; al pulsar
+  una se resalta su tarjeta. El payload es editable (`sub`, `authorities`, `exp`) y el bloque
+  del servidor compara la firma que trae el token con la que recalcula con su secreto. Se
+  puede volver a firmar con un secreto inventado: solo con el real (`JWT_SECRET`, el mismo
+  de la lección 0095) el token vuelve a ser aceptado. La firma es HMAC-SHA384 real con
+  `crypto.subtle`; una prueba reconstruye byte a byte el token de ejemplo de la lección.
+- `filter-chain` («Filtros por Request», 0043): la cadena de la API en el orden de Spring
+  Security 6, con `SecurityContextHolderFilter` al principio y `JwtAuthFilter` justo antes
+  de `UsernamePasswordAuthenticationFilter`. Al pulsar un filtro se ve qué hace, su papel en
+  nuestra API y cómo se configura. Los que no están en la cadena (`CsrfFilter` deshabilitado,
+  `UsernamePasswordAuthenticationFilter` sin `formLogin`) van tachados. Los textos viven en
+  `CHAIN_FILTERS`.
 
 #### Darla de alta en `toc.md`
 

@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { ThemeProvider } from '@/theme/ThemeContext';
 import InteractiveBlock from './InteractiveBlock';
-import { SIMS, parseSpec, jwtSteps, JWT_BANDS as BAND, JWT_GAPS as GAP_BANDS } from './springSecuritySims';
+import { webcrypto } from 'node:crypto';
+import { SIMS, parseSpec, jwtSteps, JWT_BANDS as BAND, JWT_GAPS as GAP_BANDS, b64url, payloadJson, signJwt, JWT_SECRET, CHAIN_FILTERS } from './springSecuritySims';
 
 const renderBlock = (spec) => render(<ThemeProvider><InteractiveBlock spec={spec} /></ThemeProvider>);
 
@@ -141,5 +142,62 @@ describe('jwt-flow', () => {
     }
     expect(next.style.display).toBe('none');
     expect(screen.getByTestId('client-response').textContent).toContain('200');
+  });
+});
+
+describe('jwt-anatomy', () => {
+  const LESSON = {
+    header: 'eyJhbGciOiJIUzM4NCJ9',
+    payload: 'eyJhdXRob3JpdGllcyI6WyJST0xFX1BST0ZFU09SIl0sInN1YiI6InByb2Zlc29yQGdtYWlsLmNvbSIsImlhdCI6MTc0NDI5ODQxNSwiZXhwIjoxNzQ0MzAwMjE1fQ',
+    signature: 'ETLoFXS33XS084H-fSV3diLRcqh0Njjh3Ib1cDpqve0H518mYYAAqZjKqkofAHa0',
+  };
+
+  it('rebuilds the example token of the lesson byte for byte', async () => {
+    expect(b64url('{"alg":"HS384"}')).toBe(LESSON.header);
+    const payload = b64url(payloadJson({ sub: 'profesor@gmail.com', role: 'ROLE_PROFESOR', expired: false }));
+    expect(payload).toBe(LESSON.payload);
+    expect(await signJwt(`${LESSON.header}.${payload}`, JWT_SECRET, webcrypto.subtle)).toBe(LESSON.signature);
+  });
+
+  it('rejects a tampered payload and accepts it only when signed with the real secret', async () => {
+    vi.useRealTimers();
+    vi.stubGlobal('crypto', webcrypto);
+    renderBlock('jwt-anatomy');
+    const result = screen.getByTestId('jwt-result');
+    await vi.waitFor(() => expect(result.textContent).toContain('Aceptado'));
+
+    fireEvent.change(screen.getByLabelText('authorities'), { target: { value: 'ROLE_PROFESOR' } });
+    await vi.waitFor(() => expect(result.textContent).toContain('la firma no coincide'));
+
+    fireEvent.input(screen.getByLabelText('Secreto para firmar'), { target: { value: 'adivinanza' } });
+    fireEvent.click(screen.getByText('Firmar de nuevo con este secreto'));
+    await vi.waitFor(() => expect(screen.getByTestId('jwt-signature').textContent).not.toBe('…'));
+    await vi.waitFor(() => expect(result.textContent).toContain('la firma no coincide'));
+
+    fireEvent.input(screen.getByLabelText('Secreto para firmar'), { target: { value: JWT_SECRET } });
+    fireEvent.click(screen.getByText('Firmar de nuevo con este secreto'));
+    await vi.waitFor(() => expect(result.textContent).toContain('Quien firmó conocía el secreto'));
+
+    fireEvent.change(screen.getByLabelText('exp'), { target: { value: 'yes' } });
+    await vi.waitFor(() => expect(result.textContent).toContain('la firma no coincide'));
+    vi.unstubAllGlobals();
+  });
+});
+
+describe('filter-chain', () => {
+  it('keeps JwtAuthFilter right before UsernamePasswordAuthenticationFilter and AuthorizationFilter last', () => {
+    const names = CHAIN_FILTERS.map((filter) => filter.name);
+    expect(names.indexOf('JwtAuthFilter')).toBe(names.indexOf('UsernamePasswordAuthenticationFilter') - 1);
+    expect(names.at(-1)).toBe('AuthorizationFilter');
+    expect(names[0]).toBe('SecurityContextHolderFilter');
+  });
+
+  it('shows the details of the filter that was clicked', () => {
+    const { container } = renderBlock('filter-chain');
+    const detail = screen.getByTestId('filter-detail');
+    expect(detail.textContent).toContain('JwtAuthFilter');
+    fireEvent.click(container.querySelector('[data-filter="csrf"]'));
+    expect(detail.textContent).toContain('CsrfFilter');
+    expect(detail.textContent).toContain('csrf.disable()');
   });
 });

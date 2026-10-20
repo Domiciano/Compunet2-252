@@ -22,44 +22,10 @@ Cada parte es un JSON codificado en **Base64URL**, que es una forma de escribir 
 
 ## Estructura
 
-```svg
-<svg xmlns="http://www.w3.org/2000/svg" width="680" height="320" font-family="Roboto, Arial, sans-serif">
-  <rect width="680" height="320" fill="#12121f" rx="12"/>
-  <text x="340" y="28" text-anchor="middle" fill="#e0e0e0" font-size="15" font-weight="bold">Estructura de un JSON Web Token (JWT)</text>
-  <rect x="14" y="44" width="198" height="34" rx="6" fill="#B71C1C"/>
-  <text x="113" y="65" text-anchor="middle" fill="white" font-size="11" font-family="Courier New, monospace">eyJhbGciOiJIUzM4NCJ9</text>
-  <text x="215" y="65" text-anchor="middle" fill="#ccc" font-size="20">.</text>
-  <rect x="224" y="44" width="234" height="34" rx="6" fill="#6A1B9A"/>
-  <text x="341" y="65" text-anchor="middle" fill="white" font-size="11" font-family="Courier New, monospace">eyJhdXRob3JpdGllcyI6WyJS...</text>
-  <text x="461" y="65" text-anchor="middle" fill="#ccc" font-size="20">.</text>
-  <rect x="470" y="44" width="196" height="34" rx="6" fill="#1565C0"/>
-  <text x="568" y="65" text-anchor="middle" fill="white" font-size="11" font-family="Courier New, monospace">ETLoFXS33XS084H-fSV...</text>
-  <text x="113" y="93" text-anchor="middle" fill="#EF5350" font-size="12" font-weight="bold">HEADER</text>
-  <text x="341" y="93" text-anchor="middle" fill="#CE93D8" font-size="12" font-weight="bold">PAYLOAD</text>
-  <text x="568" y="93" text-anchor="middle" fill="#42A5F5" font-size="12" font-weight="bold">SIGNATURE</text>
-  <rect x="14" y="103" width="198" height="80" rx="6" fill="#1a1a2e" stroke="#EF5350" stroke-width="1"/>
-  <text x="113" y="120" text-anchor="middle" fill="#EF5350" font-size="10" font-weight="bold">Base64URL decode:</text>
-  <text x="113" y="137" text-anchor="middle" fill="#e0e0e0" font-size="11" font-family="Courier New, monospace">{</text>
-  <text x="113" y="152" text-anchor="middle" fill="#e0e0e0" font-size="11" font-family="Courier New, monospace">  "alg": "HS384"</text>
-  <text x="113" y="167" text-anchor="middle" fill="#e0e0e0" font-size="11" font-family="Courier New, monospace">}</text>
-  <rect x="224" y="103" width="234" height="120" rx="6" fill="#1a1a2e" stroke="#CE93D8" stroke-width="1"/>
-  <text x="341" y="120" text-anchor="middle" fill="#CE93D8" font-size="10" font-weight="bold">Base64URL decode:</text>
-  <text x="341" y="137" text-anchor="middle" fill="#e0e0e0" font-size="11" font-family="Courier New, monospace">{</text>
-  <text x="341" y="152" text-anchor="middle" fill="#e0e0e0" font-size="11" font-family="Courier New, monospace">  "sub": "profesor@gmail.com",</text>
-  <text x="341" y="167" text-anchor="middle" fill="#e0e0e0" font-size="11" font-family="Courier New, monospace">  "iat": 1744298415,</text>
-  <text x="341" y="182" text-anchor="middle" fill="#e0e0e0" font-size="11" font-family="Courier New, monospace">  "exp": 1744300215</text>
-  <text x="341" y="197" text-anchor="middle" fill="#e0e0e0" font-size="11" font-family="Courier New, monospace">}</text>
-  <rect x="470" y="103" width="196" height="120" rx="6" fill="#1a1a2e" stroke="#42A5F5" stroke-width="1"/>
-  <text x="568" y="120" text-anchor="middle" fill="#42A5F5" font-size="10" font-weight="bold">HMACSHA384(</text>
-  <text x="568" y="140" text-anchor="middle" fill="#e0e0e0" font-size="10" font-family="Courier New, monospace">base64(header)</text>
-  <text x="568" y="157" text-anchor="middle" fill="#9e9e9e" font-size="10">+ "." +</text>
-  <text x="568" y="174" text-anchor="middle" fill="#e0e0e0" font-size="10" font-family="Courier New, monospace">base64(payload),</text>
-  <text x="568" y="191" text-anchor="middle" fill="#9e9e9e" font-size="10">secret</text>
-  <text x="568" y="208" text-anchor="middle" fill="#42A5F5" font-size="10">)</text>
-  <text x="340" y="255" text-anchor="middle" fill="#FFA726" font-size="12" font-weight="bold">Header y Payload son legibles — la Signature los protege</text>
-  <text x="340" y="275" text-anchor="middle" fill="#546E7A" font-size="11">Nunca guardes datos sensibles (contrasenas, tarjetas) en el Payload</text>
-  <text x="340" y="295" text-anchor="middle" fill="#546E7A" font-size="11">Sin el secret, un atacante no puede generar una firma valida</text>
-</svg>
+Pulse cada parte del token para ver qué tiene adentro. Después cambie el payload, por ejemplo `authorities` a `ROLE_PROFESOR`, y mire qué hace el servidor. Si quiere, intente volver a firmarlo con un secreto inventado.
+
+```interactive
+jwt-anatomy
 ```
 
 ## Header
