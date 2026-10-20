@@ -156,8 +156,9 @@ Se portó desde FlutterLearning el 2026-10-20: `InteractiveBlock.jsx` y la líne
 - `jwt-flow` («Auth en REST», 0042): el estudiante pulsa `POST /api/v1/auth/login` o
   `GET /api/v1/posts` y sigue el request por la `SecurityFilterChain` (otros filtros,
   `JwtAuthFilter`, `UsernamePasswordAuthenticationFilter`, `AuthorizationFilter`), el
-  `SecurityContext` como bloque aparte (no es un filtro) y, en dos columnas, controllers,
-  servicios, repositorios y base de datos: el login baja por `AuthenticationManager` →
+  `SecurityContext` como bloque aparte, a la derecha (no es un filtro), y debajo una fila
+  por request con una columna por capa (controllers, servicios, repositorios y base de
+  datos; en celular esa parte se desplaza a lo ancho): el login baja por `AuthenticationManager` →
   `UserService` → `UserRepository` → tabla `users`, y `/posts` por `PostService` →
   `PostRepository` → tabla `posts`. Cubre `/posts` sin token (401 en
   `AuthorizationFilter`), login bueno y malo, `/posts` con token válido y con token

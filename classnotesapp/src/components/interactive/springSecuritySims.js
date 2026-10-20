@@ -19,10 +19,24 @@ const CSS = `
 .jsim .js-band.js-client{--b:#C9A6EE;--bg:#F4EBFF;--ink:#7439B8;opacity:1}
 .jsim .js-band.js-chain{--b:#A9B4F2;--bg:#EEF1FF;--ink:#4453C9;flex:1 1 0}
 .jsim .js-band.js-context{--b:#F0C572;--bg:#FFF8E6;--ink:#A96C05;flex:0 1 190px;align-self:center}
-.jsim .js-band.js-ctrl{--b:#9FD68D;--bg:#E8F6E3;--ink:#3A8235}
-.jsim .js-band.js-svc{--b:#86D3CA;--bg:#E3F6F3;--ink:#0F8478}
-.jsim .js-band.js-repo{--b:#9DB8F2;--bg:#E8EFFE;--ink:#2F5BC4}
-.jsim .js-band.js-db{--b:#C4CBD8;--bg:#EFF1F5;--ink:#556074}
+.jsim .js-ctrl{--b:#9FD68D;--bg:#E8F6E3;--ink:#3A8235}
+.jsim .js-svc{--b:#86D3CA;--bg:#E3F6F3;--ink:#0F8478}
+.jsim .js-repo{--b:#9DB8F2;--bg:#E8EFFE;--ink:#2F5BC4}
+.jsim .js-db{--b:#C4CBD8;--bg:#EFF1F5;--ink:#556074}
+.jsim .js-gridwrap{overflow-x:auto;padding:3px}
+.jsim .js-grid,.jsim .js-strip{--cols:minmax(0,1fr) 22px minmax(0,1.3fr) 22px minmax(0,1fr) 22px minmax(0,1fr);
+  display:grid;grid-template-columns:var(--cols)}
+.jsim .js-grid{min-width:540px;align-items:stretch}
+.jsim .js-strip{grid-column:1 / -1;min-height:30px;align-items:center;padding:3px 0}
+.jsim .js-strip > div{display:flex;justify-content:center;min-width:0}
+.jsim .js-ghead{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--ink);padding:0 4px 4px;overflow-wrap:anywhere}
+.jsim .js-cell{border:1.5px solid var(--b);background:var(--bg);border-radius:12px;padding:6px;display:flex;flex-direction:column;
+  gap:6px;justify-content:center;min-width:0;opacity:.78;transition:box-shadow .3s,opacity .3s}
+.jsim .js-cell.js-on{opacity:1;box-shadow:0 0 0 3px var(--js-hot)}
+.jsim .js-cell .js-node{padding:4px 8px}
+.jsim .js-cell .js-node b{font-size:11.5px}
+.jsim .js-conn{display:flex;align-items:center;justify-content:center;color:#C4CBD8;font-size:15px;font-weight:700}
+.jsim .js-conn.js-act{color:#556074}
 .jsim .js-head{display:flex;justify-content:space-between;align-items:baseline;gap:4px 10px;flex-wrap:wrap;margin-bottom:6px}
 .jsim .js-name{font-size:11.5px;font-weight:700;letter-spacing:.08em;color:var(--ink)}
 .jsim .js-role{font-size:11.5px;color:var(--js-muted)}
@@ -52,7 +66,6 @@ const CSS = `
 .jsim .js-gap{display:flex;gap:10px;padding:0 12px}
 .jsim .js-slot{flex:1 1 0;min-width:0;min-height:34px;display:flex;align-items:center;justify-content:center;padding:4px 0;position:relative}
 .jsim .js-slot::before{content:'';position:absolute;top:0;bottom:0;left:50%;border-left:1.5px dashed #C4CBD8}
-.jsim .js-gap.js-free .js-slot::before{display:none}
 .jsim .js-midrow{display:flex;flex-wrap:nowrap;align-items:stretch;gap:0}
 .jsim .js-hgap{flex:0 0 140px;display:flex;align-items:center;justify-content:center;position:relative;min-height:34px;padding:0 4px}
 .jsim .js-hgap::before{content:'';position:absolute;left:0;right:0;top:50%;border-top:1.5px dashed #C4CBD8}
@@ -63,6 +76,7 @@ const CSS = `
 .jsim .js-msg.js-fail{border-color:#D64545;color:#B23434;--from:8px}
 .jsim .js-msg.js-side{border-color:#A96C05;color:#8A5A04;--from:0}
 .jsim .js-hgap .js-msg{white-space:nowrap;font-size:10.5px;padding:2px 7px}
+.jsim .js-strip .js-msg{font-size:11px}
 @keyframes jsIn{0%{opacity:0;transform:translateY(var(--from,-8px))}100%{opacity:1;transform:none}}
 .jsim .js-stack{display:flex;flex-direction:column}
 .jsim .js-link{height:10px;margin-left:22px;border-left:1.5px solid #A9B4F2}
@@ -85,10 +99,6 @@ const CSS = `
 .jsim .js-ctx div{font:11.5px 'JetBrains Mono',Menlo,Consolas,monospace;color:var(--js-muted);overflow-wrap:anywhere}
 .jsim .js-ctx .js-who{color:#245C21;font-weight:700}
 .jsim .js-ctx-note{font-size:11px;color:#79809A;margin-top:6px}
-.jsim .js-cols{display:flex;gap:10px}
-.jsim .js-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:6px}
-.jsim .js-col-row{display:flex;flex-wrap:wrap;gap:6px}
-.jsim .js-col-row > .js-node{flex:1 1 150px}
 .jsim .js-idle{opacity:.45}
 .jsim .js-table{background:#fff;border:1px solid #C4CBD8;border-radius:8px;padding:6px 8px;transition:box-shadow .3s}
 .jsim .js-table.js-hot{box-shadow:0 0 0 3px var(--js-hot)}
@@ -114,7 +124,7 @@ const CSS = `
 @container (max-width:540px){.jsim .js-midrow{flex-wrap:wrap}.jsim .js-band.js-chain{flex:1 1 100%}.jsim .js-hgap{flex:1 1 100%}.jsim .js-hgap::before{left:50%;right:auto;top:0;bottom:0;border-top:0;
   border-left:1.5px dashed #C4CBD8}.jsim .js-band.js-context{flex:1 1 100%}}
 @media (max-width:520px){.jsim{padding:12px}.jsim .js-node b{font-size:11px}.jsim .js-msg{font-size:10.5px}
-  .jsim .js-call{font-size:12px;padding:5px 8px}.jsim .js-cols,.jsim .js-gap{gap:6px}.jsim .js-gap{padding:0 4px}}
+  .jsim .js-call{font-size:12px;padding:5px 8px}.jsim .js-gap{gap:6px}.jsim .js-gap{padding:0 4px}}
 `;
 
 const ensureStyle = () => {
@@ -305,7 +315,7 @@ export const jwtSteps = ({ endpoint, token, password }) => {
     caption: 'El AuthenticationManager (con su DaoAuthenticationProvider) pide el usuario a su UserDetailsService, que usa UserService.',
   });
   add({ hot: ['userService'], gap: ['g4', 'down', `findByEmail("${USER.username}")`, 'l'], caption: 'UserService le pide el usuario al repositorio.' });
-  add({ hot: ['userRepo'], gap: ['g5', 'down', 'SELECT * FROM users WHERE email = ?', 'l'], caption: 'UserRepository consulta la base de datos.' });
+  add({ hot: ['userRepo'], gap: ['g5', 'down', 'SELECT … WHERE email = ?', 'l'], caption: 'UserRepository consulta la base de datos.' });
   add({ hot: ['db'], read: 'users', caption: 'La base de datos encuentra la fila del usuario, con su contraseña cifrada.' });
   add({ hot: ['db'], gap: ['g5', 'up', '1 fila', 'l'], caption: 'La fila sube al repositorio.' });
   add({ hot: ['userRepo'], gap: ['g4', 'up', 'Optional<User>', 'l'], caption: 'El repositorio devuelve la entidad User.' });
@@ -388,11 +398,12 @@ const mountJwtFlow = (root) => {
   const bands = {};
   const gaps = {};
 
+  const camel = (name) => name.split(/(?=[A-Z][a-z])/).flatMap((part, index) => (index ? [el('wbr'), part] : [part]));
   const node = (key, name, role, extra = '') => {
     const status = el('span', { class: 'js-st', 'data-testid': `status-${key}` });
     statuses[key] = status;
     const item = el('div', { class: `js-node${extra ? ` ${extra}` : ''}`, 'data-node': key },
-      el('span', {}, el('b', { text: name }), role ? el('small', { text: ` · ${role}` }) : null), status);
+      el('span', {}, el('b', {}, ...camel(name)), role ? el('small', { text: ` · ${role}` }) : null), status);
     nodes[key] = item;
     return item;
   };
@@ -408,8 +419,6 @@ const mountJwtFlow = (root) => {
     gaps[key] = slots;
     return el('div', { class: `js-gap${extra}`, 'data-gap': key }, ...slots);
   };
-  const cols = (left, right) => el('div', { class: 'js-cols' },
-    el('div', { class: 'js-col' }, ...left), el('div', { class: 'js-col' }, ...right));
 
   const loginButton = el('button', { class: 'js-call', type: 'button', 'data-testid': 'call-login', onclick: () => start('login') },
     el('span', { class: 'js-verb', text: 'POST' }), '/api/v1/auth/login');
@@ -451,16 +460,32 @@ const mountJwtFlow = (root) => {
   gaps.gx = [hgap];
   const context = band('context', 'context', 'SECURITYCONTEXT', 'del request actual',
     ctxBox, el('div', { class: 'js-ctx-note', text: 'No es un filtro: es donde los filtros dejan quién está autenticado.' }));
-  const controllers = band('controllers', 'ctrl', 'CONTROLLERS', 'solo llega lo que la cadena dejó pasar',
-    cols([node('auth', 'RestAuthController', 'login')], [node('posts', 'PostController', 'getPosts')]));
-  const services = band('services', 'svc', 'SERVICIOS', '',
-    cols([
-      el('div', { class: 'js-col-row' }, node('manager', 'AuthenticationManager', 'valida credenciales'), node('jwtService', 'JwtService', 'firma el token')),
-      node('userService', 'UserService', 'vía UserDetailsService'),
-    ], [node('postService', 'PostService', '')]));
-  const repositories = band('repositories', 'repo', 'REPOSITORIOS', '',
-    cols([node('userRepo', 'UserRepository', '')], [node('postRepo', 'PostRepository', '')]));
-  const database = band('database', 'db', 'BASE DE DATOS', '', cols([tables.users], [tables.posts]));
+  // Below the chain: one row per request, one column per layer, messages in a strip under each row.
+  const SPAN = { g2: '1 / 4', g3: '1 / 4', g4: '3 / 6', g5: '5 / 8' };
+  const CONN = { g3: 0, g4: 1, g5: 2 };
+  const cell = (kind, ...children) => el('div', { class: `js-cell js-${kind}` }, ...children);
+  const conn = () => el('div', { class: 'js-conn', text: '⇄' });
+  const strip = () => el('div', { class: 'js-strip' });
+  const cells = {
+    l: [cell('ctrl', node('auth', 'RestAuthController')),
+      cell('svc', node('manager', 'AuthenticationManager'), node('jwtService', 'JwtService'), node('userService', 'UserService')),
+      cell('repo', node('userRepo', 'UserRepository')), cell('db', tables.users)],
+    r: [cell('ctrl', node('posts', 'PostController')), cell('svc', node('postService', 'PostService')),
+      cell('repo', node('postRepo', 'PostRepository')), cell('db', tables.posts)],
+  };
+  const conns = { l: [conn(), conn(), conn()], r: [conn(), conn(), conn()] };
+  const strips = { g2: strip(), l: strip(), r: strip() };
+  const layerRow = (side) => cells[side].flatMap((item, index) => (index ? [conns[side][index - 1], item] : [item]));
+  const head = (kind, text) => el('div', { class: `js-ghead js-${kind}`, text });
+  const layers = el('div', { class: 'js-gridwrap' }, el('div', { class: 'js-grid' },
+    strips.g2,
+    head('ctrl', 'CONTROLLERS'), el('div'), head('svc', 'SERVICIOS'), el('div'), head('repo', 'REPOSITORIOS'), el('div'), head('db', 'BASE DE DATOS'),
+    ...layerRow('l'), strips.l, ...layerRow('r'), strips.r));
+  const cellOf = {
+    auth: ['l', 0], manager: ['l', 1], jwtService: ['l', 1], userService: ['l', 1], userRepo: ['l', 2],
+    posts: ['r', 0], postService: ['r', 1], postRepo: ['r', 2],
+  };
+  let currentRow = 'l';
 
   const note = el('div', { class: 'js-note', 'aria-live': 'polite' });
   const noteStep = el('small');
@@ -482,15 +507,12 @@ const mountJwtFlow = (root) => {
     el('div', { class: 'js-sub', text: 'Pulse un endpoint y siga el request. Empiece por /posts sin token, luego haga login y vuelva a pedir /posts.' }),
     client, gap('g1', 1),
     el('div', { class: 'js-midrow' }, chain, hgap, context),
-    gap('g2', 2, ' js-free'), controllers, gap('g3', 2), services, gap('g4', 2), repositories, gap('g5', 2), database,
+    layers,
     el('div', { class: 'js-foot' }, note,
       el('div', { class: 'js-ctrls' }, el('label', { class: 'js-switch' }, manualInput, 'Paso a paso'), nextButton)));
 
   const bandOf = {
     client: 'client', others: 'chain', jwt: 'chain', upaf: 'chain', authz: 'chain', ctx: 'context',
-    auth: 'controllers', posts: 'controllers',
-    manager: 'services', jwtService: 'services', userService: 'services', postService: 'services',
-    userRepo: 'repositories', postRepo: 'repositories', db: 'database',
   };
 
   const renderToken = () => {
@@ -510,12 +532,23 @@ const mountJwtFlow = (root) => {
   };
   const showGap = (spec) => {
     Object.values(gaps).forEach((slots) => slots.forEach((slot) => slot.replaceChildren()));
+    Object.values(strips).forEach((item) => item.replaceChildren());
+    [...conns.l, ...conns.r].forEach((item) => item.classList.remove('js-act'));
     if (!spec) return;
     const [where, dir, text, side] = spec;
+    const kind = { up: ' js-up', fail: ' js-fail', side: ' js-side' }[dir] || '';
+    if (SPAN[where]) {
+      const deeper = where !== 'g2';
+      const arrow = dir === 'down' ? (deeper ? '→' : '↓') : (deeper ? '←' : '↑');
+      const message = el('span', { class: `js-msg${kind}`, text: `${arrow} ${text}` });
+      const row = side === 'r' ? 'r' : 'l';
+      (deeper ? strips[row] : strips.g2).appendChild(el('div', { style: `grid-column:${SPAN[where]}` }, message));
+      if (deeper) conns[row][CONN[where]].classList.add('js-act');
+      return;
+    }
     const slots = gaps[where];
     const slot = slots[side === 'r' ? slots.length - 1 : 0];
     const arrow = { down: '↓', up: '↑', fail: '↑', side: '→' }[dir];
-    const kind = { up: ' js-up', fail: ' js-fail', side: ' js-side' }[dir] || '';
     slot.appendChild(el('span', { class: `js-msg${kind}`, text: `${arrow} ${text}` }));
   };
   const highlight = (keys = []) => {
@@ -523,6 +556,9 @@ const mountJwtFlow = (root) => {
     Object.entries(tables).forEach(([, item]) => item.classList.remove('js-hot'));
     const on = new Set(keys.map((key) => bandOf[key]));
     Object.entries(bands).forEach(([key, item]) => item.classList.toggle('js-on', on.has(key) && key !== 'client'));
+    const lit = keys.map((key) => (key === 'db' ? [currentRow, 3] : cellOf[key])).filter(Boolean);
+    ['l', 'r'].forEach((side) => cells[side].forEach((item, index) =>
+      item.classList.toggle('js-on', lit.some(([row, col]) => row === side && col === index))));
   };
   const markRead = (table) => {
     [rows.users, ...rows.posts].forEach((row) => row.classList.remove('js-read'));
@@ -600,6 +636,7 @@ const mountJwtFlow = (root) => {
   function start(endpoint) {
     if (running) return;
     reset(endpoint);
+    currentRow = endpoint === 'login' ? 'l' : 'r';
     steps = jwtSteps({ endpoint, token, password: passwordInput.value });
     stepIndex = 0;
     running = true;
