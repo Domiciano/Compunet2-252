@@ -14,12 +14,15 @@ const CSS = `
 .jsim .js-title{font-size:17px;font-weight:700;margin:0 0 2px}
 .jsim .js-sub{font-size:12.5px;color:#79809A;margin:0 0 12px}
 .jsim .js-band{--b:#C4CBD8;--bg:#EFF1F5;--ink:#556074;border:1.5px solid var(--b);background:var(--bg);border-radius:12px;
-  padding:8px 12px;transition:box-shadow .3s,opacity .3s;opacity:.78}
+  padding:8px 12px;transition:box-shadow .3s,opacity .3s;opacity:.78;min-width:0}
 .jsim .js-band.js-on{opacity:1;box-shadow:0 0 0 3px var(--js-hot)}
 .jsim .js-band.js-client{--b:#C9A6EE;--bg:#F4EBFF;--ink:#7439B8;opacity:1}
-.jsim .js-band.js-chain{--b:#A9B4F2;--bg:#EEF1FF;--ink:#4453C9}
+.jsim .js-band.js-chain{--b:#A9B4F2;--bg:#EEF1FF;--ink:#4453C9;flex:1 1 360px}
+.jsim .js-band.js-context{--b:#F0C572;--bg:#FFF8E6;--ink:#A96C05;flex:0 1 220px;align-self:center}
 .jsim .js-band.js-ctrl{--b:#9FD68D;--bg:#E8F6E3;--ink:#3A8235}
 .jsim .js-band.js-svc{--b:#86D3CA;--bg:#E3F6F3;--ink:#0F8478}
+.jsim .js-band.js-repo{--b:#9DB8F2;--bg:#E8EFFE;--ink:#2F5BC4}
+.jsim .js-band.js-db{--b:#C4CBD8;--bg:#EFF1F5;--ink:#556074}
 .jsim .js-head{display:flex;justify-content:space-between;align-items:baseline;gap:4px 10px;flex-wrap:wrap;margin-bottom:6px}
 .jsim .js-name{font-size:11.5px;font-weight:700;letter-spacing:.08em;color:var(--ink)}
 .jsim .js-role{font-size:11.5px;color:var(--js-muted)}
@@ -46,39 +49,53 @@ const CSS = `
   border:1px solid #C4CBD8;color:#9AA1B2;overflow-wrap:anywhere}
 .jsim .js-resp.js-ok{border-color:#9FD68D;color:#245C21;background:#F1FAEE;font-weight:700}
 .jsim .js-resp.js-fail{border-color:#F3A3B2;color:var(--js-err);background:#FFF5F7;font-weight:700}
-.jsim .js-gap{display:flex;justify-content:center;min-height:34px;padding:4px 0;position:relative}
-.jsim .js-gap::before{content:'';position:absolute;top:0;bottom:0;left:50%;border-left:1.5px dashed #C4CBD8}
+.jsim .js-gap{display:flex;gap:10px;padding:0 12px}
+.jsim .js-slot{flex:1 1 0;min-width:0;min-height:34px;display:flex;align-items:center;justify-content:center;padding:4px 0;position:relative}
+.jsim .js-slot::before{content:'';position:absolute;top:0;bottom:0;left:50%;border-left:1.5px dashed #C4CBD8}
+.jsim .js-gap.js-free .js-slot::before{display:none}
+.jsim .js-midrow{display:flex;flex-wrap:wrap;align-items:stretch;gap:0}
+.jsim .js-hgap{flex:0 0 180px;display:flex;align-items:center;justify-content:center;position:relative;min-height:34px;padding:0 4px}
+.jsim .js-hgap::before{content:'';position:absolute;left:0;right:0;top:50%;border-top:1.5px dashed #C4CBD8}
 .jsim .js-msg{position:relative;z-index:1;font:11.5px 'JetBrains Mono',Menlo,Consolas,monospace;background:#fff;
-  border:1.5px solid #556074;color:var(--js-ink);border-radius:12px;padding:2px 10px;max-width:94%;text-align:center;
+  border:1.5px solid #556074;color:var(--js-ink);border-radius:12px;padding:2px 10px;max-width:96%;text-align:center;
   overflow-wrap:anywhere;animation:jsIn .45s ease-out}
 .jsim .js-msg.js-up{border-color:#1F9D68;color:#14724B;--from:8px}
 .jsim .js-msg.js-fail{border-color:#D64545;color:#B23434;--from:8px}
+.jsim .js-msg.js-side{border-color:#A96C05;color:#8A5A04;--from:0}
+.jsim .js-hgap .js-msg{white-space:nowrap;font-size:11px;padding:2px 8px}
 @keyframes jsIn{0%{opacity:0;transform:translateY(var(--from,-8px))}100%{opacity:1;transform:none}}
-.jsim .js-chain-body{display:flex;flex-wrap:wrap;gap:10px}
-.jsim .js-filters{flex:1 1 360px;min-width:0;display:flex;flex-direction:column;gap:0}
-.jsim .js-link{height:12px;margin-left:22px;border-left:1.5px solid #A9B4F2}
-.jsim .js-node{display:flex;align-items:center;justify-content:space-between;gap:6px 10px;flex-wrap:wrap;background:#fff;
-  border:1.5px solid var(--b,#A9B4F2);border-radius:10px;padding:5px 10px;transition:box-shadow .3s,border-color .3s}
-.jsim .js-node b{font:700 12.5px 'JetBrains Mono',Menlo,Consolas,monospace;color:var(--ink,#4453C9)}
+.jsim .js-stack{display:flex;flex-direction:column}
+.jsim .js-link{height:10px;margin-left:22px;border-left:1.5px solid #A9B4F2}
+.jsim .js-node{display:flex;align-items:center;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;background:#fff;
+  border:1.5px solid var(--b,#A9B4F2);border-radius:10px;padding:5px 10px;transition:box-shadow .3s,opacity .3s;min-width:0}
+.jsim .js-node b{font:700 12.5px 'JetBrains Mono',Menlo,Consolas,monospace;color:var(--ink,#4453C9);overflow-wrap:anywhere}
 .jsim .js-node small{font-size:11.5px;color:var(--js-muted)}
 .jsim .js-node.js-dim b{font-weight:500;color:#79809A}
 .jsim .js-node.js-jwt{--b:#F0C572;background:#FFFBF1;border-width:2.5px}
 .jsim .js-node.js-jwt b{color:#A96C05}
 .jsim .js-node.js-hot{box-shadow:0 0 0 3px var(--js-hot)}
-.jsim .js-st{font-size:11.5px;font-weight:700;border-radius:10px;padding:1px 8px;white-space:nowrap}
+.jsim .js-st{font-size:11.5px;font-weight:700;border-radius:10px;padding:1px 8px}
 .jsim .js-st:empty{display:none}
 .jsim .js-st.js-pass{background:#E8F6E3;color:var(--js-ok)}
 .jsim .js-st.js-stop{background:#FFEBEF;color:var(--js-err)}
 .jsim .js-st.js-info{background:#EFF1F5;color:var(--js-muted)}
-.jsim .js-ctx{flex:0 1 230px;min-width:200px;background:#fff;border:1.5px dashed #A9B4F2;border-radius:10px;padding:8px 10px;
-  align-self:center;transition:box-shadow .3s}
+.jsim .js-ctx{background:#fff;border:1.5px dashed #F0C572;border-radius:10px;padding:8px 10px;transition:box-shadow .3s}
 .jsim .js-ctx.js-hot{box-shadow:0 0 0 3px var(--js-hot)}
-.jsim .js-ctx b{display:block;font:700 12px 'JetBrains Mono',Menlo,Consolas,monospace;color:#4453C9;margin-bottom:4px}
+.jsim .js-ctx b{display:block;font:700 12px 'JetBrains Mono',Menlo,Consolas,monospace;color:#A96C05;margin-bottom:4px}
 .jsim .js-ctx div{font:11.5px 'JetBrains Mono',Menlo,Consolas,monospace;color:var(--js-muted);overflow-wrap:anywhere}
 .jsim .js-ctx .js-who{color:#245C21;font-weight:700}
-.jsim .js-pair{display:flex;flex-wrap:wrap;gap:10px}
-.jsim .js-pair > .js-node{flex:1 1 220px;min-width:0}
-.jsim .js-pair > .js-node.js-idle{opacity:.55}
+.jsim .js-ctx-note{font-size:11px;color:#79809A;margin-top:6px}
+.jsim .js-cols{display:flex;gap:10px}
+.jsim .js-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:6px}
+.jsim .js-col-row{display:flex;flex-wrap:wrap;gap:6px}
+.jsim .js-col-row > .js-node{flex:1 1 150px}
+.jsim .js-idle{opacity:.45}
+.jsim .js-table{background:#fff;border:1px solid #C4CBD8;border-radius:8px;padding:6px 8px;transition:box-shadow .3s}
+.jsim .js-table.js-hot{box-shadow:0 0 0 3px var(--js-hot)}
+.jsim .js-table > b{display:block;font:700 11.5px 'JetBrains Mono',Menlo,Consolas,monospace;color:#556074;margin-bottom:4px}
+.jsim .js-rowdb{font:11px 'JetBrains Mono',Menlo,Consolas,monospace;padding:4px 8px;border-radius:6px;overflow-wrap:anywhere;
+  color:#454C61;background:#F4F6F9;border:1px solid #E3E7EE;margin-top:4px}
+.jsim .js-rowdb.js-read{color:#245C21;background:#D9F2D0;border-color:#7CC56A;font-weight:600}
 .jsim .js-foot{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;margin-top:12px}
 .jsim .js-note{flex:1 1 320px;font-size:13.5px;color:var(--js-ink);min-height:40px;background:#fff;border:1px solid var(--js-line);
   border-radius:10px;padding:8px 12px}
@@ -92,8 +109,10 @@ const CSS = `
 .jsim .js-flash{animation:jsFlash .9s ease-out}
 @keyframes jsFlash{0%{transform:scale(.96);box-shadow:0 0 0 0 rgba(58,130,53,.5)}60%{transform:scale(1.03)}
   100%{transform:none;box-shadow:0 0 0 8px rgba(58,130,53,0)}}
+@media (max-width:640px){.jsim .js-hgap{flex:1 1 100%}.jsim .js-hgap::before{left:50%;right:auto;top:0;bottom:0;border-top:0;
+  border-left:1.5px dashed #C4CBD8}.jsim .js-band.js-context{flex:1 1 100%}}
 @media (max-width:520px){.jsim{padding:12px}.jsim .js-node b{font-size:11px}.jsim .js-msg{font-size:10.5px}
-  .jsim .js-call{font-size:12px;padding:5px 8px}}
+  .jsim .js-call{font-size:12px;padding:5px 8px}.jsim .js-cols,.jsim .js-gap{gap:6px}.jsim .js-gap{padding:0 4px}}
 `;
 
 const ensureStyle = () => {
@@ -130,15 +149,27 @@ const flash = (node) => {
 const USER = { username: 'profesor@gmail.com', password: '123456', authority: 'ROLE_PROFESOR' };
 const TOKEN = 'eyJhbGciOiJIUzM4NCJ9.eyJhdXRob3JpdGllcyI6…';
 const TAMPERED = 'eyJhbGciOiJIUzM4NCJ9.eyJhdXRob3JpdGllcyI6…X';
-const STEP_MS = 1700;
+const STEP_MS = 1500;
+
+// Which band (row) each piece lives in, top to bottom. The tests use it too.
+export const JWT_BANDS = {
+  client: 0,
+  others: 1, jwt: 1, upaf: 1, authz: 1, ctx: 1,
+  auth: 2, posts: 2,
+  manager: 3, jwtService: 3, userService: 3, postService: 3,
+  userRepo: 4, postRepo: 4,
+  db: 5,
+};
+export const JWT_GAPS = { g1: [0, 1], gx: [1, 1], g2: [1, 2], g3: [2, 3], g4: [3, 4], g5: [4, 5] };
 
 // One message between two layers per step; what its arrival causes goes in the next step.
+// A gap step is [gap, direction, text, side]: side 'l' is the login column, 'r' the posts one.
 export const jwtSteps = ({ endpoint, token, password }) => {
   const login = endpoint === 'login';
   const steps = [];
   const add = (step) => steps.push(step);
   const request = login
-    ? `POST /api/v1/auth/login · { username, password }`
+    ? 'POST /api/v1/auth/login · { username, password }'
     : `GET /api/v1/posts · ${token ? `Authorization: Bearer ${token === 'bad' ? 'eyJ…X' : 'eyJ…'}` : 'sin Authorization'}`;
 
   add({
@@ -160,7 +191,7 @@ export const jwtSteps = ({ endpoint, token, password }) => {
     add({
       hot: ['jwt'],
       status: { jwt: ['info', 'sin token: sigue'] },
-      caption: 'JwtAuthFilter no encuentra «Bearer …». No hay nada que validar: deja seguir el request como anónimo.',
+      caption: 'JwtAuthFilter no encuentra «Bearer …». No hay nada que validar: deja seguir el request sin autenticar.',
     });
   } else if (token === 'bad') {
     add({
@@ -179,7 +210,7 @@ export const jwtSteps = ({ endpoint, token, password }) => {
       hot: ['client'],
       response: ['fail', '401 Unauthorized · Token inválido'],
       warn: true,
-      caption: 'El cliente recibe el 401. Ningún controller se ejecutó: el token falso nunca pasó del filtro.',
+      caption: 'El cliente recibe el 401. Ni los filtros siguientes ni ningún controller se ejecutaron.',
     });
     return steps;
   } else {
@@ -189,36 +220,35 @@ export const jwtSteps = ({ endpoint, token, password }) => {
       caption: 'JwtAuthFilter verifica la firma con el secreto y revisa que no haya vencido. El token es auténtico.',
     });
     add({
-      hot: ['jwt', 'ctx'],
+      hot: ['jwt'],
+      gap: ['gx', 'side', 'setAuthentication(…)'],
+      caption: 'Con los claims del token, el filtro guarda la autenticación en el SecurityContext. Sin consultar la base de datos.',
+    });
+    add({
+      hot: ['ctx'],
       context: [USER.username, USER.authority],
-      caption: 'Con los claims del token, el filtro autentica el request: setAuthentication(…) en el SecurityContext. Sin consultar la base de datos.',
+      caption: 'El SecurityContext ahora dice quién hace este request y con qué authorities. Lo leen los filtros siguientes y el controller.',
     });
   }
 
   add({
-    hot: ['etf'],
-    status: { etf: ['info', 'vigila'] },
-    caption: 'ExceptionTranslationFilter deja pasar el request, pero queda atento: si un filtro posterior lo rechaza, él arma la respuesta.',
+    hot: ['upaf'],
+    status: { upaf: ['info', 'sin formLogin: no actúa'] },
+    caption: 'UsernamePasswordAuthenticationFilter procesa el login con formulario. La API no usa formLogin, así que no hace nada. JwtAuthFilter se registró antes que él con addFilterBefore.',
   });
 
   if (!login && !token) {
     add({
-      hot: ['authz'],
+      hot: ['authz', 'ctx'],
       status: { authz: ['stop', '✗ anónimo'] },
       warn: true,
-      caption: 'AuthorizationFilter: /api/v1/posts exige un usuario autenticado y el SecurityContext solo tiene un anónimo.',
+      caption: 'AuthorizationFilter consulta el SecurityContext: /api/v1/posts exige un usuario autenticado y no hay ninguno.',
     });
     add({
-      hot: ['etf'],
-      status: { etf: ['stop', '→ 401'] },
-      warn: true,
-      caption: 'ExceptionTranslationFilter atrapa el rechazo y llama al authenticationEntryPoint, que responde 401.',
-    });
-    add({
-      hot: ['etf'],
+      hot: ['authz'],
       gap: ['g1', 'fail', '401 · { "error": "Unauthorized" }'],
       warn: true,
-      caption: 'La respuesta sale de la cadena. El controller nunca se enteró de este request.',
+      caption: 'La cadena responde 401. El controller nunca se enteró de este request.',
     });
     add({
       hot: ['client'],
@@ -230,34 +260,28 @@ export const jwtSteps = ({ endpoint, token, password }) => {
   }
 
   add({
-    hot: ['authz'],
+    hot: login ? ['authz'] : ['authz', 'ctx'],
     status: { authz: ['pass', login ? '✓ permitAll' : '✓ autenticado'] },
     caption: login
-      ? 'AuthorizationFilter: /api/v1/auth/** es permitAll. Pasa aunque el request sea anónimo: nadie tiene token antes del login.'
-      : `AuthorizationFilter: /api/v1/posts exige un usuario autenticado y el SecurityContext tiene a ${USER.username}. Pasa.`,
+      ? 'AuthorizationFilter: /api/v1/auth/** es permitAll. Pasa aunque nadie esté autenticado: nadie tiene token antes del login.'
+      : `AuthorizationFilter consulta el SecurityContext: /api/v1/posts exige un usuario autenticado y ahí está ${USER.username}. Pasa.`,
   });
 
   if (!login) {
+    add({ hot: ['authz'], gap: ['g2', 'down', 'getPosts()', 'r'], caption: 'El request por fin llega al controller.' });
     add({
       hot: ['posts'],
-      gap: ['g2', 'down', 'getPosts()'],
-      caption: 'El request por fin llega al controller.',
+      gap: ['g3', 'down', 'findAll()', 'r'],
+      caption: 'PostController atiende la solicitud como cualquier endpoint y le pide los posts al servicio. El controller no sabe nada de tokens.',
     });
-    add({
-      hot: ['posts'],
-      status: { posts: ['pass', 'consulta los posts'] },
-      caption: 'PostController atiende la solicitud como en cualquier endpoint: el controller no sabe nada de tokens.',
-    });
-    add({
-      hot: ['posts'],
-      gap: ['g2', 'up', '200 OK · [ {…}, {…} ]'],
-      caption: 'La respuesta sube de vuelta por la cadena.',
-    });
-    add({
-      hot: ['chain'],
-      gap: ['g1', 'up', '200 OK · [ {…}, {…} ]'],
-      caption: 'Sale de la SecurityFilterChain hacia el cliente.',
-    });
+    add({ hot: ['postService'], gap: ['g4', 'down', 'findAll()', 'r'], caption: 'PostService le pide los posts al repositorio.' });
+    add({ hot: ['postRepo'], gap: ['g5', 'down', 'SELECT * FROM posts', 'r'], caption: 'PostRepository consulta la base de datos.' });
+    add({ hot: ['db'], read: 'posts', caption: 'La base de datos encuentra las filas de la tabla posts.' });
+    add({ hot: ['db'], gap: ['g5', 'up', '2 filas', 'r'], caption: 'Las filas suben al repositorio.' });
+    add({ hot: ['postRepo'], gap: ['g4', 'up', 'List<Post>', 'r'], caption: 'El repositorio las convierte en entidades Post.' });
+    add({ hot: ['postService'], gap: ['g3', 'up', 'List<PostDTO>', 'r'], caption: 'El servicio entrega DTOs al controller.' });
+    add({ hot: ['posts'], gap: ['g2', 'up', '200 OK · [ {…}, {…} ]', 'r'], caption: 'El controller responde. La respuesta sube de vuelta por la cadena.' });
+    add({ hot: ['authz'], gap: ['g1', 'up', '200 OK · [ {…}, {…} ]'], caption: 'Sale de la SecurityFilterChain hacia el cliente.' });
     add({
       hot: ['client'],
       response: ['ok', '200 OK · 2 posts'],
@@ -267,46 +291,51 @@ export const jwtSteps = ({ endpoint, token, password }) => {
   }
 
   const good = password === USER.password;
+  add({ hot: ['authz'], gap: ['g2', 'down', 'login(request)', 'l'], caption: 'El request llega a RestAuthController.' });
   add({
     hot: ['auth'],
-    gap: ['g2', 'down', 'login(request)'],
-    caption: 'El request llega a RestAuthController.',
+    gap: ['g3', 'down', 'authenticate(email, password)', 'l'],
+    caption: 'El controller le pide al AuthenticationManager que valide las credenciales.',
   });
   add({
-    hot: ['auth'],
-    gap: ['g3', 'down', `authenticate(${USER.username}, ••••)`],
-    caption: 'El controller le pide al AuthenticationManager que valide las credenciales.',
+    hot: ['manager', 'userService'],
+    status: { manager: ['info', 'busca al usuario'] },
+    caption: 'El AuthenticationManager (con su DaoAuthenticationProvider) pide el usuario a su UserDetailsService, que usa UserService.',
+  });
+  add({ hot: ['userService'], gap: ['g4', 'down', `findByEmail("${USER.username}")`, 'l'], caption: 'UserService le pide el usuario al repositorio.' });
+  add({ hot: ['userRepo'], gap: ['g5', 'down', 'SELECT * FROM users WHERE email = ?', 'l'], caption: 'UserRepository consulta la base de datos.' });
+  add({ hot: ['db'], read: 'users', caption: 'La base de datos encuentra la fila del usuario, con su contraseña cifrada.' });
+  add({ hot: ['db'], gap: ['g5', 'up', '1 fila', 'l'], caption: 'La fila sube al repositorio.' });
+  add({ hot: ['userRepo'], gap: ['g4', 'up', 'Optional<User>', 'l'], caption: 'El repositorio devuelve la entidad User.' });
+  add({
+    hot: ['userService', 'manager'],
+    status: { userService: ['pass', 'UserDetails'] },
+    caption: 'Con la entidad se arma un UserDetails (username, contraseña cifrada y authorities) y vuelve al AuthenticationManager.',
   });
   if (!good) {
     add({
       hot: ['manager'],
       status: { manager: ['stop', '✗ contraseña incorrecta'] },
       warn: true,
-      caption: 'El AuthenticationManager busca al usuario en la base de datos y compara la contraseña con el PasswordEncoder: no coincide.',
+      caption: 'El AuthenticationManager compara la contraseña recibida con la cifrada usando el PasswordEncoder: no coincide.',
     });
     add({
       hot: ['manager'],
-      gap: ['g3', 'fail', 'BadCredentialsException'],
+      gap: ['g3', 'fail', 'BadCredentialsException', 'l'],
       warn: true,
       caption: 'Lanza BadCredentialsException. El controller no sigue: nunca se genera un token para credenciales malas.',
     });
     add({
       hot: ['auth'],
-      gap: ['g2', 'fail', 'BadCredentialsException'],
+      gap: ['g2', 'fail', 'BadCredentialsException', 'l'],
       warn: true,
-      caption: 'La excepción sale del controller y sube por la cadena de filtros.',
+      caption: 'La excepción sale del controller y sube a la cadena de filtros.',
     });
     add({
-      hot: ['etf'],
-      status: { etf: ['stop', '→ 401'] },
-      warn: true,
-      caption: 'ExceptionTranslationFilter la atrapa y llama al authenticationEntryPoint, que responde 401.',
-    });
-    add({
-      hot: ['etf'],
+      hot: ['authz'],
       gap: ['g1', 'fail', '401 · { "error": "Unauthorized" }'],
       warn: true,
-      caption: 'La respuesta sale de la cadena hacia el cliente.',
+      caption: 'Spring Security convierte la excepción en un 401 hacia el cliente.',
     });
     add({
       hot: ['client'],
@@ -319,43 +348,23 @@ export const jwtSteps = ({ endpoint, token, password }) => {
   add({
     hot: ['manager'],
     status: { manager: ['pass', '✓ credenciales válidas'] },
-    caption: 'El AuthenticationManager busca al usuario en la base de datos y compara la contraseña con el PasswordEncoder: coinciden.',
+    caption: 'El AuthenticationManager compara la contraseña recibida con la cifrada usando el PasswordEncoder: coinciden.',
   });
-  add({
-    hot: ['manager'],
-    gap: ['g3', 'up', 'Authentication · principal: UserDetails'],
-    caption: 'Devuelve un Authentication cuyo principal es el UserDetails del usuario.',
-  });
-  add({
-    hot: ['auth'],
-    gap: ['g3', 'down', 'generateToken(userDetails)'],
-    caption: 'Con el UserDetails, el controller le pide el token al JwtService.',
-  });
+  add({ hot: ['manager'], gap: ['g3', 'up', 'Authentication · principal: UserDetails', 'l'], caption: 'Devuelve un Authentication cuyo principal es el UserDetails.' });
+  add({ hot: ['auth'], gap: ['g3', 'down', 'generateToken(userDetails)', 'l'], caption: 'Con el UserDetails, el controller le pide el token al JwtService.' });
   add({
     hot: ['jwtService'],
     status: { jwtService: ['pass', '✓ token firmado'] },
     caption: 'JwtService arma el payload (sub, authorities, iat, exp) y lo firma con el secreto, que nunca sale del servidor.',
   });
-  add({
-    hot: ['jwtService'],
-    gap: ['g3', 'up', 'eyJhbGciOiJIUzM4NCJ9…'],
-    caption: 'Devuelve el token al controller.',
-  });
-  add({
-    hot: ['auth'],
-    gap: ['g2', 'up', '200 OK · { "accessToken": "eyJ…" }'],
-    caption: 'El controller responde con el token. La respuesta sube por la cadena.',
-  });
-  add({
-    hot: ['chain'],
-    gap: ['g1', 'up', '200 OK · { "accessToken": "eyJ…" }'],
-    caption: 'Sale de la SecurityFilterChain hacia el cliente.',
-  });
+  add({ hot: ['jwtService'], gap: ['g3', 'up', 'eyJhbGciOiJIUzM4NCJ9…', 'l'], caption: 'Devuelve el token al controller.' });
+  add({ hot: ['auth'], gap: ['g2', 'up', '200 OK · { "accessToken": "eyJ…" }', 'l'], caption: 'El controller responde con el token. La respuesta sube por la cadena.' });
+  add({ hot: ['authz'], gap: ['g1', 'up', '200 OK · { "accessToken": "eyJ…" }'], caption: 'Sale de la SecurityFilterChain hacia el cliente.' });
   add({
     hot: ['client'],
     response: ['ok', '200 OK · accessToken'],
     saveToken: true,
-    caption: 'El cliente guarda el token. Ahora pida GET /api/v1/posts: esta vez el token viaja en cada request.',
+    caption: 'El cliente guarda el token. Ahora pida GET /api/v1/posts: esta vez el token viaja en el request.',
   });
   return steps;
 };
@@ -392,11 +401,13 @@ const mountJwtFlow = (root) => {
     bands[key] = item;
     return item;
   };
-  const gap = (key) => {
-    const item = el('div', { class: 'js-gap', 'data-gap': key });
-    gaps[key] = item;
-    return item;
+  const gap = (key, columns, extra = '') => {
+    const slots = Array.from({ length: columns }, () => el('div', { class: 'js-slot' }));
+    gaps[key] = slots;
+    return el('div', { class: `js-gap${extra}`, 'data-gap': key }, ...slots);
   };
+  const cols = (left, right) => el('div', { class: 'js-cols' },
+    el('div', { class: 'js-col' }, ...left), el('div', { class: 'js-col' }, ...right));
 
   const loginButton = el('button', { class: 'js-call', type: 'button', 'data-testid': 'call-login', onclick: () => start('login') },
     el('span', { class: 'js-verb', text: 'POST' }), '/api/v1/auth/login');
@@ -409,8 +420,17 @@ const mountJwtFlow = (root) => {
   const responseBox = el('span', { class: 'js-resp', 'data-testid': 'client-response', text: 'ninguna todavía' });
 
   const ctxWho = el('div', { 'data-testid': 'security-context' });
-  const ctxBox = el('div', { class: 'js-ctx' }, el('b', { text: 'SecurityContext' }), ctxWho);
+  const ctxBox = el('div', { class: 'js-ctx' }, el('b', { text: 'Authentication' }), ctxWho);
   nodes.ctx = ctxBox;
+
+  const rows = {
+    users: el('div', { class: 'js-rowdb', text: `${USER.username} · $2a$10$Qe…` }),
+    posts: [el('div', { class: 'js-rowdb', text: '1 · Hola mundo' }), el('div', { class: 'js-rowdb', text: '2 · JWT en Spring' })],
+  };
+  const tables = {
+    users: el('div', { class: 'js-table' }, el('b', { text: 'users' }), rows.users),
+    posts: el('div', { class: 'js-table' }, el('b', { text: 'posts' }), ...rows.posts),
+  };
 
   const link = () => el('div', { class: 'js-link' });
   const client = band('client', 'client', 'CLIENTE', 'pulse un endpoint',
@@ -419,22 +439,26 @@ const mountJwtFlow = (root) => {
       el('label', {}, 'password: ', passwordInput)),
     el('div', { class: 'js-row' }, 'Token guardado:', tokenBox, tamperButton, clearButton),
     el('div', { class: 'js-row' }, 'Última respuesta:', responseBox));
-  const chain = band('chain', 'chain', 'SECURITYFILTERCHAIN · /api/v1/**', 'cada request pasa por todos sus filtros, en orden',
-    el('div', { class: 'js-chain-body' },
-      el('div', { class: 'js-filters' },
-        node('others', 'CorsFilter · LogoutFilter · …', '', 'js-dim'), link(),
-        node('jwt', 'JwtAuthFilter', 'valida el token', 'js-jwt'), link(),
-        node('etf', 'ExceptionTranslationFilter', 'convierte rechazos en 401/403'), link(),
-        node('authz', 'AuthorizationFilter', '¿puede llegar al endpoint?')),
-      ctxBox));
+  const chain = band('chain', 'chain', 'SECURITYFILTERCHAIN · /api/v1/**', 'cada request pasa por sus filtros, en orden',
+    el('div', { class: 'js-stack' },
+      node('others', 'CorsFilter · LogoutFilter · …', '', 'js-dim'), link(),
+      node('jwt', 'JwtAuthFilter', 'valida el token', 'js-jwt'), link(),
+      node('upaf', 'UsernamePasswordAuthenticationFilter', 'login con formulario'), link(),
+      node('authz', 'AuthorizationFilter', '¿puede llegar al endpoint?')));
+  const hgap = el('div', { class: 'js-hgap', 'data-gap': 'gx' });
+  gaps.gx = [hgap];
+  const context = band('context', 'context', 'SECURITYCONTEXT', 'del request actual',
+    ctxBox, el('div', { class: 'js-ctx-note', text: 'No es un filtro: es donde los filtros dejan quién está autenticado.' }));
   const controllers = band('controllers', 'ctrl', 'CONTROLLERS', 'solo llega lo que la cadena dejó pasar',
-    el('div', { class: 'js-pair' },
-      node('auth', 'RestAuthController', 'POST /auth/login'),
-      node('posts', 'PostController', 'GET /posts')));
-  const services = band('services', 'svc', 'SERVICIOS', 'los usa el login',
-    el('div', { class: 'js-pair' },
-      node('manager', 'AuthenticationManager', 'valida credenciales'),
-      node('jwtService', 'JwtService', 'firma el token')));
+    cols([node('auth', 'RestAuthController', 'login')], [node('posts', 'PostController', 'getPosts')]));
+  const services = band('services', 'svc', 'SERVICIOS', '',
+    cols([
+      el('div', { class: 'js-col-row' }, node('manager', 'AuthenticationManager', 'valida credenciales'), node('jwtService', 'JwtService', 'firma el token')),
+      node('userService', 'UserService', 'vía UserDetailsService'),
+    ], [node('postService', 'PostService', '')]));
+  const repositories = band('repositories', 'repo', 'REPOSITORIOS', '',
+    cols([node('userRepo', 'UserRepository', '')], [node('postRepo', 'PostRepository', '')]));
+  const database = band('database', 'db', 'BASE DE DATOS', '', cols([tables.users], [tables.posts]));
 
   const note = el('div', { class: 'js-note', 'aria-live': 'polite' });
   const noteStep = el('small');
@@ -453,10 +477,19 @@ const mountJwtFlow = (root) => {
 
   container.append(
     el('div', { class: 'js-title', text: 'Autenticación stateless con JWT' }),
-    el('div', { class: 'js-sub', text: 'Pulse un endpoint y siga el request por la cadena de filtros. Empiece por /posts sin token, luego haga login.' }),
-    client, gap('g1'), chain, gap('g2'), controllers, gap('g3'), services,
+    el('div', { class: 'js-sub', text: 'Pulse un endpoint y siga el request. Empiece por /posts sin token, luego haga login y vuelva a pedir /posts.' }),
+    client, gap('g1', 1),
+    el('div', { class: 'js-midrow' }, chain, hgap, context),
+    gap('g2', 2, ' js-free'), controllers, gap('g3', 2), services, gap('g4', 2), repositories, gap('g5', 2), database,
     el('div', { class: 'js-foot' }, note,
       el('div', { class: 'js-ctrls' }, el('label', { class: 'js-switch' }, manualInput, 'Paso a paso'), nextButton)));
+
+  const bandOf = {
+    client: 'client', others: 'chain', jwt: 'chain', upaf: 'chain', authz: 'chain', ctx: 'context',
+    auth: 'controllers', posts: 'controllers',
+    manager: 'services', jwtService: 'services', userService: 'services', postService: 'services',
+    userRepo: 'repositories', postRepo: 'repositories', db: 'database',
+  };
 
   const renderToken = () => {
     tokenBox.className = `js-token${token ? (token === 'bad' ? ' js-bad' : ' js-has') : ''}`;
@@ -467,33 +500,43 @@ const mountJwtFlow = (root) => {
   const renderContext = (who) => {
     ctxWho.replaceChildren(...(who
       ? [el('div', { class: 'js-who', text: who[0] }), el('div', { text: `[${who[1]}]` })]
-      : [el('div', { text: 'anónimo' })]));
+      : [el('div', { text: 'vacío: nadie autenticado' })]));
   };
   const setStatus = (key, [kind, text] = ['', '']) => {
     statuses[key].className = `js-st${kind ? ` js-${kind}` : ''}`;
     statuses[key].textContent = text;
   };
   const showGap = (spec) => {
-    Object.values(gaps).forEach((item) => item.replaceChildren());
+    Object.values(gaps).forEach((slots) => slots.forEach((slot) => slot.replaceChildren()));
     if (!spec) return;
-    const [where, dir, text] = spec;
-    const arrow = dir === 'down' ? '↓' : '↑';
-    gaps[where].appendChild(el('span', { class: `js-msg${dir === 'up' ? ' js-up' : dir === 'fail' ? ' js-fail' : ''}`, text: `${arrow} ${text}` }));
+    const [where, dir, text, side] = spec;
+    const slots = gaps[where];
+    const slot = slots[side === 'r' ? slots.length - 1 : 0];
+    const arrow = { down: '↓', up: '↑', fail: '↑', side: '→' }[dir];
+    const kind = { up: ' js-up', fail: ' js-fail', side: ' js-side' }[dir] || '';
+    slot.appendChild(el('span', { class: `js-msg${kind}`, text: `${arrow} ${text}` }));
   };
   const highlight = (keys = []) => {
     Object.entries(nodes).forEach(([key, item]) => item.classList.toggle('js-hot', keys.includes(key)));
-    const bandOf = {
-      client: 'client', others: 'chain', jwt: 'chain', etf: 'chain', authz: 'chain', ctx: 'chain', chain: 'chain',
-      auth: 'controllers', posts: 'controllers', manager: 'services', jwtService: 'services',
-    };
+    Object.entries(tables).forEach(([, item]) => item.classList.remove('js-hot'));
     const on = new Set(keys.map((key) => bandOf[key]));
     Object.entries(bands).forEach(([key, item]) => item.classList.toggle('js-on', on.has(key) && key !== 'client'));
+  };
+  const markRead = (table) => {
+    [rows.users, ...rows.posts].forEach((row) => row.classList.remove('js-read'));
+    if (!table) return;
+    tables[table].classList.add('js-hot');
+    [table === 'users' ? rows.users : rows.posts].flat().forEach((row) => {
+      row.classList.add('js-read');
+      flash(row);
+    });
   };
 
   const runStep = (step) => {
     highlight(step.hot);
     showGap(step.gap);
     Object.entries(step.status || {}).forEach(([key, value]) => setStatus(key, value));
+    if (step.read) markRead(step.read);
     if (step.context) {
       renderContext(step.context);
       flash(ctxBox);
@@ -537,10 +580,16 @@ const mountJwtFlow = (root) => {
     timers.push(setTimeout(advance, STEP_MS));
   };
 
-  const reset = () => {
+  const idleFor = {
+    login: ['posts', 'postService', 'postRepo'],
+    posts: ['auth', 'manager', 'jwtService', 'userService', 'userRepo'],
+  };
+  const reset = (endpoint) => {
     Object.keys(statuses).forEach((key) => setStatus(key));
-    nodes.posts.classList.remove('js-idle');
-    nodes.auth.classList.remove('js-idle');
+    Object.entries(nodes).forEach(([key, item]) => item.classList.toggle('js-idle', idleFor[endpoint].includes(key)));
+    tables.users.classList.toggle('js-idle', endpoint === 'posts');
+    tables.posts.classList.toggle('js-idle', endpoint === 'login');
+    markRead(null);
     renderContext(null);
     responseBox.className = 'js-resp';
     responseBox.textContent = 'esperando…';
@@ -548,8 +597,7 @@ const mountJwtFlow = (root) => {
 
   function start(endpoint) {
     if (running) return;
-    reset();
-    nodes[endpoint === 'login' ? 'posts' : 'auth'].classList.add('js-idle');
+    reset(endpoint);
     steps = jwtSteps({ endpoint, token, password: passwordInput.value });
     stepIndex = 0;
     running = true;

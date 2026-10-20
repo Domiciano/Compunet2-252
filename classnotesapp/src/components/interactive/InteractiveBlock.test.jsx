@@ -2,18 +2,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { ThemeProvider } from '@/theme/ThemeContext';
 import InteractiveBlock from './InteractiveBlock';
-import { SIMS, parseSpec, jwtSteps } from './springSecuritySims';
+import { SIMS, parseSpec, jwtSteps, JWT_BANDS as BAND, JWT_GAPS as GAP_BANDS } from './springSecuritySims';
 
 const renderBlock = (spec) => render(<ThemeProvider><InteractiveBlock spec={spec} /></ThemeProvider>);
 
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => vi.useRealTimers());
-
-const BAND = {
-  client: 0, others: 1, jwt: 1, etf: 1, authz: 1, ctx: 1, chain: 1,
-  auth: 2, posts: 2, manager: 3, jwtService: 3,
-};
-const GAP_BANDS = { g1: [0, 1], g2: [1, 2], g3: [2, 3] };
 
 const SCENARIOS = {
   'login ok': { endpoint: 'login', token: null, password: '123456' },
@@ -76,6 +70,23 @@ describe('jwtSteps', () => {
     const steps = jwtSteps(SCENARIOS['posts con token alterado']);
     expect(steps.some((step) => step.hot.includes('authz'))).toBe(false);
     expect(steps.find((step) => step.status && step.status.jwt).status.jwt[0]).toBe('stop');
+  });
+
+  it('goes down to the database through the service and the repository', () => {
+    const login = jwtSteps(SCENARIOS['login ok']);
+    expect(login.map((step) => step.hot[0])).toEqual(expect.arrayContaining(['userService', 'userRepo', 'db']));
+    expect(login.find((step) => step.read).read).toBe('users');
+    const posts = jwtSteps(SCENARIOS['posts con token']);
+    expect(posts.map((step) => step.hot[0])).toEqual(expect.arrayContaining(['postService', 'postRepo', 'db']));
+    expect(posts.find((step) => step.read).read).toBe('posts');
+  });
+
+  it('runs JwtAuthFilter before UsernamePasswordAuthenticationFilter', () => {
+    Object.values(SCENARIOS).forEach((input) => {
+      const order = jwtSteps(input).map((step) => step.hot[0]);
+      const upaf = order.indexOf('upaf');
+      if (upaf >= 0) expect(order.indexOf('jwt')).toBeLessThan(upaf);
+    });
   });
 
   it('only issues a token for good credentials', () => {

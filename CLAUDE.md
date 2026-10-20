@@ -155,10 +155,14 @@ Se portó desde FlutterLearning el 2026-10-20: `InteractiveBlock.jsx` y la líne
 
 - `jwt-flow` («Auth en REST», 0042): el estudiante pulsa `POST /api/v1/auth/login` o
   `GET /api/v1/posts` y sigue el request por la `SecurityFilterChain` (otros filtros,
-  `JwtAuthFilter`, `ExceptionTranslationFilter`, `AuthorizationFilter`), el
-  `SecurityContext`, los controllers y los servicios del login. Cubre `/posts` sin token
-  (401 en `AuthorizationFilter`), login bueno y malo, `/posts` con token válido y con token
-  alterado (401 en el propio filtro). Tiene modo *Paso a paso*. Los pasos son datos puros
+  `JwtAuthFilter`, `UsernamePasswordAuthenticationFilter`, `AuthorizationFilter`), el
+  `SecurityContext` como bloque aparte (no es un filtro) y, en dos columnas, controllers,
+  servicios, repositorios y base de datos: el login baja por `AuthenticationManager` →
+  `UserService` → `UserRepository` → tabla `users`, y `/posts` por `PostService` →
+  `PostRepository` → tabla `posts`. Cubre `/posts` sin token (401 en
+  `AuthorizationFilter`), login bueno y malo, `/posts` con token válido y con token
+  alterado (401 en el propio filtro). `ExceptionTranslationFilter` se dejó fuera a
+  propósito (pedido del profesor, 2026-10-20). Tiene modo *Paso a paso*. Los pasos son datos puros
   (`jwtSteps`) y sus reglas están probadas en `InteractiveBlock.test.jsx`: un solo mensaje
   entre capas por paso, y cada paso empieza donde llegó el anterior o en una capa vecina.
   Si cambian las lecciones 0096–0098 (rutas, códigos de error), hay que actualizarlo.
