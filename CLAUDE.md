@@ -145,6 +145,24 @@ Markdown estándar (CommonMark + GFM) para todo, más estos bloques cercados. De
 Toda valla cercada **debe declarar lenguaje** (` ```java `, nunca ` ``` ` a secas): sin
 él, el renderizador la confunde con código en línea.
 
+#### Diagramas interactivos
+
+Lo que se entiende tocando va en un bloque ` ```interactive `, cuyo cuerpo es `<id> [opciones]`.
+Se portó desde FlutterLearning el 2026-10-20: `InteractiveBlock.jsx` y la línea de
+`LessonParser.jsx` son copia literal, salvo que aquí el registro `SIMS` vive en
+`src/components/interactive/springSecuritySims.js` (JS plano, sin React ni imports,
+`mount(nodo, opciones) → destroy`, CSS prefijado con `.jsim`, tarjeta clara fija).
+
+- `jwt-flow` («Auth en REST», 0042): el estudiante pulsa `POST /api/v1/auth/login` o
+  `GET /api/v1/posts` y sigue el request por la `SecurityFilterChain` (otros filtros,
+  `JwtAuthFilter`, `ExceptionTranslationFilter`, `AuthorizationFilter`), el
+  `SecurityContext`, los controllers y los servicios del login. Cubre `/posts` sin token
+  (401 en `AuthorizationFilter`), login bueno y malo, `/posts` con token válido y con token
+  alterado (401 en el propio filtro). Tiene modo *Paso a paso*. Los pasos son datos puros
+  (`jwtSteps`) y sus reglas están probadas en `InteractiveBlock.test.jsx`: un solo mensaje
+  entre capas por paso, y cada paso empieza donde llegó el anterior o en una capa vecina.
+  Si cambian las lecciones 0096–0098 (rutas, códigos de error), hay que actualizarlo.
+
 #### Darla de alta en `toc.md`
 
 ```
