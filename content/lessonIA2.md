@@ -1,286 +1,130 @@
-# Skills en Herramientas de IA
+# Skills en Antigravity CLI
 
-## ¿Qué es una Skill?
+<!-- tags: skill, SKILL.md, .agents/skills, Antigravity CLI, agy, spec-writer, api-creator, api-tester, la skill no se carga, apidev.md, pruebas con curl, references y assets -->
 
-Una skill es un módulo de comportamiento especializado que le "enseñas" a tu herramienta de IA para que adopte un rol o metodología concreta cuando se lo pidas. En vez de describir cada vez cómo debe responder, escribes la skill una sola vez y la activas con un slash command.
+Una skill le enseña al agente a hacer bien una tarea que se repite: los pasos, las reglas y los archivos de apoyo. En esta lección instalas tres en el proyecto del curso, **262WebApp6**, y las usas con Antigravity CLI para escribir una spec, construir la API y probarla.
 
-Piénsalo como un perfil de trabajo recargable. El mismo LLM puede comportarse como un redactor técnico, un revisor de seguridad, o un escritor de specs — según qué skill esté activa en esa conversación.
+## Antes de empezar
+
+- Antigravity CLI instalado: `agy --version` responde.
+- El proyecto clonado y abierto:
+
+```shell
+git clone https://github.com/Domiciano/262WebApp6
+cd 262WebApp6
+```
+
+## La estructura de carpetas
 
 ```svg
-<svg xmlns="http://www.w3.org/2000/svg" width="560" height="200" font-family="Roboto, Arial, sans-serif" font-size="13">
+<svg id="iaSkillsCarpetas" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 764" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="iaSkillsCarpetas-ttl iaSkillsCarpetas-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
+  <title id="iaSkillsCarpetas-ttl">Las skills viven dentro del proyecto</title>
+  <desc id="iaSkillsCarpetas-dsc">Árbol de carpetas de 262WebApp6. Dentro de .agents/skills hay tres carpetas. spec-writer tiene SKILL.md y references/plantilla.md. api-creator tiene SKILL.md y references con convenciones.md y manifiesto.md. api-tester tiene SKILL.md, assets/ejemplo.sh y references/casos.md. Al lado de .agents siguen src y pom.xml.</desc>
   <defs>
-    <marker id="sk1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-      <path d="M0,0 L0,6 L8,3 z" fill="#777"/>
-    </marker>
+    <style>
+      #iaSkillsCarpetas .title{fill:#161A26;font-size:22px;font-weight:700}
+      #iaSkillsCarpetas .sub{fill:#79809A;font-size:13.5px}
+      #iaSkillsCarpetas .h{font-size:12px;font-weight:700;letter-spacing:.08em;fill:#556074}
+      #iaSkillsCarpetas .foot{fill:#79809A;font-size:12px}
+      #iaSkillsCarpetas .mono{font-family:ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace}
+    </style>
   </defs>
-  <!-- User -->
-  <rect x="10" y="80" width="100" height="40" rx="8" fill="#AB47BC"/>
-  <text x="60" y="105" text-anchor="middle" fill="white" font-weight="bold">Usuario</text>
-  <!-- Prompt -->
-  <line x1="110" y1="100" x2="155" y2="100" stroke="#777" stroke-width="2" marker-end="url(#sk1)"/>
-  <text x="132" y="92" text-anchor="middle" fill="#888" font-size="11">/spec-writer</text>
-  <!-- LLM box -->
-  <rect x="155" y="60" width="140" height="80" rx="10" fill="#42A5F5"/>
-  <text x="225" y="93" text-anchor="middle" fill="white" font-weight="bold" font-size="15">LLM</text>
-  <text x="225" y="115" text-anchor="middle" fill="white" font-size="11">+ SKILL.md inyectada</text>
-  <text x="225" y="132" text-anchor="middle" fill="white" font-size="11">como system prompt</text>
-  <!-- Arrow to output -->
-  <line x1="295" y1="100" x2="340" y2="100" stroke="#777" stroke-width="2" marker-end="url(#sk1)"/>
-  <!-- Output -->
-  <rect x="340" y="40" width="200" height="120" rx="10" fill="#66BB6A"/>
-  <text x="440" y="68" text-anchor="middle" fill="white" font-weight="bold">Spec + Plan + Tasks</text>
-  <text x="440" y="90" text-anchor="middle" fill="white" font-size="11">en formato estructurado</text>
-  <text x="440" y="110" text-anchor="middle" fill="white" font-size="11">con criterios binarios</text>
-  <text x="440" y="130" text-anchor="middle" fill="white" font-size="11">y assumptions visibles</text>
-  <text x="280" y="185" text-anchor="middle" fill="#888" font-size="12">La skill modifica el comportamiento del LLM vía system prompt</text>
+  <rect width="960" height="764" rx="16" fill="#FBFBFD"/>
+  <text class="title" x="48" y="56">Las skills viven dentro del proyecto</text>
+  <text class="sub" x="48" y="80" data-fit="860">Una carpeta por skill en .agents/skills/. El nombre de la carpeta es el nombre de la skill.</text>
+  <path d="M64,117 h7 l3,3 h10 v12 h-20 Z" fill="#EFF1F5" stroke="#556074" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="92" y="124" dy="0.35em" font-size="13.5" font-weight="700" fill="#161A26">262WebApp6/</text>
+  <path d="M74,133 V154 H86" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M90,147 h7 l3,3 h10 v12 h-20 Z" fill="#EFF1F5" stroke="#556074" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="118" y="154" dy="0.35em" font-size="13.5" font-weight="700" fill="#161A26">.agents/</text>
+  <path d="M100,163 V184 H112" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M116,177 h7 l3,3 h10 v12 h-20 Z" fill="#EFF1F5" stroke="#556074" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="144" y="184" dy="0.35em" font-size="13.5" font-weight="700" fill="#161A26">skills/</text>
+  <path d="M126,193 V214 H138" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M142,207 h7 l3,3 h10 v12 h-20 Z" fill="#F4EBFF" stroke="#7439B8" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="170" y="214" dy="0.35em" font-size="13.5" font-weight="700" fill="#7439B8">spec-writer/</text>
+  <path d="M277.2,214 H560" fill="none" stroke="#C9A6EE" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <rect x="560" y="197" width="352" height="34" rx="9" fill="#F4EBFF" stroke="#C9A6EE" stroke-width="1.5"/><text x="576" y="214" dy="0.35em" font-size="13" fill="#454C61" data-fit="320"><tspan font-weight="700" fill="#7439B8">spec-writer.</tspan> Escribe la spec antes del código.</text>
+  <path d="M152,223 V244 H164" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M170,236 h9 l5,5 v12 h-14 Z" fill="#FFFFFF" stroke="#79809A" stroke-width="1.3" stroke-linejoin="round"/><text class="mono" x="196" y="244" dy="0.35em" font-size="13.5" font-weight="700" fill="#161A26">SKILL.md</text>
+  <path d="M152,223 V274 H164" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M168,267 h7 l3,3 h10 v12 h-20 Z" fill="#F4EBFF" stroke="#7439B8" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="196" y="274" dy="0.35em" font-size="13.5" font-weight="700" fill="#7439B8">references/</text>
+  <path d="M178,283 V304 H190" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M196,296 h9 l5,5 v12 h-14 Z" fill="#FFFFFF" stroke="#79809A" stroke-width="1.3" stroke-linejoin="round"/><text class="mono" x="222" y="304" dy="0.35em" font-size="13.5" font-weight="400" fill="#161A26">plantilla.md</text>
+  <path d="M126,193 V334 H138" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M142,327 h7 l3,3 h10 v12 h-20 Z" fill="#E3F6F3" stroke="#0F8478" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="170" y="334" dy="0.35em" font-size="13.5" font-weight="700" fill="#0F8478">api-creator/</text>
+  <path d="M277.2,334 H560" fill="none" stroke="#86D3CA" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <rect x="560" y="317" width="352" height="34" rx="9" fill="#E3F6F3" stroke="#86D3CA" stroke-width="1.5"/><text x="576" y="334" dy="0.35em" font-size="13" fill="#454C61" data-fit="320"><tspan font-weight="700" fill="#0F8478">api-creator.</tspan> Crea endpoints con DTO y publicId.</text>
+  <path d="M152,343 V364 H164" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M170,356 h9 l5,5 v12 h-14 Z" fill="#FFFFFF" stroke="#79809A" stroke-width="1.3" stroke-linejoin="round"/><text class="mono" x="196" y="364" dy="0.35em" font-size="13.5" font-weight="700" fill="#161A26">SKILL.md</text>
+  <path d="M152,343 V394 H164" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M168,387 h7 l3,3 h10 v12 h-20 Z" fill="#E3F6F3" stroke="#0F8478" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="196" y="394" dy="0.35em" font-size="13.5" font-weight="700" fill="#0F8478">references/</text>
+  <path d="M178,403 V424 H190" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M196,416 h9 l5,5 v12 h-14 Z" fill="#FFFFFF" stroke="#79809A" stroke-width="1.3" stroke-linejoin="round"/><text class="mono" x="222" y="424" dy="0.35em" font-size="13.5" font-weight="400" fill="#161A26">convenciones.md</text>
+  <path d="M178,403 V454 H190" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M196,446 h9 l5,5 v12 h-14 Z" fill="#FFFFFF" stroke="#79809A" stroke-width="1.3" stroke-linejoin="round"/><text class="mono" x="222" y="454" dy="0.35em" font-size="13.5" font-weight="400" fill="#161A26">manifiesto.md</text>
+  <path d="M126,193 V484 H138" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M142,477 h7 l3,3 h10 v12 h-20 Z" fill="#FFF3DC" stroke="#A96C05" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="170" y="484" dy="0.35em" font-size="13.5" font-weight="700" fill="#A96C05">api-tester/</text>
+  <path d="M269.1,484 H560" fill="none" stroke="#F0C572" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <rect x="560" y="467" width="352" height="34" rx="9" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text x="576" y="484" dy="0.35em" font-size="13" fill="#454C61" data-fit="320"><tspan font-weight="700" fill="#A96C05">api-tester.</tspan> Prueba la API con scripts de curl.</text>
+  <path d="M152,493 V514 H164" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M170,506 h9 l5,5 v12 h-14 Z" fill="#FFFFFF" stroke="#79809A" stroke-width="1.3" stroke-linejoin="round"/><text class="mono" x="196" y="514" dy="0.35em" font-size="13.5" font-weight="700" fill="#161A26">SKILL.md</text>
+  <path d="M152,493 V544 H164" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M168,537 h7 l3,3 h10 v12 h-20 Z" fill="#FFF3DC" stroke="#A96C05" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="196" y="544" dy="0.35em" font-size="13.5" font-weight="700" fill="#A96C05">assets/</text>
+  <path d="M178,553 V574 H190" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M196,566 h9 l5,5 v12 h-14 Z" fill="#FFFFFF" stroke="#79809A" stroke-width="1.3" stroke-linejoin="round"/><text class="mono" x="222" y="574" dy="0.35em" font-size="13.5" font-weight="400" fill="#161A26">ejemplo.sh</text>
+  <path d="M152,493 V604 H164" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M168,597 h7 l3,3 h10 v12 h-20 Z" fill="#FFF3DC" stroke="#A96C05" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="196" y="604" dy="0.35em" font-size="13.5" font-weight="700" fill="#A96C05">references/</text>
+  <path d="M178,613 V634 H190" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M196,626 h9 l5,5 v12 h-14 Z" fill="#FFFFFF" stroke="#79809A" stroke-width="1.3" stroke-linejoin="round"/><text class="mono" x="222" y="634" dy="0.35em" font-size="13.5" font-weight="400" fill="#161A26">casos.md</text>
+  <path d="M74,133 V664 H86" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M90,657 h7 l3,3 h10 v12 h-20 Z" fill="#EFF1F5" stroke="#556074" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="118" y="664" dy="0.35em" font-size="13.5" font-weight="700" fill="#9AA3B5">src/</text>
+  <path d="M74,133 V694 H86" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M92,686 h9 l5,5 v12 h-14 Z" fill="#FFFFFF" stroke="#79809A" stroke-width="1.3" stroke-linejoin="round"/><text class="mono" x="118" y="694" dy="0.35em" font-size="13.5" font-weight="400" fill="#9AA3B5">pom.xml</text>
+  <text class="foot" x="48" y="736" data-fit="860">Solo archivos de texto: se crean a mano y se pega su contenido. La skill no instala nada.</text>
 </svg>
 ```
 
-## Estructura de una Skill
+Antigravity CLI busca las skills del proyecto en `.agents/skills/`. Cada skill es una carpeta, y el nombre de la carpeta tiene que ser **exactamente** el `name` de su `SKILL.md`; si no coinciden, la skill no aparece. `references/` guarda lo que el agente consulta y `assets/` lo que imita.
 
-Una skill vive en un archivo `SKILL.md` dentro de una carpeta con el nombre de la skill. Tiene dos partes: un frontmatter YAML con metadatos para que el LLM sepa cuándo activarla, y el cuerpo con el prompt de sistema que define el comportamiento.
+Crea las carpetas desde la raíz del proyecto. En macOS, Linux o Git Bash:
 
-```plain
----
-name: nombre-de-la-skill
-description: >
-  Descripción de cuándo usar esta skill.
-  Trigger keywords: palabra1, palabra2, palabra3.
----
-
-# Título de la skill
-
-Aquí va el prompt de sistema completo. Le dice al LLM cómo
-debe comportarse, qué formato de respuesta usar, qué
-restricciones respetar, qué artefactos producir, etc.
+```shell
+mkdir -p .agents/skills/spec-writer/references
+mkdir -p .agents/skills/api-creator/references
+mkdir -p .agents/skills/api-tester/references
+mkdir -p .agents/skills/api-tester/assets
 ```
 
-## Instalar una Skill en Claude Code
+En PowerShell, `mkdir` también crea las carpetas intermedias: usa las mismas cuatro líneas sin `-p`.
 
-Claude Code busca skills en dos ubicaciones:
+## Las tres skills
 
-- Global: `~/.claude/skills/` — disponible en cualquier proyecto
-- Por proyecto: `.claude/skills/` — solo en ese directorio
-
-La estructura de carpetas es:
-
-```bash
-.claude/
-└── skills/
-    └── spec-writer/
-        └── SKILL.md
+```interactive
+skill-files
 ```
 
-Para activar la skill en una conversación, usas el slash command con el nombre de la carpeta:
+Elige una pestaña y recorre sus archivos. Por cada uno, crea un archivo con ese nombre en esa carpeta, pulsa **Copiar** y pega el contenido. Empieza siempre por `SKILL.md`.
 
-```bash
-/spec-writer Agrega exportación de pedidos como CSV
+De cada `SKILL.md`, el agente lee al arrancar solo el `name` y la `description`. Carga el resto cuando tu pedido coincide con la description, y abre los archivos de `references/` y `assets/` cuando un paso se lo pide.
+
+## Úsalas en orden
+
+Cierra Antigravity CLI si estaba abierto y ábrelo de nuevo en la raíz del proyecto, para que encuentre las skills:
+
+```shell
+agy
 ```
 
-Claude inyecta el contenido de `SKILL.md` como system prompt adicional antes de responder. El LLM adopta el rol definido en la skill durante esa invocación.
+Pide las cosas sin nombrar la skill: si la description está bien escrita, el agente elige la correcta.
 
-## Instalar una Skill en Gemini CLI
+1. **Revisa la API.** «Revisa la API y dime qué entidades no tienen endpoints». `api-creator` escribe `apidev.md` con cada entidad, sus endpoints y lo que incumple las convenciones.
+2. **Especifica.** «Escribe la spec para matricular un estudiante en un curso desde la API». `spec-writer` deja la spec en `docs/specs/`, con los endpoints, sus errores y las tareas.
+3. **Construye.** «Implementa la spec de la matrícula». `api-creator` crea los DTO, los mappers, el `publicId` y los endpoints, compila y anota lo que hizo en `apidevlog.md`.
+4. **Prueba.** Arranca la app en otra terminal con `./mvnw spring-boot:run` y pide «Escribe y corre las pruebas de la API». `api-tester` deja un script por recurso en `tests/api/` y las fallas en `tests/api/hallazgos.md`.
 
-Gemini CLI usa exactamente la misma convención de `SKILL.md`, pero bajo la carpeta `.gemini/`:
+Los scripts de prueba son de bash. En Windows se corren desde Git Bash.
 
-```bash
-.gemini/
-└── skills/
-    └── spec-writer/
-        └── SKILL.md
-```
+La primera batería va a fallar en los casos sin token: la API responde `302`, una redirección a la página de login, donde debería responder `401`. La prueba está bien; lo que falla es la API. Arreglarlo es justo lo que viste en «Errores 401 y 403».
 
-Para vincular la skill al workspace de Gemini, ejecutas:
+## Si el agente no usa la skill
 
-```bash
-gemini skills link ./skills/spec-writer --scope workspace
-```
-
-El flag `--scope workspace` hace que la skill quede disponible para todos los proyectos del workspace actual.
-
-```svg
-<svg xmlns="http://www.w3.org/2000/svg" width="540" height="200" font-family="Roboto, Arial, sans-serif" font-size="13">
-  <defs>
-    <marker id="sk2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-      <path d="M0,0 L0,6 L8,3 z" fill="#777"/>
-    </marker>
-  </defs>
-  <!-- SKILL.md file -->
-  <rect x="20" y="70" width="120" height="60" rx="8" fill="#FFA726"/>
-  <text x="80" y="96" text-anchor="middle" fill="white" font-weight="bold">SKILL.md</text>
-  <text x="80" y="116" text-anchor="middle" fill="white" font-size="11">frontmatter + prompt</text>
-  <!-- Arrow to Claude -->
-  <line x1="140" y1="100" x2="200" y2="70" stroke="#777" stroke-width="1.5" marker-end="url(#sk2)"/>
-  <!-- Arrow to Gemini -->
-  <line x1="140" y1="100" x2="200" y2="130" stroke="#777" stroke-width="1.5" marker-end="url(#sk2)"/>
-  <!-- Claude -->
-  <rect x="200" y="40" width="150" height="50" rx="8" fill="#42A5F5"/>
-  <text x="275" y="63" text-anchor="middle" fill="white" font-weight="bold">Claude Code</text>
-  <text x="275" y="81" text-anchor="middle" fill="white" font-size="11">.claude/skills/</text>
-  <!-- Gemini -->
-  <rect x="200" y="110" width="150" height="50" rx="8" fill="#66BB6A"/>
-  <text x="275" y="133" text-anchor="middle" fill="white" font-weight="bold">Gemini CLI</text>
-  <text x="275" y="151" text-anchor="middle" fill="white" font-size="11">.gemini/skills/</text>
-  <!-- Label -->
-  <text x="80" y="155" text-anchor="middle" fill="#888" font-size="11">mismo archivo,</text>
-  <text x="80" y="170" text-anchor="middle" fill="#888" font-size="11">dos herramientas</text>
-  <text x="270" y="190" text-anchor="middle" fill="#888" font-size="12">El mismo SKILL.md funciona en Claude Code y Gemini CLI</text>
-</svg>
-```
-
-## Skill de ejemplo: spec-writer
-
-A continuación la skill `spec-writer` completa. Al activarla, el LLM convierte cualquier descripción vaga de feature en tres artefactos estructurados: Spec funcional, Plan técnico y Tasks ordenadas.
-
-```plain
----
-name: spec-writer
-description: >
-  Turns vague feature requests into structured specs, technical plans, and
-  ordered task breakdowns ready for any coding agent. Use this skill when the
-  user provides a feature description, a ticket, a PRD fragment, or any rough
-  idea and asks to "write a spec", "plan this feature", "break this into
-  tasks", or similar. Trigger keywords: spec, plan, tasks, feature, PRD,
-  breakdown, acceptance criteria.
----
-
-# spec-writer
-
-You are an expert in Spec Driven Development (SDD). When this skill is active,
-your job is to turn a vague feature description into three structured artifacts
-— a Spec, a Plan, and a Task breakdown — in a single response.
-
-## How to respond
-
-Generate all three sections immediately. Do NOT ask clarifying questions first.
-Instead, mark every implicit decision you make with `[ASSUMPTION: ...]` inline,
-then collect all assumptions into a prioritized list at the end.
-
----
-
-## Output format
-
-### 1. Spec (functional, technology-agnostic)
-
-- **Purpose**: One sentence describing what the feature does and why.
-- **Users**: Who interacts with this feature and in what context.
-- **Requirements**: Numbered list of functional requirements.
-- **Edge cases**: What can go wrong, boundary conditions, unauthorized access.
-- **Acceptance criteria**: Written in Given/When/Then format. Each criterion
-  must be binary — pass or fail. "Works correctly" is NOT a valid criterion.
-  "Returns 401 when unauthenticated" is.
-
-### 2. Plan (technical and concrete)
-
-- **Architecture**: Where this fits in the existing system. New services,
-  modules, or layers required.
-- **Data model**: New or modified entities, fields, relationships, indexes.
-- **API contracts**: Endpoints, methods, request/response shapes, status codes.
-- **Testing strategy**: Unit, integration, and e2e coverage expectations.
-- **Security constraints**: Auth, authorization, rate limiting, input
-  validation.
-- **Dependencies**: External services, libraries, or internal modules required.
-
-### 3. Tasks (ordered, self-contained)
-
-Each task must:
-- Be completable in a single agent session.
-- Have its own acceptance criteria (binary, testable).
-- List any tasks it depends on.
-- Never say "implement the feature" — be specific.
-
-Format each task as:
-
-```
-Task N: [Title]
-Depends on: Task X (or "none")
-What to build: [Specific, concrete description]
-Acceptance criteria:
-- [Binary criterion]
-- [Binary criterion]
-```
-
----
-
-## Assumptions summary (end of every response)
-
-After the three sections, output:
-
-```
-## Assumptions to review
-
-1. [Decision made] — Impact: HIGH | MEDIUM | LOW
-   Correct this if: [when the assumption is wrong]
-
-2. ...
-```
-
-Order by impact descending. Include every non-obvious decision made during
-generation.
-
----
-
-## Quality rules
-
-- The Spec MUST NOT contain implementation details (framework choices,
-  library names). Those go in the Plan.
-- Every assumption is visible. Nothing is hidden.
-- Every task is independently verifiable. If it cannot be tested on its own,
-  split it.
-- Acceptance criteria are binary. Rewrite any criterion that contains
-  subjective language.
-
----
-
-## Example invocation
-
-User: `/spec-writer Add a way for users to export their order history as CSV`
-
-You generate:
-1. Spec — what the export does, who uses it, edge cases, Given/When/Then
-   criteria.
-2. Plan — async job vs synchronous, S3 vs inline response, API contract,
-   auth model, test strategy.
-3. Tasks — in dependency order, each independently testable.
-4. Assumptions — e.g. async for >1,000 rows (HIGH), date range filter
-   required (MEDIUM).
-```
-
-## Cómo se instala paso a paso
-
-Para tener la skill `spec-writer` disponible en Claude Code en tu proyecto:
-
-```bash
-# 1. Crear la estructura de carpetas
-mkdir -p .claude/skills/spec-writer
-
-# 2. Crear el archivo SKILL.md con el contenido de la skill
-# (pegar el contenido mostrado arriba)
-touch .claude/skills/spec-writer/SKILL.md
-
-# 3. Verificar que Claude la detecta
-# Abrir Claude Code en el proyecto y escribir:
-/spec-writer
-```
-
-Para Gemini CLI en el mismo proyecto:
-
-```bash
-# 1. Crear la estructura de carpetas
-mkdir -p .gemini/skills/spec-writer
-
-# 2. Copiar el mismo SKILL.md
-cp .claude/skills/spec-writer/SKILL.md .gemini/skills/spec-writer/SKILL.md
-
-# 3. Vincular la skill al workspace
-gemini skills link ./.gemini/skills/spec-writer --scope workspace
-```
-
-## ¿Cuándo usar una Skill?
-
-- Cuando repites el mismo tipo de tarea constantemente (escribir specs, revisar PRs, generar tests).
-- Cuando quieres que el LLM produzca un formato de respuesta específico y consistente.
-- Cuando trabajas en equipo y quieres que todos obtengan el mismo comportamiento del LLM.
-- Cuando el contexto o rol del LLM es demasiado largo para escribirlo en cada prompt.
-
-Una skill bien escrita elimina la fricción de describir el "cómo" cada vez — te concentras solo en el "qué".
+- **El nombre no coincide.** La carpeta y el `name` del `SKILL.md` deben ser iguales, en minúsculas y con guiones.
+- **No reiniciaste el agente.** Las skills se buscan al abrir `agy`.
+- **La description no tiene tus palabras.** Si pides «haz pruebas con curl» y la description no habla de pruebas ni de curl, el agente no la relaciona. Agrégale las palabras con las que la pides.

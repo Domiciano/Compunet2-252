@@ -150,9 +150,10 @@ Toda valla cercada **debe declarar lenguaje** (` ```java `, nunca ` ``` ` a seca
 Lo que se entiende tocando va en un bloque ` ```interactive `, cuyo cuerpo es `<id> [opciones]`.
 Se portó desde FlutterLearning el 2026-10-20: `InteractiveBlock.jsx` y la línea de
 `LessonParser.jsx` son copia literal, salvo que aquí el registro `SIMS` se arma en
-`InteractiveBlock.jsx` juntando dos archivos: `src/components/interactive/springSecuritySims.js`
-(CSS prefijado con `.jsim`) y `agentSims.js` (CSS prefijado con `.asim`). Los dos son JS
-plano, sin React ni imports, `mount(nodo, opciones) → destroy`, tarjeta clara fija.
+`InteractiveBlock.jsx` juntando tres archivos de `src/components/interactive/`:
+`springSecuritySims.js` (CSS prefijado con `.jsim`), `agentSims.js` (`.asim`) y `skillSims.js`
+(`.ksim`). Los tres son JS plano, sin React ni imports, `mount(nodo, opciones) → destroy`,
+tarjeta clara fija.
 
 - `jwt-flow` («Auth en REST», 0042): el estudiante pulsa `POST /api/v1/auth/login` o
   `GET /api/v1/posts` y sigue el request por la `SecurityFilterChain` (otros filtros,
@@ -202,6 +203,16 @@ plano, sin React ni imports, `mount(nodo, opciones) → destroy`, tarjeta clara 
   su recorrido y lo cuentan en pasos. Todo son datos puros (`AGENT_ITEMS`, `AGENT_PROMPTS`,
   `agentScene`), probados en `agentSims.test.jsx`. La opción abre en una pestaña:
   ` agent-stack skills `.
+
+- `skill-files` («Skills en Antigravity CLI», 0047, en `skillSims.js`): una pestaña por skill
+  (`spec-writer`, `api-creator`, `api-tester`), el árbol de su carpeta y un visor del archivo
+  elegido con botón *Copiar*. El estudiante crea las carpetas y pega cada archivo: las skills
+  son solo texto. **Las skills se editan en `tools/skills/<nombre>/`** y se copian al
+  simulador con `python3 tools/skills_data.py`; el resumen, los pedidos de ejemplo y lo que
+  escribe cada una viven en `META` de ese script. Están pensadas para el proyecto
+  `Domiciano/262WebApp6` (rutas, paquetes, usuarios `nicolas`/`barragan` de `data.sql`).
+  Las pruebas de `skillSims.test.jsx` exigen que el `name` coincida con la carpeta y que todo
+  archivo que nombra el `SKILL.md` exista, y viceversa.
 
 #### Darla de alta en `toc.md`
 

@@ -70,7 +70,7 @@
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson28.md | MapStruct | 0040
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson31.md | Postman | 0045
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lessonIA0.md | LLMs, Agentes y MCP Servers | 0046
-[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lessonIA2.md | Skills en Herramientas de IA | 0047
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lessonIA2.md | Skills en Antigravity CLI | 0047
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lessonIA1.md | SDD (spec-writer) | 0048
 [t] SEMANA 14 · React
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson32.md | Repasito de JS | 0049

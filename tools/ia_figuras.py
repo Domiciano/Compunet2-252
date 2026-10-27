@@ -1,4 +1,4 @@
-"""Figuras SVG de «LLMs, Agentes y MCP Servers» (0046).
+"""Figuras SVG de «LLMs, Agentes y MCP Servers» (0046) y «Skills en Antigravity CLI» (0047).
 
     python3 tools/ia_figuras.py <carpeta>     escribe un .svg por figura, para revisarlas
     python3 tools/ia_figuras.py --inject      reemplaza cada bloque ```svg de la lección
@@ -18,7 +18,7 @@ from security_figuras import FAM, box, head, tail  # noqa: E402
 from rest_figuras import pill  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-LESSONS = ['lessonIA0.md']
+LESSONS = ['lessonIA0.md', 'lessonIA2.md']
 FIGS = {}
 
 
@@ -58,6 +58,77 @@ def ia_agente():
 
 
 FIGS['iaAgente'] = ia_agente
+
+
+def folder(x, y, color):
+    soft, border, strong = FAM[color]
+    return (f'<path d="M{x},{y-7} h7 l3,3 h10 v12 h-20 Z" fill="{soft}" stroke="{strong}" stroke-width="1.4" '
+            f'stroke-linejoin="round"/>')
+
+
+def file_icon(x, y):
+    return (f'<path d="M{x+2},{y-8} h9 l5,5 v12 h-14 Z" fill="#FFFFFF" stroke="#79809A" stroke-width="1.3" '
+            f'stroke-linejoin="round"/>')
+
+
+def ia_skills_carpetas():
+    rows = [(0, '262WebApp6/', 'dir', 'slate', None),
+            (1, '.agents/', 'dir', 'slate', None),
+            (2, 'skills/', 'dir', 'slate', None),
+            (3, 'spec-writer/', 'dir', 'violet', ('violet', 'spec-writer.', 'Escribe la spec antes del código.')),
+            (4, 'SKILL.md', 'file', 'violet', None),
+            (4, 'references/', 'dir', 'violet', None),
+            (5, 'plantilla.md', 'file', 'violet', None),
+            (3, 'api-creator/', 'dir', 'teal', ('teal', 'api-creator.', 'Crea endpoints con DTO y publicId.')),
+            (4, 'SKILL.md', 'file', 'teal', None),
+            (4, 'references/', 'dir', 'teal', None),
+            (5, 'convenciones.md', 'file', 'teal', None),
+            (5, 'manifiesto.md', 'file', 'teal', None),
+            (3, 'api-tester/', 'dir', 'amber', ('amber', 'api-tester.', 'Prueba la API con scripts de curl.')),
+            (4, 'SKILL.md', 'file', 'amber', None),
+            (4, 'assets/', 'dir', 'amber', None),
+            (5, 'ejemplo.sh', 'file', 'amber', None),
+            (4, 'references/', 'dir', 'amber', None),
+            (5, 'casos.md', 'file', 'amber', None),
+            (1, 'src/', 'dir', 'slate', None),
+            (1, 'pom.xml', 'file', 'slate', None)]
+    step, top, x0, ind = 30, 124, 64, 26
+    h = top + len(rows) * step + 40
+    s = head('iaSkillsCarpetas', h, 'Las skills viven dentro del proyecto', 'Las skills viven dentro del proyecto',
+             'Una carpeta por skill en .agents/skills/. El nombre de la carpeta es el nombre de la skill.',
+             'Árbol de carpetas de 262WebApp6. Dentro de .agents/skills hay tres carpetas. spec-writer tiene SKILL.md y '
+             'references/plantilla.md. api-creator tiene SKILL.md y references con convenciones.md y manifiesto.md. '
+             'api-tester tiene SKILL.md, assets/ejemplo.sh y references/casos.md. Al lado de .agents siguen src y pom.xml.')
+    last = {}
+    for i, (d, name, kind, color, call) in enumerate(rows):
+        y = top + i * step
+        x = x0 + d * ind
+        if d > 0:
+            px = x0 + (d - 1) * ind + 10
+            py = last.get(d - 1, y)
+            s += f'  <path d="M{px},{py+9} V{y} H{x-4}" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>\n'
+        last[d] = y
+        for deeper in [k for k in last if k > d]:
+            del last[deeper]
+        strong = FAM[color][2]
+        dim = name in ('src/', 'pom.xml')
+        icon = folder(x, y, color) if kind == 'dir' else file_icon(x, y)
+        weight = '700' if kind == 'dir' or name == 'SKILL.md' else '400'
+        fill = '#9AA3B5' if dim else (strong if kind == 'dir' and color != 'slate' else '#161A26')
+        s += (f'  {icon}<text class="mono" x="{x+28}" y="{y}" dy="0.35em" font-size="13.5" font-weight="{weight}" '
+              f'fill="{fill}">{name}</text>\n')
+        if call:
+            c, bold, text = call
+            soft, border, cs = FAM[c]
+            tx = x + 28 + len(name) * 8.1 + 10
+            s += f'  <path d="M{tx},{y} H560" fill="none" stroke="{border}" stroke-width="1.5" stroke-dasharray="4 4"/>\n'
+            s += (f'  <rect x="560" y="{y-17}" width="352" height="34" rx="9" fill="{soft}" stroke="{border}" stroke-width="1.5"/>'
+                  f'<text x="576" y="{y}" dy="0.35em" font-size="13" fill="#454C61" data-fit="320">'
+                  f'<tspan font-weight="700" fill="{cs}">{bold}</tspan> {text}</text>\n')
+    return s + tail(h, 'Solo archivos de texto: se crean a mano y se pega su contenido. La skill no instala nada.')
+
+
+FIGS['iaSkillsCarpetas'] = ia_skills_carpetas
 
 
 def main():
