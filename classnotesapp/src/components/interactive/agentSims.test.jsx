@@ -21,8 +21,9 @@ describe('agentScene', () => {
     const agent = keys(agentScene('agent'));
     const skills = keys(agentScene('skills'));
     const mcp = keys(agentScene('mcp'));
+    const collapsed = AGENT_ITEMS.filter((item) => item.col === 'world' && item.depth >= 2).map((item) => item.key);
     agent.forEach((key) => expect(skills).toContain(key));
-    skills.forEach((key) => expect(mcp).toContain(key));
+    skills.filter((key) => !collapsed.includes(key)).forEach((key) => expect(mcp).toContain(key));
   });
 
   it('skills add no tools; MCP adds tools', () => {
@@ -52,11 +53,16 @@ describe('agent-stack', () => {
     expect(container.querySelector('[data-item="t-pw-nav"]')).toBeNull();
     fireEvent.click(screen.getByRole('tab', { name: '+ MCP' }));
     expect(container.querySelector('[data-item="t-pw-nav"]')).toBeTruthy();
-    expect(container.querySelector('[data-item="w-chromium"]')).toBeTruthy();
+    expect(container.querySelector('.as-outside [data-item="w-chromium"]')).toBeTruthy();
+    expect(container.querySelector('.as-project [data-item="w-chromium"]')).toBeNull();
+    expect(container.querySelector('[data-wire="playwright"]').style.gridRow)
+      .toBe(container.querySelector('.as-outside [data-item="w-chromium"]').parentElement.style.gridRow);
     expect(screen.getByTestId('agent-steps').hidden).toBe(true);
     fireEvent.click(container.querySelector('[data-prompt="playwright"]'));
     expect(container.querySelector('[data-item="t-pw-nav"]').classList.contains('as-hot')).toBe(true);
     expect(screen.getByTestId('agent-steps').children.length).toBe(AGENT_PROMPTS.mcp[1].steps.length);
+    expect(container.querySelector('[data-wire="playwright"]').classList.contains('as-hot')).toBe(true);
+    expect(container.querySelector('[data-wire="stitch"]').classList.contains('as-hot')).toBe(false);
   });
 
   it('opens on the stage given as option', () => {

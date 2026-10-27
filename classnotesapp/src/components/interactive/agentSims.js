@@ -17,12 +17,22 @@ const CSS = `
 .asim .as-tab.as-sel{background:#4453C9;border-color:#4453C9;color:#fff}
 .asim .as-explain{background:#fff;border:1.5px solid #D9DEE8;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:13.5px;line-height:1.5}
 .asim .as-explain b{color:#4453C9}
-.asim .as-body{display:flex;gap:0;align-items:stretch}
-.asim .as-col{flex:1 1 0;min-width:0;border:1.5px solid var(--b);background:var(--bg);border-radius:12px;padding:10px;
-  display:flex;flex-direction:column;gap:6px}
-.asim .as-col.as-context{--b:#C9A6EE;--bg:#F4EBFF;--ink:#7439B8}
-.asim .as-col.as-tools{--b:#A9B4F2;--bg:#EEF1FF;--ink:#4453C9;border-style:dashed}
-.asim .as-col.as-world{--b:#86D3CA;--bg:#E3F6F3;--ink:#0F8478}
+.asim .as-body{display:grid;grid-template-columns:minmax(0,1fr) 26px minmax(0,1fr) 34px minmax(0,1fr);align-items:stretch}
+.asim .as-bg{border:1.5px solid var(--b);background:var(--bg);border-radius:12px}
+.asim .as-cell{min-width:0;padding:10px;display:flex;flex-direction:column;gap:6px;position:relative;z-index:1}
+.asim .as-context{--b:#C9A6EE;--bg:#F4EBFF;--ink:#7439B8}
+.asim .as-tools{--b:#A9B4F2;--bg:#EEF1FF;--ink:#4453C9}
+.asim .as-bg.as-tools{border-style:dashed}
+.asim .as-project{--b:#86D3CA;--bg:#E3F6F3;--ink:#0F8478}
+.asim .as-outside{--b:#C4CBD8;--bg:#EFF1F5;--ink:#556074}
+.asim .as-cell.as-outside{justify-content:center}
+.asim .as-outside .as-ext-note{font-size:11.5px;color:#556074;margin:-2px 0 2px}
+.asim .as-wire{display:flex;align-items:center;padding:0 2px;z-index:1}
+.asim .as-wire i{flex:1;height:2px;background:var(--w,#A9B4F2);position:relative;transition:box-shadow .25s}
+.asim .as-wire i::after{content:'';position:absolute;right:-2px;top:-5px;border:6px solid transparent;border-left:8px solid var(--w,#A9B4F2);border-right:0}
+.asim .as-wire.as-stitch{--w:#D9A23F}
+.asim .as-wire.as-playwright{--w:#3FB3A4}
+.asim .as-wire.as-hot i{height:3px;box-shadow:0 0 0 3px #F8DFA8}
 .asim .as-colhead{font-size:11.5px;font-weight:700;letter-spacing:.08em;color:var(--ink)}
 .asim .as-llm{background:#7439B8;color:#fff;border-radius:10px;padding:8px;text-align:center;font-weight:700;font-size:15px}
 .asim .as-llm small{display:block;font-weight:400;font-size:11.5px;opacity:.9}
@@ -43,7 +53,7 @@ const CSS = `
 .asim .as-item[data-depth="2"]{margin-left:24px}
 .asim .as-item[data-depth="3"]{margin-left:36px}
 .asim .as-badge{font:700 10px Roboto,Arial,sans-serif;border-radius:8px;padding:0 6px;background:#FFF3DC;color:#A96C05}
-.asim .as-link{flex:0 0 26px;display:flex;align-items:center;justify-content:center;color:#A9B4F2;font-size:18px;font-weight:700}
+.asim .as-link{display:flex;align-items:center;justify-content:center;color:#A9B4F2;font-size:18px;font-weight:700}
 .asim .as-prompts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0 8px;font-size:12px;color:#556074}
 .asim .as-prompt{border:1.5px solid #C9A6EE;background:#fff;color:#161A26;border-radius:10px;padding:5px 12px;cursor:pointer;
   font:600 12.5px Roboto,Arial,sans-serif;text-align:left}
@@ -53,8 +63,11 @@ const CSS = `
 .asim .as-steps li+li{margin-top:4px}
 .asim .as-steps code{font:12px 'JetBrains Mono',Menlo,Consolas,monospace;background:#EFF1F5;border-radius:4px;padding:0 4px}
 @container (max-width:640px){
-  .asim .as-body{flex-direction:column}
-  .asim .as-link{flex-basis:22px;transform:rotate(90deg)}
+  .asim .as-body{display:flex;flex-direction:column;gap:6px}
+  .asim .as-bg,.asim .as-link{display:none}
+  .asim .as-cell{border:1.5px solid var(--b);background:var(--bg);border-radius:12px}
+  .asim .as-wire{justify-content:center;height:22px}
+  .asim .as-wire i{flex:0 0 22px;transform:rotate(90deg)}
 }
 `;
 
@@ -141,8 +154,10 @@ export const AGENT_ITEMS = [
   { key: 'w-db-script', col: 'world', stage: 'skills', depth: 3, kind: 'skill', label: 'scripts/validar.py' },
   { key: 'w-spec-out', col: 'world', stage: 'skills', depth: 1, onDemand: true, label: 'docs/specs/exportar-csv.md', note: 'nuevo' },
   { key: 'w-db-out', col: 'world', stage: 'skills', depth: 1, onDemand: true, label: 'docs/modelo.sql', note: 'nuevo' },
-  { key: 'w-stitch', col: 'world', stage: 'mcp', group: 'stitch', ext: true, label: 'Stitch', note: 'nube · HTTP' },
-  { key: 'w-chromium', col: 'world', stage: 'mcp', group: 'playwright', ext: true, label: 'Chromium', note: 'tu equipo · stdio' },
+  { key: 'w-stitch', col: 'world', stage: 'mcp', group: 'stitch', ext: true, label: 'Stitch', note: 'nube · HTTP',
+    what: 'Genera los diseños de pantallas.' },
+  { key: 'w-chromium', col: 'world', stage: 'mcp', group: 'playwright', ext: true, label: 'Chromium', note: 'tu equipo · stdio',
+    what: 'Un navegador que controla Playwright.' },
 ];
 
 export const AGENT_PROMPTS = {
@@ -227,6 +242,7 @@ export const agentScene = (stageKey, promptKey) => {
   const hot = new Set(prompt ? prompt.hot : []);
   const items = AGENT_ITEMS
     .filter((item) => STAGE_INDEX[item.stage] <= level && (!item.onDemand || hot.has(item.key)))
+    .filter((item) => !(stage.key === 'mcp' && item.col === 'world' && item.depth >= 2))
     .map((item) => ({ ...item, isNew: level > 0 && item.stage === stage.key, hot: hot.has(item.key) }));
   return { stage, prompts, prompt, items, steps: prompt ? prompt.steps : [] };
 };
@@ -266,21 +282,45 @@ const mountAgentStack = (root, args = []) => {
       .flatMap((part) => (part.startsWith('**') ? [el('b', { text: part.slice(2, -2) })] : rich(part))));
 
     const byCol = (col) => scene.items.filter((item) => item.col === col);
-    const context = el('div', { class: 'as-col as-context' }, el('div', { class: 'as-colhead', text: 'CONTEXTO DEL LLM' }),
-      el('div', { class: 'as-llm' }, 'LLM', el('small', { text: 'predice texto y decide qué tool pedir' })),
-      byCol('context').map(itemNode));
-    const tools = el('div', { class: 'as-col as-tools' }, el('div', { class: 'as-colhead', text: 'TOOL SYSTEM' }));
-    let group = null;
-    byCol('tools').forEach((item) => {
-      if (item.group !== group) {
-        group = item.group;
-        tools.append(el('div', { class: `as-group as-${group}`, text: GROUP_LABEL[group] }));
-      }
-      tools.append(itemNode(item));
-    });
-    const world = el('div', { class: 'as-col as-world' }, el('div', { class: 'as-colhead', text: 'TU PROYECTO Y AFUERA' }),
-      byCol('world').map(itemNode));
-    body.replaceChildren(context, el('div', { class: 'as-link', text: '⇄' }), tools, el('div', { class: 'as-link', text: '⇄' }), world);
+    const tools = (group) => byCol('tools').filter((item) => item.group === group);
+    const mcp = stageKey === 'mcp';
+    const at = (col, row) => `grid-column:${col};grid-row:${row}`;
+    const rows = mcp ? '1 / 4' : '1 / 2';
+    const cell = (cls, col, row, ...children) => el('div', { class: `as-cell ${cls}`, style: at(col, row) }, ...children);
+    const wire = (group, row, items) => el('div', {
+      class: `as-wire as-${group}${items.some((item) => item.hot) ? ' as-hot' : ''}`,
+      style: at(4, row),
+      'data-wire': group,
+    }, el('i'));
+    const toolCell = (group, row, head) => cell('as-tools', 3, row, head,
+      el('div', { class: `as-group as-${group}`, text: GROUP_LABEL[group] }), tools(group).map(itemNode));
+    const project = byCol('world').filter((item) => !item.ext);
+    const outside = (key) => byCol('world').find((item) => item.key === key);
+
+    const parts = [
+      el('div', { class: 'as-bg as-context', style: at(1, rows) }),
+      cell('as-context', 1, rows, el('div', { class: 'as-colhead', text: 'CONTEXTO DEL LLM' }),
+        el('div', { class: 'as-llm' }, 'LLM', el('small', { text: 'predice texto y decide qué tool pedir' })),
+        byCol('context').map(itemNode)),
+      el('div', { class: 'as-link', style: at(2, rows), text: '⇄' }),
+      el('div', { class: 'as-bg as-tools', style: at(3, rows) }),
+      toolCell('native', 1, el('div', { class: 'as-colhead', text: 'TOOL SYSTEM' })),
+      wire('native', 1, [...tools('native'), ...project]),
+      el('div', { class: 'as-bg as-project', style: at(5, 1) }),
+      cell('as-project', 5, 1, el('div', { class: 'as-colhead', text: 'TU PROYECTO' }), project.map(itemNode)),
+    ];
+    if (mcp) {
+      const stitch = outside('w-stitch');
+      const chromium = outside('w-chromium');
+      parts.push(
+        el('div', { class: 'as-bg as-outside', style: at(5, '2 / 4') }),
+        toolCell('stitch', 2), wire('stitch', 2, [...tools('stitch'), stitch]),
+        cell('as-outside', 5, 2, el('div', { class: 'as-colhead', text: 'MUNDO EXTERIOR' }),
+          itemNode(stitch), el('div', { class: 'as-ext-note', text: stitch.what })),
+        toolCell('playwright', 3), wire('playwright', 3, [...tools('playwright'), chromium]),
+        cell('as-outside', 5, 3, itemNode(chromium), el('div', { class: 'as-ext-note', text: chromium.what })));
+    }
+    body.replaceChildren(...parts);
 
     prompts.replaceChildren('Pídale:', ...scene.prompts.map((item) => el('button', {
       class: `as-prompt${item.key === promptKey ? ' as-sel' : ''}`,

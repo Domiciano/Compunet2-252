@@ -189,8 +189,11 @@ plano, sin React ni imports, `mount(nodo, opciones) → destroy`, tarjeta clara 
   nuestra API y cómo se configura. Los que no están en la cadena (`CsrfFilter` deshabilitado,
   `UsernamePasswordAuthenticationFilter` sin `formLogin`) van tachados. Los textos viven en
   `CHAIN_FILTERS`.
-- `agent-stack` («LLMs, Agentes y MCP Servers», 0046, en `agentSims.js`): tres columnas
-  (contexto del LLM, tool system, tu proyecto y afuera) y tres pestañas acumulativas:
+- `agent-stack` («LLMs, Agentes y MCP Servers», 0046, en `agentSims.js`): una grilla con el
+  contexto del LLM, el tool system y, a la derecha, *Tu proyecto*; en *+ MCP* aparece debajo
+  un bloque aparte, *Mundo exterior*, y cada grupo de tools MCP queda en la misma fila que su
+  destino, con una flecha hacia él (Stitch, Chromium). Ahí las carpetas de skills se pliegan
+  a `.agents/skills/` para que las filas no se separen. Tres pestañas acumulativas:
   *Agente*, *+ Skills* y *+ MCP*. Lo que suma cada pestaña aparece punteado con la marca
   «nuevo». Las skills de ejemplo son `spec-writer` y `db-designer`: entran al contexto
   solo como description y su `SKILL.md` se carga solo con el pedido que coincide. Además
