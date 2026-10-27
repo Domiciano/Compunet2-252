@@ -438,7 +438,7 @@ def rest_stateless(freeze=None):
         (4, 'green', 'El servidor se reinicia y el cliente envía el mismo token.', 'Sigue funcionando: el request trae todo lo que hace falta.')],
         ('Stateless: el servidor no guarda nada entre requests; cada uno trae todo lo que necesita.',
          'Por eso un reinicio no afecta al cliente: no había nada que perder.'))
-    return s + tail(h, 'El token firmado (JWT) se ve en detalle en «Auth en REST», la semana 12.')
+    return s + tail(h, 'El token firmado (JWT) se ve en detalle en «Anatomía de un JWT», la semana 12.')
 
 
 FIGS['restStateless'] = rest_stateless
@@ -817,6 +817,180 @@ def rest_mapstruct():
 
 
 FIGS['restMapstruct'] = rest_mapstruct
+
+
+def ms_row(x, y, w, name, value, color, gone=False):
+    soft, border, strong = FAM[color]
+    if gone:
+        rb = FAM['rose'][1]
+        return (f'  <rect x="{x}" y="{y}" width="{w}" height="30" rx="7" fill="#FFFFFF" stroke="{rb}" stroke-width="1.25" stroke-dasharray="4 4"/>'
+                f'<text class="mono" x="{x+14}" y="{y+15}" dy="0.35em" font-size="13" fill="#9AA3B5">{esc(name)}</text>'
+                f'<text class="mono" x="{x+w-14}" y="{y+15}" dy="0.35em" text-anchor="end" font-size="12" fill="#9AA3B5">{esc(value)}</text>\n')
+    return (f'  <rect x="{x}" y="{y}" width="{w}" height="30" rx="7" fill="#FFFFFF" stroke="{border}" stroke-width="1.25"/>'
+            f'<text class="mono" x="{x+14}" y="{y+15}" dy="0.35em" font-size="13" fill="#161A26">{esc(name)}</text>'
+            f'<text class="mono" x="{x+w-14}" y="{y+15}" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">{esc(value)}</text>\n')
+
+
+def ms_card(x, y, w, label, color, cls, fields):
+    """Objeto con sus campos. fields: (nombre, valor, gone) o (nombre, tipo, color, [subcampos]) para un objeto anidado
+    o una lista. Devuelve el SVG, la altura y las anclas {ruta: (x_izq, x_der, y_centro)}."""
+    anchors = {}
+    body = ''
+    cy = y + 92
+    for f in fields:
+        if len(f) == 3:
+            name, value, gone = f
+            body += ms_row(x + 16, cy, w - 32, name, value, color, gone)
+            anchors[name] = (x + 16, x + w - 16, cy + 15)
+            cy += 38
+            continue
+        name, typ, ncolor, subs = f
+        soft, border, strong = FAM[ncolor]
+        nh = 34 + len(subs) * 38
+        body += (f'  <rect x="{x+16}" y="{cy}" width="{w-32}" height="{nh}" rx="9" fill="{soft}" stroke="{border}" stroke-width="1.5"/>'
+                 f'<text class="mono" x="{x+30}" y="{cy+17}" dy="0.35em" font-size="12.5" font-weight="700" fill="{strong}">{esc(name)}</text>'
+                 f'<text class="mono" x="{x+w-30}" y="{cy+17}" dy="0.35em" text-anchor="end" font-size="12" fill="{strong}">{esc(typ)}</text>\n')
+        anchors[name] = (x + 16, x + w - 16, cy + nh / 2)
+        for i, (sn, sv) in enumerate(subs):
+            sy = cy + 34 + i * 38
+            body += ms_row(x + 28, sy, w - 56, sn, sv, ncolor)
+            anchors[f'{name}.{sn}'] = (x + 28, x + w - 28, sy + 15)
+        cy += nh + 8
+    h = cy - y + 8
+    s = panel(x, y, w, h, label)
+    s += '  ' + box(x + 16, y + 36, w - 32, 40, color, cls, fs=13.5)
+    return s + body, h, anchors
+
+
+def ms_link(a, b, color, text=None, dashed=False, mono=True):
+    (_, x1, y1), (x2, _, y2) = a, b
+    x1, x2 = x1 + 4, x2 - 6
+    mx = (x1 + x2) / 2
+    dash = ' stroke-dasharray="5 4"' if dashed else ''
+    s = f'  <path class="ar-{color}" d="M{x1},{y1:.0f} C{mx:.0f},{y1:.0f} {mx:.0f},{y2:.0f} {x2},{y2:.0f}"{dash}/>\n'
+    if text:
+        s += '  ' + pill(mx, (y1 + y2) / 2, text, color) + '\n'
+    return s
+
+
+def ms_source_target():
+    fid, h = 'restMsSourceTarget', 372
+    s = head(fid, h, 'Source es lo que entra, target es lo que sale', 'Source es lo que entra, target es lo que sale',
+             'Cada método del mapper lee un objeto source y llena un objeto target nuevo. @Mapping nombra campos de uno y del otro.',
+             'Un panel de código con dos líneas. En CursoDTO toDTO(Curso curso), el parámetro Curso curso está resaltado en '
+             'ámbar como source y el tipo de retorno CursoDTO en verde como target. En @Mapping(source = "profesor.id", '
+             'target = "profesorId"), el valor de source es una ruta dentro del parámetro y el de target una ruta dentro del '
+             'objeto que se devuelve. Abajo dos tarjetas explican cada rol.', colors=('slate',))
+    a, g = FAM['amber'][1], FAM['green'][1]
+    lines = ['@Mapping(source = "profesor.id", target = "profesorId")', 'CursoDTO toDTO(Curso curso);']
+    fs, cw = 17, 17 * .6
+    s += pane(48, 104, 864, 120, 'CursoMapper.java', lines, fs=fs, lh=36, top=62,
+              marks=[(0, 18, 13, a), (0, 42, 12, g), (1, 0, 8, g), (1, 15, 11, a)])
+    cards = [(48, 'amber', 'SOURCE', 'El parámetro del método', 'El objeto del que se leen los datos. En @Mapping,',
+              'source es una ruta dentro de él: profesor.id.'),
+             (488, 'green', 'TARGET', 'El tipo de retorno', 'El objeto que MapStruct crea y llena. En @Mapping,',
+              'target es una ruta dentro de él: profesorId.')]
+    for x, color, tag, title, l1, l2 in cards:
+        soft, border, strong = FAM[color]
+        s += (f'  <rect x="{x}" y="244" width="424" height="76" rx="12" fill="{soft}" stroke="{border}" stroke-width="1.5"/>'
+              f'<text x="{x+20}" y="270" font-size="13" font-weight="700" letter-spacing=".08em" fill="{strong}">{tag}</text>'
+              f'<text x="{x+100}" y="270" font-size="14" font-weight="700" fill="#161A26">{title}</text>'
+              f'<text x="{x+20}" y="292" font-size="12.5" fill="#454C61" data-fit="384">{l1}</text>'
+              f'<text x="{x+20}" y="310" font-size="12.5" fill="#454C61" data-fit="384">{l2}</text>\n')
+    return s + tail(h, 'Sin @Mapping, MapStruct empareja por nombre: cada campo del target recibe el campo homónimo del source.')
+
+
+FIGS['restMsSourceTarget'] = ms_source_target
+
+
+def ms_simple():
+    fid = 'restMsSimple'
+    src, sh, sa = ms_card(48, 104, 300, 'SOURCE · parámetro', 'amber', 'Usuario',
+                          [('id', '7', False), ('nombre', '"Ana"', False), ('email', '"ana@icesi.co"', False),
+                           ('fechaNacimiento', '2004-03-14', False), ('password', '"s3cr3t"', False)])
+    tgt, th, ta = ms_card(612, 104, 300, 'TARGET · retorno', 'green', 'UsuarioDTO',
+                          [('id', '7', False), ('nombre', '"Ana"', False), ('correo', '"ana@icesi.co"', False),
+                           ('fechaNacimiento', '"14/03/2004"', False)])
+    h = 104 + max(sh, th) + 64
+    s = head(fid, h, 'Objetos simples: cuatro casos campo por campo', 'Objetos simples: cuatro casos campo por campo',
+             'Usuario → UsuarioDTO. Con el mismo nombre se copia solo; lo demás se declara con @Mapping.',
+             'A la izquierda el source Usuario con id 7, nombre Ana, email, fechaNacimiento 2004-03-14 y password. A la derecha '
+             'el target UsuarioDTO con id, nombre, correo y fechaNacimiento como texto 14/03/2004. id y nombre se copian solos '
+             'por tener el mismo nombre. email va a correo con @Mapping. fechaNacimiento cambia de LocalDate a String con '
+             'dateFormat. password no existe en el DTO y no se copia.',
+             colors=('slate', 'indigo', 'violet', 'rose'))
+    s += src + tgt
+    s += ms_link(sa['id'], ta['id'], 'slate', 'mismo nombre')
+    s += ms_link(sa['nombre'], ta['nombre'], 'slate', 'mismo nombre')
+    s += ms_link(sa['email'], ta['correo'], 'indigo', '@Mapping')
+    s += ms_link(sa['fechaNacimiento'], ta['fechaNacimiento'], 'violet', 'dateFormat')
+    x1, _, y1 = sa['password'][1], 0, sa['password'][2]
+    s += f'  <path d="M{x1+4},{y1} H420" fill="none" stroke="{FAM["rose"][2]}" stroke-width="1.75" stroke-dasharray="5 4"/>\n'
+    s += '  ' + pill(500, y1, 'no hay campo: no sale', 'rose') + '\n'
+    return s + tail(h, 'Un campo del target que nadie llena produce el aviso "Unmapped target property" al compilar.')
+
+
+FIGS['restMsSimple'] = ms_simple
+
+
+def ms_aplanar():
+    fid = 'restMsAplanar'
+    src, sh, sa = ms_card(48, 104, 300, 'SOURCE · Curso', 'amber', 'Curso',
+                          [('id', '12', False), ('nombre', '"Compu 2"', False),
+                           ('profesor', 'Profesor', 'teal', [('id', '3'), ('nombre', '"Carlos"')])])
+    tgt, th, ta = ms_card(612, 104, 300, 'TARGET · CursoDTO', 'green', 'CursoDTO',
+                          [('id', '12', False), ('nombre', '"Compu 2"', False), ('profesorId', '3', False),
+                           ('profesorNombre', '"Carlos"', False)])
+    h = 104 + max(sh, th) + 64
+    s = head(fid, h, 'Objeto compuesto a plano: el punto entra al objeto', 'Objeto compuesto a plano: el punto entra al objeto',
+             'Curso trae un Profesor adentro; CursoDTO solo quiere dos datos suyos. source = "profesor.id" baja un nivel.',
+             'A la izquierda el source Curso con id 12, nombre Computación 2 y un objeto profesor de tipo Profesor con id 3 y '
+             'nombre Carlos Ruiz. A la derecha el target CursoDTO plano con id, nombre, profesorId y profesorNombre. id y '
+             'nombre se copian solos. profesor.id va a profesorId y profesor.nombre a profesorNombre con @Mapping.',
+             colors=('slate', 'indigo'))
+    s += src + tgt
+    s += ms_link(sa['id'], ta['id'], 'slate', 'mismo nombre')
+    s += ms_link(sa['nombre'], ta['nombre'], 'slate', 'mismo nombre')
+    s += ms_link(sa['profesor.id'], ta['profesorId'], 'indigo', '"profesor.id"')
+    s += ms_link(sa['profesor.nombre'], ta['profesorNombre'], 'indigo', '"profesor.nombre"')
+    return s + tail(h, 'De vuelta (toEntity) se invierte: source = "profesorId", target = "profesor.id" crea el Profesor y le pone el id.')
+
+
+FIGS['restMsAplanar'] = ms_aplanar
+
+
+def ms_anidado():
+    fid = 'restMsAnidado'
+    src, sh, sa = ms_card(48, 104, 300, 'SOURCE · Curso', 'amber', 'Curso',
+                          [('id', '12', False), ('nombre', '"Compu 2"', False),
+                           ('profesor', 'Profesor', 'teal', [('id', '3'), ('nombre', '"Carlos"')]),
+                           ('estudiantes', 'List<Estudiante>', 'violet', [('[0]', 'Ana'), ('[1]', 'Luis')])])
+    tgt, th, ta = ms_card(612, 104, 300, 'TARGET · CursoDTO', 'green', 'CursoDTO',
+                          [('id', '12', False), ('nombre', '"Compu 2"', False),
+                           ('profesor', 'ProfesorDTO', 'teal', [('id', '3'), ('nombre', '"Carlos"')]),
+                           ('estudiantes', 'List<EstudianteDTO>', 'violet', [('[0]', 'Ana'), ('[1]', 'Luis')])])
+    h = 104 + max(sh, th) + 64
+    s = head(fid, h, 'Objeto compuesto a compuesto: cada tipo con su mapper', 'Objeto compuesto a compuesto: cada tipo con su mapper',
+             'Para Profesor → ProfesorDTO y para cada Estudiante de la lista, CursoMapper delega en el mapper de ese tipo.',
+             'A la izquierda el source Curso con id, nombre, un profesor de tipo Profesor con id y nombre, y una lista '
+             'estudiantes de tipo List de Estudiante con Ana y Luis. A la derecha el target CursoDTO con id, nombre, un profesor '
+             'de tipo ProfesorDTO con id y nombre, y una lista de EstudianteDTO con Ana y Luis. En el centro, ProfesorMapper '
+             'convierte el profesor y EstudianteMapper convierte la lista, un elemento a la vez.',
+             colors=('slate', 'indigo'))
+    s += src + tgt
+    s += ms_link(sa['id'], ta['id'], 'slate')
+    s += ms_link(sa['nombre'], ta['nombre'], 'slate')
+    for key, mapper, sub in (('profesor', 'ProfesorMapper', 'toDTO(profesor)'),
+                             ('estudiantes', 'EstudianteMapper', 'toDTO(…) por elemento')):
+        (_, x1, y1), (x2, _, y2) = sa[key], ta[key]
+        cy = (y1 + y2) / 2
+        s += f'  <path class="ar-indigo" d="M{x1+4},{y1:.0f} C{x1+40},{y1:.0f} {x1+40},{cy:.0f} 384,{cy:.0f}"/>\n'
+        s += f'  <path class="ar-indigo" d="M576,{cy:.0f} C{x2-40},{cy:.0f} {x2-40},{y2:.0f} {x2-6},{y2:.0f}"/>\n'
+        s += '  ' + box(384, cy - 26, 192, 52, 'indigo', mapper, sub=sub, fs=13)
+    return s + tail(h, 'Las reglas de cada tipo viven en su propio mapper; CursoMapper solo lo declara en uses.')
+
+
+FIGS['restMsAnidado'] = ms_anidado
 
 
 def rest_lombok():
