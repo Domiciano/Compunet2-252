@@ -927,6 +927,41 @@ def ms_aplanar():
 FIGS['restMsAplanar'] = ms_aplanar
 
 
+def ms_course_to_entity():
+    fid = 'restMsCourseToEntity'
+    src, sh, sa = ms_card(48, 104, 300, 'SOURCE · CourseRequestDTO', 'green', 'CourseRequestDTO',
+                          [('name', '"Compu 2"', False), ('credits', '3', False), ('professorId', '2', False)])
+    tgt, th, ta = ms_card(612, 104, 300, 'TARGET · Course', 'amber', 'Course',
+                          [('name', '"Compu 2"', False), ('credits', '3', False),
+                           ('professor', 'Maria Rodriguez', False), ('publicId', 'UUID', False),
+                           ('id', 'null', True), ('enrollments', 'null', True)])
+    h = 104 + max(sh, th) + 64
+    s = head(fid, h, 'Ejemplo 1 · De vuelta: toEntity para crear un curso', 'Ejemplo 1 · De vuelta: toEntity para crear un curso',
+             'El mapper copia los datos; lo que sale de la base de datos o de una regla lo pone el service.',
+             'A la izquierda el source CourseRequestDTO con name, credits y professorId. A la derecha el target Course. '
+             'name y credits se copian solos. professor, publicId, id y enrollments se ignoran en el mapper: el service '
+             'busca el Professor con professorId y genera el publicId con UUID; el id lo genera la base de datos al '
+             'guardar y enrollments empieza vacío.', colors=('slate', 'indigo'))
+    s += src + tgt
+    s += ms_link(sa['name'], ta['name'], 'slate', 'mismo nombre')
+    s += ms_link(sa['credits'], ta['credits'], 'slate', 'mismo nombre')
+    ind = FAM['indigo'][2]
+    (_, x1, y1), (x2, _, y2) = sa['professorId'], ta['professor']
+    s += (f'  <path d="M{x1+4},{y1} H{x2-6}" fill="none" stroke="{ind}" stroke-width="1.75" stroke-dasharray="5 4" '
+          f'marker-end="url(#{fid}-ar-indigo)"/>\n')
+    s += '  ' + pill(480, y1, 'service: findById(professorId)', 'indigo', fs=10.5) + '\n'
+    for key, text, color in (('publicId', 'service: UUID.randomUUID()', 'indigo'),
+                             ('id', 'ignore · lo genera la BD', 'rose'),
+                             ('enrollments', 'ignore · empieza vacío', 'rose')):
+        x2, _, y2 = ta[key][0], 0, ta[key][2]
+        s += f'  <path d="M{x2-150},{y2} H{x2-6}" fill="none" stroke="{FAM[color][1]}" stroke-width="1.5" stroke-dasharray="4 4"/>\n'
+        s += '  ' + pill(x2 - 150, y2, text, color, fs=10.5) + '\n'
+    return s + tail(h, 'En el mapper los cuatro campos de la derecha van con ignore = true: MapStruct no sabe de dónde sacarlos.')
+
+
+FIGS['restMsCourseToEntity'] = ms_course_to_entity
+
+
 def ms_simple():
     fid = 'restMsSimple'
     src, sh, sa = ms_card(48, 104, 300, 'SOURCE · Student', 'amber', 'Student',

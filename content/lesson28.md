@@ -168,6 +168,110 @@ public List<CourseDTO> getAllRest() {
 
 `GET /api/v1/courses` responde exactamente lo mismo que antes.
 
+### De vuelta: crear un curso
+
+Para crear, el cliente no manda un `CourseDTO`: no conoce el `publicId` y no debería escribir el nombre del profesor, sino decir cuál es. Por eso la entrada es otro DTO, `api/dto/CourseRequestDTO.java`:
+
+```java
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class CourseRequestDTO {
+    private String name;
+    private int credits;
+    private Integer professorId;
+}
+```
+
+```svg
+<svg id="restMsCourseToEntity" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 496" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="restMsCourseToEntity-ttl restMsCourseToEntity-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
+  <title id="restMsCourseToEntity-ttl">Ejemplo 1 · De vuelta: toEntity para crear un curso</title>
+  <desc id="restMsCourseToEntity-dsc">A la izquierda el source CourseRequestDTO con name, credits y professorId. A la derecha el target Course. name y credits se copian solos. professor, publicId, id y enrollments se ignoran en el mapper: el service busca el Professor con professorId y genera el publicId con UUID; el id lo genera la base de datos al guardar y enrollments empieza vacío.</desc>
+  <defs>
+    <style>
+      #restMsCourseToEntity .title{fill:#161A26;font-size:22px;font-weight:700}
+      #restMsCourseToEntity .sub{fill:#79809A;font-size:13.5px}
+      #restMsCourseToEntity .h{font-size:12px;font-weight:700;letter-spacing:.08em;fill:#556074}
+      #restMsCourseToEntity .foot{fill:#79809A;font-size:12px}
+      #restMsCourseToEntity .mono{font-family:ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace}
+      #restMsCourseToEntity .ar-slate{fill:none;stroke:#556074;stroke-width:1.75;marker-end:url(#restMsCourseToEntity-ar-slate)}
+      #restMsCourseToEntity .ar-indigo{fill:none;stroke:#4453C9;stroke-width:1.75;marker-end:url(#restMsCourseToEntity-ar-indigo)}
+    </style>
+    <marker id="restMsCourseToEntity-ar-slate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#556074"/></marker>
+    <marker id="restMsCourseToEntity-ar-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#4453C9"/></marker>
+  </defs>
+  <rect width="960" height="496" rx="16" fill="#FBFBFD"/>
+  <text class="title" x="48" y="56">Ejemplo 1 · De vuelta: toEntity para crear un curso</text>
+  <text class="sub" x="48" y="80" data-fit="860">El mapper copia los datos; lo que sale de la base de datos o de una regla lo pone el service.</text>
+  <rect x="48" y="104" width="300" height="214" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
+  <text class="h" x="64" y="128" data-fit="268">SOURCE · CourseRequestDTO</text>
+  <rect x="64" y="140" width="268" height="40" rx="10" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text class="mono" x="198" y="160" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#3A8235" data-fit="252">CourseRequestDTO</text>
+  <rect x="64" y="196" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="78" y="211" dy="0.35em" font-size="13" fill="#161A26">name</text><text class="mono" x="318" y="211" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;Compu 2&quot;</text>
+  <rect x="64" y="234" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="78" y="249" dy="0.35em" font-size="13" fill="#161A26">credits</text><text class="mono" x="318" y="249" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">3</text>
+  <rect x="64" y="272" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="78" y="287" dy="0.35em" font-size="13" fill="#161A26">professorId</text><text class="mono" x="318" y="287" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">2</text>
+  <rect x="612" y="104" width="300" height="328" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
+  <text class="h" x="628" y="128" data-fit="268">TARGET · Course</text>
+  <rect x="628" y="140" width="268" height="40" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text class="mono" x="762" y="160" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#A96C05" data-fit="252">Course</text>
+  <rect x="628" y="196" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="642" y="211" dy="0.35em" font-size="13" fill="#161A26">name</text><text class="mono" x="882" y="211" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;Compu 2&quot;</text>
+  <rect x="628" y="234" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="642" y="249" dy="0.35em" font-size="13" fill="#161A26">credits</text><text class="mono" x="882" y="249" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">3</text>
+  <rect x="628" y="272" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="642" y="287" dy="0.35em" font-size="13" fill="#161A26">professor</text><text class="mono" x="882" y="287" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">Maria Rodriguez</text>
+  <rect x="628" y="310" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="642" y="325" dy="0.35em" font-size="13" fill="#161A26">publicId</text><text class="mono" x="882" y="325" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">UUID</text>
+  <rect x="628" y="348" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F3A3B2" stroke-width="1.25" stroke-dasharray="4 4"/><text class="mono" x="642" y="363" dy="0.35em" font-size="13" fill="#9AA3B5">id</text><text class="mono" x="882" y="363" dy="0.35em" text-anchor="end" font-size="12" fill="#9AA3B5">null</text>
+  <rect x="628" y="386" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F3A3B2" stroke-width="1.25" stroke-dasharray="4 4"/><text class="mono" x="642" y="401" dy="0.35em" font-size="13" fill="#9AA3B5">enrollments</text><text class="mono" x="882" y="401" dy="0.35em" text-anchor="end" font-size="12" fill="#9AA3B5">null</text>
+  <path class="ar-slate" d="M336,211 C479,211 479,211 622,211"/>
+  <rect x="431.4" y="201.0" width="95.2" height="20" rx="10" fill="#EFF1F5" stroke="#C4CBD8" stroke-width="1.5"/><text class="mono" x="479.0" y="211.0" dy="0.35em" text-anchor="middle" font-size="11" font-weight="700" fill="#556074">mismo nombre</text>
+  <path class="ar-slate" d="M336,249 C479,249 479,249 622,249"/>
+  <rect x="431.4" y="239.0" width="95.2" height="20" rx="10" fill="#EFF1F5" stroke="#C4CBD8" stroke-width="1.5"/><text class="mono" x="479.0" y="249.0" dy="0.35em" text-anchor="middle" font-size="11" font-weight="700" fill="#556074">mismo nombre</text>
+  <path d="M336,287 H622" fill="none" stroke="#4453C9" stroke-width="1.75" stroke-dasharray="5 4" marker-end="url(#restMsCourseToEntity-ar-indigo)"/>
+  <rect x="377.5" y="277" width="205.0" height="20" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text class="mono" x="480" y="287" dy="0.35em" text-anchor="middle" font-size="10.5" font-weight="700" fill="#4453C9">service: findById(professorId)</text>
+  <path d="M478,325 H622" fill="none" stroke="#A9B4F2" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <rect x="388.1" y="315" width="179.8" height="20" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text class="mono" x="478" y="325" dy="0.35em" text-anchor="middle" font-size="10.5" font-weight="700" fill="#4453C9">service: UUID.randomUUID()</text>
+  <path d="M478,363 H622" fill="none" stroke="#F3A3B2" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <rect x="394.4" y="353" width="167.2" height="20" rx="10" fill="#FFEBEF" stroke="#F3A3B2" stroke-width="1.5"/><text class="mono" x="478" y="363" dy="0.35em" text-anchor="middle" font-size="10.5" font-weight="700" fill="#C2354F">ignore · lo genera la BD</text>
+  <path d="M478,401 H622" fill="none" stroke="#F3A3B2" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <rect x="400.7" y="391" width="154.6" height="20" rx="10" fill="#FFEBEF" stroke="#F3A3B2" stroke-width="1.5"/><text class="mono" x="478" y="401" dy="0.35em" text-anchor="middle" font-size="10.5" font-weight="700" fill="#C2354F">ignore · empieza vacío</text>
+  <text class="foot" x="48" y="468" data-fit="860">En el mapper los cuatro campos de la derecha van con ignore = true: MapStruct no sabe de dónde sacarlos.</text>
+</svg>
+```
+
+En `CourseMapper` se agrega el camino de vuelta. Todo campo de `Course` que no sale del DTO se declara con `ignore = true`; si no, MapStruct avisa al compilar:
+
+```java
+@Mapping(target = "id", ignore = true)
+@Mapping(target = "publicId", ignore = true)
+@Mapping(target = "professor", ignore = true)
+@Mapping(target = "enrollments", ignore = true)
+Course toEntity(CourseRequestDTO dto);
+```
+
+El service completa lo que el mapper no puede saber: busca el profesor y genera el `publicId`.
+
+```java
+@Transactional
+@PreAuthorize("hasAuthority('CREATE_COURSE')")
+public CourseDTO createRest(CourseRequestDTO dto) {
+    Professor professor = professorRepository
+            .findById(dto.getProfessorId())
+            .orElseThrow(() -> new IllegalStateException(
+                    "Professor " + dto.getProfessorId() + " does not exist"));
+    Course course = courseMapper.toEntity(dto);
+    course.setProfessor(professor);
+    course.setPublicId(UUID.randomUUID().toString());
+    return courseMapper.toDTO(courseRepository.save(course));
+}
+```
+
+Y en `CourseRestController`:
+
+```java
+@PostMapping
+public ResponseEntity<CourseDTO> createCourse(@RequestBody CourseRequestDTO dto) {
+    return ResponseEntity.status(201).body(courseService.createRest(dto));
+}
+```
+
+Entra un `CourseRequestDTO` y sale un `CourseDTO`: el cliente nunca toca la entidad, ni para leer ni para escribir.
+
 ## Ejemplo 2 · Student, un objeto simple
 
 ```svg
