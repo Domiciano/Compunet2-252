@@ -355,26 +355,3 @@ Para actualizar una entidad que ya existe sin crear otra, el target se pasa como
 ```java
 void updateEntity(CursoDTO dto, @MappingTarget Curso entity);
 ```
-
-## GYM de REST
-
-Implemente los siguientes endpoints para el proyecto del curso. Recuerde usar semántica REST correcta.
-
-- Obtener todos los cursos con su respectivo profesor. Paginados.
-- Obtener un curso por `id` con su profesor y su lista de estudiantes.
-- Buscar cursos por coincidencias en el nombre. Paginados.
-- Obtener todos los estudiantes inscritos en un curso específico.
-- Consultar todos los cursos de un estudiante por su código.
-- Buscar estudiantes por programa académico, ordenados por código. Paginados.
-- Listar todos los cursos con la cantidad de estudiantes inscritos.
-- Crear un nuevo curso y asignarle un profesor existente.
-- Registrar un nuevo estudiante.
-- Matricular un estudiante en un curso.
-- Actualizar nombre, código o programa de un estudiante.
-- Eliminar una matrícula por `id`.
-
-```plain
-https://classroom.github.com/a/tFfCV0KZ
-```
-
-Entregue esta tarea a más tardar el jueves de semana 13.
