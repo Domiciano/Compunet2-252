@@ -3,7 +3,10 @@ import React, { useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useThemeMode } from '@/theme/ThemeContext';
-import { SIMS, parseSpec } from '@/components/interactive/springSecuritySims';
+import { SIMS as SECURITY_SIMS, parseSpec } from '@/components/interactive/springSecuritySims';
+import { SIMS as AGENT_SIMS } from '@/components/interactive/agentSims';
+
+const SIMS = { ...SECURITY_SIMS, ...AGENT_SIMS };
 
 // ```interactive fences: the first word names the simulator, the rest are its options.
 // Simulators are plain DOM (shared with the session decks), so React only hands them a node.

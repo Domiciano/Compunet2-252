@@ -149,9 +149,10 @@ Toda valla cercada **debe declarar lenguaje** (` ```java `, nunca ` ``` ` a seca
 
 Lo que se entiende tocando va en un bloque ` ```interactive `, cuyo cuerpo es `<id> [opciones]`.
 Se portó desde FlutterLearning el 2026-10-20: `InteractiveBlock.jsx` y la línea de
-`LessonParser.jsx` son copia literal, salvo que aquí el registro `SIMS` vive en
-`src/components/interactive/springSecuritySims.js` (JS plano, sin React ni imports,
-`mount(nodo, opciones) → destroy`, CSS prefijado con `.jsim`, tarjeta clara fija).
+`LessonParser.jsx` son copia literal, salvo que aquí el registro `SIMS` se arma en
+`InteractiveBlock.jsx` juntando dos archivos: `src/components/interactive/springSecuritySims.js`
+(CSS prefijado con `.jsim`) y `agentSims.js` (CSS prefijado con `.asim`). Los dos son JS
+plano, sin React ni imports, `mount(nodo, opciones) → destroy`, tarjeta clara fija.
 
 - `jwt-flow` («Auth en REST», 0042): el estudiante pulsa `POST /api/v1/auth/login` o
   `GET /api/v1/posts` y sigue el request por la `SecurityFilterChain` (otros filtros,
@@ -188,6 +189,16 @@ Se portó desde FlutterLearning el 2026-10-20: `InteractiveBlock.jsx` y la líne
   nuestra API y cómo se configura. Los que no están en la cadena (`CsrfFilter` deshabilitado,
   `UsernamePasswordAuthenticationFilter` sin `formLogin`) van tachados. Los textos viven en
   `CHAIN_FILTERS`.
+- `agent-stack` («LLMs, Agentes y MCP Servers», 0046, en `agentSims.js`): tres columnas
+  (contexto del LLM, tool system, tu proyecto y afuera) y tres pestañas acumulativas:
+  *Agente*, *+ Skills* y *+ MCP*. Lo que suma cada pestaña aparece punteado con la marca
+  «nuevo». Las skills de ejemplo son `spec-writer` y `db-designer`: entran al contexto
+  solo como description y su `SKILL.md` se carga solo con el pedido que coincide. Además
+  **no agregan tools**, y una prueba lo verifica. MCP agrega las tools de Stitch (nube,
+  HTTP) y de Playwright (Chromium local, stdio). Cada pestaña trae dos pedidos que iluminan
+  su recorrido y lo cuentan en pasos. Todo son datos puros (`AGENT_ITEMS`, `AGENT_PROMPTS`,
+  `agentScene`), probados en `agentSims.test.jsx`. La opción abre en una pestaña:
+  ` agent-stack skills `.
 
 #### Darla de alta en `toc.md`
 
