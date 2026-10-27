@@ -19,13 +19,13 @@ Actualizado: AAAA-MM-DD
 
 ## Student
 
-- Expuesta: no · publicId: no
+- Expuesta: no · publicId: sí
 - Falta: DTO, mapper y endpoints
 
 ## Pendientes
 
-- Student no tiene publicId.
-- `ProfessorDTO` trae el `id` numérico.
+- Student no tiene endpoints.
+- `CourseDTO` trae el nombre del profesor, pero no su `publicId`.
 ```
 
 ## apidevlog.md

@@ -930,7 +930,7 @@ FIGS['restMsAplanar'] = ms_aplanar
 def ms_course_to_entity():
     fid = 'restMsCourseToEntity'
     src, sh, sa = ms_card(48, 104, 300, 'SOURCE · CourseRequestDTO', 'green', 'CourseRequestDTO',
-                          [('name', '"Compu 2"', False), ('credits', '3', False), ('professorId', '2', False)])
+                          [('name', '"Compu 2"', False), ('credits', '3', False), ('professorPublicId', '"c32b…"', False)])
     tgt, th, ta = ms_card(612, 104, 300, 'TARGET · Course', 'amber', 'Course',
                           [('name', '"Compu 2"', False), ('credits', '3', False),
                            ('professor', 'Maria Rodriguez', False), ('publicId', 'UUID', False),
@@ -938,18 +938,18 @@ def ms_course_to_entity():
     h = 104 + max(sh, th) + 64
     s = head(fid, h, 'Ejemplo 1 · De vuelta: toEntity para crear un curso', 'Ejemplo 1 · De vuelta: toEntity para crear un curso',
              'El mapper copia los datos; lo que sale de la base de datos o de una regla lo pone el service.',
-             'A la izquierda el source CourseRequestDTO con name, credits y professorId. A la derecha el target Course. '
+             'A la izquierda el source CourseRequestDTO con name, credits y professorPublicId. A la derecha el target Course. '
              'name y credits se copian solos. professor, publicId, id y enrollments se ignoran en el mapper: el service '
-             'busca el Professor con professorId y genera el publicId con UUID; el id lo genera la base de datos al '
+             'busca el Professor con professorPublicId y genera el publicId con UUID; el id lo genera la base de datos al '
              'guardar y enrollments empieza vacío.', colors=('slate', 'indigo'))
     s += src + tgt
     s += ms_link(sa['name'], ta['name'], 'slate', 'mismo nombre')
     s += ms_link(sa['credits'], ta['credits'], 'slate', 'mismo nombre')
     ind = FAM['indigo'][2]
-    (_, x1, y1), (x2, _, y2) = sa['professorId'], ta['professor']
+    (_, x1, y1), (x2, _, y2) = sa['professorPublicId'], ta['professor']
     s += (f'  <path d="M{x1+4},{y1} H{x2-6}" fill="none" stroke="{ind}" stroke-width="1.75" stroke-dasharray="5 4" '
           f'marker-end="url(#{fid}-ar-indigo)"/>\n')
-    s += '  ' + pill(480, y1, 'service: findById(professorId)', 'indigo', fs=10.5) + '\n'
+    s += '  ' + pill(480, y1, 'service: findByPublicId(…)', 'indigo', fs=10.5) + '\n'
     for key, text, color in (('publicId', 'service: UUID.randomUUID()', 'indigo'),
                              ('id', 'ignore · lo genera la BD', 'rose'),
                              ('enrollments', 'ignore · empieza vacío', 'rose')):
@@ -965,27 +965,28 @@ FIGS['restMsCourseToEntity'] = ms_course_to_entity
 def ms_simple():
     fid = 'restMsSimple'
     src, sh, sa = ms_card(48, 104, 300, 'SOURCE · Student', 'amber', 'Student',
-                          [('code', '"2021102001"', False), ('name', '"Laura Garcia"', False), ('program', '"Ing. Sistemas"', False),
-                           ('id', '1', True), ('studentCourses', 'List<…>', True)])
+                          [('publicId', '"0d82…"', False), ('code', '"2021102001"', False), ('name', '"Laura Garcia"', False),
+                           ('program', '"Ing. Sistemas"', False), ('id', '1', True), ('studentCourses', 'List<…>', True)])
     tgt, th, ta = ms_card(612, 104, 300, 'TARGET · StudentDTO', 'green', 'StudentDTO',
-                          [('code', '"2021102001"', False), ('name', '"Laura Garcia"', False),
+                          [('publicId', '"0d82…"', False), ('code', '"2021102001"', False), ('name', '"Laura Garcia"', False),
                            ('academicProgram', '"Ing. Sistemas"', False)])
     h = 104 + max(sh, th) + 64
     s = head(fid, h, 'Ejemplo 2 · Student: un objeto simple', 'Ejemplo 2 · Student: un objeto simple',
              'Con el mismo nombre se copia solo; con otro nombre se declara con @Mapping; lo que el DTO no tiene, no sale.',
-             'A la izquierda el source Student con id, code, name, program y la lista studentCourses. A la derecha el '
-             'target StudentDTO con code, name y academicProgram. code y name se copian solos. program va a '
+             'A la izquierda el source Student con publicId, code, name, program, id y la lista studentCourses. A la derecha '
+             'el target StudentDTO con publicId, code, name y academicProgram. publicId, code y name se copian solos. program va a '
              'academicProgram con @Mapping. id y studentCourses no tienen pareja en el DTO y no salen.',
              colors=('slate', 'indigo', 'rose'))
     s += src + tgt
+    s += ms_link(sa['publicId'], ta['publicId'], 'slate')
     s += ms_link(sa['code'], ta['code'], 'slate', 'mismo nombre')
-    s += ms_link(sa['name'], ta['name'], 'slate', 'mismo nombre')
+    s += ms_link(sa['name'], ta['name'], 'slate')
     s += ms_link(sa['program'], ta['academicProgram'], 'indigo', '@Mapping')
     for f in ('id', 'studentCourses'):
         x1, y1 = sa[f][1], sa[f][2]
         s += f'  <path d="M{x1+4},{y1} H420" fill="none" stroke="{FAM["rose"][2]}" stroke-width="1.75" stroke-dasharray="5 4"/>\n'
         s += '  ' + pill(500, y1, 'sin pareja: no sale', 'rose') + '\n'
-    return s + tail(h, 'De vuelta (toEntity) id y studentCourses no tienen de dónde salir: se marcan con ignore = true.')
+    return s + tail(h, 'De vuelta (toEntity) id, publicId y studentCourses no salen del DTO: se marcan con ignore = true.')
 
 
 FIGS['restMsSimple'] = ms_simple
@@ -994,21 +995,21 @@ FIGS['restMsSimple'] = ms_simple
 def ms_anidado():
     fid = 'restMsAnidado'
     src, sh, sa = ms_card(48, 104, 300, 'SOURCE · Professor', 'amber', 'Professor',
-                          [('id', '1', False), ('name', '"Juan Perez"', False),
+                          [('publicId', '"e03c…"', False), ('name', '"Juan Perez"', False),
                            ('courses', 'List<Course>', 'violet', [('[0]', 'Estructuras…'), ('[1]', 'Algoritmos…'),
                                                                   ('[2]', 'Base de Datos')])])
     tgt, th, ta = ms_card(612, 104, 300, 'TARGET · ProfessorDTO', 'green', 'ProfessorDTO',
-                          [('id', '1', False), ('name', '"Juan Perez"', False),
+                          [('publicId', '"e03c…"', False), ('name', '"Juan Perez"', False),
                            ('courses', 'List<CourseDTO>', 'violet', [('[0]', 'Estructuras…'), ('[1]', 'Algoritmos…'),
                                                                      ('[2]', 'Base de Datos')])])
     h = 104 + max(sh, th) + 64
     s = head(fid, h, 'Ejemplo 3 · Professor: de compuesto a compuesto', 'Ejemplo 3 · Professor: de compuesto a compuesto',
              'Cada Course de la lista pasa por CourseMapper, el del ejemplo 1. ProfessorMapper solo lo declara en uses.',
-             'A la izquierda el source Professor con id, name y una lista courses de tipo List de Course con tres cursos. '
-             'A la derecha el target ProfessorDTO con id, name y una lista de CourseDTO con los mismos tres cursos. En el '
+             'A la izquierda el source Professor con publicId, name y una lista courses de tipo List de Course con tres cursos. '
+             'A la derecha el target ProfessorDTO con publicId, name y una lista de CourseDTO con los mismos tres cursos. En el '
              'centro, CourseMapper convierte la lista, un elemento a la vez.', colors=('slate', 'indigo'))
     s += src + tgt
-    s += ms_link(sa['id'], ta['id'], 'slate', 'mismo nombre')
+    s += ms_link(sa['publicId'], ta['publicId'], 'slate', 'mismo nombre')
     s += ms_link(sa['name'], ta['name'], 'slate', 'mismo nombre')
     (_, x1, y1), (x2, _, y2) = sa['courses'], ta['courses']
     cy = (y1 + y2) / 2
@@ -1019,6 +1020,37 @@ def ms_anidado():
 
 
 FIGS['restMsAnidado'] = ms_anidado
+
+
+def ms_paginado():
+    fid = 'restMsPaginado'
+    names = [('[0]', 'Ana Martinez'), ('[1]', 'Diana Ospina'), ('[2]', 'Elena Vargas')]
+    src, sh, sa = ms_card(48, 104, 300, 'SOURCE · findAll(PageRequest)', 'amber', 'Page&lt;Professor&gt;',
+                          [('number', '0', False), ('size', '3', False), ('totalElements', '11', False),
+                           ('totalPages', '4', False), ('content', 'List<Professor>', 'violet', names)])
+    tgt, th, ta = ms_card(612, 104, 300, 'TARGET · respuesta', 'green', 'ProfessorPageDTO',
+                          [('page', '0', False), ('size', '3', False), ('totalElements', '11', False),
+                           ('totalPages', '4', False), ('content', 'List<ProfessorDTO>', 'violet', names)])
+    h = 104 + max(sh, th) + 64
+    s = head(fid, h, 'Ejemplo 4 · Una página de profesores', 'Ejemplo 4 · Una página de profesores',
+             'GET /professors?page=0&amp;size=3. El repositorio devuelve un Page; el mapper lo convierte en un DTO de página.',
+             'A la izquierda el source Page de Professor que devuelve findAll con un PageRequest: number 0, size 3, '
+             'totalElements 11, totalPages 4 y content con tres profesores. A la derecha el target ProfessorPageDTO con '
+             'page, size, totalElements, totalPages y content con tres ProfessorDTO. number va a page con @Mapping; size, '
+             'totalElements y totalPages se copian solos; cada profesor de content pasa por toDTO del ejemplo 3.',
+             colors=('slate', 'indigo'))
+    s += src + tgt
+    s += ms_link(sa['number'], ta['page'], 'indigo', '@Mapping')
+    s += ms_link(sa['size'], ta['size'], 'slate', 'mismo nombre')
+    s += ms_link(sa['totalElements'], ta['totalElements'], 'slate')
+    s += ms_link(sa['totalPages'], ta['totalPages'], 'slate')
+    (_, x1, y1), (x2, _, y2) = sa['content'], ta['content']
+    s += f'  <path class="ar-indigo" d="M{x1+4},{y1:.0f} H384"/><path class="ar-indigo" d="M576,{y2:.0f} H{x2-6}"/>\n'
+    s += '  ' + box(384, y1 - 26, 192, 52, 'indigo', 'toDTO', sub='por cada profesor', fs=13)
+    return s + tail(h, 'Ana Martinez es el primero porque la página se pidió con Sort.by("name"). Sin orden, cada página sale como la devuelva la BD.')
+
+
+FIGS['restMsPaginado'] = ms_paginado
 
 
 def rest_lombok():

@@ -1,6 +1,6 @@
 # MapStruct
 
-<!-- tags: MapStruct, @Mapper, @Mapping, source y target, CourseMapper, mapeo manual a MapStruct, uses, aplanar objeto anidado, DTO anidado, Unmapped target property, mapper no se genera, lombok-mapstruct-binding -->
+<!-- tags: MapStruct, @Mapper, @Mapping, source y target, CourseMapper, mapeo manual a MapStruct, uses, aplanar objeto anidado, DTO anidado, Unmapped target property, Page a DTO paginado, lombok-mapstruct-binding -->
 
 MapStruct genera, al compilar, el código que copia los campos de una entidad a su DTO. Usted solo declara una interfaz. Todo lo de esta lección se hace sobre el proyecto del curso, [262WebApp6](https://github.com/Domiciano/262WebApp6).
 
@@ -170,7 +170,7 @@ public List<CourseDTO> getAllRest() {
 
 ### De vuelta: crear un curso
 
-Para crear, el cliente no manda un `CourseDTO`: no conoce el `publicId` y no debería escribir el nombre del profesor, sino decir cuál es. Por eso la entrada es otro DTO, `api/dto/CourseRequestDTO.java`:
+Para crear, el cliente no manda un `CourseDTO`: no conoce el `publicId` del curso y no debería escribir el nombre del profesor, sino decir cuál es con su `publicId`. Por eso la entrada es otro DTO, `api/dto/CourseRequestDTO.java`:
 
 ```java
 @Data
@@ -179,14 +179,14 @@ Para crear, el cliente no manda un `CourseDTO`: no conoce el `publicId` y no deb
 public class CourseRequestDTO {
     private String name;
     private int credits;
-    private Integer professorId;
+    private String professorPublicId;
 }
 ```
 
 ```svg
 <svg id="restMsCourseToEntity" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 496" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="restMsCourseToEntity-ttl restMsCourseToEntity-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
   <title id="restMsCourseToEntity-ttl">Ejemplo 1 · De vuelta: toEntity para crear un curso</title>
-  <desc id="restMsCourseToEntity-dsc">A la izquierda el source CourseRequestDTO con name, credits y professorId. A la derecha el target Course. name y credits se copian solos. professor, publicId, id y enrollments se ignoran en el mapper: el service busca el Professor con professorId y genera el publicId con UUID; el id lo genera la base de datos al guardar y enrollments empieza vacío.</desc>
+  <desc id="restMsCourseToEntity-dsc">A la izquierda el source CourseRequestDTO con name, credits y professorPublicId. A la derecha el target Course. name y credits se copian solos. professor, publicId, id y enrollments se ignoran en el mapper: el service busca el Professor con professorPublicId y genera el publicId con UUID; el id lo genera la base de datos al guardar y enrollments empieza vacío.</desc>
   <defs>
     <style>
       #restMsCourseToEntity .title{fill:#161A26;font-size:22px;font-weight:700}
@@ -208,7 +208,7 @@ public class CourseRequestDTO {
   <rect x="64" y="140" width="268" height="40" rx="10" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text class="mono" x="198" y="160" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#3A8235" data-fit="252">CourseRequestDTO</text>
   <rect x="64" y="196" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="78" y="211" dy="0.35em" font-size="13" fill="#161A26">name</text><text class="mono" x="318" y="211" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;Compu 2&quot;</text>
   <rect x="64" y="234" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="78" y="249" dy="0.35em" font-size="13" fill="#161A26">credits</text><text class="mono" x="318" y="249" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">3</text>
-  <rect x="64" y="272" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="78" y="287" dy="0.35em" font-size="13" fill="#161A26">professorId</text><text class="mono" x="318" y="287" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">2</text>
+  <rect x="64" y="272" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="78" y="287" dy="0.35em" font-size="13" fill="#161A26">professorPublicId</text><text class="mono" x="318" y="287" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;c32b…&quot;</text>
   <rect x="612" y="104" width="300" height="328" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
   <text class="h" x="628" y="128" data-fit="268">TARGET · Course</text>
   <rect x="628" y="140" width="268" height="40" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text class="mono" x="762" y="160" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#A96C05" data-fit="252">Course</text>
@@ -223,7 +223,7 @@ public class CourseRequestDTO {
   <path class="ar-slate" d="M336,249 C479,249 479,249 622,249"/>
   <rect x="431.4" y="239.0" width="95.2" height="20" rx="10" fill="#EFF1F5" stroke="#C4CBD8" stroke-width="1.5"/><text class="mono" x="479.0" y="249.0" dy="0.35em" text-anchor="middle" font-size="11" font-weight="700" fill="#556074">mismo nombre</text>
   <path d="M336,287 H622" fill="none" stroke="#4453C9" stroke-width="1.75" stroke-dasharray="5 4" marker-end="url(#restMsCourseToEntity-ar-indigo)"/>
-  <rect x="377.5" y="277" width="205.0" height="20" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text class="mono" x="480" y="287" dy="0.35em" text-anchor="middle" font-size="10.5" font-weight="700" fill="#4453C9">service: findById(professorId)</text>
+  <rect x="390.1" y="277" width="179.8" height="20" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text class="mono" x="480" y="287" dy="0.35em" text-anchor="middle" font-size="10.5" font-weight="700" fill="#4453C9">service: findByPublicId(…)</text>
   <path d="M478,325 H622" fill="none" stroke="#A9B4F2" stroke-width="1.5" stroke-dasharray="4 4"/>
   <rect x="388.1" y="315" width="179.8" height="20" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text class="mono" x="478" y="325" dy="0.35em" text-anchor="middle" font-size="10.5" font-weight="700" fill="#4453C9">service: UUID.randomUUID()</text>
   <path d="M478,363 H622" fill="none" stroke="#F3A3B2" stroke-width="1.5" stroke-dasharray="4 4"/>
@@ -244,16 +244,22 @@ En `CourseMapper` se agrega el camino de vuelta. Todo campo de `Course` que no s
 Course toEntity(CourseRequestDTO dto);
 ```
 
-El service completa lo que el mapper no puede saber: busca el profesor y genera el `publicId`.
+El service completa lo que el mapper no puede saber: busca el profesor y genera el `publicId`. Para buscar por `publicId`, `ProfessorRepository` necesita un método más:
+
+```java
+Optional<Professor> findByPublicId(String publicId);
+```
+
+Y el método del service:
 
 ```java
 @Transactional
 @PreAuthorize("hasAuthority('CREATE_COURSE')")
 public CourseDTO createRest(CourseRequestDTO dto) {
     Professor professor = professorRepository
-            .findById(dto.getProfessorId())
+            .findByPublicId(dto.getProfessorPublicId())
             .orElseThrow(() -> new IllegalStateException(
-                    "Professor " + dto.getProfessorId() + " does not exist"));
+                    "Professor " + dto.getProfessorPublicId() + " does not exist"));
     Course course = courseMapper.toEntity(dto);
     course.setProfessor(professor);
     course.setPublicId(UUID.randomUUID().toString());
@@ -275,9 +281,9 @@ Entra un `CourseRequestDTO` y sale un `CourseDTO`: el cliente nunca toca la enti
 ## Ejemplo 2 · Student, un objeto simple
 
 ```svg
-<svg id="restMsSimple" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 458" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="restMsSimple-ttl restMsSimple-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
+<svg id="restMsSimple" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 496" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="restMsSimple-ttl restMsSimple-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
   <title id="restMsSimple-ttl">Ejemplo 2 · Student: un objeto simple</title>
-  <desc id="restMsSimple-dsc">A la izquierda el source Student con id, code, name, program y la lista studentCourses. A la derecha el target StudentDTO con code, name y academicProgram. code y name se copian solos. program va a academicProgram con @Mapping. id y studentCourses no tienen pareja en el DTO y no salen.</desc>
+  <desc id="restMsSimple-dsc">A la izquierda el source Student con publicId, code, name, program, id y la lista studentCourses. A la derecha el target StudentDTO con publicId, code, name y academicProgram. publicId, code y name se copian solos. program va a academicProgram con @Mapping. id y studentCourses no tienen pareja en el DTO y no salen.</desc>
   <defs>
     <style>
       #restMsSimple .title{fill:#161A26;font-size:22px;font-weight:700}
@@ -293,34 +299,36 @@ Entra un `CourseRequestDTO` y sale un `CourseDTO`: el cliente nunca toca la enti
     <marker id="restMsSimple-ar-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#4453C9"/></marker>
     <marker id="restMsSimple-ar-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#C2354F"/></marker>
   </defs>
-  <rect width="960" height="458" rx="16" fill="#FBFBFD"/>
+  <rect width="960" height="496" rx="16" fill="#FBFBFD"/>
   <text class="title" x="48" y="56">Ejemplo 2 · Student: un objeto simple</text>
   <text class="sub" x="48" y="80" data-fit="860">Con el mismo nombre se copia solo; con otro nombre se declara con @Mapping; lo que el DTO no tiene, no sale.</text>
-  <rect x="48" y="104" width="300" height="290" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
+  <rect x="48" y="104" width="300" height="328" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
   <text class="h" x="64" y="128" data-fit="268">SOURCE · Student</text>
   <rect x="64" y="140" width="268" height="40" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text class="mono" x="198" y="160" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#A96C05" data-fit="252">Student</text>
-  <rect x="64" y="196" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="78" y="211" dy="0.35em" font-size="13" fill="#161A26">code</text><text class="mono" x="318" y="211" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;2021102001&quot;</text>
-  <rect x="64" y="234" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="78" y="249" dy="0.35em" font-size="13" fill="#161A26">name</text><text class="mono" x="318" y="249" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;Laura Garcia&quot;</text>
-  <rect x="64" y="272" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="78" y="287" dy="0.35em" font-size="13" fill="#161A26">program</text><text class="mono" x="318" y="287" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;Ing. Sistemas&quot;</text>
-  <rect x="64" y="310" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F3A3B2" stroke-width="1.25" stroke-dasharray="4 4"/><text class="mono" x="78" y="325" dy="0.35em" font-size="13" fill="#9AA3B5">id</text><text class="mono" x="318" y="325" dy="0.35em" text-anchor="end" font-size="12" fill="#9AA3B5">1</text>
-  <rect x="64" y="348" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F3A3B2" stroke-width="1.25" stroke-dasharray="4 4"/><text class="mono" x="78" y="363" dy="0.35em" font-size="13" fill="#9AA3B5">studentCourses</text><text class="mono" x="318" y="363" dy="0.35em" text-anchor="end" font-size="12" fill="#9AA3B5">List&lt;…&gt;</text>
-  <rect x="612" y="104" width="300" height="214" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
+  <rect x="64" y="196" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="78" y="211" dy="0.35em" font-size="13" fill="#161A26">publicId</text><text class="mono" x="318" y="211" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;0d82…&quot;</text>
+  <rect x="64" y="234" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="78" y="249" dy="0.35em" font-size="13" fill="#161A26">code</text><text class="mono" x="318" y="249" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;2021102001&quot;</text>
+  <rect x="64" y="272" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="78" y="287" dy="0.35em" font-size="13" fill="#161A26">name</text><text class="mono" x="318" y="287" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;Laura Garcia&quot;</text>
+  <rect x="64" y="310" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="78" y="325" dy="0.35em" font-size="13" fill="#161A26">program</text><text class="mono" x="318" y="325" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;Ing. Sistemas&quot;</text>
+  <rect x="64" y="348" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F3A3B2" stroke-width="1.25" stroke-dasharray="4 4"/><text class="mono" x="78" y="363" dy="0.35em" font-size="13" fill="#9AA3B5">id</text><text class="mono" x="318" y="363" dy="0.35em" text-anchor="end" font-size="12" fill="#9AA3B5">1</text>
+  <rect x="64" y="386" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F3A3B2" stroke-width="1.25" stroke-dasharray="4 4"/><text class="mono" x="78" y="401" dy="0.35em" font-size="13" fill="#9AA3B5">studentCourses</text><text class="mono" x="318" y="401" dy="0.35em" text-anchor="end" font-size="12" fill="#9AA3B5">List&lt;…&gt;</text>
+  <rect x="612" y="104" width="300" height="252" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
   <text class="h" x="628" y="128" data-fit="268">TARGET · StudentDTO</text>
   <rect x="628" y="140" width="268" height="40" rx="10" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text class="mono" x="762" y="160" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#3A8235" data-fit="252">StudentDTO</text>
-  <rect x="628" y="196" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="642" y="211" dy="0.35em" font-size="13" fill="#161A26">code</text><text class="mono" x="882" y="211" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;2021102001&quot;</text>
-  <rect x="628" y="234" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="642" y="249" dy="0.35em" font-size="13" fill="#161A26">name</text><text class="mono" x="882" y="249" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;Laura Garcia&quot;</text>
-  <rect x="628" y="272" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="642" y="287" dy="0.35em" font-size="13" fill="#161A26">academicProgram</text><text class="mono" x="882" y="287" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;Ing. Sistemas&quot;</text>
+  <rect x="628" y="196" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="642" y="211" dy="0.35em" font-size="13" fill="#161A26">publicId</text><text class="mono" x="882" y="211" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;0d82…&quot;</text>
+  <rect x="628" y="234" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="642" y="249" dy="0.35em" font-size="13" fill="#161A26">code</text><text class="mono" x="882" y="249" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;2021102001&quot;</text>
+  <rect x="628" y="272" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="642" y="287" dy="0.35em" font-size="13" fill="#161A26">name</text><text class="mono" x="882" y="287" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;Laura Garcia&quot;</text>
+  <rect x="628" y="310" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="642" y="325" dy="0.35em" font-size="13" fill="#161A26">academicProgram</text><text class="mono" x="882" y="325" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;Ing. Sistemas&quot;</text>
   <path class="ar-slate" d="M336,211 C479,211 479,211 622,211"/>
-  <rect x="431.4" y="201.0" width="95.2" height="20" rx="10" fill="#EFF1F5" stroke="#C4CBD8" stroke-width="1.5"/><text class="mono" x="479.0" y="211.0" dy="0.35em" text-anchor="middle" font-size="11" font-weight="700" fill="#556074">mismo nombre</text>
   <path class="ar-slate" d="M336,249 C479,249 479,249 622,249"/>
   <rect x="431.4" y="239.0" width="95.2" height="20" rx="10" fill="#EFF1F5" stroke="#C4CBD8" stroke-width="1.5"/><text class="mono" x="479.0" y="249.0" dy="0.35em" text-anchor="middle" font-size="11" font-weight="700" fill="#556074">mismo nombre</text>
-  <path class="ar-indigo" d="M336,287 C479,287 479,287 622,287"/>
-  <rect x="444.6" y="277.0" width="68.8" height="20" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text class="mono" x="479.0" y="287.0" dy="0.35em" text-anchor="middle" font-size="11" font-weight="700" fill="#4453C9">@Mapping</text>
-  <path d="M336,325 H420" fill="none" stroke="#C2354F" stroke-width="1.75" stroke-dasharray="5 4"/>
-  <rect x="429.3" y="315" width="141.4" height="20" rx="10" fill="#FFEBEF" stroke="#F3A3B2" stroke-width="1.5"/><text class="mono" x="500" y="325" dy="0.35em" text-anchor="middle" font-size="11" font-weight="700" fill="#C2354F">sin pareja: no sale</text>
+  <path class="ar-slate" d="M336,287 C479,287 479,287 622,287"/>
+  <path class="ar-indigo" d="M336,325 C479,325 479,325 622,325"/>
+  <rect x="444.6" y="315.0" width="68.8" height="20" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text class="mono" x="479.0" y="325.0" dy="0.35em" text-anchor="middle" font-size="11" font-weight="700" fill="#4453C9">@Mapping</text>
   <path d="M336,363 H420" fill="none" stroke="#C2354F" stroke-width="1.75" stroke-dasharray="5 4"/>
   <rect x="429.3" y="353" width="141.4" height="20" rx="10" fill="#FFEBEF" stroke="#F3A3B2" stroke-width="1.5"/><text class="mono" x="500" y="363" dy="0.35em" text-anchor="middle" font-size="11" font-weight="700" fill="#C2354F">sin pareja: no sale</text>
-  <text class="foot" x="48" y="430" data-fit="860">De vuelta (toEntity) id y studentCourses no tienen de dónde salir: se marcan con ignore = true.</text>
+  <path d="M336,401 H420" fill="none" stroke="#C2354F" stroke-width="1.75" stroke-dasharray="5 4"/>
+  <rect x="429.3" y="391" width="141.4" height="20" rx="10" fill="#FFEBEF" stroke="#F3A3B2" stroke-width="1.5"/><text class="mono" x="500" y="401" dy="0.35em" text-anchor="middle" font-size="11" font-weight="700" fill="#C2354F">sin pareja: no sale</text>
+  <text class="foot" x="48" y="468" data-fit="860">De vuelta (toEntity) id, publicId y studentCourses no salen del DTO: se marcan con ignore = true.</text>
 </svg>
 ```
 
@@ -331,13 +339,14 @@ El DTO, en `api/dto/StudentDTO.java`:
 @NoArgsConstructor
 @AllArgsConstructor
 public class StudentDTO {
+    private String publicId;
     private String code;
     private String name;
     private String academicProgram;
 }
 ```
 
-El mapper va en los dos sentidos. De vuelta, `id` y `studentCourses` no tienen de dónde salir: `ignore = true` dice que se quedan vacíos a propósito.
+El mapper va en los dos sentidos. De vuelta, `id`, `publicId` y `studentCourses` no salen del DTO: `ignore = true` dice que el mapper los deja vacíos a propósito.
 
 ```java
 @Mapper(componentModel = "spring")
@@ -347,6 +356,7 @@ public interface StudentMapper {
     StudentDTO toDTO(Student student);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "publicId", ignore = true)
     @Mapping(target = "studentCourses", ignore = true)
     @Mapping(source = "academicProgram", target = "program")
     Student toEntity(StudentDTO dto);
@@ -366,19 +376,20 @@ public List<StudentDTO> getAllRest() {
 @Transactional
 @PreAuthorize("hasAuthority('CREATE_STUDENT')")
 public StudentDTO createRest(StudentDTO dto) {
-    Student saved = studentRepository.save(studentMapper.toEntity(dto));
-    return studentMapper.toDTO(saved);
+    Student student = studentMapper.toEntity(dto);
+    student.setPublicId(UUID.randomUUID().toString());
+    return studentMapper.toDTO(studentRepository.save(student));
 }
 ```
 
-Con un `StudentRestController` que exponga `GET` y `POST` en `/api/v1/students`, el cliente nunca ve el `id` ni las matrículas.
+Con un `StudentRestController` que exponga `GET` y `POST` en `/api/v1/students`, el cliente ve el `publicId`, pero nunca el `id` ni las matrículas.
 
 ## Ejemplo 3 · Professor, de compuesto a compuesto
 
 ```svg
 <svg id="restMsAnidado" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 500" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="restMsAnidado-ttl restMsAnidado-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
   <title id="restMsAnidado-ttl">Ejemplo 3 · Professor: de compuesto a compuesto</title>
-  <desc id="restMsAnidado-dsc">A la izquierda el source Professor con id, name y una lista courses de tipo List de Course con tres cursos. A la derecha el target ProfessorDTO con id, name y una lista de CourseDTO con los mismos tres cursos. En el centro, CourseMapper convierte la lista, un elemento a la vez.</desc>
+  <desc id="restMsAnidado-dsc">A la izquierda el source Professor con publicId, name y una lista courses de tipo List de Course con tres cursos. A la derecha el target ProfessorDTO con publicId, name y una lista de CourseDTO con los mismos tres cursos. En el centro, CourseMapper convierte la lista, un elemento a la vez.</desc>
   <defs>
     <style>
       #restMsAnidado .title{fill:#161A26;font-size:22px;font-weight:700}
@@ -398,7 +409,7 @@ Con un `StudentRestController` que exponga `GET` y `POST` en `/api/v1/students`,
   <rect x="48" y="104" width="300" height="332" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
   <text class="h" x="64" y="128" data-fit="268">SOURCE · Professor</text>
   <rect x="64" y="140" width="268" height="40" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text class="mono" x="198" y="160" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#A96C05" data-fit="252">Professor</text>
-  <rect x="64" y="196" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="78" y="211" dy="0.35em" font-size="13" fill="#161A26">id</text><text class="mono" x="318" y="211" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">1</text>
+  <rect x="64" y="196" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="78" y="211" dy="0.35em" font-size="13" fill="#161A26">publicId</text><text class="mono" x="318" y="211" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;e03c…&quot;</text>
   <rect x="64" y="234" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="78" y="249" dy="0.35em" font-size="13" fill="#161A26">name</text><text class="mono" x="318" y="249" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;Juan Perez&quot;</text>
   <rect x="64" y="272" width="268" height="148" rx="9" fill="#F4EBFF" stroke="#C9A6EE" stroke-width="1.5"/><text class="mono" x="78" y="289" dy="0.35em" font-size="12.5" font-weight="700" fill="#7439B8">courses</text><text class="mono" x="318" y="289" dy="0.35em" text-anchor="end" font-size="12" fill="#7439B8">List&lt;Course&gt;</text>
   <rect x="76" y="306" width="244" height="30" rx="7" fill="#FFFFFF" stroke="#C9A6EE" stroke-width="1.25"/><text class="mono" x="90" y="321" dy="0.35em" font-size="13" fill="#161A26">[0]</text><text class="mono" x="306" y="321" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">Estructuras…</text>
@@ -407,7 +418,7 @@ Con un `StudentRestController` que exponga `GET` y `POST` en `/api/v1/students`,
   <rect x="612" y="104" width="300" height="332" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
   <text class="h" x="628" y="128" data-fit="268">TARGET · ProfessorDTO</text>
   <rect x="628" y="140" width="268" height="40" rx="10" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text class="mono" x="762" y="160" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#3A8235" data-fit="252">ProfessorDTO</text>
-  <rect x="628" y="196" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="642" y="211" dy="0.35em" font-size="13" fill="#161A26">id</text><text class="mono" x="882" y="211" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">1</text>
+  <rect x="628" y="196" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="642" y="211" dy="0.35em" font-size="13" fill="#161A26">publicId</text><text class="mono" x="882" y="211" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;e03c…&quot;</text>
   <rect x="628" y="234" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="642" y="249" dy="0.35em" font-size="13" fill="#161A26">name</text><text class="mono" x="882" y="249" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">&quot;Juan Perez&quot;</text>
   <rect x="628" y="272" width="268" height="148" rx="9" fill="#F4EBFF" stroke="#C9A6EE" stroke-width="1.5"/><text class="mono" x="642" y="289" dy="0.35em" font-size="12.5" font-weight="700" fill="#7439B8">courses</text><text class="mono" x="882" y="289" dy="0.35em" text-anchor="end" font-size="12" fill="#7439B8">List&lt;CourseDTO&gt;</text>
   <rect x="640" y="306" width="244" height="30" rx="7" fill="#FFFFFF" stroke="#C9A6EE" stroke-width="1.25"/><text class="mono" x="654" y="321" dy="0.35em" font-size="13" fill="#161A26">[0]</text><text class="mono" x="870" y="321" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">Estructuras…</text>
@@ -431,7 +442,7 @@ El DTO lleva una lista de otro DTO:
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProfessorDTO {
-    private Integer id;
+    private String publicId;
     private String name;
     private List<CourseDTO> courses;
 }
@@ -447,17 +458,145 @@ public interface ProfessorMapper {
 }
 ```
 
-En `ProfessorServiceImpl`, el método va con `@Transactional`: la lista de cursos de un profesor se carga de la base de datos solo cuando el mapper la recorre, y eso necesita una transacción abierta.
+Este mapper todavía no tiene endpoint propio: lo usa el ejemplo 4.
+
+## Ejemplo 4 · Profesores paginados
+
+Con muchos profesores no conviene devolverlos todos de una vez. El cliente pide una página con dos parámetros de la URL:
+
+```http
+GET /api/v1/professors?page=0&size=3
+```
+
+`JpaRepository` ya trae `findAll(Pageable)`, que devuelve un `Page<Professor>`: los profesores de esa página y los datos para navegar. Ese `Page` no se devuelve tal cual. Se convierte en un DTO de página que dice exactamente qué ve el cliente:
+
+```java
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProfessorPageDTO {
+    private List<ProfessorDTO> content = new ArrayList<>();
+    private int page;
+    private int size;
+    private long totalElements;
+    private int totalPages;
+}
+```
+
+```svg
+<svg id="restMsPaginado" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 576" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="restMsPaginado-ttl restMsPaginado-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
+  <title id="restMsPaginado-ttl">Ejemplo 4 · Una página de profesores</title>
+  <desc id="restMsPaginado-dsc">A la izquierda el source Page de Professor que devuelve findAll con un PageRequest: number 0, size 3, totalElements 11, totalPages 4 y content con tres profesores. A la derecha el target ProfessorPageDTO con page, size, totalElements, totalPages y content con tres ProfessorDTO. number va a page con @Mapping; size, totalElements y totalPages se copian solos; cada profesor de content pasa por toDTO del ejemplo 3.</desc>
+  <defs>
+    <style>
+      #restMsPaginado .title{fill:#161A26;font-size:22px;font-weight:700}
+      #restMsPaginado .sub{fill:#79809A;font-size:13.5px}
+      #restMsPaginado .h{font-size:12px;font-weight:700;letter-spacing:.08em;fill:#556074}
+      #restMsPaginado .foot{fill:#79809A;font-size:12px}
+      #restMsPaginado .mono{font-family:ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace}
+      #restMsPaginado .ar-slate{fill:none;stroke:#556074;stroke-width:1.75;marker-end:url(#restMsPaginado-ar-slate)}
+      #restMsPaginado .ar-indigo{fill:none;stroke:#4453C9;stroke-width:1.75;marker-end:url(#restMsPaginado-ar-indigo)}
+    </style>
+    <marker id="restMsPaginado-ar-slate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#556074"/></marker>
+    <marker id="restMsPaginado-ar-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#4453C9"/></marker>
+  </defs>
+  <rect width="960" height="576" rx="16" fill="#FBFBFD"/>
+  <text class="title" x="48" y="56">Ejemplo 4 · Una página de profesores</text>
+  <text class="sub" x="48" y="80" data-fit="860">GET /professors?page=0&amp;size=3. El repositorio devuelve un Page; el mapper lo convierte en un DTO de página.</text>
+  <rect x="48" y="104" width="300" height="408" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
+  <text class="h" x="64" y="128" data-fit="268">SOURCE · findAll(PageRequest)</text>
+  <rect x="64" y="140" width="268" height="40" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text class="mono" x="198" y="160" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#A96C05" data-fit="252">Page&lt;Professor&gt;</text>
+  <rect x="64" y="196" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="78" y="211" dy="0.35em" font-size="13" fill="#161A26">number</text><text class="mono" x="318" y="211" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">0</text>
+  <rect x="64" y="234" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="78" y="249" dy="0.35em" font-size="13" fill="#161A26">size</text><text class="mono" x="318" y="249" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">3</text>
+  <rect x="64" y="272" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="78" y="287" dy="0.35em" font-size="13" fill="#161A26">totalElements</text><text class="mono" x="318" y="287" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">11</text>
+  <rect x="64" y="310" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.25"/><text class="mono" x="78" y="325" dy="0.35em" font-size="13" fill="#161A26">totalPages</text><text class="mono" x="318" y="325" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">4</text>
+  <rect x="64" y="348" width="268" height="148" rx="9" fill="#F4EBFF" stroke="#C9A6EE" stroke-width="1.5"/><text class="mono" x="78" y="365" dy="0.35em" font-size="12.5" font-weight="700" fill="#7439B8">content</text><text class="mono" x="318" y="365" dy="0.35em" text-anchor="end" font-size="12" fill="#7439B8">List&lt;Professor&gt;</text>
+  <rect x="76" y="382" width="244" height="30" rx="7" fill="#FFFFFF" stroke="#C9A6EE" stroke-width="1.25"/><text class="mono" x="90" y="397" dy="0.35em" font-size="13" fill="#161A26">[0]</text><text class="mono" x="306" y="397" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">Ana Martinez</text>
+  <rect x="76" y="420" width="244" height="30" rx="7" fill="#FFFFFF" stroke="#C9A6EE" stroke-width="1.25"/><text class="mono" x="90" y="435" dy="0.35em" font-size="13" fill="#161A26">[1]</text><text class="mono" x="306" y="435" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">Diana Ospina</text>
+  <rect x="76" y="458" width="244" height="30" rx="7" fill="#FFFFFF" stroke="#C9A6EE" stroke-width="1.25"/><text class="mono" x="90" y="473" dy="0.35em" font-size="13" fill="#161A26">[2]</text><text class="mono" x="306" y="473" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">Elena Vargas</text>
+  <rect x="612" y="104" width="300" height="408" rx="12" fill="#FFFFFF" stroke="#D9DEE8" stroke-width="1.5"/>
+  <text class="h" x="628" y="128" data-fit="268">TARGET · respuesta</text>
+  <rect x="628" y="140" width="268" height="40" rx="10" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text class="mono" x="762" y="160" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#3A8235" data-fit="252">ProfessorPageDTO</text>
+  <rect x="628" y="196" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="642" y="211" dy="0.35em" font-size="13" fill="#161A26">page</text><text class="mono" x="882" y="211" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">0</text>
+  <rect x="628" y="234" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="642" y="249" dy="0.35em" font-size="13" fill="#161A26">size</text><text class="mono" x="882" y="249" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">3</text>
+  <rect x="628" y="272" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="642" y="287" dy="0.35em" font-size="13" fill="#161A26">totalElements</text><text class="mono" x="882" y="287" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">11</text>
+  <rect x="628" y="310" width="268" height="30" rx="7" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.25"/><text class="mono" x="642" y="325" dy="0.35em" font-size="13" fill="#161A26">totalPages</text><text class="mono" x="882" y="325" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">4</text>
+  <rect x="628" y="348" width="268" height="148" rx="9" fill="#F4EBFF" stroke="#C9A6EE" stroke-width="1.5"/><text class="mono" x="642" y="365" dy="0.35em" font-size="12.5" font-weight="700" fill="#7439B8">content</text><text class="mono" x="882" y="365" dy="0.35em" text-anchor="end" font-size="12" fill="#7439B8">List&lt;ProfessorDTO&gt;</text>
+  <rect x="640" y="382" width="244" height="30" rx="7" fill="#FFFFFF" stroke="#C9A6EE" stroke-width="1.25"/><text class="mono" x="654" y="397" dy="0.35em" font-size="13" fill="#161A26">[0]</text><text class="mono" x="870" y="397" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">Ana Martinez</text>
+  <rect x="640" y="420" width="244" height="30" rx="7" fill="#FFFFFF" stroke="#C9A6EE" stroke-width="1.25"/><text class="mono" x="654" y="435" dy="0.35em" font-size="13" fill="#161A26">[1]</text><text class="mono" x="870" y="435" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">Diana Ospina</text>
+  <rect x="640" y="458" width="244" height="30" rx="7" fill="#FFFFFF" stroke="#C9A6EE" stroke-width="1.25"/><text class="mono" x="654" y="473" dy="0.35em" font-size="13" fill="#161A26">[2]</text><text class="mono" x="870" y="473" dy="0.35em" text-anchor="end" font-size="12" fill="#79809A">Elena Vargas</text>
+  <path class="ar-indigo" d="M336,211 C479,211 479,211 622,211"/>
+  <rect x="444.6" y="201.0" width="68.8" height="20" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text class="mono" x="479.0" y="211.0" dy="0.35em" text-anchor="middle" font-size="11" font-weight="700" fill="#4453C9">@Mapping</text>
+  <path class="ar-slate" d="M336,249 C479,249 479,249 622,249"/>
+  <rect x="431.4" y="239.0" width="95.2" height="20" rx="10" fill="#EFF1F5" stroke="#C4CBD8" stroke-width="1.5"/><text class="mono" x="479.0" y="249.0" dy="0.35em" text-anchor="middle" font-size="11" font-weight="700" fill="#556074">mismo nombre</text>
+  <path class="ar-slate" d="M336,287 C479,287 479,287 622,287"/>
+  <path class="ar-slate" d="M336,325 C479,325 479,325 622,325"/>
+  <path class="ar-indigo" d="M336,422 H384"/><path class="ar-indigo" d="M576,422 H622"/>
+  <rect x="384" y="396.0" width="192" height="52" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text class="mono" x="480" y="413" dy="0.35em" text-anchor="middle" font-size="13" font-weight="700" fill="#4453C9" data-fit="176">toDTO</text><text x="480" y="432" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="176">por cada profesor</text>
+  <text class="foot" x="48" y="548" data-fit="860">Ana Martinez es el primero porque la página se pidió con Sort.by("name"). Sin orden, cada página sale como la devuelva la BD.</text>
+</svg>
+```
+
+Para MapStruct, un `Page` es un objeto más: tiene `getContent()`, `getNumber()`, `getSize()`, `getTotalElements()` y `getTotalPages()`. Solo hay que decirle que `number` se llama `page`. Para la lista `content` usa solo el `toDTO` del mismo mapper:
+
+```java
+@Mapper(componentModel = "spring", uses = CourseMapper.class)
+public interface ProfessorMapper {
+
+    ProfessorDTO toDTO(Professor professor);
+
+    @Mapping(source = "number", target = "page")
+    ProfessorPageDTO toPageDTO(Page<Professor> page);
+}
+```
+
+El service arma el `PageRequest` con la página, el tamaño y el orden. Va con `@Transactional` porque los cursos de cada profesor se cargan de la base de datos cuando el mapper los recorre, y eso necesita una transacción abierta:
 
 ```java
 @Transactional(readOnly = true)
 @PreAuthorize("hasAuthority('READ_PROFESSOR')")
-public List<ProfessorDTO> getAllRest() {
-    return professorRepository.findAll().stream()
-            .map(professorMapper::toDTO)
-            .toList();
+public ProfessorPageDTO getPageRest(int page, int size) {
+    PageRequest request = PageRequest.of(page, size, Sort.by("name"));
+    return professorMapper.toPageDTO(professorRepository.findAll(request));
 }
 ```
+
+El controller recibe los dos parámetros con `@RequestParam`. Con `defaultValue`, `GET /api/v1/professors` sin parámetros devuelve la primera página de 5:
+
+```java
+@RestController
+@RequestMapping("/api/v1/professors")
+public class ProfessorRestController {
+
+    @Autowired
+    private ProfessorService professorService;
+
+    @GetMapping
+    public ResponseEntity<ProfessorPageDTO> getProfessors(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(professorService.getPageRest(page, size));
+    }
+}
+```
+
+La respuesta de `?page=0&size=3`:
+
+```json
+{
+  "content": [
+    { "publicId": "86f9035d-…", "name": "Ana Martinez", "courses": [ … ] },
+    { "publicId": "28001e7a-…", "name": "Diana Ospina", "courses": [] },
+    { "publicId": "c67cee52-…", "name": "Elena Vargas", "courses": [ … ] }
+  ],
+  "page": 0,
+  "size": 3,
+  "totalElements": 11,
+  "totalPages": 4
+}
+```
+
+Una página que no existe, como `?page=99`, responde `"content": []`. Por eso `content` empieza como una lista vacía: MapStruct no la llena cuando el `Page` no trae nada.
 
 ## Lo que MapStruct escribe por usted
 
