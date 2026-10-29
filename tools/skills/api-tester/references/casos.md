@@ -32,9 +32,12 @@ Todos con la contraseña `123456`.
 ## Si llega un 302
 
 La API redirigió el error a la página de login de Thymeleaf en vez de
-responder con un código de error. La prueba falla y va a `hallazgos.md`
-con esa causa probable.
+responder con un código de error. La prueba falla: esa es su causa
+probable.
 
 ## Cómo se nombra un caso
 
-`<MÉTODO> <ruta> · <situación>`. Ejemplo: `POST /students · sin permiso`.
+`<MÉTODO> <ruta> · <situación>`, con la ruta escrita igual que en
+`ENDPOINTS` de `test.sh`: `POST /students · sin permiso`,
+`GET /students/{publicId} · no existe`. Así `test.sh` sabe qué
+endpoints tienen pruebas y calcula la cobertura.

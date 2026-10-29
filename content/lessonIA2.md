@@ -17,9 +17,9 @@ cd 262WebApp6
 ## La estructura de carpetas
 
 ```svg
-<svg id="iaSkillsCarpetas" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 764" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="iaSkillsCarpetas-ttl iaSkillsCarpetas-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
+<svg id="iaSkillsCarpetas" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 794" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="iaSkillsCarpetas-ttl iaSkillsCarpetas-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
   <title id="iaSkillsCarpetas-ttl">Las skills viven dentro del proyecto</title>
-  <desc id="iaSkillsCarpetas-dsc">Árbol de carpetas de 262WebApp6. Dentro de .agents/skills hay tres carpetas. spec-writer tiene SKILL.md y references/plantilla.md. api-creator tiene SKILL.md y references con convenciones.md y manifiesto.md. api-tester tiene SKILL.md, assets/ejemplo.sh y references/casos.md. Al lado de .agents siguen src y pom.xml.</desc>
+  <desc id="iaSkillsCarpetas-dsc">Árbol de carpetas de 262WebApp6. Dentro de .agents/skills hay tres carpetas. spec-writer tiene SKILL.md y references/plantilla.md. api-creator tiene SKILL.md y references con convenciones.md y manifiesto.md. api-tester tiene SKILL.md, assets con ejemplo.sh y test.sh, y references/casos.md. Al lado de .agents siguen src y pom.xml.</desc>
   <defs>
     <style>
       #iaSkillsCarpetas .title{fill:#161A26;font-size:22px;font-weight:700}
@@ -29,7 +29,7 @@ cd 262WebApp6
       #iaSkillsCarpetas .mono{font-family:ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace}
     </style>
   </defs>
-  <rect width="960" height="764" rx="16" fill="#FBFBFD"/>
+  <rect width="960" height="794" rx="16" fill="#FBFBFD"/>
   <text class="title" x="48" y="56">Las skills viven dentro del proyecto</text>
   <text class="sub" x="48" y="80" data-fit="860">Una carpeta por skill en .agents/skills/. El nombre de la carpeta es el nombre de la skill.</text>
   <path d="M64,117 h7 l3,3 h10 v12 h-20 Z" fill="#EFF1F5" stroke="#556074" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="92" y="124" dy="0.35em" font-size="13.5" font-weight="700" fill="#161A26">262WebApp6/</text>
@@ -69,15 +69,17 @@ cd 262WebApp6
   <path d="M168,537 h7 l3,3 h10 v12 h-20 Z" fill="#FFF3DC" stroke="#A96C05" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="196" y="544" dy="0.35em" font-size="13.5" font-weight="700" fill="#A96C05">assets/</text>
   <path d="M178,553 V574 H190" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
   <path d="M196,566 h9 l5,5 v12 h-14 Z" fill="#FFFFFF" stroke="#79809A" stroke-width="1.3" stroke-linejoin="round"/><text class="mono" x="222" y="574" dy="0.35em" font-size="13.5" font-weight="400" fill="#161A26">ejemplo.sh</text>
-  <path d="M152,493 V604 H164" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
-  <path d="M168,597 h7 l3,3 h10 v12 h-20 Z" fill="#FFF3DC" stroke="#A96C05" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="196" y="604" dy="0.35em" font-size="13.5" font-weight="700" fill="#A96C05">references/</text>
-  <path d="M178,613 V634 H190" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
-  <path d="M196,626 h9 l5,5 v12 h-14 Z" fill="#FFFFFF" stroke="#79809A" stroke-width="1.3" stroke-linejoin="round"/><text class="mono" x="222" y="634" dy="0.35em" font-size="13.5" font-weight="400" fill="#161A26">casos.md</text>
-  <path d="M74,133 V664 H86" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
-  <path d="M90,657 h7 l3,3 h10 v12 h-20 Z" fill="#EFF1F5" stroke="#556074" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="118" y="664" dy="0.35em" font-size="13.5" font-weight="700" fill="#9AA3B5">src/</text>
+  <path d="M178,553 V604 H190" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M196,596 h9 l5,5 v12 h-14 Z" fill="#FFFFFF" stroke="#79809A" stroke-width="1.3" stroke-linejoin="round"/><text class="mono" x="222" y="604" dy="0.35em" font-size="13.5" font-weight="400" fill="#161A26">test.sh</text>
+  <path d="M152,493 V634 H164" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M168,627 h7 l3,3 h10 v12 h-20 Z" fill="#FFF3DC" stroke="#A96C05" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="196" y="634" dy="0.35em" font-size="13.5" font-weight="700" fill="#A96C05">references/</text>
+  <path d="M178,643 V664 H190" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M196,656 h9 l5,5 v12 h-14 Z" fill="#FFFFFF" stroke="#79809A" stroke-width="1.3" stroke-linejoin="round"/><text class="mono" x="222" y="664" dy="0.35em" font-size="13.5" font-weight="400" fill="#161A26">casos.md</text>
   <path d="M74,133 V694 H86" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
-  <path d="M92,686 h9 l5,5 v12 h-14 Z" fill="#FFFFFF" stroke="#79809A" stroke-width="1.3" stroke-linejoin="round"/><text class="mono" x="118" y="694" dy="0.35em" font-size="13.5" font-weight="400" fill="#9AA3B5">pom.xml</text>
-  <text class="foot" x="48" y="736" data-fit="860">Solo archivos de texto: se crean a mano y se pega su contenido. La skill no instala nada.</text>
+  <path d="M90,687 h7 l3,3 h10 v12 h-20 Z" fill="#EFF1F5" stroke="#556074" stroke-width="1.4" stroke-linejoin="round"/><text class="mono" x="118" y="694" dy="0.35em" font-size="13.5" font-weight="700" fill="#9AA3B5">src/</text>
+  <path d="M74,133 V724 H86" fill="none" stroke="#C4CBD8" stroke-width="1.3"/>
+  <path d="M92,716 h9 l5,5 v12 h-14 Z" fill="#FFFFFF" stroke="#79809A" stroke-width="1.3" stroke-linejoin="round"/><text class="mono" x="118" y="724" dy="0.35em" font-size="13.5" font-weight="400" fill="#9AA3B5">pom.xml</text>
+  <text class="foot" x="48" y="766" data-fit="860">Solo archivos de texto: se crean a mano y se pega su contenido. La skill no instala nada.</text>
 </svg>
 ```
 
@@ -117,7 +119,7 @@ Pide las cosas sin nombrar la skill: si la description está bien escrita, el ag
 1. **Revisa la API.** «Revisa la API y dime qué entidades no tienen endpoints». `api-creator` escribe `apidev.md` con cada entidad, sus endpoints y lo que incumple las convenciones.
 2. **Especifica.** «Escribe la spec para matricular un estudiante en un curso desde la API». `spec-writer` deja la spec en `docs/specs/`, con los endpoints, sus errores y las tareas.
 3. **Construye.** «Implementa la spec de la matrícula». `api-creator` crea los DTO, los mappers, el `publicId` y los endpoints, compila y anota lo que hizo en `apidevlog.md`.
-4. **Prueba.** Arranca la app en otra terminal con `./mvnw spring-boot:run` y pide «Escribe y corre las pruebas de la API». `api-tester` deja un script por recurso en `tests/api/` y las fallas en `tests/api/hallazgos.md`.
+4. **Prueba.** Arranca la app en otra terminal con `./mvnw spring-boot:run` y pide «Escribe y corre las pruebas de la API». `api-tester` deja un script por recurso en `tests/api/`, los corre todos con `bash test.sh` y anota en `testresults.md` la cobertura y qué pruebas pasaron y cuáles fallaron. Desde ahí, `bash test.sh` vuelve a correr la batería cuando quieras.
 
 Los scripts de prueba son de bash. En Windows se corren desde Git Bash.
 

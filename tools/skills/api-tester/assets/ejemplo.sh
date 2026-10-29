@@ -1,48 +1,24 @@
-#!/usr/bin/env bash
-# Pruebas de /courses. Antes: ./mvnw spring-boot:run
-BASE="${BASE:-http://localhost:8080/WebApp6/api/v1}"
-PASS=0
-FAIL=0
+# Pruebas de /courses. Las corre test.sh, que define check,
+# status, body, has y los tokens.
 
-login() {
-  curl -s -X POST "$BASE/auth/login" \
-    -H "Content-Type: application/json" \
-    -d "{\"username\":\"$1\",\"password\":\"$2\"}" \
-    | sed -E 's/.*"accessToken":"([^"]+)".*/\1/'
-}
-
-status() {
-  local args=(-s -o /dev/null -w "%{http_code}" -X "$1" "$BASE$2")
-  [ -n "$3" ] && args+=(-H "Authorization: Bearer $3")
-  [ -n "$4" ] && args+=(-H "Content-Type: application/json" -d "$4")
-  curl "${args[@]}"
-}
-
-check() {
-  if [ "$2" = "$3" ]; then
-    PASS=$((PASS + 1)); echo "  OK     $1"
-  else
-    FAIL=$((FAIL + 1)); echo "  FALLA  $1 · esperaba $2, llegó $3"
-  fi
-}
-
-ADMIN=$(login nicolas 123456)
-DIRECTOR=$(login barragan 123456)
-ALTERADO=$(echo "$ADMIN" | sed 's/\./.e/')
-
-echo "GET /courses"
 check "GET /courses · admin" 200 "$(status GET /courses "$ADMIN")"
 check "GET /courses · director" 200 "$(status GET /courses "$DIRECTOR")"
 check "GET /courses · sin token" 401 "$(status GET /courses)"
-check "GET /courses · token alterado" 401 \
-  "$(status GET /courses "$ALTERADO")"
+check "GET /courses · token alterado" 401 "$(status GET /courses "$ALTERADO")"
 
-BODY=$(curl -s "$BASE/courses" -H "Authorization: Bearer $ADMIN")
-check "GET /courses · trae publicId" si \
-  "$(echo "$BODY" | grep -q '"publicId"' && echo si || echo no)"
-check "GET /courses · no trae el id" no \
-  "$(echo "$BODY" | grep -q '"id":' && echo si || echo no)"
+LIST=$(body GET /courses "$ADMIN")
+check "GET /courses · trae publicId" si "$(has "$LIST" '"publicId"')"
+check "GET /courses · no trae el id" no "$(has "$LIST" '"id":')"
 
-echo
-echo "$PASS pasaron · $FAIL fallaron"
-[ "$FAIL" -eq 0 ]
+ID=$(echo "$LIST" | sed -E 's/.*"publicId":"([^"]+)".*/\1/')
+check "GET /courses/{publicId} · existe" 200 \
+  "$(status GET "/courses/$ID" "$ADMIN")"
+check "GET /courses/{publicId} · no existe" 404 \
+  "$(status GET /courses/00000000-0000-0000-0000-000000000000 "$ADMIN")"
+
+NEW="{\"name\":\"Curso $(date +%s)\"}"
+check "POST /courses · admin" 201 "$(status POST /courses "$ADMIN" "$NEW")"
+check "POST /courses · sin permiso" 403 \
+  "$(status POST /courses "$DIRECTOR" "$NEW")"
+check "POST /courses · JSON mal formado" 400 \
+  "$(status POST /courses "$ADMIN" '{"name":')"

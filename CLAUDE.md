@@ -205,7 +205,7 @@ tarjeta clara fija.
   ` agent-stack skills `.
 
 - `skill-files` («Skills en Antigravity CLI», 0047, en `skillSims.js`): una pestaña por skill
-  (`spec-writer`, `api-creator`, `api-tester`), el árbol de su carpeta y un visor del archivo
+  (`api-creator`, `api-tester`, `spec-writer`), el árbol de su carpeta y un visor del archivo
   elegido con botón *Copiar*. El estudiante crea las carpetas y pega cada archivo: las skills
   son solo texto. **Las skills se editan en `tools/skills/<nombre>/`** y se copian al
   simulador con `python3 tools/skills_data.py`; el resumen, los pedidos de ejemplo y lo que

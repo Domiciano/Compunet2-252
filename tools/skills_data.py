@@ -15,11 +15,6 @@ SRC = ROOT / 'tools' / 'skills'
 SIM = ROOT / 'classnotesapp' / 'src' / 'components' / 'interactive' / 'skillSims.js'
 
 META = [
-    dict(name='spec-writer', color='#7439B8', soft='#F4EBFF',
-         summary='Convierte un pedido vago en una spec: requisitos, criterios de aceptación que se responden '
-                 'con sí o no, endpoints con sus errores y tareas. No escribe código.',
-         prompts=['Escribe la spec para matricular un estudiante en un curso desde la API'],
-         writes=['docs/specs/<nombre>.md']),
     dict(name='api-creator', color='#0F8478', soft='#E3F6F3',
          summary='Revisa qué entidades tienen endpoints y cuáles no, y crea los que faltan con DTO, mapper '
                  'de MapStruct y publicId. Deja el manifiesto de la API y un histórico de lo que hizo.',
@@ -28,9 +23,14 @@ META = [
          writes=['apidev.md', 'apidevlog.md', 'api/dto/', 'api/mapper/', 'api/']),
     dict(name='api-tester', color='#A96C05', soft='#FFF3DC',
          summary='Escribe una batería de pruebas con curl por cada recurso de la API, con casos positivos y '
-                 'negativos, la corre y anota cada falla. Nunca corrige el código: solo la encuentra.',
+                 'negativos, y deja test.sh para correrla. Anota la cobertura y cada falla. Nunca corrige el código.',
          prompts=['Escribe y corre las pruebas de la API'],
-         writes=['tests/api/<recurso>.sh', 'tests/api/todas.sh', 'tests/api/hallazgos.md']),
+         writes=['tests/api/<recurso>.sh', 'test.sh', 'testresults.md']),
+    dict(name='spec-writer', color='#7439B8', soft='#F4EBFF',
+         summary='Convierte un pedido vago en una spec: requisitos, criterios de aceptación que se responden '
+                 'con sí o no, endpoints con sus errores y tareas. No escribe código.',
+         prompts=['Escribe la spec para matricular un estudiante en un curso desde la API'],
+         writes=['docs/specs/<nombre>.md']),
 ]
 
 

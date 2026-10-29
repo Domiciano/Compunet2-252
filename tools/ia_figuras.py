@@ -88,6 +88,7 @@ def ia_skills_carpetas():
             (4, 'SKILL.md', 'file', 'amber', None),
             (4, 'assets/', 'dir', 'amber', None),
             (5, 'ejemplo.sh', 'file', 'amber', None),
+            (5, 'test.sh', 'file', 'amber', None),
             (4, 'references/', 'dir', 'amber', None),
             (5, 'casos.md', 'file', 'amber', None),
             (1, 'src/', 'dir', 'slate', None),
@@ -98,7 +99,7 @@ def ia_skills_carpetas():
              'Una carpeta por skill en .agents/skills/. El nombre de la carpeta es el nombre de la skill.',
              'Árbol de carpetas de 262WebApp6. Dentro de .agents/skills hay tres carpetas. spec-writer tiene SKILL.md y '
              'references/plantilla.md. api-creator tiene SKILL.md y references con convenciones.md y manifiesto.md. '
-             'api-tester tiene SKILL.md, assets/ejemplo.sh y references/casos.md. Al lado de .agents siguen src y pom.xml.')
+             'api-tester tiene SKILL.md, assets con ejemplo.sh y test.sh, y references/casos.md. Al lado de .agents siguen src y pom.xml.')
     last = {}
     for i, (d, name, kind, color, call) in enumerate(rows):
         y = top + i * step

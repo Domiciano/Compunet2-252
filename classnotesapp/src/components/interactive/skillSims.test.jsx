@@ -8,8 +8,8 @@ const renderBlock = (spec) => render(<ThemeProvider><InteractiveBlock spec={spec
 const skillMd = (skill) => skill.files.find((file) => file.path === 'SKILL.md').content;
 
 describe('SKILLS', () => {
-  it('has spec-writer, api-creator and api-tester', () => {
-    expect(SKILLS.map((skill) => skill.name)).toEqual(['spec-writer', 'api-creator', 'api-tester']);
+  it('has api-creator, api-tester and spec-writer', () => {
+    expect(SKILLS.map((skill) => skill.name)).toEqual(['api-creator', 'api-tester', 'spec-writer']);
   });
 
   it('opens every skill on its SKILL.md, whose name matches the folder', () => {
@@ -40,19 +40,19 @@ describe('SKILLS', () => {
 
   it('lists folders before the files they hold', () => {
     const rows = skillTree(SKILLS.find((skill) => skill.name === 'api-tester'));
-    expect(rows.map((row) => row.name)).toEqual(['SKILL.md', 'assets/', 'ejemplo.sh', 'references/', 'casos.md']);
+    expect(rows.map((row) => row.name)).toEqual(['SKILL.md', 'assets/', 'ejemplo.sh', 'test.sh', 'references/', 'casos.md']);
   });
 });
 
 describe('skill-files', () => {
   it('switches skill and file', () => {
     const { container } = renderBlock('skill-files');
-    expect(screen.getByTestId('skill-content').textContent).toContain('name: spec-writer');
+    expect(screen.getByTestId('skill-content').textContent).toContain('name: api-creator');
     fireEvent.click(screen.getByRole('tab', { name: 'api-tester' }));
     expect(screen.getByTestId('skill-content').textContent).toContain('name: api-tester');
-    fireEvent.click(container.querySelector('[data-path="assets/ejemplo.sh"]'));
+    fireEvent.click(container.querySelector('[data-path="assets/test.sh"]'));
     expect(screen.getByTestId('skill-content').textContent).toContain('curl');
-    expect(container.textContent).toContain('.agents/skills/api-tester/assets/ejemplo.sh');
+    expect(container.textContent).toContain('.agents/skills/api-tester/assets/test.sh');
   });
 
   it('opens on the skill given as option', () => {

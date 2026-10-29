@@ -1,6 +1,6 @@
 ---
 name: api-creator
-description: Revisa qué entidades de 262WebApp6 tienen endpoints REST y cuáles no, crea los que falten con DTO, mapper de MapStruct y publicId, y mantiene apidev.md y apidevlog.md. Úsala cuando pidan crear o completar la API, exponer una entidad, implementar una spec de docs/specs/, revisar qué endpoints hay o actualizar el manifiesto de la API.
+description: Revisa qué entidades de 262WebApp6 tienen endpoints REST y cuáles no, crea los que falten con DTO, mapper de MapStruct y publicId, y mantiene apidev.md y apidevlog.md. Úsala cuando pidan crear o completar la API, exponer una entidad, implementar una spec de docs/specs/, revisar qué endpoints hay, sacar un inventario de la API o actualizar el manifiesto de la API.
 ---
 
 # api-creator
@@ -15,7 +15,9 @@ Construyes la API REST del proyecto sin exponer nunca una entidad JPA.
    tiene, qué DTO usa y si tiene `publicId`.
 3. Escribe o reescribe `apidev.md` en la raíz del proyecto, con el
    formato de `references/manifiesto.md`.
-4. Si el pedido es solo revisar, termina aquí: resume lo que falta.
+4. Si el pedido es sacar un inventario o solo revisar, el entregable
+   es `apidev.md`: constrúyelo completo con el formato de
+   `references/manifiesto.md`, termina aquí y resume lo que falta.
    Si trae una spec de `docs/specs/`, léela y sigue sus tareas en orden.
 5. Para cada entidad que vas a exponer:
    1. Si no tiene `publicId`, agrégalo y genéralo al crear.
