@@ -1,45 +1,8 @@
-# Props, Children y Listas
+# Children y Listas
 
-Los componentes de React son más útiles cuando pueden recibir datos del exterior. Para eso existen las **props**: los datos que un componente padre le pasa a un componente hijo.
+<!-- tags: children, prop children, map en JSX, key, Each child in a list should have a unique key, listas en React, componente contenedor -->
 
-## ¿Qué son las props?
-
-Las props funcionan como los atributos en HTML, pero pueden ser cualquier valor de JavaScript: strings, números, arreglos, objetos o funciones.
-
-```jsx
-function Tarjeta(props) {
-  return (
-    <div>
-      <h2>{props.nombre}</h2>
-      <p>{props.tipo}</p>
-    </div>
-  )
-}
-
-function App() {
-  return (
-    <div>
-      <Tarjeta nombre="Sensor A" tipo="Temperatura" />
-      <Tarjeta nombre="Sensor B" tipo="Humedad" />
-    </div>
-  )
-}
-```
-
-## Desestructurar props
-
-En lugar de acceder a `props.nombre`, puedes desestructurar directamente en la firma de la función. El resultado es el mismo, pero el código queda más limpio.
-
-```jsx
-function Tarjeta({ nombre, tipo }) {
-  return (
-    <div>
-      <h2>{nombre}</h2>
-      <p>{tipo}</p>
-    </div>
-  )
-}
-```
+Ya sabes pasar datos con props. Aquí dos usos más: pasar **JSX** como contenido de un componente, y dibujar una lista a partir de un arreglo.
 
 ## La prop especial: children
 
@@ -105,6 +68,14 @@ function App() {
 
 Cuando tenemos un arreglo de datos, usamos `.map()` para convertir cada elemento en un componente. React requiere que cada elemento tenga una prop `key` única.
 
+Supón un componente que recibe dos props:
+
+```jsx
+function Dispositivo({ nombre, tipo }) {
+  return <p>{nombre} — {tipo}</p>;
+}
+```
+
 ```jsx
 const dispositivos = [
   { id: 1, nombre: "Sensor A", tipo: "Temperatura" },
@@ -116,7 +87,7 @@ function App() {
   return (
     <div>
       {dispositivos.map((dispositivo) => (
-        <Tarjeta
+        <Dispositivo
           key={dispositivo.id}
           nombre={dispositivo.nombre}
           tipo={dispositivo.tipo}
@@ -131,8 +102,6 @@ La prop `key` no se muestra en pantalla. React la usa internamente para saber qu
 
 ## Resumen
 
-- Las `props` son los datos que el padre le pasa al hijo
-- Se desestructuran directamente en la firma: `function Comp({ nombre, tipo })`
 - `children` es el contenido escrito entre las etiquetas del componente
 - `.map()` convierte un arreglo de datos en un arreglo de componentes
 - Cada elemento renderizado con `.map()` necesita una prop `key` única

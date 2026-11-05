@@ -1,64 +1,67 @@
-# De Vanilla a React
+# JavaScript en el navegador
 
-En los inicios del desarrollo web, las páginas se construían con HTML, CSS y JavaScript puro (VanillaJS). Cada interacción o cambio visual debía manejarse manualmente con funciones que modificaban el DOM, lo que hacía que las aplicaciones crecientes fueran difíciles de mantener.
+<!-- tags: DOM, VanillaJS, getElementById, addEventListener, textContent, createElement, script src, null is not an object, Cannot read properties of null -->
 
-## El problema del DOM manual
+Así es como ya saben hacer páginas: un HTML que carga un archivo JS, y ese JS que controla lo que hay en pantalla.
 
-Con HTML y JavaScript puro, cada vez que el usuario interactúa con la página hay que actualizar el DOM manualmente:
+## El HTML carga el JS
 
-```javascript
-const lista = document.getElementById("lista");
-const nuevoItem = document.createElement("li");
-nuevoItem.textContent = "Sensor A";
-lista.appendChild(nuevoItem);
+El navegador lee `index.html` de arriba abajo. Al llegar a `<script src="app.js">` descarga y ejecuta ese archivo. Desde ahí, el JS puede tocar el **DOM**: el árbol de nodos que el navegador arma con el HTML y que pinta en pantalla.
+
+```svg
+<svg id="vanillaFlujo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="vanillaFlujo-ttl vanillaFlujo-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
+  <title id="vanillaFlujo-ttl">Cómo funciona una página con JavaScript puro</title>
+  <desc id="vanillaFlujo-dsc">Cuatro bloques en fila. index.html carga app.js con una etiqueta script. app.js lee y modifica el DOM con getElementById, textContent y appendChild. El DOM es el árbol de nodos en memoria y el navegador lo pinta en la pantalla. Una flecha de vuelta va de la pantalla a app.js: cuando el usuario hace clic o escribe, el navegador dispara un evento y corre la función registrada con addEventListener.</desc>
+  <defs>
+    <style>
+      #vanillaFlujo .title{fill:#161A26;font-size:22px;font-weight:700}
+      #vanillaFlujo .sub{fill:#79809A;font-size:13.5px}
+      #vanillaFlujo .h{font-size:12px;font-weight:700;letter-spacing:.08em;fill:#556074}
+      #vanillaFlujo .foot{fill:#79809A;font-size:12px}
+      #vanillaFlujo .mono{font-family:ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace}
+      #vanillaFlujo .ar-indigo{fill:none;stroke:#4453C9;stroke-width:1.75;marker-end:url(#vanillaFlujo-ar-indigo)}
+      #vanillaFlujo .ar-amber{fill:none;stroke:#A96C05;stroke-width:1.75;marker-end:url(#vanillaFlujo-ar-amber)}
+    </style>
+    <marker id="vanillaFlujo-ar-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#4453C9"/></marker>
+    <marker id="vanillaFlujo-ar-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#A96C05"/></marker>
+  </defs>
+  <rect width="960" height="360" rx="16" fill="#FBFBFD"/>
+  <text class="title" x="48" y="56">Cómo funciona una página con JavaScript puro</text>
+  <text class="sub" x="48" y="80" data-fit="860">El HTML carga el JS. El JS lee y cambia el DOM, y el navegador pinta lo que cambió.</text>
+  <rect x="48" y="136" width="168" height="100" rx="12" fill="#EFF1F5" stroke="#C4CBD8" stroke-width="1.75"/><text class="mono" x="132" y="164" dy="0.35em" text-anchor="middle" font-size="15" font-weight="700" fill="#556074">index.html</text><text x="132" y="194" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="152">la estructura</text><text class="mono" x="132" y="214" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="152">&lt;script src=&quot;app.js&quot;&gt;</text>
+  <rect x="280" y="136" width="168" height="100" rx="12" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.75"/><text class="mono" x="364" y="164" dy="0.35em" text-anchor="middle" font-size="15" font-weight="700" fill="#4453C9">app.js</text><text class="mono" x="364" y="194" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="152">getElementById</text><text class="mono" x="364" y="214" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="152">addEventListener</text>
+  <rect x="512" y="136" width="168" height="100" rx="12" fill="#E3F6F3" stroke="#86D3CA" stroke-width="1.75"/><text class="mono" x="596" y="164" dy="0.35em" text-anchor="middle" font-size="15" font-weight="700" fill="#0F8478">DOM</text><text x="596" y="194" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="152">árbol de nodos</text><text x="596" y="214" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="152">en memoria</text>
+  <rect x="744" y="136" width="168" height="100" rx="12" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.75"/><text class="mono" x="828" y="164" dy="0.35em" text-anchor="middle" font-size="15" font-weight="700" fill="#3A8235">Pantalla</text><text x="828" y="194" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="152">lo que ve</text><text x="828" y="214" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="152">el usuario</text>
+  <path class="ar-indigo" d="M220,186.0 H276"/>
+  <text x="248" y="174.0" text-anchor="middle" font-size="11.5" fill="#4453C9" font-weight="600">carga</text>
+  <path class="ar-indigo" d="M452,186.0 H508"/>
+  <text x="480" y="174.0" text-anchor="middle" font-size="11.5" fill="#4453C9" font-weight="600">cambia</text>
+  <path class="ar-indigo" d="M684,186.0 H740"/>
+  <text x="712" y="174.0" text-anchor="middle" font-size="11.5" fill="#4453C9" font-weight="600">pinta</text>
+  <path class="ar-amber" d="M828.0,240 V280 H364.0 V244"/>
+  <rect x="446" y="268" width="300" height="24" rx="12" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text x="596" y="280" dy="0.35em" text-anchor="middle" font-size="12" fill="#A96C05" font-weight="700">evento: click, input… y corre tu función</text>
+  <text class="foot" x="48" y="332" data-fit="860">Mostrar datos y recibir al usuario pasa por el mismo lugar: tu JS tocando el DOM, nodo por nodo.</text>
+</svg>
 ```
 
-Esto funciona para páginas simples, pero cuando la interfaz crece —múltiples componentes, datos que cambian, eventos encadenados— el código se vuelve difícil de mantener.
+## Recibir al usuario
 
-## ¿Qué es React?
+`getElementById` busca un nodo del DOM y `addEventListener` le cuelga una función que corre cuando pasa algo. Escribe tu nombre en la vista previa y pulsa *Saludar*. Luego cambia `app.js` y pulsa **Recargar**.
 
-React es una librería de JavaScript creada por Meta que resuelve este problema. En lugar de manipular el DOM directamente, describes cómo debería verse la interfaz en función de los datos, y React se encarga de actualizar lo que sea necesario.
+```interactive
+vanilla-dom greet
+```
 
-En React no dices "agrega este elemento". Dices "cuando los datos sean así, muestra esto".
+Prueba también a borrar la línea `<script src="app.js"></script>` de `index.html`: la página se ve igual, pero el botón ya no hace nada.
 
-Con el tiempo surgieron librerías y frameworks que ayudaron a estructurar el código, pero la gran revolución llegó con React, que propuso un modelo declarativo basado en componentes reutilizables y un DOM virtual que mejora el rendimiento y la claridad del código.
+## Mostrar información
 
-## DOM
+Ahora al revés: el JS tiene los datos (un arreglo) y crea un `<li>` por cada uno. Agrega unas tareas.
 
-El DOM (Document Object Model) es una representación en memoria de la estructura de una página web, donde cada elemento del HTML —como etiquetas, atributos y texto— se organiza en forma de árbol de nodos. Gracias al DOM, los lenguajes de programación como JavaScript pueden acceder, modificar o eliminar elementos de la página de manera dinámica.
+```interactive
+vanilla-dom list
+```
 
-![Árbol DOM](https://media.geeksforgeeks.org/wp-content/uploads/20241120143259875787/DOM-Tree1.webp)
+## Lo que se vuelve difícil
 
-`Créditos` Geek for geeks
-
-En otras palabras, el DOM actúa como un puente entre el código HTML estático y el comportamiento interactivo que vemos en el navegador, permitiendo que los sitios web respondan a eventos, animaciones o cambios de datos sin necesidad de recargar toda la página.
-
-## Node.js
-
-Node.js es un runtime de JavaScript basado en el motor V8 de Chrome, que permite ejecutar código JavaScript fuera del navegador. Esto abrió la puerta al desarrollo de herramientas y servidores escritos en JS. En el entorno del front-end, Node se usa para ejecutar utilidades como `npm`, `Vite` o `Webpack`, que gestionan dependencias, transpilan código moderno (JSX, ES6) y empaquetan la aplicación para producción.
-
-## Proceso de desarrollo
-
-Hoy en día, cuando trabajamos con React, el flujo de desarrollo pasa por Node y un bundler (como Vite o Webpack).
-Durante el desarrollo, estas herramientas levantan un servidor local que interpreta JSX y módulos ES modernos en tiempo real, ofreciendo recarga instantánea.
-Al momento del build, todo el código fuente —componentes, estilos y recursos— se transforma y empaqueta en archivos estáticos optimizados: un index.html, un main.js y un main.css, listos para ser desplegados en cualquier servidor web. De esta forma, React se comporta como una aplicación web tradicional en producción, pero con toda la potencia modular y reactiva del desarrollo moderno.
-
-![Proceso de bundling](https://www.campusmvp.es/recursos/image.axd?picture=/2017/4T/Webpack-Concepto.gif)
-
-`Créditos` Campus MVP.es
-
-## Vite
-
-Vite (del francés "rápido", pronunciado /vit/ como `veet`) es una herramienta de construcción (build tool) que busca ofrecer una experiencia de desarrollo más veloz y ligera para proyectos web modernos. Se compone de dos partes principales:
-
-Un servidor de desarrollo que aprovecha los módulos ES nativos del navegador e incorpora funciones avanzadas como el Hot Module Replacement (HMR) para recargar cambios al instante, y un comando de compilación que utiliza Rollup para generar recursos estáticos altamente optimizados para producción.
-
-Vite ofrece configuraciones predeterminadas bien pensadas, pero también es extensible mediante plugins y puede adaptarse fácilmente a distintos frameworks o necesidades específicas de un proyecto.
-
-## ECMAScript
-
-ECMAScript es el estándar que define cómo debe funcionar el lenguaje JavaScript. Fue creado por la organización ECMA International para garantizar que todas las implementaciones de JavaScript siguieran un conjunto común de reglas y características. Cada versión del estándar (ES3, ES5, ES6, etc.) introduce nuevas funcionalidades del lenguaje, como clases, promesas o módulos, asegurando compatibilidad y evolución coordinada entre navegadores y entornos.
-
-## ES Modules
-
-Los ES Modules (ECMAScript Modules), introducidos oficialmente en ES6 (2015), permiten dividir el código JavaScript en archivos reutilizables e independientes, usando las palabras clave `import` y `export`. Antes de su aparición, los desarrolladores dependían de sistemas externos como CommonJS (en Node.js) o RequireJS (en el navegador) para gestionar dependencias. Con los ES Modules, el lenguaje incorporó de forma nativa un sistema de modularización eficiente, seguro y compatible con los navegadores modernos, facilitando la organización y mantenimiento de aplicaciones grandes.
+Funciona, pero fíjate en `pintar()`: cada vez que cambian los datos **tú** tienes que acordarte de borrar y volver a crear los nodos. Con dos o tres pantallas que dependen de los mismos datos, ese código manual se vuelve el problema. React se encarga justo de eso: tú dices cómo se ve la pantalla para unos datos, y él actualiza el DOM.

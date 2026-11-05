@@ -73,10 +73,13 @@
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lessonIA2.md | Skills en Antigravity CLI | 0047
 [t] SEMANA 14 · React
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson32.md | Repasito de JS | 0049
-[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson33.md | De Vanilla a React | 0050
-[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson34.md | Componentes y JSX | 0051
-[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson34b.md | Props, Children y Listas | 0052
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson33.md | JavaScript en el navegador | 0050
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_node_bundler.md | Qué cambia con Node | 0099
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_react_setup.md | Tu primer proyecto React | 0100
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_jsx.md | JSX | 0101
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson34.md | Componentes y Props | 0051
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson35.md | Estado con useState | 0053
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson34b.md | Children y Listas | 0052
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson37.md | useEffect | 0054
 [t] SEMANA 15 · Hooks
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson36.md | Componentes Básicos de Material-UI | 0055

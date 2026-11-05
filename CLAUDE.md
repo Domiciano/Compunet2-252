@@ -150,9 +150,9 @@ Toda valla cercada **debe declarar lenguaje** (` ```java `, nunca ` ``` ` a seca
 Lo que se entiende tocando va en un bloque ` ```interactive `, cuyo cuerpo es `<id> [opciones]`.
 Se portó desde FlutterLearning el 2026-10-20: `InteractiveBlock.jsx` y la línea de
 `LessonParser.jsx` son copia literal, salvo que aquí el registro `SIMS` se arma en
-`InteractiveBlock.jsx` juntando tres archivos de `src/components/interactive/`:
-`springSecuritySims.js` (CSS prefijado con `.jsim`), `agentSims.js` (`.asim`) y `skillSims.js`
-(`.ksim`). Los tres son JS plano, sin React ni imports, `mount(nodo, opciones) → destroy`,
+`InteractiveBlock.jsx` juntando cuatro archivos de `src/components/interactive/`:
+`springSecuritySims.js` (CSS prefijado con `.jsim`), `agentSims.js` (`.asim`), `skillSims.js`
+(`.ksim`) y `reactSims.js` (`.rsim`). Los cuatro son JS plano, sin React ni imports, `mount(nodo, opciones) → destroy`,
 tarjeta clara fija.
 
 - `jwt-flow` («Auth en REST», 0042): el estudiante pulsa `POST /api/v1/auth/login` o
@@ -213,6 +213,32 @@ tarjeta clara fija.
   `Domiciano/262WebApp6` (rutas, paquetes, usuarios `nicolas`/`barragan` de `data.sql`).
   Las pruebas de `skillSims.test.jsx` exigen que el `name` coincida con la carpeta y que todo
   archivo que nombra el `SKILL.md` exista, y viceversa.
+
+- **Introducción a React** (SEMANA 14, en `reactSims.js`, probado en `reactSims.test.jsx`;
+  figuras en `tools/react_figuras.py`, que también inyecta con `--inject`):
+  - `js-run <snippet>` («Repasito de JS», 0049): código editable con *Ejecutar* y una consola
+    simulada. Corre con `new Function` y un `console` falso, en modo estricto; captura también
+    lo que se imprime después (timers, promesas). Los snippets viven en `JS_SNIPPETS` y la
+    prueba fija la salida esperada de cada uno; `var` falla a propósito.
+  - `vanilla-dom greet|list` («JavaScript en el navegador», 0050): pestañas `index.html` y
+    `app.js` editables y un navegador falso (`iframe` con `sandbox="allow-scripts"` y
+    `srcdoc`). La etiqueta `<script src="app.js">` se reemplaza por el código de `app.js`; si
+    el estudiante la borra, el JS no se carga y la consola lo avisa. `console.log` vuelve por
+    `postMessage`.
+  - `bundler` («Qué cambia con Node», 0099): `npm run build` paso a paso (grafo de imports
+    desde `index.html`, JSX → JS, un `.js`, un `.css` y `dist/index.html`). Datos en
+    `BUNDLE_STEPS`.
+  - `jsx-live` (0101) y `props-header hardcoded|props` (0051): mismo motor. Un transformador
+    de JSX a `React.createElement` hecho a mano (subconjunto: elementos, fragmentos,
+    atributos, `{expresiones}` con JSX adentro), un `React` falso que arma el árbol y un
+    render a DOM. Muestra pantalla, árbol de componentes (con las props de cada uno) y el JS
+    transformado. Dos raíces dan el mensaje real de React. No hay hooks: `useState` ahí
+    falla.
+  - `react-counter [forget]` («Estado con useState», 0053): columnas Componente → Virtual
+    DOM → DOM real → Pantalla, *Primer render* y luego `+`. Un solo mensaje por paso y entre
+    capas vecinas (`MOUNT_STEPS`, `CLICK_STEPS`, probado). Muestra el árbol nuevo, el *diff*
+    (solo cambia el `<p>`) y el único cambio en el DOM. `forget` usa `let count`: el valor
+    sube y la pantalla se queda en 0. Modelado sobre el `state-tree counter` de Seminario.
 
 #### Darla de alta en `toc.md`
 
