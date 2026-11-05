@@ -6,7 +6,7 @@ JSX es **JavaScript que parece HTML**. No es HTML ni es texto: el bundler lo con
 
 ## Pruébalo
 
-Edita el código de la izquierda. A la derecha ves lo que se dibuja, el árbol de elementos que describe ese JSX y, abajo, el JavaScript en que se convierte. Recorre las pestañas: cada una muestra una regla.
+Edita el código de la izquierda. A la derecha ves lo que se dibuja y el árbol de elementos que describe ese JSX. Recorre las pestañas: cada una muestra una regla.
 
 ```interactive
 jsx-live

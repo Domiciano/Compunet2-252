@@ -105,54 +105,72 @@ const CSS = `
   .rsim .rs-bundle{grid-template-columns:minmax(0,1fr)}
 }
 
-.rsim .rs-codepane{background:#1F2430;border-radius:10px;padding:8px 0;font:12px/1.45 ${MONO};color:#E6EAF2;overflow:auto;margin-bottom:12px}
+.rsim .rs-codepane{background:#1F2430;border-radius:10px;padding:8px 0;font:12.5px/1.55 ${MONO};color:#E6EAF2;overflow:auto}
 .rsim .rs-codepane div{padding:0 12px;white-space:pre;border-left:3px solid transparent;transition:background .3s}
 .rsim .rs-codepane div.rs-hl{background:rgba(240,197,114,.22);border-left-color:#F0C572}
-.rsim .rs-layers{display:grid;grid-template-columns:minmax(0,1fr) 80px minmax(0,1fr) 80px minmax(0,1fr) 80px minmax(0,1fr);
-  align-items:stretch}
-.rsim .rs-layer{background:#fff;border:1.5px solid var(--b);border-radius:12px;padding:10px;display:flex;flex-direction:column;
-  gap:6px;min-width:0;transition:box-shadow .3s}
-.rsim .rs-layer.rs-active{box-shadow:0 0 0 4px #F8DFA8}
-.rsim .rs-l-comp{--b:#C9A6EE;--ink:#7439B8;--s:#F4EBFF}
-.rsim .rs-l-vdom{--b:#A9B4F2;--ink:#4453C9;--s:#EEF1FF}
-.rsim .rs-l-dom{--b:#86D3CA;--ink:#0F8478;--s:#E3F6F3}
-.rsim .rs-l-screen{--b:#C4CBD8;--ink:#556074;--s:#EFF1F5}
-.rsim .rs-layer .rs-col-head{color:var(--ink)}
-.rsim .rs-statebox{border:1.5px solid var(--b);background:var(--s);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px}
-.rsim .rs-statebox.rs-plain{--b:#C4CBD8;--s:#EFF1F5}
-.rsim .rs-statelabel{font-size:10.5px;font-weight:700;letter-spacing:.06em;color:var(--ink)}
-.rsim .rs-var{display:flex;align-items:center;justify-content:space-between;gap:6px;font:12.5px ${MONO}}
-.rsim .rs-val{min-width:30px;text-align:center;border-radius:8px;padding:2px 8px;background:#7439B8;color:#fff;font-weight:700;
-  transition:transform .3s}
-.rsim .rs-plain .rs-val{background:#556074}
 .rsim .rs-flash{animation:rsflash .7s ease-out}
-@keyframes rsflash{0%{transform:scale(1.35);box-shadow:0 0 0 6px #F8DFA8}100%{transform:scale(1);box-shadow:0 0 0 0 transparent}}
-.rsim .rs-vnode{font:12px ${MONO};border:1.5px solid #E3E7EE;border-radius:8px;padding:3px 7px;margin-left:calc(var(--d,0) * 12px);
-  background:#fff;display:flex;flex-wrap:wrap;gap:4px;align-items:center;transition:box-shadow .3s,background .3s}
-.rsim .rs-vnode.rs-focus{box-shadow:0 0 0 3px #F8DFA8}
-.rsim .rs-vnode.rs-changed{background:#FFF3DC;border-color:#F0C572}
-.rsim .rs-vnode.rs-same{opacity:.6}
-.rsim .rs-vnode s{color:#C2354F;font-size:11px}
-.rsim .rs-badge{font:700 10px Roboto,Arial,sans-serif;border-radius:8px;padding:0 6px;background:#3A8235;color:#fff}
-.rsim .rs-badge.rs-amber{background:#A96C05}
-.rsim .rs-badge.rs-violet{background:#7439B8}
+@keyframes rsflash{0%{transform:scale(1.25);box-shadow:0 0 0 6px #F8DFA8}100%{transform:scale(1);box-shadow:0 0 0 0 transparent}}
 .rsim .rs-emptyl{font-size:12px;color:#9AA1B2;font-style:italic}
-.rsim .rs-gap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:0 2px;min-width:0}
-.rsim .rs-gap .rs-arrow{font-size:22px;color:#C4CBD8;line-height:1;transition:color .3s}
-.rsim .rs-gap .rs-msg{white-space:nowrap;font:700 10px ${MONO};color:#fff;background:#4453C9;border-radius:8px;padding:2px 6px;text-align:center;
-  overflow-wrap:anywhere;max-width:100%}
-.rsim .rs-gap.rs-live .rs-arrow{color:#4453C9}
-.rsim .rs-mini{border:1.5px solid #C4CBD8;border-radius:10px;overflow:hidden;background:#fff}
-.rsim .rs-mini-body{padding:10px;text-align:center;font-family:Roboto,Arial,sans-serif;min-height:120px}
-.rsim .rs-mini-body h1{font-size:17px;margin:0 0 4px}
-.rsim .rs-mini-body p{margin:0 0 8px;font-size:14px;transition:background .3s;border-radius:6px}
-.rsim .rs-mini-body p.rs-focus{background:#FFF3DC}
-.rsim .rs-plus{width:40px;height:40px;border-radius:12px;border:0;background:#4453C9;color:#fff;font-size:22px;cursor:pointer}
-.rsim .rs-plus:disabled{opacity:.45;cursor:default}
-@container (max-width:760px){
-  .rsim .rs-layers{grid-template-columns:minmax(0,1fr)}
-  .rsim .rs-gap{flex-direction:row;padding:4px 0}
-  .rsim .rs-gap .rs-arrow{transform:rotate(90deg)}
+.rsim .rs-counter{display:grid;grid-template-columns:minmax(0,290px) minmax(0,1fr);gap:20px;align-items:start}
+.rsim .rs-left{display:flex;flex-direction:column;gap:12px}
+.rsim .rs-app{border:1.5px solid #C4CBD8;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+.rsim .rs-app-body{padding:20px 14px 18px;min-height:260px;display:flex;flex-direction:column;align-items:center;gap:12px;
+  font-family:Roboto,Arial,sans-serif}
+.rsim .rs-app-body h1{font-size:22px;margin:0;align-self:stretch;text-align:left;padding-bottom:10px;border-bottom:1px solid #E3E7EE}
+.rsim .rs-big{font-size:64px;line-height:1.1;padding:4px 18px;border-radius:12px;margin:18px 0 8px}
+.rsim .rs-plus{width:56px;height:56px;border-radius:16px;border:0;background:#EEF1FF;color:#2A2F7A;font-size:30px;cursor:pointer;
+  box-shadow:0 3px 8px rgba(0,0,0,.2)}
+.rsim .rs-plus:disabled{opacity:.5;cursor:default}
+.rsim .rs-press{animation:rspress .35s ease-out}
+@keyframes rspress{50%{transform:scale(.88)}}
+.rsim .rs-ctl{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+.rsim .rs-seg{display:inline-flex;border:1.5px solid #7439B8;border-radius:20px;overflow:hidden;align-self:flex-start}
+.rsim .rs-seg button{border:0;background:#fff;color:#7439B8;padding:6px 16px;font:600 13px Roboto,Arial,sans-serif;cursor:pointer}
+.rsim .rs-seg button.rs-sel{background:#7439B8;color:#fff}
+.rsim .rs-right{display:flex;flex-direction:column;gap:12px;min-width:0;position:relative}
+.rsim .rs-box{background:#fff;border:1.5px solid #D9DEE8;border-radius:12px;padding:12px 14px;min-width:0;position:relative;z-index:1}
+.rsim .rs-box-head{font-size:11px;font-weight:700;letter-spacing:.08em;color:#556074;margin-bottom:10px}
+.rsim .rs-ctree{display:flex;flex-direction:column;gap:6px}
+.rsim .rs-cnode{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font:600 13px ${MONO};border:1.5px solid #D9DEE8;
+  border-radius:10px;padding:4px 10px;background:#fff;margin-left:calc(var(--d) * 22px);transition:box-shadow .3s,background .3s,opacity .3s}
+.rsim .rs-cnode.rs-comp{border-color:#C9A6EE;background:#F4EBFF;color:#7439B8}
+.rsim .rs-cnode.rs-reads{border-style:dashed;border-color:#9061DB}
+.rsim .rs-cnode.rs-hot{box-shadow:0 0 0 3px #F8DFA8}
+.rsim .rs-cnode.rs-changed{background:#FFF3DC;border-color:#F0C572}
+.rsim .rs-cnode.rs-same{opacity:.5}
+.rsim .rs-oid{font:700 11px Roboto,Arial,sans-serif;background:#556074;color:#fff;border-radius:9px;padding:1px 7px}
+.rsim .rs-note2{font:500 11.5px Roboto,Arial,sans-serif;color:#79809A}
+.rsim .rs-sbox{background:#F4EBFF;border:1.5px solid #C9A6EE;border-radius:12px;padding:12px 14px;position:relative;z-index:1;transition:box-shadow .3s}
+.rsim .rs-sbox.rs-plain{background:#EFF1F5;border-color:#C4CBD8}
+.rsim .rs-sbox.rs-hot{box-shadow:0 0 0 4px #F8DFA8}
+.rsim .rs-sbox h4{margin:0 0 8px;font-size:12px;letter-spacing:.08em;color:#7439B8}
+.rsim .rs-sbox.rs-plain h4{color:#556074}
+.rsim .rs-svar{display:flex;align-items:center;gap:10px;font:15px ${MONO};flex-wrap:wrap}
+.rsim .rs-svar .rs-kw{color:#7439B8}
+.rsim .rs-plain .rs-svar .rs-kw{color:#556074}
+.rsim .rs-sval{display:inline-block;min-width:56px;text-align:center;border:2px solid #7439B8;border-radius:10px;padding:4px 12px;
+  background:#fff;font:700 22px ${MONO}}
+.rsim .rs-plain .rs-sval{border-color:#556074}
+.rsim .rs-sfoot{display:flex;gap:8px;align-items:center;margin-top:8px;font:12px ${MONO};color:#79809A;flex-wrap:wrap}
+.rsim .rs-tag2{font:600 11.5px Roboto,Arial,sans-serif;border-radius:10px;padding:1px 8px;background:#E8F6E3;color:#3A8235}
+.rsim .rs-tag2.rs-warnt{background:#FFF3DC;color:#A96C05}
+.rsim .rs-tag2.rs-badt{background:#FFEBEF;color:#C2354F}
+.rsim .rs-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.rsim .rs-chip{display:inline-flex;align-items:center;gap:6px;border:1.5px solid #D9DEE8;border-radius:16px;padding:3px 10px 3px 4px;
+  font-size:12.5px;color:#556074;background:#fff}
+.rsim .rs-chip b{width:20px;height:20px;border-radius:50%;background:#EFF1F5;display:inline-flex;align-items:center;justify-content:center;font-size:11px}
+.rsim .rs-chip.rs-now{border-color:#7439B8;color:#7439B8}
+.rsim .rs-chip.rs-now b{background:#7439B8;color:#fff}
+.rsim .rs-chip.rs-done{opacity:.55}
+.rsim .rs-caption{font-size:14px;line-height:1.5;min-height:42px}
+.rsim .rs-caption code{font:12.5px ${MONO};background:#EEF1FF;border-radius:4px;padding:0 4px}
+.rsim .rs-caption b{color:#7439B8}
+.rsim .rs-wire{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:2}
+.rsim .rs-wire path{fill:none;stroke:#B69DF8;stroke-width:2;stroke-dasharray:6 5}
+.rsim .rs-wire path.rs-live{stroke:#7439B8;animation:rsdash .7s linear infinite}
+@keyframes rsdash{to{stroke-dashoffset:-22}}
+@container (max-width:700px){
+  .rsim .rs-counter{grid-template-columns:minmax(0,1fr)}
 }
 `;
 
@@ -1206,25 +1224,20 @@ const mountJsxPlayground = (root, args, set) => {
   const tabs = el('div', { class: 'rs-tabs' });
   const preview = el('div', { class: 'rs-preview', 'data-testid': 'jsx-preview' });
   const tree = el('div', { class: 'rs-tree', 'data-testid': 'jsx-tree' });
-  const compiled = el('pre', { class: 'rs-pre', 'data-testid': 'jsx-compiled' });
   const warnings = el('div', { class: 'rs-warnings' });
 
   const update = () => {
     warnings.replaceChildren();
     try {
       const result = evaluateJsx(editor.value);
-      compiled.className = 'rs-pre';
-      compiled.textContent = result.compiled.trim();
       tree.replaceChildren(...treeRows(result.tree));
       preview.replaceChildren();
       renderDom(result.tree, preview);
       result.warnings.forEach((text) => warnings.appendChild(el('div', { class: 'rs-line rs-warn', text })));
     } catch (error) {
       const message = `${error.jsx || error instanceof SyntaxError ? 'SyntaxError' : error.name}: ${error.message}`;
-      compiled.className = 'rs-error-box';
-      compiled.textContent = message;
       tree.replaceChildren(el('div', { class: 'rs-emptyl', text: 'Sin árbol: el código no compila.' }));
-      preview.replaceChildren(el('div', { class: 'rs-emptyl', text: 'Nada que mostrar.' }));
+      preview.replaceChildren(el('pre', { class: 'rs-error-box', 'data-testid': 'jsx-error', text: message }));
     }
   };
   const schedule = () => { clearTimeout(timer); timer = setTimeout(update, 250); };
@@ -1243,7 +1256,7 @@ const mountJsxPlayground = (root, args, set) => {
     ? [el('div', { class: 'rs-title', text: 'Un componente Header, primero quemado y luego con props' }),
       el('div', { class: 'rs-sub', text: 'Cambia de pestaña y edita los textos: el árbol muestra qué props recibe cada Header.' })]
     : [el('div', { class: 'rs-title', text: 'JSX en vivo' }),
-      el('div', { class: 'rs-sub', text: 'Escribe JSX a la izquierda: a la derecha ves lo que se dibuja, el árbol y el JavaScript que llega al navegador.' })];
+      el('div', { class: 'rs-sub', text: 'Escribe JSX a la izquierda: a la derecha ves lo que se dibuja y el árbol que describe.' })];
 
   const container = el('div', { class: 'rsim', 'data-testid': set === 'header' ? 'props-header' : 'jsx-live' },
     ...header,
@@ -1252,9 +1265,7 @@ const mountJsxPlayground = (root, args, set) => {
       el('div', { class: 'rs-stack' }, el('span', { class: 'rs-file', style: 'align-self:flex-start', text: 'App.jsx' }), editor),
       el('div', { class: 'rs-stack' },
         el('div', { class: 'rs-panel' }, el('div', { class: 'rs-head', text: 'PANTALLA' }), preview, warnings),
-        el('div', { class: 'rs-panel' }, el('div', { class: 'rs-head', text: 'ÁRBOL DE COMPONENTES' }), tree))),
-    el('div', { class: 'rs-panel', style: 'margin-top:12px' },
-      el('div', { class: 'rs-head', text: 'EL JAVASCRIPT QUE LLEGA AL NAVEGADOR (JSX TRANSFORMADO)' }), compiled));
+        el('div', { class: 'rs-panel' }, el('div', { class: 'rs-head', text: 'ÁRBOL DE COMPONENTES' }), tree))));
   renderTabs();
   update();
   root.replaceChildren(container);
@@ -1262,10 +1273,8 @@ const mountJsxPlayground = (root, args, set) => {
 };
 
 /* ------------------------------------------------------------------ */
-/* react-counter: state → component → Virtual DOM → DOM → screen       */
+/* react-counter: one figure, two tabs (useState / plain variable)     */
 /* ------------------------------------------------------------------ */
-
-export const LAYERS = Object.freeze(['comp', 'vdom', 'dom', 'screen']);
 
 export const COUNTER_CODE = Object.freeze({
   state: `import { useState } from 'react';
@@ -1280,7 +1289,7 @@ function App() {
   return (
     <div>
       <h1>Contador</h1>
-      <p>Valor: {count}</p>
+      <p>{count}</p>
       <button onClick={increment}>+</button>
     </div>
   );
@@ -1295,275 +1304,272 @@ function App() {
   return (
     <div>
       <h1>Contador</h1>
-      <p>Valor: {count}</p>
+      <p>{count}</p>
       <button onClick={increment}>+</button>
     </div>
   );
 }`,
 });
 
-// Steps are pure data. `at` is the layer where the step happens; `msg` (optional) is the one
-// message travelling from the previous layer to `at`; `sets` lists the layers that now show
-// the new value. Texts use {a} (old value) and {b} (new value).
-export const MOUNT_STEPS = Object.freeze({
+// The tree that App's JSX produces. `reads` marks the node that shows the state.
+export const COUNTER_TREE = Object.freeze([
+  { key: 'App', depth: 0, comp: true, label: () => 'App' },
+  { key: 'div', depth: 1, label: () => '<div>' },
+  { key: 'h1', depth: 2, label: () => '<h1>Contador</h1>' },
+  { key: 'p', depth: 2, reads: true, label: (v) => `<p>${v}</p>` },
+  { key: 'button', depth: 2, label: () => '<button onClick>+</button>' },
+]);
+
+// Steps are pure data. `set` moves a value forward: vars (the variable), built (the tree)
+// or painted (the screen). Texts use {a} (before), {b} (after) and {p} (on screen).
+export const COUNTER_STEPS = Object.freeze({
   state: [
-    { at: 'comp', sets: ['comp'], lines: [3], text: 'React llama a `App()` por primera vez. `useState(0)` crea el estado: `count` vale **0**.' },
-    { at: 'vdom', msg: 'JSX', sets: ['vdom'], lines: [9, 10, 11, 12, 13, 14, 15], text: 'El `return` de App es JSX: produce el **Virtual DOM**, un árbol de objetos JavaScript en memoria.' },
-    { at: 'dom', msg: 'crear', sets: ['dom'], text: 'React recorre ese árbol y crea los nodos del **DOM real** dentro de `<div id="root">`.' },
-    { at: 'screen', msg: 'pintar', sets: ['screen'], text: 'El navegador pinta el DOM. Ahora pulsa **+** en la pantalla.' },
+    { name: 'Clic', hot: ['button'], press: true, lines: [13, 5],
+      text: 'Pulsaste **+**: el `onClick` del `<button>` llama a `increment()`.' },
+    { name: 'setCount', set: 'vars', hot: ['state'], lines: [6],
+      text: '`setCount({b})`: React guarda `count = {b}` y agenda un nuevo render de `App`. La pantalla todavía no cambia.' },
+    { name: 'App()', render: true, hot: ['App'], lines: [2],
+      text: 'React vuelve a llamar a `App()`. Su JSX crea un árbol nuevo, con objetos nuevos (mira los #). El estado no se pierde: lo guarda React, fuera de la función.' },
+    { name: 'Leer el estado', set: 'built', hot: ['p'], wire: true, lines: [3, 12],
+      text: '`useState` devuelve **{b}**, y el `<p>` del árbol nuevo dice `{b}`.' },
+    { name: 'Diff', diff: true, hot: ['p'],
+      text: 'React compara el árbol nuevo con el anterior (**diff**): solo cambió el texto del `<p>`. Lo demás es igual.' },
+    { name: 'Pantalla', set: 'painted', hot: [],
+      text: 'React cambia ese único texto en el **DOM real** y el navegador lo pinta: la pantalla muestra **{b}**.' },
   ],
   forget: [
-    { at: 'comp', sets: ['comp'], lines: [1], text: 'React llama a `App()`. `let count = 0` es una variable normal de la función.' },
-    { at: 'vdom', msg: 'JSX', sets: ['vdom'], lines: [7, 8, 9, 10, 11, 12, 13], text: 'El `return` de App produce el **Virtual DOM** con `Valor: 0`.' },
-    { at: 'dom', msg: 'crear', sets: ['dom'], text: 'React crea los nodos del **DOM real**.' },
-    { at: 'screen', msg: 'pintar', sets: ['screen'], text: 'El navegador pinta. Ahora pulsa **+** en la pantalla.' },
+    { name: 'Clic', hot: ['button'], press: true, lines: [11, 3],
+      text: 'Pulsaste **+**: el `onClick` del `<button>` llama a `increment()`.' },
+    { name: 'count cambia', set: 'vars', hot: ['state'], lines: [4],
+      text: '`count = count + 1`: la variable pasa de {a} a **{b}**. Pero es una variable normal: React no se entera.' },
+    { name: 'Sin render', hot: [],
+      text: 'Nadie llamó a `setCount`: React no vuelve a llamar a `App()`, el árbol no cambia y la pantalla sigue en **{p}**. Sin error, sin aviso.' },
   ],
 });
 
-export const CLICK_STEPS = Object.freeze({
-  state: [
-    { at: 'screen', focus: 'button', text: 'Pulsas **+** en la pantalla.' },
-    { at: 'dom', msg: 'click', focus: 'button', text: 'El clic llega al `<button>` del **DOM real**. React tiene un escuchador puesto ahí.' },
-    { at: 'vdom', msg: 'evento', focus: 'button', lines: [13], text: 'React busca ese botón en su **Virtual DOM** y encuentra su `onClick`: la función `increment`.' },
-    { at: 'comp', msg: 'increment()', lines: [5, 6, 7], text: 'Corre `increment`, que llama a `setCount({b})`.' },
-    { at: 'comp', sets: ['comp'], lines: [3], text: 'El estado `count` pasa de {a} a **{b}**. Como cambió con `setCount`, React agenda un nuevo render.' },
-    { at: 'vdom', msg: 'App()', sets: ['vdom'], mark: 'new', lines: [9, 10, 11, 12, 13, 14, 15], text: 'React vuelve a llamar a `App()`. Su JSX produce un **Virtual DOM nuevo** con `Valor: {b}`.' },
-    { at: 'vdom', mark: 'diff', focus: 'p', text: '**Diff**: React compara el árbol nuevo con el anterior. Solo cambió el texto del `<p>`.' },
-    { at: 'dom', msg: '1 cambio', focus: 'p', text: 'React aplica al DOM real un único cambio: el texto del `<p>`.' },
-    { at: 'dom', sets: ['dom'], focus: 'p', text: 'El `<p>` del DOM ahora dice `Valor: {b}`. El `<h1>` y el `<button>` ni se tocaron.' },
-    { at: 'screen', msg: 'pintar', focus: 'p', text: 'El navegador vuelve a pintar lo que cambió.' },
-    { at: 'screen', sets: ['screen'], focus: 'p', text: 'La pantalla muestra **{b}**. Pulsa + otra vez.' },
-  ],
-  forget: [
-    { at: 'screen', focus: 'button', text: 'Pulsas **+** en la pantalla.' },
-    { at: 'dom', msg: 'click', focus: 'button', text: 'El clic llega al `<button>` del **DOM real**.' },
-    { at: 'vdom', msg: 'evento', focus: 'button', lines: [11], text: 'React encuentra el `onClick` del botón en su **Virtual DOM**: `increment`.' },
-    { at: 'comp', msg: 'increment()', lines: [3, 4, 5], text: 'Corre `increment`: `count = count + 1`.' },
-    { at: 'comp', sets: ['comp'], lines: [4], text: 'La variable `count` sí cambió: vale **{b}**. Pero es una variable normal: React no se entera.' },
-    { at: 'comp', text: 'Nadie llamó a un `setCount`, así que **no hay nuevo render**: el Virtual DOM, el DOM y la pantalla siguen en 0. Pulsa + varias veces y compara.' },
-  ],
-});
+const COUNTER_TABS = [
+  { key: 'state', label: 'Con useState' },
+  { key: 'forget', label: 'Con variable normal' },
+];
+
+let counterUid = 0;
 
 const mountCounter = (root, args = []) => {
   ensureStyle();
-  const variant = args.includes('forget') ? 'forget' : 'state';
-  const code = COUNTER_CODE[variant];
-  const vals = { comp: null, vdom: null, dom: null, screen: null };
-  let prevVdom = null;
-  let seq = null;
-  let idx = -1;
-  let timer = null;
+  counterUid += 1;
+  const uid = counterUid;
+  let variant = args.includes('forget') ? 'forget' : 'state';
+  let view = 'tree';
   let stepMode = false;
+  let model;
+  let run = null;
+  let timer = null;
+  let nextId;
+  let ids;
 
-  const codeLines = code.split('\n').map((line) => el('div', { text: line || ' ' }));
-  const explain = el('div', { class: 'rs-explain', 'data-testid': 'counter-explain' });
-  const layerNodes = {};
-  const gaps = [];
-  const nextBtn = el('button', { class: 'rs-btn rs-primary', type: 'button', 'data-testid': 'counter-next' }, 'Siguiente ›');
-  const mountBtn = el('button', { class: 'rs-btn rs-primary', type: 'button', 'data-testid': 'counter-mount' }, '▶ Primer render');
-  const resetBtn = el('button', { class: 'rs-btn', type: 'button' }, '↺ Reiniciar');
-  const stepBox = el('input', { type: 'checkbox', 'data-testid': 'counter-stepmode' });
-  const plus = el('button', { class: 'rs-plus', type: 'button', 'aria-label': 'Incrementar', 'data-testid': 'counter-plus' }, '+');
-
-  const fill = (text) => text.replace(/\{a\}/g, String(seq ? seq.from : 0)).replace(/\{b\}/g, String(seq ? seq.to : 0));
-
-  const vnode = (depth, tag, text, key, extra = []) => el('div', {
-    class: 'rs-vnode', style: `--d:${depth}`, 'data-node': key,
-  }, el('span', { class: 'rs-tag', style: 'padding:0;color:#4453C9', text: tag }), text ? el('span', { class: 'rs-txt', text }) : null, ...extra);
-
-  const render = () => {
-    const step = seq ? seq.steps[idx] : null;
-    const active = step ? step.at : null;
-    const focus = step ? step.focus : null;
-    const shown = (layer) => vals[layer];
-
-    // Component
-    const isState = variant === 'state';
-    const valNode = el('span', { class: 'rs-val', 'data-testid': 'counter-comp-value', text: shown('comp') === null ? '—' : String(shown('comp')) });
-    layerNodes.comp.replaceChildren(...[
-      el('div', { class: 'rs-col-head', text: 'COMPONENTE' }),
-      el('div', { class: 'rs-vnode', style: 'border-color:#C9A6EE;background:#F4EBFF' },
-        el('span', { class: 'rs-tag', style: 'padding:0;color:#7439B8', text: 'App()' }),
-        shown('comp') === null ? el('span', { class: 'rs-emptyl', text: 'sin llamar' }) : null),
-      el('div', { class: `rs-statebox${isState ? '' : ' rs-plain'}` },
-        el('div', { class: 'rs-statelabel', text: isState ? 'ESTADO (lo guarda React)' : 'VARIABLE NORMAL' }),
-        el('div', { class: 'rs-var' }, el('span', { text: 'count' }), valNode)),
-      isState ? el('div', { class: 'rs-note', style: 'margin:0', text: 'setCount avisa a React que debe volver a dibujar.' })
-        : el('div', { class: 'rs-note', style: 'margin:0', text: 'Cambiarla no avisa a nadie.' }),
-    ]);
-    if (step && step.sets && step.sets.includes('comp')) flash(valNode);
-
-    // Virtual DOM
-    const v = shown('vdom');
-    if (v === null) {
-      layerNodes.vdom.replaceChildren(el('div', { class: 'rs-col-head', text: 'VIRTUAL DOM' }), el('div', { class: 'rs-emptyl', text: '(vacío)' }));
-    } else {
-      const mark = step && step.at === 'vdom' ? step.mark : null;
-      const changed = prevVdom !== null && prevVdom !== v && (mark === 'new' || mark === 'diff');
-      const pExtra = [];
-      if (changed) pExtra.push(el('s', { text: `Valor: ${prevVdom}` }));
-      if (mark === 'diff') pExtra.push(el('span', { class: 'rs-badge rs-amber', text: 'cambió' }));
-      const same = mark === 'diff' ? [el('span', { class: 'rs-badge', text: '=' })] : [];
-      const nodes = [
-        vnode(0, '<div>', null, 'div', [...same]),
-        vnode(1, '<h1>', 'Contador', 'h1', [...(mark === 'diff' ? [el('span', { class: 'rs-badge', text: '=' })] : [])]),
-        vnode(1, '<p>', `Valor: ${v}`, 'p', pExtra),
-        vnode(1, '<button>', '+', 'button', [el('span', { class: 'rs-prop', text: 'onClick=ƒ' }),
-          ...(mark === 'diff' ? [el('span', { class: 'rs-badge', text: '=' })] : [])]),
-      ];
-      nodes.forEach((node) => {
-        const key = node.getAttribute('data-node');
-        if (active === 'vdom' && focus === key) node.classList.add('rs-focus');
-        if (mark === 'diff') node.classList.add(key === 'p' ? 'rs-changed' : 'rs-same');
-        if (mark === 'new' && key === 'p' && changed) node.classList.add('rs-changed');
-      });
-      layerNodes.vdom.replaceChildren(...[
-        el('div', { class: 'rs-col-head', text: 'VIRTUAL DOM' }),
-        mark === 'new' ? el('span', { class: 'rs-badge rs-violet', style: 'align-self:flex-start', text: 'árbol nuevo' }) : null,
-        el('div', { class: 'rs-vnode', style: 'border-color:#C9A6EE;background:#F4EBFF' },
-          el('span', { class: 'rs-tag', style: 'padding:0;color:#7439B8', text: 'App' })),
-        ...nodes.map((node) => { node.style.setProperty('--d', String(Number(node.style.getPropertyValue('--d')) + 1)); return node; }),
-      ].filter(Boolean));
-    }
-
-    // DOM
-    const d = shown('dom');
-    const domNode = (depth, html, key) => {
-      const node = el('div', { class: 'rs-vnode', style: `--d:${depth}`, 'data-node': key, text: html });
-      if (active === 'dom' && focus === key) node.classList.add('rs-focus');
-      if (step && step.at === 'dom' && step.sets && step.sets.includes('dom') && key === 'p' && seq && seq.kind === 'click') {
-        node.classList.add('rs-changed');
-      }
-      return node;
-    };
-    layerNodes.dom.replaceChildren(
-      el('div', { class: 'rs-col-head', text: 'DOM REAL' }),
-      el('div', { class: 'rs-vnode', style: 'border-color:#86D3CA;background:#E3F6F3', text: '<div id="root">' }),
-      ...(d === null ? [el('div', { class: 'rs-emptyl', text: '(vacío)' })] : [
-        domNode(1, '<div>', 'div'),
-        domNode(2, '<h1>Contador</h1>', 'h1'),
-        domNode(2, `<p>Valor: ${d}</p>`, 'p'),
-        domNode(2, '<button>+</button>', 'button'),
-      ]));
-
-    // Screen
-    const s = shown('screen');
-    const busy = Boolean(seq) && idx < seq.steps.length;
-    plus.disabled = s === null || busy;
-    const pNode = el('p', { 'data-testid': 'counter-screen-value', text: `Valor: ${s}` });
-    if (active === 'screen' && focus === 'p') pNode.classList.add('rs-focus');
-    layerNodes.screen.replaceChildren(
-      el('div', { class: 'rs-col-head', text: 'PANTALLA' }),
-      el('div', { class: 'rs-mini' },
-        el('div', { class: 'rs-browser-bar' }, el('span', { class: 'rs-dot' }), el('span', { class: 'rs-url', text: 'localhost:5173' })),
-        el('div', { class: 'rs-mini-body' }, ...(s === null ? [el('div', { class: 'rs-emptyl', text: '(en blanco)' })]
-          : [el('h1', { text: 'Contador' }), pNode, plus]))));
-    if (step && step.sets && step.sets.includes('screen')) flash(pNode);
-
-    LAYERS.forEach((layer) => layerNodes[layer].classList.toggle('rs-active', layer === active));
-
-    // Gaps: at most one message, between the previous layer and `at`.
-    gaps.forEach((gap) => { gap.node.classList.remove('rs-live'); gap.msg.hidden = true; gap.arrow.textContent = '→'; });
-    if (step && step.msg) {
-      const prev = idx > 0 ? seq.steps[idx - 1].at : seq.start;
-      const a = LAYERS.indexOf(prev);
-      const b = LAYERS.indexOf(step.at);
-      const gap = gaps[Math.min(a, b)];
-      gap.node.classList.add('rs-live');
-      gap.msg.hidden = false;
-      gap.msg.textContent = fill(step.msg);
-      gap.arrow.textContent = b > a ? '→' : '←';
-    }
-
-    codeLines.forEach((line, i) => line.classList.toggle('rs-hl', Boolean(step && step.lines && step.lines.includes(i))));
-
-    if (!seq) {
-      explain.replaceChildren(...(vals.screen === null
-        ? ['La app todavía no existe en pantalla. Pulsa ', el('b', { text: '▶ Primer render' }), '.']
-        : rich('Pulsa **+** en la pantalla.')));
-    } else {
-      explain.replaceChildren(el('span', { class: 'rs-count', text: `${idx + 1}/${seq.steps.length}` }), ...rich(fill(step.text)));
-    }
-    mountBtn.disabled = vals.screen !== null || Boolean(seq);
-    nextBtn.hidden = !stepMode;
-    nextBtn.disabled = !seq;
+  const renew = () => { COUNTER_TREE.forEach((n) => { ids[n.key] = nextId; nextId += 1; }); };
+  const reset = () => {
+    clearTimeout(timer);
+    run = null;
+    model = { vars: 0, built: 0, painted: 0 };
+    nextId = 1;
+    ids = {};
+    renew();
   };
 
-  const finish = () => {
-    if (seq && seq.kind === 'click' && variant === 'state') prevVdom = null;
-    seq = null;
-    idx = -1;
-    render();
+  const tabs = el('div', { class: 'rs-tabs', style: 'margin-bottom:14px' });
+  const seg = el('div', { class: 'rs-seg' });
+  const big = el('p', { class: 'rs-big', 'data-testid': 'counter-screen-value' });
+  const plus = el('button', { class: 'rs-plus', type: 'button', 'aria-label': 'Incrementar', 'data-testid': 'counter-plus' }, '+');
+  const stepBox = el('input', { type: 'checkbox', 'data-testid': 'counter-stepmode' });
+  const nextBtn = el('button', { class: 'rs-btn', type: 'button', 'data-testid': 'counter-next' }, 'Siguiente paso');
+  const treeBox = el('div', { class: 'rs-box' });
+  const codeBox = el('div', { class: 'rs-codepane' });
+  const stateBox = el('div', { class: 'rs-sbox', 'data-testid': 'counter-state' });
+  const chips = el('div', { class: 'rs-chips' });
+  const caption = el('div', { class: 'rs-caption', 'data-testid': 'counter-explain' });
+  const markerId = `rsim-wire-${uid}`;
+  const svgNs = 'http://www.w3.org/2000/svg';
+  const wire = document.createElementNS(svgNs, 'svg');
+  wire.setAttribute('class', 'rs-wire');
+  wire.innerHTML = `<defs><marker id="${markerId}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">`
+    + '<path d="M0,0 L10,5 L0,10 Z" fill="#9061DB" stroke="none"/></marker></defs>';
+  const wirePath = document.createElementNS(svgNs, 'path');
+  wirePath.setAttribute('marker-end', `url(#${markerId})`);
+  wire.appendChild(wirePath);
+  const right = el('div', { class: 'rs-right' }, seg, treeBox, codeBox, stateBox,
+    el('div', { class: 'rs-box' }, chips, caption));
+  right.appendChild(wire);
+
+  const steps = () => COUNTER_STEPS[variant];
+  const current = () => (run ? steps()[run.idx] : null);
+  const fill = (text) => text
+    .replace(/\{a\}/g, String(run ? run.from : model.vars))
+    .replace(/\{b\}/g, String(run ? run.to : model.vars))
+    .replace(/\{p\}/g, String(model.painted));
+
+  let pNode = null;
+  let valNode = null;
+
+  const drawWire = () => {
+    if (view !== 'tree' || !pNode || !valNode || typeof right.getBoundingClientRect !== 'function') {
+      wirePath.setAttribute('d', '');
+      return;
+    }
+    const base = right.getBoundingClientRect();
+    const a = valNode.getBoundingClientRect();
+    const b = pNode.getBoundingClientRect();
+    if (!a.width || !b.width) { wirePath.setAttribute('d', ''); return; }
+    const x1 = a.right - base.left + 2;
+    const y1 = a.top + a.height / 2 - base.top;
+    const x2 = b.right - base.left + 6;
+    const y2 = b.top + b.height / 2 - base.top;
+    const widest = Math.max(...[...treeBox.querySelectorAll('.rs-cnode')].map((n) => n.getBoundingClientRect().right));
+    const xm = Math.max(x1, widest - base.left) + 28;
+    wirePath.setAttribute('d', `M${x1},${y1} H${xm} V${y2} H${x2 + 4}`);
+    const step = current();
+    wirePath.classList.toggle('rs-live', Boolean(step && step.wire));
+  };
+
+  const render = () => {
+    const step = current();
+    const hot = step ? step.hot : [];
+    const isState = variant === 'state';
+
+    tabs.replaceChildren(...COUNTER_TABS.map((t) => el('button', {
+      class: `rs-tab${t.key === variant ? ' rs-sel' : ''}`,
+      type: 'button',
+      'data-testid': `counter-tab-${t.key}`,
+      onclick: () => { if (t.key !== variant) { variant = t.key; reset(); render(); } },
+    }, t.label)));
+
+    seg.replaceChildren(...[['tree', 'Árbol de componentes'], ['code', 'Código']].map(([key, label]) => el('button', {
+      class: key === view ? 'rs-sel' : '',
+      type: 'button',
+      onclick: () => { view = key; render(); },
+    }, label)));
+
+    treeBox.hidden = view !== 'tree';
+    codeBox.hidden = view !== 'code';
+
+    pNode = null;
+    treeBox.replaceChildren(
+      el('div', { class: 'rs-box-head', text: 'ÁRBOL DE COMPONENTES · VIRTUAL DOM · #N = NÚMERO DE OBJETO' }),
+      el('div', { class: 'rs-ctree' }, ...COUNTER_TREE.map((n) => {
+        let cls = 'rs-cnode';
+        if (n.comp) cls += ' rs-comp';
+        if (n.reads) cls += ' rs-reads';
+        if (hot.includes(n.key)) cls += ' rs-hot';
+        if (step && step.diff) cls += n.key === 'p' ? ' rs-changed' : ' rs-same';
+        const node = el('div', { class: cls, style: `--d:${n.depth}`, 'data-node': n.key },
+          n.label(model.built),
+          el('span', { class: 'rs-oid', text: `#${ids[n.key]}` }),
+          step && step.diff && n.key === 'p' ? el('span', { class: 'rs-tag2 rs-warnt', text: 'cambió' }) : null);
+        if (n.reads) pNode = node;
+        return node;
+      })));
+
+    codeBox.replaceChildren(...COUNTER_CODE[variant].split('\n').map((line, i) => el('div', {
+      class: step && step.lines && step.lines.includes(i) ? 'rs-hl' : '',
+      text: line || ' ',
+    })));
+
+    valNode = el('span', { class: 'rs-sval', 'data-testid': 'counter-comp-value', text: String(model.vars) });
+    let tag;
+    if (!isState && model.vars !== model.painted) tag = el('span', { class: 'rs-tag2 rs-badt', text: 'React no se enteró' });
+    else if (model.vars !== model.painted) tag = el('span', { class: 'rs-tag2 rs-warnt', text: 'falta pintar' });
+    else tag = el('span', { class: 'rs-tag2', text: 'al día' });
+    stateBox.className = `rs-sbox${isState ? '' : ' rs-plain'}${hot.includes('state') ? ' rs-hot' : ''}`;
+    stateBox.replaceChildren(
+      el('h4', { text: isState ? 'ESTADO' : 'VARIABLE NORMAL' }),
+      el('div', { class: 'rs-svar' },
+        el('span', { class: 'rs-kw', text: isState ? 'const [count, setCount]' : 'let count' }), valNode),
+      el('div', { class: 'rs-sfoot' },
+        el('span', { text: isState ? 'lo guarda React, fuera de App()' : 'vive dentro de App()' }), tag));
+    if (step && step.set === 'vars') flash(valNode);
+
+    const names = steps().map((s) => s.name);
+    chips.replaceChildren(...names.map((name, i) => {
+      let cls = 'rs-chip';
+      if (run && i === run.idx) cls += ' rs-now';
+      else if (run && i < run.idx) cls += ' rs-done';
+      return el('span', { class: cls }, el('b', { text: String(i + 1) }), name);
+    }));
+    if (step) caption.replaceChildren(...rich(fill(step.text)));
+    else if (!caption.dataset.keep) {
+      caption.replaceChildren(...rich(isState
+        ? 'Pulsa **+** y sigue los pasos: primero cambia el estado y al final la pantalla.'
+        : 'Pulsa **+** varias veces y compara la variable con la pantalla.'));
+    }
+    delete caption.dataset.keep;
+
+    big.textContent = String(model.painted);
+    if (step && step.set === 'painted') flash(big);
+    plus.disabled = Boolean(run);
+    nextBtn.disabled = !stepMode || !run;
+    nextBtn.hidden = !stepMode;
+    drawWire();
   };
 
   const advance = () => {
     clearTimeout(timer);
-    if (!seq) return;
-    if (idx >= seq.steps.length - 1) {
-      // Keep the last text on screen; just unlock the controls.
-      const lastText = fill(seq.steps[idx].text);
-      seq = null;
-      idx = -1;
+    if (!run) return;
+    if (run.idx >= steps().length - 1) {
+      const last = fill(steps()[run.idx].text);
+      run = null;
+      caption.dataset.keep = '1';
+      caption.replaceChildren(...rich(last));
       render();
-      explain.replaceChildren(...rich(lastText));
       return;
     }
-    idx += 1;
-    const step = seq.steps[idx];
-    (step.sets || []).forEach((layer) => {
-      if (layer === 'vdom') prevVdom = vals.vdom;
-      vals[layer] = seq.to;
-    });
-    render();
-    if (!stepMode) timer = setTimeout(advance, 1500);
-  };
-
-  const start = (kind) => {
-    if (seq) return;
-    if (kind === 'mount') {
-      seq = { kind, steps: MOUNT_STEPS[variant], from: 0, to: 0, start: 'comp' };
-    } else {
-      const from = vals.comp;
-      seq = { kind, steps: CLICK_STEPS[variant], from, to: from + 1, start: 'screen' };
+    run.idx += 1;
+    const step = current();
+    if (step.set === 'vars') model.vars = run.to;
+    if (step.set === 'built') model.built = run.to;
+    if (step.set === 'painted') model.painted = run.to;
+    if (step.render) renew();
+    if (step.press) {
+      plus.classList.remove('rs-press');
+      plus.offsetWidth;
+      plus.classList.add('rs-press');
     }
-    idx = -1;
-    advance();
+    render();
+    if (!stepMode) timer = setTimeout(advance, 1600);
   };
 
-  plus.addEventListener('click', () => start('click'));
-  mountBtn.addEventListener('click', () => start('mount'));
+  plus.addEventListener('click', () => {
+    if (run) return;
+    run = { idx: -1, from: model.vars, to: model.vars + 1 };
+    advance();
+  });
   nextBtn.addEventListener('click', advance);
   stepBox.addEventListener('change', () => {
     stepMode = stepBox.checked;
-    if (!stepMode && seq) advance();
-    else { clearTimeout(timer); render(); }
+    if (!stepMode && run) advance();
+    else render();
   });
-  resetBtn.addEventListener('click', () => {
-    clearTimeout(timer);
-    Object.keys(vals).forEach((key) => { vals[key] = null; });
-    prevVdom = null;
-    finish();
-  });
-
-  LAYERS.forEach((layer) => { layerNodes[layer] = el('div', { class: `rs-layer rs-l-${layer}`, 'data-layer': layer }); });
-  for (let i = 0; i < LAYERS.length - 1; i += 1) {
-    const msg = el('span', { class: 'rs-msg', hidden: true });
-    const arrow = el('span', { class: 'rs-arrow', text: '→' });
-    gaps.push({ node: el('div', { class: 'rs-gap', 'data-gap': String(i) }, msg, arrow), msg, arrow });
-  }
 
   const container = el('div', { class: 'rsim', 'data-testid': 'react-counter' },
-    el('div', { class: 'rs-title', text: variant === 'state' ? 'El contador: del estado a la pantalla' : 'El contador con una variable normal' }),
-    el('div', { class: 'rs-sub', text: 'Componente → Virtual DOM → DOM real → pantalla. Cada paso es un solo salto.' }),
-    el('div', { class: 'rs-bar' }, mountBtn,
-      el('label', { class: 'rs-check' }, stepBox, 'Paso a paso'), nextBtn, el('span', { class: 'rs-spacer' }), resetBtn),
-    explain,
-    el('div', { class: 'rs-layers' },
-      layerNodes.comp, gaps[0].node, layerNodes.vdom, gaps[1].node, layerNodes.dom, gaps[2].node, layerNodes.screen),
-    el('div', { class: 'rs-codepane', style: 'margin:12px 0 0' }, ...codeLines));
-  render();
+    tabs,
+    el('div', { class: 'rs-counter' },
+      el('div', { class: 'rs-left' },
+        el('div', { class: 'rs-app' },
+          el('div', { class: 'rs-browser-bar' }, el('span', { class: 'rs-dot' }), el('span', { class: 'rs-dot' }),
+            el('span', { class: 'rs-dot' }), el('span', { class: 'rs-url', text: 'localhost:5173' })),
+          el('div', { class: 'rs-app-body' }, el('h1', { text: 'Contador' }), big, plus)),
+        el('div', { class: 'rs-ctl' }, el('label', { class: 'rs-check' }, stepBox, 'Paso a paso'), nextBtn)),
+      right));
+
+  const onResize = () => drawWire();
+  if (typeof window !== 'undefined') window.addEventListener('resize', onResize);
+  reset();
   root.replaceChildren(container);
-  return () => { clearTimeout(timer); root.replaceChildren(); };
+  render();
+  return () => {
+    clearTimeout(timer);
+    if (typeof window !== 'undefined') window.removeEventListener('resize', onResize);
+    root.replaceChildren();
+  };
 };
 
 export const SIMS = Object.freeze({

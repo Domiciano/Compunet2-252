@@ -6,28 +6,15 @@ Las props vienen de afuera. El **estado** es lo que un componente recuerda por s
 
 ## El contador
 
-El ejemplo de siempre, visto por dentro. Pulsa **▶ Primer render** para ver cómo el JSX se convierte en un árbol y ese árbol en pantalla. Luego pulsa **+** varias veces. Con *Paso a paso* avanzas tú.
+El ejemplo de siempre, visto por dentro. A la izquierda la app en el navegador; a la derecha el **árbol de componentes** que produce su JSX y el **estado**, unido con una línea al `<p>` que lo muestra. Pulsa **+** y sigue los pasos; con *Paso a paso* avanzas tú. En *Código* ves qué línea corre en cada paso.
 
 ```interactive
 react-counter
 ```
 
-Las cuatro columnas son las piezas del proceso:
+Fíjate en los `#`: en cada render React vuelve a llamar a `App()` y el árbol se crea otra vez, con objetos nuevos. Ese árbol es el **Virtual DOM**, barato de crear. El **DOM real**, el que pinta el navegador, es caro de tocar, así que React compara el árbol nuevo con el anterior (*diff*) y cambia solo lo que difiere. El estado sobrevive porque no vive en la función: `useState` le pide a React que lo guarde.
 
-- **Componente.** La función `App` y su estado. `useState(0)` le pide a React que guarde `count` **fuera** de la función, para que no se pierda entre una llamada y otra.
-- **Virtual DOM.** Lo que devuelve el JSX: un árbol de objetos JavaScript que describe la pantalla. Es barato de crear, así que React lo vuelve a crear entero en cada render.
-- **DOM real.** Los nodos que el navegador pinta. Tocarlos es caro, así que React compara el árbol nuevo con el anterior (*diff*) y cambia solo lo que difiere.
-- **Pantalla.** Lo que ve el usuario.
-
-## Con una variable normal
-
-Ahora `count` es un `let` común. Pulsa **+** varias veces y mira el bloque del componente.
-
-```interactive
-react-counter forget
-```
-
-El valor cambia, pero la pantalla no. Una variable normal no le avisa a nadie: React solo vuelve a dibujar cuando se llama a la función `set` de un estado. Es el error más común al empezar: *"cambio la variable y la pantalla no se actualiza"*.
+Ahora pasa a la pestaña **Con variable normal**, donde `count` es un `let` común, y pulsa **+** varias veces. El valor cambia, pero la pantalla no: una variable normal no le avisa a nadie, y React solo vuelve a dibujar cuando se llama a la función `set` de un estado. Es el error más común al empezar: *"cambio la variable y la pantalla no se actualiza"*.
 
 ## Anatomía de useState
 

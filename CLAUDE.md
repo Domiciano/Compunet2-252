@@ -231,14 +231,18 @@ tarjeta clara fija.
   - `jsx-live` (0101) y `props-header hardcoded|props` (0051): mismo motor. Un transformador
     de JSX a `React.createElement` hecho a mano (subconjunto: elementos, fragmentos,
     atributos, `{expresiones}` con JSX adentro), un `React` falso que arma el árbol y un
-    render a DOM. Muestra pantalla, árbol de componentes (con las props de cada uno) y el JS
-    transformado. Dos raíces dan el mensaje real de React. No hay hooks: `useState` ahí
+    render a DOM. Muestra pantalla y árbol de componentes (con las props de cada uno); el JS
+    transformado no se muestra (lo pidió el profesor, 2026-11-05) y los errores de compilación
+    salen en el panel de pantalla. Dos raíces dan el mensaje real de React. No hay hooks: `useState` ahí
     falla.
-  - `react-counter [forget]` («Estado con useState», 0053): columnas Componente → Virtual
-    DOM → DOM real → Pantalla, *Primer render* y luego `+`. Un solo mensaje por paso y entre
-    capas vecinas (`MOUNT_STEPS`, `CLICK_STEPS`, probado). Muestra el árbol nuevo, el *diff*
-    (solo cambia el `<p>`) y el único cambio en el DOM. `forget` usa `let count`: el valor
-    sube y la pantalla se queda en 0. Modelado sobre el `state-tree counter` de Seminario.
+  - `react-counter [forget]` («Estado con useState», 0053): **una sola figura con dos
+    pestañas**, *Con useState* y *Con variable normal* (`forget` abre en la segunda), al estilo
+    del `state-tree` de Seminario (pedido del profesor, 2026-11-05). A la izquierda la app en un
+    navegador con el botón `+`; a la derecha *Árbol de componentes* / *Código*, el bloque de
+    estado unido con línea punteada al `<p>` que lo lee, y la barra de pasos (Clic, setCount,
+    App(), Leer el estado, Diff, Pantalla). El árbol es el Virtual DOM: sus `#n` se
+    renuevan en cada render y el estado no. Con variable normal el valor sube y ni el árbol ni
+    la pantalla cambian. Datos en `COUNTER_STEPS` y `COUNTER_TREE`.
 
 #### Darla de alta en `toc.md`
 

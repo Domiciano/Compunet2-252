@@ -5,7 +5,7 @@ import InteractiveBlock from './InteractiveBlock';
 import {
   JS_SNIPPETS, runSnippet, formatValue, buildDocument, VANILLA_EXAMPLES,
   transformJsx, evaluateJsx, JSX_PRESETS, BUNDLE_STEPS, BUNDLE_FILES, BUNDLE_OUTPUT,
-  LAYERS, MOUNT_STEPS, CLICK_STEPS, COUNTER_CODE,
+  COUNTER_STEPS, COUNTER_CODE, COUNTER_TREE,
 } from './reactSims';
 
 const renderBlock = (spec) => render(<ThemeProvider><InteractiveBlock spec={spec} /></ThemeProvider>);
@@ -150,6 +150,12 @@ describe('JSX', () => {
     expect(warnings[0]).toMatch(/className/);
   });
 
+  it('shows a compile error in the screen panel', () => {
+    renderBlock('jsx-live adjacent');
+    expect(screen.getByTestId('jsx-error').textContent).toMatch(/Adjacent JSX elements/);
+    expect(screen.queryByText(/JAVASCRIPT QUE LLEGA/)).toBeNull();
+  });
+
   it('renders the preview from the block', () => {
     renderBlock('props-header props');
     expect(screen.getByTestId('jsx-preview').textContent).toContain('Semana 14');
@@ -158,34 +164,27 @@ describe('JSX', () => {
 });
 
 describe('react-counter steps', () => {
-  const sequences = [
-    ...Object.entries(MOUNT_STEPS).map(([k, steps]) => ({ name: `mount/${k}`, steps, start: 'comp' })),
-    ...Object.entries(CLICK_STEPS).map(([k, steps]) => ({ name: `click/${k}`, steps, start: 'screen' })),
-  ];
-
-  it('each step moves at most to a neighbouring layer, and only with one message', () => {
-    sequences.forEach(({ name, steps, start }) => {
-      let prev = start;
-      steps.forEach((step, i) => {
-        const jump = Math.abs(LAYERS.indexOf(step.at) - LAYERS.indexOf(prev));
-        expect(jump, `${name} #${i + 1}`).toBeLessThanOrEqual(1);
-        if (jump === 1) expect(step.msg, `${name} #${i + 1} needs a message`).toBeTruthy();
-        if (step.msg && i > 0) expect(jump, `${name} #${i + 1}`).toBe(1);
-        prev = step.at;
-      });
-    });
-  });
-
   it('highlights only lines that exist in the code', () => {
-    Object.entries(CLICK_STEPS).forEach(([variant, steps]) => {
+    Object.entries(COUNTER_STEPS).forEach(([variant, steps]) => {
       const n = COUNTER_CODE[variant].split('\n').length;
-      [...steps, ...MOUNT_STEPS[variant]].forEach((s) => (s.lines || []).forEach((l) => expect(l).toBeLessThan(n)));
+      steps.forEach((s) => (s.lines || []).forEach((l) => expect(l).toBeLessThan(n)));
     });
   });
 
-  it('the forgotten variable never re-renders', () => {
-    const sets = CLICK_STEPS.forget.flatMap((s) => s.sets || []);
-    expect(sets).toEqual(['comp']);
+  it('with useState the value moves variable → tree → screen, in that order', () => {
+    expect(COUNTER_STEPS.state.filter((s) => s.set).map((s) => s.set)).toEqual(['vars', 'built', 'painted']);
+    const render = COUNTER_STEPS.state.findIndex((s) => s.render);
+    expect(render).toBeGreaterThan(COUNTER_STEPS.state.findIndex((s) => s.set === 'vars'));
+    expect(render).toBeLessThan(COUNTER_STEPS.state.findIndex((s) => s.set === 'built'));
+  });
+
+  it('the plain variable never re-renders', () => {
+    expect(COUNTER_STEPS.forget.flatMap((s) => (s.set ? [s.set] : []))).toEqual(['vars']);
+    expect(COUNTER_STEPS.forget.some((s) => s.render)).toBe(false);
+  });
+
+  it('only the node that reads the state changes in the diff', () => {
+    expect(COUNTER_TREE.filter((n) => n.reads).map((n) => n.key)).toEqual(['p']);
   });
 });
 
@@ -194,41 +193,45 @@ describe('react-counter block', () => {
   afterEach(() => vi.useRealTimers());
 
   const runAll = () => act(() => { vi.advanceTimersByTime(30000); });
+  const ids = (container) => [...container.querySelectorAll('.rs-oid')].map((n) => n.textContent);
 
-  it('mounts, then a click updates state, Virtual DOM, DOM and screen', () => {
-    renderBlock('react-counter');
-    fireEvent.click(screen.getByTestId('counter-mount'));
-    runAll();
-    expect(screen.getByTestId('counter-screen-value').textContent).toBe('Valor: 0');
+  it('a click updates state, tree and screen, and renews the tree objects', () => {
+    const { container } = renderBlock('react-counter');
+    const before = ids(container);
     fireEvent.click(screen.getByTestId('counter-plus'));
     runAll();
     expect(screen.getByTestId('counter-comp-value').textContent).toBe('1');
-    expect(screen.getByTestId('counter-screen-value').textContent).toBe('Valor: 1');
+    expect(screen.getByTestId('counter-screen-value').textContent).toBe('1');
+    expect(container.querySelector('[data-node=p]').textContent).toContain('<p>1</p>');
+    expect(ids(container)).not.toEqual(before);
   });
 
-  it('with a plain variable the value changes but the screen does not', () => {
-    renderBlock('react-counter forget');
-    fireEvent.click(screen.getByTestId('counter-mount'));
-    runAll();
+  it('the plain-variable tab changes the value but not the screen nor the tree', () => {
+    const { container } = renderBlock('react-counter');
+    fireEvent.click(screen.getByTestId('counter-tab-forget'));
+    const before = ids(container);
     fireEvent.click(screen.getByTestId('counter-plus'));
     runAll();
     fireEvent.click(screen.getByTestId('counter-plus'));
     runAll();
     expect(screen.getByTestId('counter-comp-value').textContent).toBe('2');
-    expect(screen.getByTestId('counter-screen-value').textContent).toBe('Valor: 0');
+    expect(screen.getByTestId('counter-screen-value').textContent).toBe('0');
+    expect(ids(container)).toEqual(before);
+    expect(screen.getByTestId('counter-state').textContent).toContain('React no se enteró');
   });
 
-  it('step mode waits for Siguiente and shows at most one message', () => {
-    const { container } = renderBlock('react-counter');
+  it('opens on the plain-variable tab with the forget option', () => {
+    renderBlock('react-counter forget');
+    expect(screen.getByTestId('counter-tab-forget').className).toContain('rs-sel');
+  });
+
+  it('step mode waits for Siguiente paso', () => {
+    renderBlock('react-counter');
     fireEvent.click(screen.getByTestId('counter-stepmode'));
-    fireEvent.click(screen.getByTestId('counter-mount'));
-    MOUNT_STEPS.state.forEach(() => fireEvent.click(screen.getByTestId('counter-next')));
     fireEvent.click(screen.getByTestId('counter-plus'));
-    CLICK_STEPS.state.forEach(() => {
-      expect(container.querySelectorAll('.rs-gap.rs-live').length).toBeLessThanOrEqual(1);
-      expect(container.querySelectorAll('.rs-layer.rs-active').length).toBe(1);
-      fireEvent.click(screen.getByTestId('counter-next'));
-    });
-    expect(screen.getByTestId('counter-screen-value').textContent).toBe('Valor: 1');
+    runAll();
+    expect(screen.getByTestId('counter-screen-value').textContent).toBe('0');
+    COUNTER_STEPS.state.forEach(() => fireEvent.click(screen.getByTestId('counter-next')));
+    expect(screen.getByTestId('counter-screen-value').textContent).toBe('1');
   });
 });
