@@ -238,9 +238,10 @@ tarjeta clara fija.
   - `react-counter [forget]` («Estado con useState», 0053): **una sola figura con dos
     pestañas**, *Con useState* y *Con variable normal* (`forget` abre en la segunda), al estilo
     del `state-tree` de Seminario (pedido del profesor, 2026-11-05). A la izquierda la app en un
-    navegador con el botón `+`; a la derecha *Árbol de componentes* / *Código*, el bloque de
-    estado unido con línea punteada al `<p>` que lo lee, y la barra de pasos (Clic, setCount,
-    App(), Leer el estado, Diff, Pantalla). El árbol es el Virtual DOM: sus `#n` se
+    navegador con el botón `+` y, debajo, el bloque **DOM real**; a la derecha *Árbol de
+    componentes* / *Código*, el bloque de estado unido con línea punteada al `<p>` que lo lee,
+    y la barra de pasos (Clic, setCount, App(), Leer el estado, Diff, DOM real, Pantalla): el
+    cambio pasa del Virtual DOM al DOM real y solo después a la pantalla. El árbol es el Virtual DOM: sus `#n` se
     renuevan en cada render y el estado no. Con variable normal el valor sube y ni el árbol ni
     la pantalla cambian. Datos en `COUNTER_STEPS` y `COUNTER_TREE`.
 

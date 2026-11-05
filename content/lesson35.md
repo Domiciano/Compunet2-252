@@ -6,7 +6,7 @@ Las props vienen de afuera. El **estado** es lo que un componente recuerda por s
 
 ## El contador
 
-El ejemplo de siempre, visto por dentro. A la izquierda la app en el navegador; a la derecha el **árbol de componentes** que produce su JSX y el **estado**, unido con una línea al `<p>` que lo muestra. Pulsa **+** y sigue los pasos; con *Paso a paso* avanzas tú. En *Código* ves qué línea corre en cada paso.
+El ejemplo de siempre, visto por dentro. A la izquierda la app en el navegador y, debajo, su **DOM real**; a la derecha el **árbol de componentes** que produce su JSX y el **estado**, unido con una línea al `<p>` que lo muestra. Pulsa **+** y sigue los pasos; con *Paso a paso* avanzas tú. En *Código* ves qué línea corre en cada paso.
 
 ```interactive
 react-counter

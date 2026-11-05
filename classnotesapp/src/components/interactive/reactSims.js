@@ -118,8 +118,13 @@ const CSS = `
   font-family:Roboto,Arial,sans-serif}
 .rsim .rs-app-body h1{font-size:22px;margin:0;align-self:stretch;text-align:left;padding-bottom:10px;border-bottom:1px solid #E3E7EE}
 .rsim .rs-big{font-size:64px;line-height:1.1;padding:4px 18px;border-radius:12px;margin:18px 0 8px}
-.rsim .rs-plus{width:56px;height:56px;border-radius:16px;border:0;background:#EEF1FF;color:#2A2F7A;font-size:30px;cursor:pointer;
-  box-shadow:0 3px 8px rgba(0,0,0,.2)}
+.rsim .rs-plus{width:56px;height:56px;border-radius:16px;border:0;background:#EEF1FF;color:#2A2F7A;cursor:pointer;padding:0;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,.2)}
+.rsim .rs-plus svg{display:block}
+.rsim .rs-dombox{background:#fff;border:1.5px solid #86D3CA;border-radius:12px;padding:12px 14px}
+.rsim .rs-dombox .rs-box-head{color:#0F8478}
+.rsim .rs-cnode.rs-dom{border-color:#86D3CA;background:#E3F6F3;color:#0F6B61;font-size:12.5px;margin-left:calc(var(--d) * 16px)}
+.rsim .rs-cnode.rs-dom.rs-root{background:#fff;border-style:dashed}
 .rsim .rs-plus:disabled{opacity:.5;cursor:default}
 .rsim .rs-press{animation:rspress .35s ease-out}
 @keyframes rspress{50%{transform:scale(.88)}}
@@ -1321,10 +1326,10 @@ export const COUNTER_TREE = Object.freeze([
 ]);
 
 // Steps are pure data. `set` moves a value forward: vars (the variable), built (the tree)
-// or painted (the screen). Texts use {a} (before), {b} (after) and {p} (on screen).
+// dom (the real DOM) or painted (the screen). Texts use {a} (before), {b} (after) and {p} (on screen).
 export const COUNTER_STEPS = Object.freeze({
   state: [
-    { name: 'Clic', hot: ['button'], press: true, lines: [13, 5],
+    { name: 'Clic', hot: ['button', 'dom-button'], press: true, lines: [13, 5],
       text: 'Pulsaste **+**: el `onClick` del `<button>` llama a `increment()`.' },
     { name: 'setCount', set: 'vars', hot: ['state'], lines: [6],
       text: '`setCount({b})`: React guarda `count = {b}` y agenda un nuevo render de `App`. La pantalla todavía no cambia.' },
@@ -1334,16 +1339,18 @@ export const COUNTER_STEPS = Object.freeze({
       text: '`useState` devuelve **{b}**, y el `<p>` del árbol nuevo dice `{b}`.' },
     { name: 'Diff', diff: true, hot: ['p'],
       text: 'React compara el árbol nuevo con el anterior (**diff**): solo cambió el texto del `<p>`. Lo demás es igual.' },
+    { name: 'DOM real', set: 'dom', hot: ['dom-p'], patch: true,
+      text: 'React aplica al **DOM real** un único cambio: el texto del `<p>` pasa a `{b}`. Los demás nodos del DOM ni se tocan.' },
     { name: 'Pantalla', set: 'painted', hot: [],
-      text: 'React cambia ese único texto en el **DOM real** y el navegador lo pinta: la pantalla muestra **{b}**.' },
+      text: 'El navegador pinta lo que cambió en el DOM: la pantalla muestra **{b}**.' },
   ],
   forget: [
-    { name: 'Clic', hot: ['button'], press: true, lines: [11, 3],
+    { name: 'Clic', hot: ['button', 'dom-button'], press: true, lines: [11, 3],
       text: 'Pulsaste **+**: el `onClick` del `<button>` llama a `increment()`.' },
     { name: 'count cambia', set: 'vars', hot: ['state'], lines: [4],
       text: '`count = count + 1`: la variable pasa de {a} a **{b}**. Pero es una variable normal: React no se entera.' },
     { name: 'Sin render', hot: [],
-      text: 'Nadie llamó a `setCount`: React no vuelve a llamar a `App()`, el árbol no cambia y la pantalla sigue en **{p}**. Sin error, sin aviso.' },
+      text: 'Nadie llamó a `setCount`: React no vuelve a llamar a `App()`, ni el árbol ni el DOM cambian, y la pantalla sigue en **{p}**. Sin error, sin aviso.' },
   ],
 });
 
@@ -1371,7 +1378,7 @@ const mountCounter = (root, args = []) => {
   const reset = () => {
     clearTimeout(timer);
     run = null;
-    model = { vars: 0, built: 0, painted: 0 };
+    model = { vars: 0, built: 0, dom: 0, painted: 0 };
     nextId = 1;
     ids = {};
     renew();
@@ -1380,7 +1387,10 @@ const mountCounter = (root, args = []) => {
   const tabs = el('div', { class: 'rs-tabs', style: 'margin-bottom:14px' });
   const seg = el('div', { class: 'rs-seg' });
   const big = el('p', { class: 'rs-big', 'data-testid': 'counter-screen-value' });
-  const plus = el('button', { class: 'rs-plus', type: 'button', 'aria-label': 'Incrementar', 'data-testid': 'counter-plus' }, '+');
+  const plus = el('button', { class: 'rs-plus', type: 'button', 'aria-label': 'Incrementar', 'data-testid': 'counter-plus' });
+  plus.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">'
+    + '<path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
+  const domBox = el('div', { class: 'rs-dombox', 'data-testid': 'counter-dom' });
   const stepBox = el('input', { type: 'checkbox', 'data-testid': 'counter-stepmode' });
   const nextBtn = el('button', { class: 'rs-btn', type: 'button', 'data-testid': 'counter-next' }, 'Siguiente paso');
   const treeBox = el('div', { class: 'rs-box' });
@@ -1488,6 +1498,21 @@ const mountCounter = (root, args = []) => {
         el('span', { text: isState ? 'lo guarda React, fuera de App()' : 'vive dentro de App()' }), tag));
     if (step && step.set === 'vars') flash(valNode);
 
+    const domNodes = [
+      { key: 'dom-root', depth: 0, text: '<div id="root">', root: true },
+      { key: 'dom-div', depth: 1, text: '<div>' },
+      { key: 'dom-h1', depth: 2, text: '<h1>Contador</h1>' },
+      { key: 'dom-p', depth: 2, text: `<p>${model.dom}</p>` },
+      { key: 'dom-button', depth: 2, text: '<button>+</button>' },
+    ];
+    domBox.replaceChildren(
+      el('div', { class: 'rs-box-head', text: 'DOM REAL · LO QUE PINTA EL NAVEGADOR' }),
+      el('div', { class: 'rs-ctree' }, ...domNodes.map((n) => el('div', {
+        class: `rs-cnode rs-dom${n.root ? ' rs-root' : ''}${hot.includes(n.key) ? ' rs-hot' : ''}`,
+        style: `--d:${n.depth}`,
+        'data-node': n.key,
+      }, n.text, step && step.patch && n.key === 'dom-p' ? el('span', { class: 'rs-tag2 rs-warnt', text: 'cambió' }) : null))));
+
     const names = steps().map((s) => s.name);
     chips.replaceChildren(...names.map((name, i) => {
       let cls = 'rs-chip';
@@ -1526,6 +1551,7 @@ const mountCounter = (root, args = []) => {
     const step = current();
     if (step.set === 'vars') model.vars = run.to;
     if (step.set === 'built') model.built = run.to;
+    if (step.set === 'dom') model.dom = run.to;
     if (step.set === 'painted') model.painted = run.to;
     if (step.render) renew();
     if (step.press) {
@@ -1557,6 +1583,7 @@ const mountCounter = (root, args = []) => {
           el('div', { class: 'rs-browser-bar' }, el('span', { class: 'rs-dot' }), el('span', { class: 'rs-dot' }),
             el('span', { class: 'rs-dot' }), el('span', { class: 'rs-url', text: 'localhost:5173' })),
           el('div', { class: 'rs-app-body' }, el('h1', { text: 'Contador' }), big, plus)),
+        domBox,
         el('div', { class: 'rs-ctl' }, el('label', { class: 'rs-check' }, stepBox, 'Paso a paso'), nextBtn)),
       right));
 

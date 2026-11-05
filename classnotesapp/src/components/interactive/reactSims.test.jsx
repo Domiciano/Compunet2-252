@@ -171,8 +171,8 @@ describe('react-counter steps', () => {
     });
   });
 
-  it('with useState the value moves variable → tree → screen, in that order', () => {
-    expect(COUNTER_STEPS.state.filter((s) => s.set).map((s) => s.set)).toEqual(['vars', 'built', 'painted']);
+  it('with useState the value moves variable → tree → DOM → screen, in that order', () => {
+    expect(COUNTER_STEPS.state.filter((s) => s.set).map((s) => s.set)).toEqual(['vars', 'built', 'dom', 'painted']);
     const render = COUNTER_STEPS.state.findIndex((s) => s.render);
     expect(render).toBeGreaterThan(COUNTER_STEPS.state.findIndex((s) => s.set === 'vars'));
     expect(render).toBeLessThan(COUNTER_STEPS.state.findIndex((s) => s.set === 'built'));
@@ -203,6 +203,7 @@ describe('react-counter block', () => {
     expect(screen.getByTestId('counter-comp-value').textContent).toBe('1');
     expect(screen.getByTestId('counter-screen-value').textContent).toBe('1');
     expect(container.querySelector('[data-node=p]').textContent).toContain('<p>1</p>');
+    expect(container.querySelector('[data-node=dom-p]').textContent).toContain('<p>1</p>');
     expect(ids(container)).not.toEqual(before);
   });
 
@@ -217,6 +218,7 @@ describe('react-counter block', () => {
     expect(screen.getByTestId('counter-comp-value').textContent).toBe('2');
     expect(screen.getByTestId('counter-screen-value').textContent).toBe('0');
     expect(ids(container)).toEqual(before);
+    expect(container.querySelector('[data-node=dom-p]').textContent).toContain('<p>0</p>');
     expect(screen.getByTestId('counter-state').textContent).toContain('React no se enteró');
   });
 
@@ -231,7 +233,12 @@ describe('react-counter block', () => {
     fireEvent.click(screen.getByTestId('counter-plus'));
     runAll();
     expect(screen.getByTestId('counter-screen-value').textContent).toBe('0');
-    COUNTER_STEPS.state.forEach(() => fireEvent.click(screen.getByTestId('counter-next')));
+    const steps = COUNTER_STEPS.state;
+    const domAt = steps.findIndex((s) => s.set === 'dom');
+    for (let i = 1; i <= domAt; i += 1) fireEvent.click(screen.getByTestId('counter-next'));
+    expect(screen.getByTestId('counter-dom').textContent).toContain('<p>1</p>');
+    expect(screen.getByTestId('counter-screen-value').textContent).toBe('0');
+    steps.slice(domAt).forEach(() => fireEvent.click(screen.getByTestId('counter-next')));
     expect(screen.getByTestId('counter-screen-value').textContent).toBe('1');
   });
 });
