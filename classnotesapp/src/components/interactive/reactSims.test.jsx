@@ -5,7 +5,7 @@ import InteractiveBlock from './InteractiveBlock';
 import {
   JS_SNIPPETS, runSnippet, formatValue, buildDocument, VANILLA_EXAMPLES,
   transformJsx, evaluateJsx, JSX_PRESETS, BUNDLE_STEPS, BUNDLE_FILES, BUNDLE_OUTPUT,
-  COUNTER_STEPS, COUNTER_CODE, COUNTER_TREE,
+  COUNTER_STEPS, COUNTER_CODE, COUNTER_TREE, EFFECT_STEPS, EFFECT_CODE, effectTree, postsPage, SAMPLE_TOKEN,
 } from './reactSims';
 
 const renderBlock = (spec) => render(<ThemeProvider><InteractiveBlock spec={spec} /></ThemeProvider>);
@@ -240,5 +240,113 @@ describe('react-counter block', () => {
     expect(screen.getByTestId('counter-screen-value').textContent).toBe('0');
     steps.slice(domAt).forEach(() => fireEvent.click(screen.getByTestId('counter-next')));
     expect(screen.getByTestId('counter-screen-value').textContent).toBe('1');
+  });
+});
+
+describe('react-effect steps', () => {
+  const ops = (kind) => EFFECT_STEPS[kind].map((s) => s.op);
+  const KNOWN = ['render', 'diff', 'commit', 'paint', 'show', 'effect', 'response', 'check', 'click', 'setpage', 'spin'];
+
+  it('uses only known ops and highlights lines that exist', () => {
+    Object.entries(EFFECT_STEPS).forEach(([kind, steps]) => {
+      const code = EFFECT_CODE[kind === 'next' ? 'deps' : kind];
+      const n = code.split('\n').length;
+      steps.forEach((s) => {
+        expect(KNOWN).toContain(s.op);
+        (s.lines || []).forEach((l) => expect(l).toBeLessThan(n));
+      });
+    });
+  });
+
+  it('the effect runs only after the screen is painted', () => {
+    ['mount', 'deps', 'next'].forEach((kind) => {
+      const o = ops(kind);
+      const effect = o.indexOf('effect');
+      expect(effect).toBeGreaterThan(o.indexOf('paint'));
+      expect(o.indexOf('render')).toBeLessThan(o.indexOf('paint'));
+    });
+  });
+
+  it('every effect-driven run ends checking the dependencies', () => {
+    ['mount', 'deps', 'next'].forEach((kind) => expect(ops(kind).at(-1)).toBe('check'));
+  });
+
+  it('without useEffect there is no effect step and the request leaves during render', () => {
+    expect(ops('loop')).not.toContain('effect');
+    expect(EFFECT_STEPS.loop.filter((s) => s.fetch).every((s) => s.op === 'render')).toBe(true);
+    expect(ops('loop').at(-1)).toBe('spin');
+  });
+
+  it('builds the tree from the state snapshot', () => {
+    expect(effectTree({ posts: [], page: 1 }, 'mount').map((n) => n.key)).toEqual(['App', 'div', 'h1', 'loading']);
+    const keys = effectTree({ posts: postsPage(2), page: 2 }, 'deps').map((n) => n.key);
+    expect(keys).toEqual(['App', 'div', 'h1', 'ul', 'li-4', 'li-5', 'li-6', 'button']);
+  });
+});
+
+describe('react-effect block', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+  const runAll = () => act(() => { vi.advanceTimersByTime(60000); });
+
+  it('mount: one request, two renders, the list on screen and the effect does not run again', () => {
+    renderBlock('react-effect');
+    fireEvent.click(screen.getByTestId('effect-load'));
+    runAll();
+    expect(screen.getByTestId('effect-screen').querySelectorAll('li')).toHaveLength(3);
+    expect(screen.getByTestId('effect-requests').textContent).toBe('peticiones: 1');
+    expect(screen.getByTestId('effect-renders').textContent).toBe('2');
+    expect(screen.getByTestId('effect-status').textContent).toContain('no corre');
+  });
+
+  it('step mode: the screen shows Cargando... before any request leaves', () => {
+    renderBlock('react-effect');
+    fireEvent.click(screen.getByTestId('effect-stepmode'));
+    fireEvent.click(screen.getByTestId('effect-load'));
+    const paintAt = EFFECT_STEPS.mount.findIndex((s) => s.op === 'paint');
+    for (let i = 0; i < paintAt; i += 1) fireEvent.click(screen.getByTestId('effect-step'));
+    expect(screen.getByTestId('effect-screen').textContent).toContain('Cargando...');
+    expect(screen.getByTestId('effect-requests').textContent).toBe('peticiones: 0');
+    fireEvent.click(screen.getByTestId('effect-step'));
+    expect(screen.getByTestId('effect-requests').textContent).toBe('peticiones: 1');
+  });
+
+  it('deps: Siguiente changes page, the effect runs again and loads page 2', () => {
+    renderBlock('react-effect deps');
+    expect(screen.getByTestId('effect-tab-deps').className).toContain('rs-sel');
+    fireEvent.click(screen.getByTestId('effect-load'));
+    runAll();
+    fireEvent.click(screen.getByTestId('effect-next-page'));
+    runAll();
+    expect(screen.getByTestId('effect-page').textContent).toBe('2');
+    expect(screen.getByTestId('effect-screen').textContent).toContain('página 2');
+    expect(screen.getByTestId('effect-screen').textContent).toContain(postsPage(2)[0].title);
+    expect(screen.getByTestId('effect-requests').textContent).toBe('peticiones: 2');
+    expect(screen.getByTestId('effect-api').textContent).toContain('page=2');
+  });
+
+  it('without useEffect the requests keep piling up', () => {
+    renderBlock('react-effect loop');
+    fireEvent.click(screen.getByTestId('effect-load'));
+    runAll();
+    const n = Number(screen.getByTestId('effect-requests').textContent.replace(/\D/g, ''));
+    expect(n).toBeGreaterThan(5);
+  });
+});
+
+describe('local-storage block', () => {
+  it('setItem survives a reload, the page variable does not', () => {
+    renderBlock('local-storage');
+    fireEvent.click(screen.getByTestId('ls-get'));
+    expect(screen.getByTestId('ls-token').textContent).toBe('null');
+    fireEvent.click(screen.getByTestId('ls-set'));
+    expect(screen.getByTestId('ls-table').textContent).toContain(SAMPLE_TOKEN);
+    fireEvent.click(screen.getByTestId('ls-get'));
+    expect(screen.getByTestId('ls-token').textContent).toBe(`'${SAMPLE_TOKEN}'`);
+    fireEvent.click(screen.getByTestId('ls-reload'));
+    expect(screen.getByTestId('ls-token').textContent).toBe('—');
+    expect(screen.getByTestId('ls-table').textContent).toContain(SAMPLE_TOKEN);
+    fireEvent.click(screen.getByTestId('ls-remove'));
+    expect(screen.getByTestId('ls-table').textContent).toContain('vacío');
   });
 });

@@ -1,75 +1,35 @@
 # Local Storage
 
-Cuando un usuario inicia sesión en una aplicación, el servidor generalmente devuelve un `accessToken` (token de acceso). Este token es una credencial que permite al usuario acceder a rutas protegidas de una API. Para que el usuario no tenga que iniciar sesión cada vez que recarga la página, necesitamos almacenar este token de forma persistente en el navegador. Una de las formas más comunes de hacerlo es usando `localStorage`.
+<!-- tags: localStorage, setItem, getItem, removeItem, guardar el token, accessToken, getItem devuelve null, se pierde al recargar, cerrar sesión, XSS -->
 
-## ¿Qué es Local Storage?
+Todo lo que vive en una variable de JavaScript, incluido el estado de React, desaparece al recargar la página. `localStorage` es un pequeño almacén del navegador, **clave → valor**, que sobrevive a las recargas y a cerrar el navegador. Es donde vamos a guardar el token del login.
 
-`localStorage` es una API del navegador que permite a las aplicaciones web almacenar datos de tipo clave-valor de forma persistente, sin fecha de expiración. Los datos almacenados en `localStorage` persisten incluso después de que el navegador se cierra y se vuelve a abrir.
+## Pruébalo
 
-## Guardando el Token en `localStorage`
+Pulsa **setItem**, luego **Recargar la página** y después **getItem**. La variable `token` se borra al recargar; lo que está en localStorage no.
 
-Para guardar el token, usamos el método `setItem()`. Este método recibe dos argumentos: una clave (key) y un valor (value), ambos deben ser strings.
-
-## Flujo típico después del login
-
-1.  El usuario envía sus credenciales (email/contraseña) al servidor.
-2.  El servidor valida las credenciales y devuelve un `accessToken`.
-3.  La aplicación cliente (React) recibe el token y lo guarda en `localStorage`.
-
-```jsx
-// Suponiendo que 'apiLogin' es una función que hace la petición a tu API
-const handleLogin = async (email, password) => {
-  try {
-    const response = await apiLogin(email, password);
-    
-    // Asumimos que la respuesta tiene una propiedad 'accessToken'
-    const { accessToken } = response.data;
-
-    if (accessToken) {
-      // Guardamos el token en localStorage
-      localStorage.setItem('accessToken', accessToken);
-      console.log('Token guardado exitosamente!');
-    }
-  } catch (error) {
-    console.error('Error al iniciar sesión:', error);
-  }
-}
+```interactive
+local-storage
 ```
 
-## Leyendo el Token desde `localStorage`
+## Las tres funciones
 
-Para recuperar el token y usarlo en futuras peticiones a la API, usamos el método `getItem()`. Este método recibe la clave del ítem que queremos obtener.
+```js
+localStorage.setItem('accessToken', token);
 
-```jsx
-...
 const token = localStorage.getItem('accessToken');
 
-fetch('https://api.example.com/profesores', {
-  headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  },
-});
-...
+localStorage.removeItem('accessToken');
 ```
 
-## Eliminando el Token de `localStorage`
+- `setItem(clave, valor)` guarda. Si la clave ya existía, la reemplaza.
+- `getItem(clave)` lee. Si no hay nada con esa clave devuelve `null`, así que antes de usar el valor hay que revisarlo.
+- `removeItem(clave)` borra. Es lo que se hace al **cerrar sesión**.
 
-Cuando el usuario cierra sesión (`logout`), es crucial eliminar el token de `localStorage` para invalidar su sesión en el cliente. Para esto, usamos el método `removeItem()`.
+Los valores siempre se guardan como **texto**: `setItem('n', 5)` guarda `'5'`. Para un objeto hay que pasarlo por `JSON.stringify` al guardar y por `JSON.parse` al leer.
 
-```jsx
-const handleLogout = () => {
-  localStorage.removeItem('accessToken');
-  console.log('Token eliminado. Sesión cerrada.');
-}
-```
+Puedes ver lo que tiene guardado cualquier página en las herramientas del navegador: *DevTools → Application → Local Storage*.
 
-También puedes usar `localStorage.clear()` para eliminar todos los datos almacenados en `localStorage` para ese dominio, pero `removeItem()` es más preciso.
+## Un cuidado
 
-## Consideraciones de Seguridad
-
-Aunque `localStorage` es muy conveniente, es importante ser consciente de sus implicaciones de seguridad:
-*   Vulnerabilidad a XSS: Los datos en `localStorage` son accesibles a través de JavaScript. Si tu aplicación tiene una vulnerabilidad de Cross-Site Scripting (XSS), un atacante podría ejecutar código malicioso para robar el token del usuario.
-*   No almacenes datos sensibles: Nunca guardes información altamente sensible como contraseñas o datos personales sin cifrar en `localStorage`.
-
-Para muchas aplicaciones, almacenar el `accessToken` en `localStorage` es una solución aceptable, pero para aplicaciones que requieren alta seguridad, se suelen explorar otras alternativas como `HttpOnly cookies`. Sin embargo, para empezar, `localStorage` es una herramienta muy útil y fácil de implementar.
+Cualquier JavaScript que corra en la página puede leer localStorage. Si la app tuviera una vulnerabilidad de **XSS**, un script ajeno podría llevarse el token. Por eso ahí no se guardan contraseñas ni datos sensibles: solo el token, que además vence.

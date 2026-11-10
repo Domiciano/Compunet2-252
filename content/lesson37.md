@@ -1,196 +1,73 @@
 # useEffect
 
-`useEffect` te deja hacer cosas después de que React renderiza el componente.
-Por ejemplo, se usa para
+<!-- tags: useEffect, efecto, array de dependencias, useEffect con [], el efecto se ejecuta dos veces, bucle infinito de renders, función de limpieza, cargar datos de una API, setState dentro de useEffect, AbortController -->
 
-- Llamar una API.
-- Escuchar o limpiar eventos.
-- Actualizar el título de la página.
+Un componente es una función que React llama para dibujar. Pero a veces hay que hacer algo que **no es dibujar**: pedir datos al backend, poner un temporizador, cambiar el título de la pestaña. Eso es un **efecto**, y `useEffect` le dice a React que lo corra **después de pintar** la pantalla.
 
-`useEffect` es básicamente “Hacé algo cuando mi componente se monte, cambie o se desmonte.”
+## Cargar una lista al abrir la página
 
-## Anatomía de `useEffect`
+El caso de siempre: al abrir la app hay que traer los posts del backend y mostrarlos. Pulsa **Cargar la página** y sigue los pasos; con *Paso a paso* avanzas tú y en *Código* ves qué línea corre en cada momento.
 
-`useEffect` es una función que recibe dos argumentos
-1.  Una función de efecto que se ejecutará después de que el componente se renderice.
-2.  Un array de dependencias (opcional) que controla cuándo se debe volver a ejecutar el efecto.
+```interactive
+react-effect
+```
+
+Fíjate en el orden. Primero React llama a `App()` con `posts = []`, monta el DOM y la pantalla muestra *Cargando...*; **solo entonces** corre el efecto y sale el `GET`. Cuando llega la respuesta, `setPosts(data)` cambia el estado y hay un segundo render, ahora con la lista. Ese es el patrón para cargar datos: **lo que trae el efecto se guarda en el estado, y el estado dibuja la pantalla**.
+
+`getPosts()` es una función que pide la lista al backend y devuelve una promesa. En la lección de **Axios** la escribimos de verdad.
+
+## Anatomía de useEffect
 
 ```jsx
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 useEffect(() => {
-  // Tu código de efecto aquí
-  console.log('El componente se ha renderizado o actualizado.');
-
-  return () => {
-    // Función de limpieza (opcional)
-    console.log('El componente se va a desmontar o el efecto se va a re-ejecutar.');
-  };
-}, [/* array de dependencias */]);
+  // lo que hay que hacer después de pintar
+}, [dependencias]);
 ```
 
-## `useEffect` con `[]` (Array Vacío)
+Recibe dos cosas: la **función del efecto** y el **arreglo de dependencias**. Después de cada render, React compara las dependencias con las del render anterior y solo vuelve a correr el efecto si alguna cambió. En el primer render corre siempre.
 
-Cuando el array de dependencias está vacío, el efecto se ejecuta una sola vez, justo después del primer renderizado del componente.
+- `[]`: no hay nada que pueda cambiar, así que corre **una sola vez**, al montar.
+- `[page]`: corre al montar y cada vez que `page` cambie.
+- Sin arreglo: corre después de **todos** los renders. Casi nunca es lo que quieres.
 
-Caso de uso típico
-Realizar una petición a una API para cargar datos iniciales.
+## Con una dependencia
+
+Pasa a la pestaña **Con dependencia · [page]**. Carga la página y pulsa **Siguiente** en la app: `setPage` provoca un render, React ve que `[page]` pasó de `[1]` a `[2]` y vuelve a correr el efecto con la página nueva.
 
 ```jsx
-import React, { useState, useEffect } from 'react';
-
-const UserProfile = () => {
-  console.log('1. Renderizando del componente');
-
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    console.log('3. Efecto ejecutado: Buscando datos del usuario...');
-
-    const fetchUser = async () => {
-      const fetchedUser = await getUserById(56);
-      console.log('4. Datos recibidos y estado actualizado.');
-      setUser(fetchedUser);
-    };
-
-    fetchUser();
-
-    return () => {
-      console.log('6. Limpieza: El componente UserProfile se está desmontando.');
-    };
-  }, []); // Se ejecuta una sola vez al montar
-
-  console.log('2. Renderizando componente user nulo');
-  if (!user) {
-    return <div>Cargando...</div>;
-  }
-
-  console.log('5. Renderizando componente (con datos del usuario)');
-  return <div>Nombre: {user.name}</div>;
-};
-
-export default UserProfile;
+useEffect(() => {
+  getPosts(page).then((data) => setPosts(data));
+}, [page]);
 ```
 
-`Flujo`
-`1` Renderizando del componente
-`2` Renderizando componente user nulo
-`3` Efecto ejecutado: Buscando datos del usuario...
-`4` Datos recibidos y estado actualizado.
-`5` Renderizando componente (con datos del usuario)
-`6` Limpieza: El componente UserProfile se está desmontando.
+La regla práctica: **toda variable del componente que uses dentro del efecto va en las dependencias**. Si usas `page` y no la pones, el efecto se queda con la página 1 para siempre.
 
-## `useEffect` con Dependencias `[variable]`
+## El error típico: llamar a la API en el cuerpo
 
-Cuando incluyes una o más variables en el array de dependencias, el efecto se ejecutará después del primer renderizado y cada vez que alguna de esas variables cambie de valor.
+Ahora la pestaña **Sin useEffect**. Es el mismo componente, pero con `getPosts()` suelta en el cuerpo de la función. Como el cuerpo corre en cada render, cada render pide la lista; cada respuesta llama a `setPosts` con un arreglo nuevo, que provoca otro render, que vuelve a pedir la lista. Mira el contador de peticiones: es un **bucle infinito**, y el backend lo nota.
 
-`Flujo`
-`1` El componente se monta y se renderiza.
-`2` React ejecuta la función de efecto.
-`3` El usuario realiza una acción que cambia el valor de una variable en el array de dependencias.
-`4` El componente se re-renderiza con el nuevo valor.
-`5` Antes de ejecutar el efecto de nuevo, React ejecuta la función de limpieza del efecto anterior.
-`6` Después del re-renderizado, React ejecuta la función de efecto nuevamente porque una dependencia cambió.
+La llamada va dentro de un `useEffect`, con sus dependencias.
 
-Caso de uso típico
-Buscar datos que dependen de un ID que puede cambiar, o suscribirse a un evento que depende de una prop.
+## La función de limpieza
+
+Si el efecto **devuelve una función**, React la llama antes de volver a correr el efecto y cuando el componente desaparece. Sirve para deshacer lo que el efecto dejó andando: un temporizador, un listener o una petición que ya no hace falta.
 
 ```jsx
-import React, { useState, useEffect } from 'react';
+useEffect(() => {
+  const controller = new AbortController();
 
-const ProductDetails = ({ productId }) => {
-  const [product, setProduct] = useState(null);
+  getPosts(page, controller.signal)
+    .then((data) => setPosts(data))
+    .catch(() => {});
 
-  useEffect(() => {
-    console.log(`Efecto ejecutado para productId: ${productId}`);
-
-    // Definimos una función flecha asíncrona dentro del efecto
-    const fetchProduct = async () => {
-      try {
-        const response = await fetch(`https://api.example.com/products/${productId}`);
-        const data = await response.json();
-        setProduct(data);
-      } catch (error) {
-        console.error('Error al obtener el producto:', error);
-      }
-    };
-
-    fetchProduct();
-
-    // Limpieza: se ejecuta antes de que corra el siguiente efecto o al desmontar
-    return () => {
-      console.log(`Limpiando efecto anterior para productId: ${productId}`);
-    };
-  }, [productId]); // <-- El efecto depende de productId
-
-  if (!product) {
-    return <div>Cargando producto...</div>;
-  }
-
-  return <h2>{product.name}</h2>;
-};
-
-export default ProductDetails;
+  return () => controller.abort();
+}, [page]);
 ```
 
-Si `productId` cambia de `1` a `2`, el flujo sería:
-1.  Se ejecuta la función de limpieza con el valor "viejo" (`productId` era `1`).
-2.  El componente se re-renderiza.
-3.  Se ejecuta la función de efecto con el valor "nuevo" (`productId` es `2`).
+Si el usuario pulsa **Siguiente** dos veces seguidas, la limpieza cancela la petición de la página 2 antes de pedir la 3. Sin ella, la respuesta vieja podría llegar de última y pisar la nueva.
 
-## El Retorno de `useEffect`: La Función de Limpieza
+## ¿Por qué corre dos veces?
 
-La función que se retorna desde `useEffect` se llama función de limpieza (`cleanup function`). Su propósito es "limpiar" lo que el efecto hizo antes de que el componente se desmonte o antes de que el efecto se vuelva a ejecutar.
-
-¿Por qué es importante?
-Para prevenir "fugas de memoria" (memory leaks) y comportamiento inesperado. Por ejemplo cancelar llamadas a API
-
-```jsx
-import React, { useState, useEffect } from 'react';
-
-const ProductDetails = ({ productId }) => {
-  const [product, setProduct] = useState(null);
-
-  useEffect(() => {
-    console.log(`Efecto ejecutado para productId: ${productId}`);
-
-    // Creamos un controlador para abortar el fetch
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    // Hacemos la petición con async/await
-    const fetchProduct = async () => {
-      try {
-        const response = await fetch(
-          `https://api.example.com/products/${productId}`,
-          { signal } // Pasamos la señal al fetch
-        );
-        const data = await response.json();
-        setProduct(data);
-      } catch (error) {
-        if (error.name === 'AbortError') {
-          console.log(`Petición cancelada para productId: ${productId}`);
-        } else {
-          console.error('Error al obtener el producto:', error);
-        }
-      }
-    };
-
-    fetchProduct();
-
-    // Función de limpieza: cancela el fetch si el efecto se reinicia o el componente se desmonta
-    return () => {
-      console.log(`Limpiando efecto anterior para productId: ${productId}`);
-      controller.abort(); // Cancela la solicitud en curso
-    };
-  }, [productId]);
-
-  if (!product) {
-    return <div>Cargando producto...</div>;
-  }
-
-  return <h2>{product.name}</h2>;
-};
-
-export default ProductDetails;
-```
+En desarrollo, con `<StrictMode>` en `main.jsx`, React monta el componente, lo desmonta y lo vuelve a montar, a propósito: así se nota si a un efecto le falta su limpieza. Por eso ves el `console.log` del efecto dos veces y dos peticiones en la pestaña *Network*. En el build de producción pasa una sola vez.

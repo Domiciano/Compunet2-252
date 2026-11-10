@@ -177,6 +177,47 @@ const CSS = `
 @container (max-width:700px){
   .rsim .rs-counter{grid-template-columns:minmax(0,1fr)}
 }
+
+.rsim .rs-feed{align-items:stretch;gap:10px;min-height:250px}
+.rsim .rs-feed ul{margin:0;padding-left:20px}
+.rsim .rs-feed li{margin:5px 0}
+.rsim .rs-feed .rs-loading{color:#79809A;font-style:italic;margin:6px 0}
+.rsim .rs-feed .rs-btn{align-self:flex-start}
+.rsim .rs-blank{color:#9AA1B2;text-align:center;margin:90px 0 0;font-size:13px}
+.rsim .rs-cnode.rs-gone{opacity:.45;text-decoration:line-through}
+.rsim .rs-cnode.rs-new{background:#E8F6E3;border-color:#9FD68D}
+.rsim .rs-duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.rsim .rs-sbox.rs-effect{background:#FFF3DC;border-color:#F0C572}
+.rsim .rs-sbox.rs-effect h4{color:#A96C05}
+.rsim .rs-sbox.rs-plainfx{background:#FFEBEF;border-color:#F3A3B2}
+.rsim .rs-sbox.rs-plainfx h4{color:#C2354F}
+.rsim .rs-sbox.rs-api{background:#EEF1FF;border-color:#A9B4F2}
+.rsim .rs-sbox.rs-api h4{color:#4453C9}
+.rsim .rs-fxline{font:13px ${MONO};margin:2px 0;overflow-wrap:anywhere}
+.rsim .rs-sval.rs-small{font-size:15px;min-width:0;padding:2px 10px}
+@container (max-width:520px){
+  .rsim .rs-duo{grid-template-columns:minmax(0,1fr)}
+}
+
+.rsim .rs-ls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.rsim .rs-field{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#556074;margin-bottom:10px}
+.rsim .rs-field input{font:13px ${MONO};padding:6px 10px;border:1.5px solid #C4CBD8;border-radius:8px;color:#161A26;min-width:0}
+.rsim .rs-field input:focus{outline:none;border-color:#4453C9}
+.rsim .rs-actions{display:flex;flex-direction:column;gap:8px}
+.rsim .rs-action{display:block;text-align:left;border:1.5px solid #C4CBD8;background:#1F2430;color:#E6EAF2;
+  border-radius:10px;padding:8px 12px;cursor:pointer;font:12.5px ${MONO};overflow-wrap:anywhere}
+.rsim .rs-action:hover{box-shadow:0 0 0 3px #A9B4F2}
+.rsim .rs-action span{color:#F0C572}
+.rsim .rs-kv{width:100%;border-collapse:collapse;font:12.5px ${MONO}}
+.rsim .rs-kv th{text-align:left;font:700 11px Roboto,Arial,sans-serif;letter-spacing:.06em;color:#556074;padding:4px 8px;
+  border-bottom:1.5px solid #D9DEE8}
+.rsim .rs-kv td{padding:6px 8px;border-bottom:1px solid #F0F2F6;overflow-wrap:anywhere;word-break:break-all}
+.rsim .rs-kv tr.rs-flashrow td{background:#FFF3DC}
+.rsim .rs-kv td:first-child{white-space:nowrap;word-break:normal}
+.rsim .rs-sval.rs-long{font-size:12px;text-align:left;word-break:break-all;max-width:100%}
+@container (max-width:640px){
+  .rsim .rs-ls{grid-template-columns:minmax(0,1fr)}
+}
 `;
 
 const ensureStyle = () => {
@@ -1599,6 +1640,586 @@ const mountCounter = (root, args = []) => {
   };
 };
 
+/* ------------------------------------------------------------------ */
+/* react-effect: the effect runs after the paint (mount / deps / loop) */
+/* ------------------------------------------------------------------ */
+
+export const EFFECT_CODE = Object.freeze({
+  mount: `import { useEffect, useState } from 'react';
+
+function App() {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    getPosts().then((data) => setPosts(data));
+  }, []);
+
+  return (
+    <div>
+      <h1>Posts</h1>
+      {posts.length === 0
+        ? <p>Cargando...</p>
+        : <ul>{posts.map((p) => <li key={p.id}>{p.title}</li>)}</ul>}
+    </div>
+  );
+}`,
+  deps: `import { useEffect, useState } from 'react';
+
+function App() {
+  const [page, setPage] = useState(1);
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    getPosts(page).then((data) => setPosts(data));
+  }, [page]);
+
+  return (
+    <div>
+      <h1>Posts · página {page}</h1>
+      {posts.length === 0
+        ? <p>Cargando...</p>
+        : <ul>{posts.map((p) => <li key={p.id}>{p.title}</li>)}</ul>}
+      <button onClick={() => setPage(page + 1)}>Siguiente</button>
+    </div>
+  );
+}`,
+  loop: `import { useState } from 'react';
+
+function App() {
+  const [posts, setPosts] = useState([]);
+
+  getPosts().then((data) => setPosts(data));
+
+  return (
+    <div>
+      <h1>Posts</h1>
+      {posts.length === 0
+        ? <p>Cargando...</p>
+        : <ul>{posts.map((p) => <li key={p.id}>{p.title}</li>)}</ul>}
+    </div>
+  );
+}`,
+});
+
+const POST_TITLES = [
+  'Bienvenidos a la API', 'Qué es un JWT', 'DTOs con MapStruct', 'Paginación en Spring', 'Props y estado',
+  'Listas con map', 'Rutas protegidas', 'Desplegar con Docker', 'Errores 401 y 403',
+];
+
+export const postsPage = (page) => [0, 1, 2].map((i) => {
+  const id = (page - 1) * 3 + i + 1;
+  return { id, title: POST_TITLES[(id - 1) % POST_TITLES.length] };
+});
+
+// The Virtual DOM that App's JSX produces for a state snapshot ({ posts, page }).
+export const effectTree = (snap, variant) => {
+  if (!snap) return [];
+  const nodes = [
+    { key: 'App', depth: 0, comp: true, label: 'App' },
+    { key: 'div', depth: 1, label: '<div>' },
+    { key: 'h1', depth: 2, label: variant === 'deps' ? `<h1>Posts · página ${snap.page}</h1>` : '<h1>Posts</h1>' },
+  ];
+  if (snap.posts.length === 0) nodes.push({ key: 'loading', depth: 2, label: '<p>Cargando...</p>' });
+  else {
+    nodes.push({ key: 'ul', depth: 2, label: '<ul>' });
+    snap.posts.forEach((p) => nodes.push({ key: `li-${p.id}`, depth: 3, label: `<li>${p.title}</li>` }));
+  }
+  if (variant === 'deps') nodes.push({ key: 'button', depth: 2, label: '<button>Siguiente</button>' });
+  return nodes;
+};
+
+// Marks for the new list against the old one, plus the nodes that went away (shown struck through).
+const diffNodes = (prev, next) => {
+  const before = new Map(prev.map((n) => [n.key, n.label]));
+  const after = new Set(next.map((n) => n.key));
+  const shown = next.map((n) => {
+    if (!before.has(n.key)) return { ...n, mark: 'nuevo' };
+    if (before.get(n.key) !== n.label) return { ...n, mark: 'cambió' };
+    return { ...n, mark: null };
+  });
+  prev.forEach((n, i) => {
+    if (!after.has(n.key)) shown.splice(Math.min(i, shown.length), 0, { ...n, mark: 'se va' });
+  });
+  return shown;
+};
+
+// Steps are pure data. `op` says what moves: render (state → Virtual DOM), diff, commit (→ DOM real),
+// paint (→ pantalla), effect (runs and sends the GET), response (setPosts), check (compare deps),
+// click, setpage and spin (the endless loop). Texts use {url}, {n}, {from}, {to} and {req}.
+export const EFFECT_STEPS = Object.freeze({
+  mount: [
+    { name: 'App()', op: 'render', hot: ['App', 'state', 'effect'], lines: [2, 3, 5, 7],
+      text: 'React llama a `App()` por primera vez. `useState([])` da `posts = []` y el JSX dice Cargando... `useEffect` **no corre todavía**: React solo guarda la función para después de pintar.' },
+    { name: 'DOM real', op: 'commit', hot: ['dom'],
+      text: 'React crea los nodos en el **DOM real**, dentro de `<div id="root">`.' },
+    { name: 'Pantalla', op: 'paint', hot: [], lines: [13],
+      text: 'El navegador pinta: el usuario ya ve **Cargando...** Hasta aquí no ha salido ninguna petición.' },
+    { name: 'Efecto', op: 'effect', hot: ['effect', 'api'], lines: [5, 6],
+      text: 'Con la pantalla ya pintada, React corre el **efecto**: `getPosts()` manda `GET {url}`. El efecto termina enseguida, no se queda esperando la respuesta.' },
+    { name: 'setPosts', op: 'response', hot: ['api', 'state'], lines: [6],
+      text: 'Llega la respuesta, `200` con {n} posts. El `.then` llama a `setPosts(data)`: React guarda la lista y agenda otro render.' },
+    { name: 'App()', op: 'render', hot: ['App', 'state'], lines: [2, 3],
+      text: 'React vuelve a llamar a `App()`. Ahora `posts` trae {n} posts, así que el JSX arma un `<ul>` en lugar del Cargando...' },
+    { name: 'Diff', op: 'diff', hot: [],
+      text: '**Diff** contra el árbol anterior: el `<p>Cargando...</p>` se va y entran el `<ul>` y sus `<li>`. El `<h1>` no cambia.' },
+    { name: 'DOM real', op: 'commit', hot: ['dom'],
+      text: 'React aplica al **DOM real** solo esos cambios.' },
+    { name: 'Pantalla', op: 'paint', hot: [], lines: [14],
+      text: 'El navegador pinta la lista.' },
+    { name: '¿Otra vez?', op: 'check', hot: ['effect'], lines: [7],
+      text: 'Después de pintar, React mira las dependencias: `[]` está vacío, no hay nada que pueda cambiar. **El efecto no vuelve a correr.** Por eso `[]` quiere decir: una sola vez, al montar.' },
+  ],
+  deps: [
+    { name: 'App()', op: 'render', hot: ['App', 'state', 'effect'], lines: [2, 3, 4, 6, 8],
+      text: 'Primer render: `page = 1` y `posts = []`. React guarda el efecto y sus dependencias, `[page]`, para después de pintar.' },
+    { name: 'DOM real', op: 'commit', hot: ['dom'],
+      text: 'React crea los nodos en el **DOM real**.' },
+    { name: 'Pantalla', op: 'paint', hot: [], lines: [14],
+      text: 'El navegador pinta: página 1, Cargando...' },
+    { name: 'Efecto', op: 'effect', hot: ['effect', 'api'], lines: [6, 7],
+      text: 'Primer render, así que el efecto corre siempre: `getPosts(1)` manda `GET {url}`.' },
+    { name: 'setPosts', op: 'response', hot: ['api', 'state'], lines: [7],
+      text: 'Llega la respuesta con {n} posts y `setPosts(data)` agenda otro render.' },
+    { name: 'App()', op: 'render', hot: ['App', 'state'], lines: [2, 3, 4],
+      text: 'Segundo render: `page` sigue en 1 y `posts` ya trae la lista.' },
+    { name: 'DOM real', op: 'commit', hot: ['dom'],
+      text: '**Diff** y **DOM real**: se va el Cargando... y entran el `<ul>` y sus `<li>`.' },
+    { name: 'Pantalla', op: 'paint', hot: [], lines: [15],
+      text: 'El navegador pinta la lista de la página 1.' },
+    { name: '¿Otra vez?', op: 'check', hot: ['effect'], lines: [8],
+      text: '`[page]` era `[1]` y sigue siendo `[1]`: no cambió, **el efecto no corre**. Ahora pulsa **Siguiente** en la app.' },
+  ],
+  next: [
+    { name: 'Clic', op: 'click', hot: ['button', 'dom-button'], lines: [16],
+      text: 'Pulsaste **Siguiente**: el `onClick` llama a `setPage({to})`.' },
+    { name: 'setPage', op: 'setpage', hot: ['state'], lines: [16],
+      text: 'React guarda `page = {to}` y agenda otro render. `posts` sigue con la página {from}.' },
+    { name: 'App()', op: 'render', hot: ['App', 'h1'], lines: [2, 3, 12],
+      text: '`App()` corre con `page = {to}`: el `<h1>` dice página {to}, pero la lista sigue siendo la de la página {from}. Nadie ha pedido los posts nuevos.' },
+    { name: 'DOM real', op: 'commit', hot: ['dom'],
+      text: '**Diff** y **DOM real**: solo cambia el texto del `<h1>`.' },
+    { name: 'Pantalla', op: 'paint', hot: [],
+      text: 'El navegador pinta: página {to} en el título y todavía los posts de la página {from}.' },
+    { name: '¿Otra vez?', op: 'check', hot: ['effect'], lines: [8],
+      text: 'Después de pintar, React compara las dependencias: `[page]` era `[{from}]` y ahora es `[{to}]`. **Cambió, así que el efecto corre otra vez.**' },
+    { name: 'Efecto', op: 'effect', hot: ['effect', 'api'], lines: [6, 7],
+      text: 'El efecto corre con `page = {to}`: `getPosts({to})` manda `GET {url}`.' },
+    { name: 'setPosts', op: 'response', hot: ['api', 'state'], lines: [7],
+      text: 'Llegan los {n} posts de la página {to} y `setPosts(data)` agenda otro render.' },
+    { name: 'App()', op: 'render', hot: ['App', 'state'], lines: [2, 4],
+      text: '`App()` corre con la lista nueva.' },
+    { name: 'DOM real', op: 'commit', hot: ['dom'],
+      text: 'Los `<li>` traen otros `key` (otros ids), así que React quita los viejos y crea los nuevos en el **DOM real**.' },
+    { name: 'Pantalla', op: 'paint', hot: [],
+      text: 'El navegador pinta los posts de la página {to}.' },
+    { name: '¿Otra vez?', op: 'check', hot: ['effect'], lines: [8],
+      text: '`[{to}]` contra `[{to}]`: no cambió, **el efecto no corre**. Un render solo dispara el efecto si cambia alguna dependencia.' },
+  ],
+  loop: [
+    { name: 'App()', op: 'render', fetch: true, hot: ['App', 'state', 'effect', 'api'], lines: [2, 3, 5],
+      text: 'React llama a `App()`. `getPosts()` está suelta en el cuerpo de la función, así que **corre durante el render**: sale `GET {url}` (petición {req}).' },
+    { name: 'Pantalla', op: 'show', hot: ['dom'],
+      text: 'React monta el DOM real y el navegador pinta Cargando...' },
+    { name: 'setPosts', op: 'response', hot: ['api', 'state'], lines: [5],
+      text: 'Llega la respuesta y `setPosts(data)` guarda un arreglo **nuevo**. El estado cambió: otro render.' },
+    { name: 'App()', op: 'render', fetch: true, hot: ['App', 'effect', 'api'], lines: [2, 5],
+      text: 'Segundo render. La línea de `getPosts()` vuelve a correr: petición {req}.' },
+    { name: 'Pantalla', op: 'show', hot: ['dom'],
+      text: 'Diff, DOM real y pantalla: aparece la lista. Parece que todo va bien...' },
+    { name: 'setPosts', op: 'response', hot: ['api', 'state'], lines: [5],
+      text: 'Pero llega la segunda respuesta y `setPosts(data)` vuelve a guardar un arreglo. Los posts son los mismos, el arreglo es **otro objeto**: para React el estado cambió. Otro render.' },
+    { name: 'Bucle', op: 'spin', hot: ['App', 'api'], lines: [5],
+      text: 'Y así para siempre: cada render pide la lista y cada respuesta provoca un render. **Bucle infinito**: el simulador para aquí, tu app no, y el backend recibe peticiones sin parar. La solución es la primera pestaña: la llamada va dentro de un `useEffect` con `[]`.' },
+  ],
+});
+
+const EFFECT_TABS = [
+  { key: 'mount', label: 'Al montar · []' },
+  { key: 'deps', label: 'Con dependencia · [page]' },
+  { key: 'loop', label: 'Sin useEffect' },
+];
+
+const FX_STATUS = {
+  idle: ['sin montar', 'rs-tag2 rs-warnt'],
+  pending: ['pendiente · se revisa después de pintar', 'rs-tag2 rs-warnt'],
+  waiting: ['corrió · esperando la respuesta', 'rs-tag2 rs-warnt'],
+  done: ['terminó', 'rs-tag2'],
+  skipped: ['no corre · dependencias iguales', 'rs-tag2'],
+  changed: ['corre otra vez · cambiaron', 'rs-tag2 rs-badt'],
+};
+
+const mountEffect = (root, args = []) => {
+  ensureStyle();
+  let variant = EFFECT_TABS.some((t) => args.includes(t.key)) ? args.find((a) => EFFECT_TABS.some((t) => t.key === a)) : 'mount';
+  let view = 'tree';
+  let stepMode = false;
+  let model;
+  let run = null;
+  let timer = null;
+
+  const renew = () => {
+    effectTree(model.built, variant).forEach((n) => { model.ids[n.key] = model.nextId; model.nextId += 1; });
+  };
+  const reset = () => {
+    clearTimeout(timer);
+    run = null;
+    model = {
+      state: { posts: [], page: 1 }, built: null, prevBuilt: null, dom: null, prevDom: null, painted: null,
+      renders: 0, effect: 'idle', deps: null, request: null, requests: 0, ids: {}, nextId: 1, mounted: false,
+    };
+  };
+
+  const tabs = el('div', { class: 'rs-tabs', style: 'margin-bottom:14px' });
+  const seg = el('div', { class: 'rs-seg' });
+  const screenBody = el('div', { class: 'rs-app-body rs-feed', 'data-testid': 'effect-screen' });
+  const domBox = el('div', { class: 'rs-dombox', 'data-testid': 'effect-dom' });
+  const loadBtn = el('button', { class: 'rs-btn rs-primary', type: 'button', 'data-testid': 'effect-load' });
+  const stepBox = el('input', { type: 'checkbox', 'data-testid': 'effect-stepmode' });
+  const nextBtn = el('button', { class: 'rs-btn', type: 'button', 'data-testid': 'effect-step' }, 'Siguiente paso');
+  const treeBox = el('div', { class: 'rs-box' });
+  const codeBox = el('div', { class: 'rs-codepane' });
+  const stateBox = el('div', { class: 'rs-sbox', 'data-testid': 'effect-state' });
+  const fxBox = el('div', { class: 'rs-sbox rs-effect', 'data-testid': 'effect-box' });
+  const apiBox = el('div', { class: 'rs-sbox rs-api', 'data-testid': 'effect-api' });
+  const chips = el('div', { class: 'rs-chips' });
+  const caption = el('div', { class: 'rs-caption', 'data-testid': 'effect-explain' });
+  const right = el('div', { class: 'rs-right' }, seg, treeBox, codeBox, stateBox,
+    el('div', { class: 'rs-duo' }, fxBox, apiBox), el('div', { class: 'rs-box' }, chips, caption));
+
+  const steps = () => (run ? EFFECT_STEPS[run.kind] : EFFECT_STEPS[variant]);
+  const current = () => (run && run.idx >= 0 ? steps()[run.idx] : null);
+  const url = () => (variant === 'deps' ? `/api/v1/posts?page=${run ? run.to : model.state.page}` : '/api/v1/posts');
+  const fill = (text) => text
+    .replace(/\{url\}/g, url())
+    .replace(/\{n\}/g, '3')
+    .replace(/\{from\}/g, String(run ? run.from : model.state.page))
+    .replace(/\{to\}/g, String(run ? run.to : model.state.page))
+    .replace(/\{req\}/g, `#${model.requests}`);
+
+  const nodeView = (nodes, hot, dom) => nodes.map((n) => {
+    let cls = `rs-cnode${dom ? ' rs-dom' : ''}`;
+    if (n.comp) cls += ' rs-comp';
+    if (n.root) cls += ' rs-root';
+    if (hot.includes(n.key) || (dom && hot.includes(`dom-${n.key}`))) cls += ' rs-hot';
+    if (n.mark === 'nuevo') cls += ' rs-new';
+    if (n.mark === 'cambió') cls += ' rs-changed';
+    if (n.mark === 'se va') cls += ' rs-gone';
+    const kids = [n.label];
+    if (!dom && !n.mark && model.ids[n.key]) kids.push(el('span', { class: 'rs-oid', text: `#${model.ids[n.key]}` }));
+    if (n.mark) kids.push(el('span', { class: `rs-tag2${n.mark === 'nuevo' ? '' : ' rs-warnt'}`, text: n.mark }));
+    return el('div', { class: cls, style: `--d:${n.depth}`, 'data-node': n.key }, ...kids);
+  });
+
+  const domList = (snap) => [{ key: 'root', depth: 0, label: '<div id="root">', root: true },
+    ...effectTree(snap, variant).filter((n) => !n.comp)];
+
+  const renderScreen = () => {
+    const snap = model.painted;
+    if (!snap) {
+      screenBody.replaceChildren(el('p', { class: 'rs-blank', text: 'Página en blanco' }));
+      return;
+    }
+    const kids = [el('h1', { text: variant === 'deps' ? `Posts · página ${snap.page}` : 'Posts' })];
+    if (snap.posts.length === 0) kids.push(el('p', { class: 'rs-loading', text: 'Cargando...' }));
+    else kids.push(el('ul', {}, ...snap.posts.map((p) => el('li', { text: p.title }))));
+    if (variant === 'deps') {
+      kids.push(el('button', {
+        class: 'rs-btn', type: 'button', 'data-testid': 'effect-next-page', disabled: Boolean(run) || !model.mounted,
+        onclick: () => startNext(),
+      }, 'Siguiente'));
+    }
+    screenBody.replaceChildren(...kids);
+  };
+
+  const render = () => {
+    const step = current();
+    const hot = step ? step.hot : [];
+    const isLoop = variant === 'loop';
+
+    tabs.replaceChildren(...EFFECT_TABS.map((t) => el('button', {
+      class: `rs-tab${t.key === variant ? ' rs-sel' : ''}`, type: 'button', 'data-testid': `effect-tab-${t.key}`,
+      onclick: () => { if (t.key !== variant) { variant = t.key; reset(); render(); } },
+    }, t.label)));
+
+    seg.replaceChildren(...[['tree', 'Árbol de componentes'], ['code', 'Código']].map(([key, label]) => el('button', {
+      class: key === view ? 'rs-sel' : '', type: 'button', onclick: () => { view = key; render(); },
+    }, label)));
+    treeBox.hidden = view !== 'tree';
+    codeBox.hidden = view !== 'code';
+
+    const tree = effectTree(model.built, variant);
+    const shownTree = step && step.op === 'diff' ? diffNodes(effectTree(model.prevBuilt, variant), tree) : tree;
+    treeBox.replaceChildren(
+      el('div', { class: 'rs-box-head', text: 'ÁRBOL DE COMPONENTES · VIRTUAL DOM' }),
+      tree.length
+        ? el('div', { class: 'rs-ctree' }, ...nodeView(shownTree, hot, false))
+        : el('div', { class: 'rs-emptyl', text: 'App todavía no se ha llamado.' }));
+
+    codeBox.replaceChildren(...EFFECT_CODE[variant].split('\n').map((line, i) => el('div', {
+      class: step && step.lines && step.lines.includes(i) ? 'rs-hl' : '', text: line || ' ',
+    })));
+
+    const postsVal = model.renders ? (model.state.posts.length ? `[${model.state.posts.length} posts]` : '[]') : '—';
+    stateBox.className = `rs-sbox${hot.includes('state') ? ' rs-hot' : ''}`;
+    stateBox.replaceChildren(...[
+      el('h4', { text: 'ESTADO' }),
+      variant === 'deps' ? el('div', { class: 'rs-svar', style: 'margin-bottom:6px' },
+        el('span', { class: 'rs-kw', text: 'const [page, setPage]' }),
+        el('span', { class: 'rs-sval rs-small', 'data-testid': 'effect-page', text: model.renders ? String(model.state.page) : '—' })) : null,
+      el('div', { class: 'rs-svar' }, el('span', { class: 'rs-kw', text: 'const [posts, setPosts]' }),
+        el('span', { class: 'rs-sval rs-small', 'data-testid': 'effect-posts', text: postsVal })),
+      el('div', { class: 'rs-sfoot' }, el('span', { text: 'renders de App:' }),
+        el('span', { class: 'rs-tag2', 'data-testid': 'effect-renders', text: String(model.renders) }))].filter(Boolean));
+
+    if (isLoop) {
+      fxBox.className = `rs-sbox rs-plainfx${hot.includes('effect') ? ' rs-hot' : ''}`;
+      fxBox.replaceChildren(el('h4', { text: 'SIN useEffect' }),
+        el('div', { class: 'rs-fxline', text: 'getPosts() en el cuerpo' }),
+        el('div', { class: 'rs-sfoot' }, el('span', { class: 'rs-tag2 rs-badt', text: 'corre en cada render' })));
+    } else {
+      const [label, cls] = FX_STATUS[model.effect];
+      const deps = variant === 'deps' ? `[page]${model.deps !== null ? ` = [${model.deps}]` : ''}` : '[]';
+      fxBox.className = `rs-sbox rs-effect${hot.includes('effect') ? ' rs-hot' : ''}`;
+      fxBox.replaceChildren(el('h4', { text: 'EFECTO · useEffect' }),
+        el('div', { class: 'rs-fxline', text: `dependencias: ${deps}` }),
+        el('div', { class: 'rs-sfoot' }, el('span', { class: cls, 'data-testid': 'effect-status', text: label })));
+    }
+
+    apiBox.className = `rs-sbox rs-api${hot.includes('api') ? ' rs-hot' : ''}`;
+    const req = model.request;
+    apiBox.replaceChildren(el('h4', { text: 'BACKEND' }),
+      el('div', { class: 'rs-fxline', text: req ? `GET ${req.url}` : 'sin peticiones' }),
+      el('div', { class: 'rs-sfoot' },
+        req ? el('span', { class: req.status === 'ok' ? 'rs-tag2' : 'rs-tag2 rs-warnt', text: req.status === 'ok' ? '200 OK · 3 posts' : 'en camino…' }) : null,
+        el('span', { 'data-testid': 'effect-requests', text: `peticiones: ${model.requests}` })));
+
+    const domNodes = model.dom ? domList(model.dom) : [{ key: 'root', depth: 0, label: '<div id="root">', root: true }];
+    const shownDom = step && step.op === 'commit' && model.prevDom !== undefined
+      ? diffNodes(model.prevDom ? domList(model.prevDom) : domNodes.slice(0, 1), domNodes) : domNodes;
+    domBox.replaceChildren(el('div', { class: 'rs-box-head', text: 'DOM REAL · LO QUE PINTA EL NAVEGADOR' }),
+      el('div', { class: 'rs-ctree' }, ...nodeView(shownDom, hot.includes('dom') ? [] : hot, true)));
+
+    chips.replaceChildren(...steps().map((s, i) => {
+      let cls = 'rs-chip';
+      if (run && i === run.idx) cls += ' rs-now';
+      else if (run && i < run.idx) cls += ' rs-done';
+      return el('span', { class: cls }, el('b', { text: String(i + 1) }), s.name);
+    }));
+    if (step) caption.replaceChildren(...rich(fill(step.text)));
+    else if (!caption.dataset.keep) {
+      caption.replaceChildren(...rich(isLoop
+        ? 'Pulsa **Cargar la página** y mira el contador de peticiones.'
+        : 'Pulsa **Cargar la página** y fíjate en cuándo corre el efecto: después de pintar.'));
+    }
+    delete caption.dataset.keep;
+
+    renderScreen();
+    loadBtn.textContent = model.renders ? 'Recargar' : 'Cargar la página';
+    loadBtn.disabled = Boolean(run);
+    nextBtn.disabled = !stepMode || !run;
+    nextBtn.hidden = !stepMode;
+  };
+
+  const apply = (step) => {
+    const s = model.state;
+    if (step.op === 'render') {
+      model.prevBuilt = model.built;
+      model.built = { posts: s.posts, page: s.page };
+      model.renders += 1;
+      renew();
+      if (variant !== 'loop') model.effect = 'pending';
+      if (step.fetch) {
+        model.requests += 1;
+        model.request = { url: url(), status: 'pending' };
+      }
+    }
+    if (step.op === 'commit' || step.op === 'show') {
+      model.prevDom = model.dom;
+      model.dom = model.built;
+    }
+    if (step.op === 'paint' || step.op === 'show') { model.painted = model.dom; model.mounted = true; }
+    if (step.op === 'effect') {
+      model.deps = s.page;
+      model.effect = 'waiting';
+      model.requests += 1;
+      model.request = { url: url(), status: 'pending' };
+    }
+    if (step.op === 'response') {
+      s.posts = postsPage(variant === 'deps' ? run.to : 1);
+      model.request = { ...model.request, status: 'ok' };
+      if (variant !== 'loop') model.effect = 'done';
+    }
+    if (step.op === 'check') model.effect = variant === 'deps' && model.deps !== s.page ? 'changed' : 'skipped';
+    if (step.op === 'setpage') s.page = run.to;
+  };
+
+  const finish = () => {
+    const last = fill(steps()[run.idx].text);
+    run = null;
+    caption.dataset.keep = '1';
+    caption.replaceChildren(...rich(last));
+    render();
+  };
+
+  const spin = (left) => {
+    if (left === 0) { finish(); return; }
+    model.renders += 1;
+    model.requests += 1;
+    renew();
+    model.request = { url: url(), status: left % 2 ? 'ok' : 'pending' };
+    render();
+    timer = setTimeout(() => spin(left - 1), 380);
+  };
+
+  const advance = () => {
+    clearTimeout(timer);
+    if (!run) return;
+    if (run.idx >= steps().length - 1) { finish(); return; }
+    run.idx += 1;
+    const step = current();
+    apply(step);
+    render();
+    if (step.op === 'spin') { timer = setTimeout(() => spin(8), 600); return; }
+    if (!stepMode) timer = setTimeout(advance, 1700);
+  };
+
+  const startNext = () => {
+    if (run || !model.mounted || variant !== 'deps') return;
+    run = { kind: 'next', idx: -1, from: model.state.page, to: model.state.page + 1 };
+    advance();
+  };
+
+  loadBtn.addEventListener('click', () => {
+    if (run) return;
+    reset();
+    run = { kind: variant, idx: -1, from: 1, to: 1 };
+    advance();
+  });
+  nextBtn.addEventListener('click', advance);
+  stepBox.addEventListener('change', () => {
+    stepMode = stepBox.checked;
+    if (!stepMode && run && current() && current().op !== 'spin') advance();
+    else render();
+  });
+
+  const container = el('div', { class: 'rsim', 'data-testid': 'react-effect' },
+    tabs,
+    el('div', { class: 'rs-counter' },
+      el('div', { class: 'rs-left' },
+        el('div', { class: 'rs-app' },
+          el('div', { class: 'rs-browser-bar' }, el('span', { class: 'rs-dot' }), el('span', { class: 'rs-dot' }),
+            el('span', { class: 'rs-dot' }), el('span', { class: 'rs-url', text: 'localhost:5173' })),
+          screenBody),
+        domBox,
+        el('div', { class: 'rs-ctl' }, loadBtn, el('label', { class: 'rs-check' }, stepBox, 'Paso a paso'), nextBtn)),
+      right));
+
+  reset();
+  root.replaceChildren(container);
+  render();
+  return () => { clearTimeout(timer); root.replaceChildren(); };
+};
+
+/* ------------------------------------------------------------------ */
+/* local-storage: setItem / getItem / removeItem and a page reload     */
+/* ------------------------------------------------------------------ */
+
+export const SAMPLE_TOKEN = 'eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwcm9mZXNvckBnbWFpbC5jb20ifQ.k3Jx';
+
+const quote = (v) => (v === null ? 'null' : `'${v}'`);
+
+const mountLocalStorage = (root) => {
+  ensureStyle();
+  const store = new Map();
+  let memory;
+  let lastKey = null;
+  const log = [];
+
+  const keyIn = el('input', { 'data-testid': 'ls-key', value: 'accessToken', spellcheck: 'false' });
+  const valueIn = el('input', { 'data-testid': 'ls-value', value: SAMPLE_TOKEN, spellcheck: 'false' });
+  const setBtn = el('button', { class: 'rs-action', type: 'button', 'data-testid': 'ls-set' });
+  const getBtn = el('button', { class: 'rs-action', type: 'button', 'data-testid': 'ls-get' });
+  const removeBtn = el('button', { class: 'rs-action', type: 'button', 'data-testid': 'ls-remove' });
+  const reloadBtn = el('button', { class: 'rs-btn', type: 'button', 'data-testid': 'ls-reload' }, '↻ Recargar la página');
+  const table = el('div', { 'data-testid': 'ls-table' });
+  const memBox = el('div', { class: 'rs-sbox', 'data-testid': 'ls-memory' });
+  const consoleBox = el('div', { class: 'rs-log', 'data-testid': 'ls-console', style: 'min-height:96px' });
+  const caption = el('div', { class: 'rs-caption', style: 'margin-top:10px' });
+
+  const key = () => keyIn.value.trim() || 'accessToken';
+  const say = (text) => caption.replaceChildren(...rich(text));
+
+  const render = () => {
+    setBtn.replaceChildren(`localStorage.setItem(${quote(key())}, `, el('span', { text: quote(valueIn.value) }), ')');
+    getBtn.replaceChildren('const token = ', `localStorage.getItem(${quote(key())})`);
+    removeBtn.replaceChildren(`localStorage.removeItem(${quote(key())})`);
+    const rows = [...store.entries()];
+    table.replaceChildren(rows.length
+      ? el('table', { class: 'rs-kv' },
+        el('tr', {}, el('th', { text: 'KEY' }), el('th', { text: 'VALUE' })),
+        ...rows.map(([k, v]) => el('tr', { class: k === lastKey ? 'rs-flashrow' : '' }, el('td', { text: k }), el('td', { text: v }))))
+      : el('div', { class: 'rs-emptyl', text: 'vacío' }));
+    memBox.replaceChildren(el('h4', { text: 'MEMORIA DE LA PÁGINA' }),
+      el('div', { class: 'rs-svar' }, el('span', { class: 'rs-kw', text: 'token' }),
+        el('span', { class: 'rs-sval rs-small rs-long', 'data-testid': 'ls-token', text: memory === undefined ? '—' : quote(memory) })),
+      el('div', { class: 'rs-sfoot' }, el('span', { text: 'se borra al recargar' })));
+    consoleBox.replaceChildren(...(log.length ? log : [{ dim: true, text: '// aquí sale lo que ejecutas' }])
+      .slice(-6).map((l) => el('div', { class: l.dim ? 'rs-dim' : l.ok ? 'rs-ok' : '', text: l.text })));
+  };
+
+  setBtn.addEventListener('click', () => {
+    store.set(key(), String(valueIn.value));
+    lastKey = key();
+    log.push({ text: `> localStorage.setItem(${quote(key())}, …)` }, { dim: true, text: 'undefined' });
+    say(`Guardado en **localStorage** con la clave \`${key()}\`. Recarga la página: sigue ahí.`);
+    render();
+  });
+  getBtn.addEventListener('click', () => {
+    memory = store.has(key()) ? store.get(key()) : null;
+    lastKey = key();
+    log.push({ text: `> localStorage.getItem(${quote(key())})` }, { ok: memory !== null, dim: memory === null, text: quote(memory) });
+    say(memory === null
+      ? '`getItem` devuelve `null`: no hay nada guardado con esa clave.'
+      : '`getItem` copió el valor a la variable `token`, en la memoria de la página.');
+    render();
+  });
+  removeBtn.addEventListener('click', () => {
+    store.delete(key());
+    lastKey = null;
+    log.push({ text: `> localStorage.removeItem(${quote(key())})` }, { dim: true, text: 'undefined' });
+    say('Borrado. Es lo que se hace al **cerrar sesión**.');
+    render();
+  });
+  reloadBtn.addEventListener('click', () => {
+    memory = undefined;
+    lastKey = null;
+    log.push({ dim: true, text: '↻ página recargada' });
+    say('Al recargar, JavaScript arranca de cero: la variable `token` desapareció. **localStorage sigue igual**: vuelve a hacer `getItem`.');
+    flash(memBox);
+    render();
+  });
+  keyIn.addEventListener('input', render);
+  valueIn.addEventListener('input', render);
+
+  const container = el('div', { class: 'rsim', 'data-testid': 'local-storage' },
+    el('div', { class: 'rs-ls' },
+      el('div', {},
+        el('label', { class: 'rs-field' }, 'Clave', keyIn),
+        el('label', { class: 'rs-field' }, 'Valor', valueIn),
+        el('div', { class: 'rs-actions' }, setBtn, getBtn, removeBtn),
+        el('div', { class: 'rs-ctl', style: 'margin-top:12px;justify-content:flex-start' }, reloadBtn)),
+      el('div', { class: 'rs-stack' },
+        el('div', { class: 'rs-box' }, el('div', { class: 'rs-box-head', text: 'LOCAL STORAGE · localhost:5173' }), table),
+        memBox,
+        el('div', { class: 'rs-panel' }, el('div', { class: 'rs-head', text: 'CONSOLA' }), consoleBox))),
+    caption);
+
+  say('Prueba en orden: **setItem**, **Recargar la página** y **getItem**.');
+  root.replaceChildren(container);
+  render();
+  return () => root.replaceChildren();
+};
+
 export const SIMS = Object.freeze({
   'js-run': mountJsRun,
   'vanilla-dom': mountVanillaDom,
@@ -1606,4 +2227,6 @@ export const SIMS = Object.freeze({
   'jsx-live': (root, args = []) => mountJsxPlayground(root, args, 'jsx'),
   'props-header': (root, args = []) => mountJsxPlayground(root, args, 'header'),
   'react-counter': mountCounter,
+  'react-effect': mountEffect,
+  'local-storage': mountLocalStorage,
 });

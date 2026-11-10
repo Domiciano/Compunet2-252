@@ -215,7 +215,8 @@ tarjeta clara fija.
   archivo que nombra el `SKILL.md` exista, y viceversa.
 
 - **Introducción a React** (SEMANA 14, en `reactSims.js`, probado en `reactSims.test.jsx`;
-  figuras en `tools/react_figuras.py`, que también inyecta con `--inject`):
+  figuras en `tools/react_figuras.py`, que también inyecta con `--inject`; ahí vive también
+  `axiosFlujo`, la figura de «Axios», 0056):
   - `js-run <snippet>` («Repasito de JS», 0049): código editable con *Ejecutar* y una consola
     simulada. Corre con `new Function` y un `console` falso, en modo estricto; captura también
     lo que se imprime después (timers, promesas). Los snippets viven en `JS_SNIPPETS` y la
@@ -244,6 +245,20 @@ tarjeta clara fija.
     cambio pasa del Virtual DOM al DOM real y solo después a la pantalla. El árbol es el Virtual DOM: sus `#n` se
     renuevan en cada render y el estado no. Con variable normal el valor sube y ni el árbol ni
     la pantalla cambian. Datos en `COUNTER_STEPS` y `COUNTER_TREE`.
+  - `react-effect [mount|deps|loop]` («useEffect», 0054, SEMANA 15): misma figura que
+    `react-counter` (app con su DOM real a la izquierda; árbol/código, estado y pasos a la
+    derecha) más dos cajas: **EFECTO** (dependencias y si corre) y **BACKEND** (último `GET` y
+    contador de peticiones). Tres pestañas (pedido del profesor, 2026-11-10): *Al montar · []*
+    (el efecto corre después de pintar *Cargando...*, `setPosts` provoca el segundo render y
+    al final `[]` no vuelve a correrlo), *Con dependencia · [page]* (el botón *Siguiente* de la
+    app cambia `page` y el efecto corre otra vez con `?page=2`) y *Sin useEffect* (`getPosts()`
+    en el cuerpo: bucle infinito, el contador de peticiones no para). `getPosts` es la misma
+    que escribe la lección de Axios. Pasos en `EFFECT_STEPS` (datos con `op`), árbol en
+    `effectTree`; las pruebas fijan que el efecto siempre va después de `paint`.
+  - `local-storage` («Local Storage», 0062): clave y valor editables, botones `setItem`,
+    `getItem` (copia a la variable `token`) y `removeItem`, y *Recargar la página*, que
+    borra la variable y deja localStorage intacto. Almacén en memoria, no toca el
+    localStorage real.
 
 #### Darla de alta en `toc.md`
 

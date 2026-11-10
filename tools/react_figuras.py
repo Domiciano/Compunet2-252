@@ -14,13 +14,13 @@ import re
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from security_figuras import FAM, box, head, tail  # noqa: E402
+from security_figuras import FAM, box, chip, head, tail  # noqa: E402
 from rest_figuras import esc, pane, pill  # noqa: E402
 from ia_figuras import folder, file_icon  # noqa: E402
 from console_frame import frame  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-LESSONS = ['lesson32.md', 'lesson33.md', 'lesson_node_bundler.md', 'lesson_react_setup.md', 'lesson34.md']
+LESSONS = ['lesson32.md', 'lesson33.md', 'lesson_node_bundler.md', 'lesson_react_setup.md', 'lesson34.md', 'lesson104.md']
 FIGS = {}
 
 
@@ -385,6 +385,50 @@ def props_flujo():
 
 
 FIGS['propsFlujo'] = props_flujo
+
+
+def axios_flujo():
+    fid, h = 'axiosFlujo', 600
+    s = head(fid, h, 'Del login a la lista', 'Del login a la lista',
+             'El POST trae el token, localStorage lo guarda y el GET lo manda en el header para traer la lista.',
+             'Diagrama de secuencia con tres participantes: la app React, localStorage y el backend. Uno: LoginForm '
+             'envía POST /api/v1/auth/login con username y password. Dos: el backend responde 200 con accessToken. '
+             'Tres: la app guarda el token con setItem. Cuatro: al abrir PostsPage, su useEffect lee el token con '
+             'getItem. Cinco: envía GET /api/v1/posts con el header Authorization Bearer y el token. Seis: el backend '
+             'responde 200 con la lista de posts. Siete: setPosts guarda la lista en el estado y React la dibuja.',
+             colors=('indigo', 'green', 'amber'))
+    cols = [(176, 'App React', 'violet'), (480, 'localStorage', 'amber'), (784, 'Backend', 'indigo')]
+    for cx, label, c in cols:
+        s += '  ' + box(cx - 110, 108, 220, 44, c, label, mono=False, fs=14)
+        s += f'  <path d="M{cx},152 V{h-70}" stroke="#C4CBD8" stroke-width="1.5" stroke-dasharray="5 5"/>\n'
+    soft, border, strong = FAM['violet']
+    for y, hh, label in [(170, 120, 'LoginForm'), (336, 196, 'PostsPage')]:
+        s += (f'  <rect x="96" y="{y}" width="160" height="{hh}" rx="10" fill="{soft}" fill-opacity=".55" stroke="{border}" '
+              f'stroke-width="1.5"/><text class="mono" x="106" y="{y+16}" font-size="11.5" font-weight="700" fill="{strong}">{label}</text>\n')
+    rows = [
+        (1, 200, 256, 784, 'indigo', 'POST /api/v1/auth/login · { username, password }'),
+        (2, 236, 784, 256, 'green', '200 · { accessToken }'),
+        (3, 272, 256, 480, 'amber', "setItem('accessToken', token)"),
+        (4, 372, 480, 256, 'amber', "getItem('accessToken')"),
+        (5, 420, 256, 784, 'indigo', 'GET /api/v1/posts · Authorization: Bearer token'),
+        (6, 456, 784, 256, 'green', '200 · [ { id, title }, … ]'),
+    ]
+    for n, y, x1, x2, c, label in rows:
+        d = 1 if x2 > x1 else -1
+        s += f'  <path class="ar-{c}" d="M{x1 + 4*d},{y} H{x2 - 6*d}"/>\n'
+        cx = max(round((x1 + x2) / 2 - len(label) * 3.45 - 20), min(x1, x2) + 26)
+        s += (f'  <text class="mono" x="{cx + 20}" y="{y-9}" font-size="11.5" fill="#454C61" '
+              f'data-fit="{abs(x2-x1)-80}">{esc(label)}</text>\n')
+        s += '  ' + chip(cx, y - 13, n, c) + '\n'
+    s += (f'  <rect x="112" y="486" width="128" height="34" rx="8" fill="#FFFFFF" stroke="#C9A6EE" stroke-width="1.5"/>'
+          f'<text class="mono" x="176" y="503" dy="0.35em" text-anchor="middle" font-size="12" font-weight="700" fill="#7439B8">setPosts(data)</text>\n')
+    s += '  ' + chip(92, 503, 7, 'violet') + '\n'
+    s += (f'  <text x="368" y="392" text-anchor="middle" font-size="12" fill="#79809A" data-fit="200">dentro del useEffect</text>\n'
+          f'  <text x="276" y="508" font-size="12" fill="#79809A" data-fit="300">el estado cambia y React dibuja la lista</text>\n')
+    return s + tail(h, 'El backend entrega el token una sola vez, en el login. Desde ahí la app lo manda en cada request protegido.')
+
+
+FIGS['axiosFlujo'] = axios_flujo
 
 
 def main():
