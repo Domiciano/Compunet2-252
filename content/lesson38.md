@@ -2,7 +2,7 @@
 
 <!-- tags: localStorage, setItem, getItem, removeItem, guardar el token, accessToken, getItem devuelve null, se pierde al recargar, cerrar sesión, XSS -->
 
-Todo lo que vive en una variable de JavaScript, incluido el estado de React, desaparece al recargar la página. `localStorage` es un pequeño almacén del navegador, **clave → valor**, que sobrevive a las recargas y a cerrar el navegador. Es donde vamos a guardar el token del login.
+Todo lo que vive en una variable de JavaScript, incluido el estado de React, desaparece al recargar la página. `localStorage` es un pequeño almacén del navegador, **clave → valor**, que sobrevive a las recargas y a cerrar el navegador. Es donde guardamos el token del login en la lección de **Axios**.
 
 ## Pruébalo
 

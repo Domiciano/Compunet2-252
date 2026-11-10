@@ -14,7 +14,7 @@ react-effect
 
 Fíjate en el orden. Primero React llama a `App()` con `posts = []`, monta el DOM y la pantalla muestra *Cargando...*; **solo entonces** corre el efecto y sale el `GET`. Cuando llega la respuesta, `setPosts(data)` cambia el estado y hay un segundo render, ahora con la lista. Ese es el patrón para cargar datos: **lo que trae el efecto se guarda en el estado, y el estado dibuja la pantalla**.
 
-`getPosts()` es una función que pide la lista al backend y devuelve una promesa. En la lección de **Axios** la escribimos de verdad.
+`getPosts()` es la función que escribimos en la lección de **Axios**: pide la lista al backend y devuelve una promesa.
 
 ## Anatomía de useEffect
 

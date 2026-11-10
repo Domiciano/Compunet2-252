@@ -88,7 +88,7 @@ export default api;
 
 ## POST: el login
 
-El formulario guarda lo que escribe el usuario en el estado. Al enviarlo, `api.post` recibe la ruta y el **cuerpo** del request, que Axios convierte a JSON. La respuesta llega en `response.data`, que aquí es `{ accessToken: '...' }`, y el token se guarda en **localStorage**.
+El formulario guarda lo que escribe el usuario en el estado. Al enviarlo, `api.post` recibe la ruta y el **cuerpo** del request, que Axios convierte a JSON. La respuesta llega en `response.data`, que aquí es `{ accessToken: '...' }`, y el token se guarda en **localStorage**, un almacén del navegador que sobrevive a las recargas (lo vemos en la siguiente lección).
 
 ```jsx
 import { useState } from 'react';
@@ -132,11 +132,11 @@ function LoginForm() {
 ```
 
 - `await` espera la respuesta; si el status no es 2xx, Axios **lanza un error** y el código salta al `catch`.
-- En el `catch`, `err.response` trae la respuesta del servidor: `err.response.status` es `401` cuando las credenciales no sirven (lección **Errores 401 y 403**). Si no hay `err.response`, el request ni llegó: el backend está apagado o hay un problema de **CORS** (lección siguiente).
+- En el `catch`, `err.response` trae la respuesta del servidor: `err.response.status` es `401` cuando las credenciales no sirven (lección **Errores 401 y 403**). Si no hay `err.response`, el request ni llegó: el backend está apagado o hay un problema de **CORS** (lección **CORS**).
 
 ## GET: la lista
 
-`PostsPage` hace lo de la lección de **useEffect**: al montar, pide la lista y la pasa al estado. La diferencia es que `/posts` está protegido, así que hay que mandar el token en el header `Authorization`.
+`PostsPage` usa `useEffect`, el hook que corre código después de pintar la pantalla (lo vemos a fondo en la lección **useEffect**): al montar, pide la lista y la pasa al estado. Como `/posts` está protegido, hay que mandar el token en el header `Authorization`.
 
 ```js
 // src/api/posts.js
