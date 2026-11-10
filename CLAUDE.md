@@ -216,7 +216,8 @@ tarjeta clara fija.
 
 - **Introducción a React** (SEMANA 14, en `reactSims.js`, probado en `reactSims.test.jsx`;
   figuras en `tools/react_figuras.py`, que también inyecta con `--inject`; ahí vive también
-  `axiosFlujo`, la figura de «Axios», 0056):
+  `axiosFlujo`, la figura de «Axios», 0056, y las tres de «CORS», 0102: `corsOrigen`,
+  `corsPreflight` y `corsSecurity`):
   - `js-run <snippet>` («Repasito de JS», 0049): código editable con *Ejecutar* y una consola
     simulada. Corre con `new Function` y un `console` falso, en modo estricto; captura también
     lo que se imprime después (timers, promesas). Los snippets viven en `JS_SNIPPETS` y la

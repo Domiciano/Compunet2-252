@@ -20,7 +20,7 @@ from ia_figuras import folder, file_icon  # noqa: E402
 from console_frame import frame  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-LESSONS = ['lesson32.md', 'lesson33.md', 'lesson_node_bundler.md', 'lesson_react_setup.md', 'lesson34.md', 'lesson104.md']
+LESSONS = ['lesson32.md', 'lesson33.md', 'lesson_node_bundler.md', 'lesson_react_setup.md', 'lesson34.md', 'lesson104.md', 'lesson_cors.md']
 FIGS = {}
 
 
@@ -429,6 +429,131 @@ def axios_flujo():
 
 
 FIGS['axiosFlujo'] = axios_flujo
+
+
+def _t(x, y, text, fs=12, fill='#454C61', anchor='start', mono=True, bold=False, fit=None):
+    cls = 'class="mono" ' if mono else ''
+    w = ' font-weight="700"' if bold else ''
+    f = f' data-fit="{fit}"' if fit else ''
+    return (f'<text {cls}x="{x}" y="{y}" dy="0.35em" text-anchor="{anchor}" font-size="{fs}" fill="{fill}"{w}{f}>'
+            f'{esc(text)}</text>')
+
+
+def cors_origen():
+    fid, h = 'corsOrigen', 500
+    s = head(fid, h, 'Dos orígenes distintos', 'Dos orígenes distintos',
+             'El request llega y el backend responde, pero el navegador no deja que el JavaScript lea la respuesta.',
+             'A la izquierda el navegador con la app React servida desde http://localhost:5173; a la derecha el backend '
+             'Spring Boot en http://localhost:8080. El navegador envía GET /api/v1/posts y el backend responde 200 con '
+             'la lista, pero como la respuesta no trae el header Access-Control-Allow-Origin, el navegador la bloquea. '
+             'Abajo se comparan los dos orígenes por partes: mismo esquema http, mismo host localhost y distinto '
+             'puerto, 5173 contra 8080. Basta una parte distinta para que sea otro origen.',
+             colors=('indigo', 'green'))
+    for x, color, title, sub in [(48, 'violet', 'Navegador', 'App React · servida por Vite'),
+                                  (552, 'indigo', 'Backend', 'Spring Boot · los RestControllers')]:
+        soft, border, strong = FAM[color]
+        s += (f'  <rect x="{x}" y="108" width="360" height="190" rx="12" fill="#FFFFFF" stroke="{border}" stroke-width="1.75"/>'
+              + _t(x + 18, 130, title, 14, strong, mono=False, bold=True)
+              + _t(x + 18, 152, sub, 12, '#79809A', mono=False) + '\n')
+    s += '  ' + box(66, 176, 324, 40, 'violet', 'http://localhost:5173') 
+    s += '  ' + box(570, 176, 324, 40, 'indigo', 'http://localhost:8080')
+    s += '  <path class="ar-indigo" d="M410,186 H546"/>' + _t(478, 172, 'GET /api/v1/posts', 11.5, '#4453C9', 'middle') + '\n'
+    s += '  <path class="ar-green" d="M550,230 H414"/>' + _t(482, 244, '200 · [ … ]', 11.5, '#3A8235', 'middle') + '\n'
+    soft, border, strong = FAM['rose']
+    s += (f'  <rect x="66" y="232" width="324" height="50" rx="10" fill="{soft}" stroke="{border}" stroke-width="1.5"/>'
+          + _t(228, 249, 'Bloqueado por el navegador', 12.5, strong, 'middle', mono=False, bold=True)
+          + _t(228, 267, 'falta Access-Control-Allow-Origin', 11.5, strong, 'middle') + '\n')
+    s += _t(48, 330, 'ORIGEN = ESQUEMA + HOST + PUERTO', 12, '#556074', mono=False, bold=True) + '\n'
+    cols = [(140, 'esquema'), (300, 'host'), (450, 'puerto')]
+    for cx, lab in cols:
+        s += '  ' + _t(cx, 356, lab, 11.5, '#79809A', 'middle', mono=False) + '\n'
+    for y, port, pc, who in [(386, ':5173', 'green', 'la app React'), (424, ':8080', 'rose', 'el backend')]:
+        s += '  ' + pill(140, y, 'http://', 'slate', 12) + pill(300, y, 'localhost', 'slate', 12) + pill(450, y, port, pc, 12)
+        s += _t(510, y, who, 12, '#454C61', mono=False) + '\n'
+    s += ('  ' + _t(640, 386, 'Mismo esquema y mismo host,', 12.5, '#454C61', mono=False)
+          + _t(640, 406, 'otro puerto: otro origen.', 12.5, '#C2354F', mono=False, bold=True) + '\n')
+    return s + tail(h, 'Postman y curl no son navegadores: no revisan CORS. Por eso allá el mismo request sí funcionaba.')
+
+
+FIGS['corsOrigen'] = cors_origen
+
+
+def cors_preflight():
+    fid, h = 'corsPreflight', 640
+    s = head(fid, h, 'El pre-flight: primero se pregunta', 'El pre-flight: primero se pregunta',
+             'Antes del GET con token, el navegador manda solo un OPTIONS. Si la respuesta no da permiso, el GET nunca sale.',
+             'Diagrama de secuencia entre el navegador en localhost:5173 y el backend en localhost:8080. Banda de '
+             'pre-flight: uno, el navegador envía OPTIONS /api/v1/posts con Origin, Access-Control-Request-Method GET '
+             'y Access-Control-Request-Headers authorization; dos, el backend responde 200 con '
+             'Access-Control-Allow-Origin, Allow-Methods, Allow-Headers y Max-Age. Banda de request real: tres, el '
+             'navegador envía GET /api/v1/posts con Authorization Bearer y Origin; cuatro, el backend responde 200 con '
+             'la lista y Access-Control-Allow-Origin.',
+             colors=('indigo', 'green', 'amber'))
+    bx, sx = 200, 760
+    for y, hh, color, label in [(160, 236, 'amber', 'PRE-FLIGHT'),
+                                (408, 176, 'indigo', 'REQUEST REAL')]:
+        soft, border, strong = FAM[color]
+        s += (f'  <rect x="48" y="{y}" width="864" height="{hh}" rx="12" fill="{soft}" fill-opacity=".45" stroke="{border}" '
+              f'stroke-dasharray="6 4" stroke-width="1.25"/>' + _t(64, y + 16, label, 11, strong, mono=False, bold=True) + '\n')
+    s += '  ' + box(bx - 120, 104, 240, 40, 'violet', 'Navegador · :5173', mono=False)
+    s += '  ' + box(sx - 120, 104, 240, 40, 'indigo', 'Backend · :8080', mono=False)
+    for x in (bx, sx):
+        s += f'  <path d="M{x},144 V{h-62}" stroke="#C4CBD8" stroke-width="1.5" stroke-dasharray="5 5"/>\n'
+    rows = [
+        (1, 200, True, 'amber', 'OPTIONS /api/v1/posts',
+         ['Origin: http://localhost:5173', 'Access-Control-Request-Method: GET',
+          'Access-Control-Request-Headers: authorization']),
+        (2, 294, False, 'green', '200 OK · sin cuerpo',
+         ['Access-Control-Allow-Origin: http://localhost:5173', 'Access-Control-Allow-Methods: GET,POST,PUT,DELETE',
+          'Access-Control-Allow-Headers: authorization, content-type', 'Access-Control-Max-Age: 3600']),
+        (3, 448, True, 'indigo', 'GET /api/v1/posts',
+         ['Authorization: Bearer eyJhbGciOiJIUzM4NCJ9…', 'Origin: http://localhost:5173']),
+        (4, 524, False, 'green', '200 OK · [ { id, title }, … ]',
+         ['Access-Control-Allow-Origin: http://localhost:5173']),
+    ]
+    for n, y, right, c, label, lines in rows:
+        x1, x2 = (bx + 4, sx - 6) if right else (sx - 4, bx + 6)
+        s += f'  <path class="ar-{c}" d="M{x1},{y} H{x2}"/>\n'
+        s += '  ' + chip(282, y - 16, n, c) + '  ' + _t(302, y - 16, label, 12.5, FAM[c][2], bold=True) + '\n'
+        for i, line in enumerate(lines):
+            s += '  ' + _t(232, y + 16 + i * 17, line, 11.5, '#556074', fit=520) + '\n'
+    return s + tail(h, 'Con Access-Control-Max-Age el navegador recuerda la respuesta una hora y no repite el OPTIONS en cada request.')
+
+
+FIGS['corsPreflight'] = cors_preflight
+
+
+def cors_security():
+    fid, h = 'corsSecurity', 440
+    s = head(fid, h, 'Spring Security y el pre-flight', 'Spring Security y el pre-flight',
+             'El OPTIONS nunca trae el token. Sin .cors(), la cadena lo trata como un request anónimo y lo rechaza.',
+             'Dos filas. Arriba, sin cors en la SecurityFilterChain: el OPTIONS pasa por JwtAuthFilter sin token y '
+             'llega a AuthorizationFilter, que exige autenticación y responde 401; el navegador bloquea y el GET nunca '
+             'sale. Abajo, con cors Customizer.withDefaults: el CorsFilter, que va antes, reconoce el pre-flight, '
+             'responde 200 con los headers Access-Control-Allow y corta la cadena; JwtAuthFilter y AuthorizationFilter '
+             'no se ejecutan.',
+             colors=('indigo', 'green', 'rose'))
+    rows = [(130, 'Sin .cors()', False), (262, 'Con .cors(Customizer.withDefaults())', True)]
+    for y, label, ok in rows:
+        s += '  ' + _t(48, y - 16, label, 12.5, '#161A26', bold=True) + '\n'
+        s += '  ' + box(48, y, 150, 56, 'violet', 'OPTIONS', 'sin token', fs=13)
+        if ok:
+            s += '  ' + box(250, y, 170, 56, 'teal', 'CorsFilter', 'es un pre-flight', hero=True, fs=13)
+            s += '  <path class="ar-indigo" d="M200,' + str(y + 28) + ' H244"/>\n'
+            s += (f'  <g opacity=".38">' + box(470, y, 170, 56, 'slate', 'JwtAuthFilter', 'no se ejecuta', fs=13)
+                  + box(690, y, 222, 56, 'slate', 'AuthorizationFilter', 'no se ejecuta', fs=13) + '</g>\n')
+            s += f'  <path class="ar-green" d="M335,{y + 60} V{y + 84} H100 V{y + 62}"/>\n'
+            s += '  ' + _t(345, y + 96, '200 + Access-Control-Allow-* · la cadena se corta aquí', 12, '#3A8235', mono=False, bold=True) + '\n'
+        else:
+            s += '  ' + box(250, y, 170, 56, 'slate', 'JwtAuthFilter', 'no hay token, sigue', fs=13)
+            s += '  ' + box(470, y, 220, 56, 'slate', 'AuthorizationFilter', 'anyRequest().authenticated()', fs=13)
+            s += '  ' + box(742, y, 170, 56, 'rose', '401', 'el GET nunca sale', hero=True, fs=15)
+            s += (f'  <path class="ar-indigo" d="M200,{y + 28} H244"/><path class="ar-indigo" d="M420,{y + 28} H464"/>'
+                  f'<path class="ar-rose" d="M690,{y + 28} H736"/>\n')
+    return s + tail(h, 'El CorsFilter usa la configuración de @CrossOrigin o de addCorsMappings: no hay que escribirla dos veces.')
+
+
+FIGS['corsSecurity'] = cors_security
 
 
 def main():

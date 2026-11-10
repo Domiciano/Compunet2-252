@@ -132,7 +132,7 @@ function LoginForm() {
 ```
 
 - `await` espera la respuesta; si el status no es 2xx, Axios **lanza un error** y el código salta al `catch`.
-- En el `catch`, `err.response` trae la respuesta del servidor: `err.response.status` es `401` cuando las credenciales no sirven (lección **Errores 401 y 403**). Si no hay `err.response`, el request ni llegó: el backend está apagado o hay un problema de **CORS**.
+- En el `catch`, `err.response` trae la respuesta del servidor: `err.response.status` es `401` cuando las credenciales no sirven (lección **Errores 401 y 403**). Si no hay `err.response`, el request ni llegó: el backend está apagado o hay un problema de **CORS** (lección siguiente).
 
 ## GET: la lista
 
