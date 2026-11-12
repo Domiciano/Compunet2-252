@@ -220,12 +220,10 @@ Se importa igual que `useNavigate`, desde `react-router-dom`.
 
 ## Link en vez de a
 
-Debajo del formulario está el enlace *Regístrate*, hecho con `<a href>`. Un `<a>` le pide al servidor una página nueva: se recarga todo y se pierde el estado de React. Entre pantallas de la app se usa `Link`, que cambia la URL igual que `navigate`:
+Para un enlace que lleva a otra pantalla de la app no se usa `<a href>`. Un `<a>` le pide al servidor una página nueva: se recarga todo y se pierde el estado de React. Se usa `Link`, que cambia la URL igual que `navigate`:
 
 ```jsx
-<Link to="/signup">Regístrate</Link>
+<Link to="/home">Ir al inicio</Link>
 ```
-
-Para que lleve a algún lado, la ruta `/signup` tiene que existir en el router.
 
 Ya estamos en la segunda pantalla con el token guardado. Falta pedir los cursos al backend en cuanto `HomePage` aparece, y para eso está la siguiente lección: **useEffect**.
