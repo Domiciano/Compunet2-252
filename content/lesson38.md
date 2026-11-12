@@ -30,6 +30,18 @@ Los valores siempre se guardan como **texto**: `setItem('n', 5)` guarda `'5'`. P
 
 Puedes ver lo que tiene guardado cualquier página en las herramientas del navegador: *DevTools → Application → Local Storage*.
 
+## En el proyecto
+
+Hoy `login()` en `services/AuthServices.js` solo imprime el token. Cambia ese `console.log` por:
+
+```js
+localStorage.setItem('accessToken', response.data.accessToken);
+```
+
+Inicia sesión y revisa *DevTools → Application → Local Storage*: ahí debe estar `accessToken`. Recarga y sigue ahí.
+
+De paso, `login()` todavía manda un usuario y una contraseña fijos. Haz que los reciba como parámetros y que `handleLogin` le pase los del formulario.
+
 ## Un cuidado
 
 Cualquier JavaScript que corra en la página puede leer localStorage. Si la app tuviera una vulnerabilidad de **XSS**, un script ajeno podría llevarse el token. Por eso ahí no se guardan contraseñas ni datos sensibles: solo el token, que además vence.

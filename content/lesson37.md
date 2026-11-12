@@ -16,40 +16,27 @@ Fíjate en el orden. Primero React llama a `App()` con `posts = []`, monta el DO
 
 `getPosts()` es la función que escribimos en la lección de **Axios**: pide la lista al backend y devuelve una promesa.
 
-Así queda `PostsPage` con la lista. Es la de **React Router** más un estado para los posts, otro para el aviso de carga y el efecto:
+En `PostsPage` necesitas dos estados nuevos, uno para la lista y otro para el aviso de carga:
 
 ```jsx
-// src/pages/PostsPage.jsx
-import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { getPosts } from '../api/posts';
-
-export default function PostsPage() {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const token = localStorage.getItem('accessToken');
-
-  useEffect(() => {
-    getPosts()
-      .then((data) => setPosts(data))
-      .catch(() => setPosts([]))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (!token) return <Navigate to="/" replace />;
-  if (loading) return <p>Cargando...</p>;
-
-  return (
-    <ul>
-      {posts.map((post) => (
-        <li key={post.id}>{post.title}</li>
-      ))}
-    </ul>
-  );
-}
+const [posts, setPosts] = useState([]);
+const [loading, setLoading] = useState(true);
 ```
 
-El `useEffect` va **antes** de los `return` tempranos: los hooks se llaman siempre, en el mismo orden, en cada render. Y la función del efecto no puede ser `async` (tiene que devolver nada o una función de limpieza), por eso se usa `.then` adentro.
+El efecto que pide la lista al abrir la pantalla:
+
+```jsx
+useEffect(() => {
+  getPosts()
+    .then((data) => setPosts(data))
+    .catch(() => setPosts([]))
+    .finally(() => setLoading(false));
+}, []);
+```
+
+Mientras `loading` sea `true`, la pantalla devuelve un *Cargando...*; después, un `<li>` por post con `posts.map`, cada uno con su `key`.
+
+Dos cuidados. El `useEffect` va **antes** de cualquier `return` temprano, como el `<Navigate>` de cuando no hay token: los hooks se llaman siempre, en el mismo orden, en cada render. Y la función del efecto no puede ser `async` (tiene que devolver nada o una función de limpieza), por eso se usa `.then` adentro.
 
 ## Anatomía de useEffect
 
