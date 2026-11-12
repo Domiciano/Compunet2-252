@@ -94,10 +94,10 @@
 **[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson103.md | Rutas Protegidas con ProtectedRoute | 0061
 [t] SEMANA 16 · Deploy
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson107.md | Deploy | 0063
-[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_tanstack.md | Introduccion a TanStack Query | 0064
+**[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_tanstack.md | Introduccion a TanStack Query | 0064
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_vite_config.md | Configuracion de Vite: Alias y Proxy | 0065
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_vite_nginx.md | Despliegue de Vite con Docker y Nginx | 0066
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson108.md | Despliegue en AWS EC2 con Docker Compose | 0067
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/tarea4.md | Tarea 4 | 0068
-[t] Extras
-[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson105.md | useRef | 0069
+**[t] Extras
+**[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson105.md | useRef | 0069
