@@ -14,29 +14,22 @@ react-effect
 
 Fíjate en el orden. Primero React llama a `App()` con `posts = []`, monta el DOM y la pantalla muestra *Cargando...*; **solo entonces** corre el efecto y sale el `GET`. Cuando llega la respuesta, `setPosts(data)` cambia el estado y hay un segundo render, ahora con la lista. Ese es el patrón para cargar datos: **lo que trae el efecto se guarda en el estado, y el estado dibuja la pantalla**.
 
-`getPosts()` es la función que escribimos en la lección de **Axios**: pide la lista al backend y devuelve una promesa.
+## En PostsPage
 
-En `PostsPage` necesitas dos estados nuevos, uno para la lista y otro para el aviso de carga:
+En el simulador, `getPosts()` resume el `GET`. En el proyecto va directo con el cliente de Axios de `services/Api.js`: el efecto lee el token de localStorage, lo manda en el header `Authorization` y guarda la respuesta en el estado.
 
 ```jsx
 const [posts, setPosts] = useState([]);
-const [loading, setLoading] = useState(true);
-```
 
-El efecto que pide la lista al abrir la pantalla:
-
-```jsx
 useEffect(() => {
-  getPosts()
-    .then((data) => setPosts(data))
-    .catch(() => setPosts([]))
-    .finally(() => setLoading(false));
+  const token = localStorage.getItem('accessToken');
+  api.get('/posts', {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((response) => setPosts(response.data));
 }, []);
 ```
 
-Mientras `loading` sea `true`, la pantalla devuelve un *Cargando...*; después, un `<li>` por post con `posts.map`, cada uno con su `key`.
-
-Dos cuidados. El `useEffect` va **antes** de cualquier `return` temprano, como el `<Navigate>` de cuando no hay token: los hooks se llaman siempre, en el mismo orden, en cada render. Y la función del efecto no puede ser `async` (tiene que devolver nada o una función de limpieza), por eso se usa `.then` adentro.
+Para dibujarla, un `<li>` por post con `posts.map`, cada uno con su `key`. La función del efecto no puede ser `async` (tiene que devolver nada o una función de limpieza), por eso se usa `.then`.
 
 ## Anatomía de useEffect
 
