@@ -33,3 +33,7 @@ Puedes ver lo que tiene guardado cualquier página en las herramientas del naveg
 ## Un cuidado
 
 Cualquier JavaScript que corra en la página puede leer localStorage. Si la app tuviera una vulnerabilidad de **XSS**, un script ajeno podría llevarse el token. Por eso ahí no se guardan contraseñas ni datos sensibles: solo el token, que además vence.
+
+## Y ahora
+
+Con el token guardado, el login ya cumplió. Lo siguiente es sacar al usuario de esa pantalla y llevarlo a la de los posts: eso es la lección **React Router**.

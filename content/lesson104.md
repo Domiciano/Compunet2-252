@@ -1,8 +1,10 @@
 # Axios
 
-<!-- tags: axios, axios.post, axios.get, response.data, login desde React, Authorization Bearer, axios.create baseURL, error 401 en el login, error.response.status, CORS, cargar lista con useEffect, interceptores -->
+<!-- tags: axios, axios.post, axios.get, response.data, login desde React, Authorization Bearer, axios.create baseURL, error 401 en el login, error.response.status, CORS, getPosts, interceptores -->
 
 Axios es la librería con la que React habla con el backend. Aquí la usamos para las dos cosas que hace cualquier app con login: un **POST** que manda las credenciales y recibe el token, y un **GET** que trae una lista protegida para mostrarla en pantalla. El backend es el de las semanas anteriores: `POST /api/v1/auth/login` y `GET /api/v1/posts`.
+
+La figura es el hilo de esta semana: aquí hacemos el login (pasos 1 y 2); en **Local Storage** guardamos el token, en **React Router** pasamos a la pantalla de posts y en **useEffect** traemos la lista.
 
 ```svg
 <svg id="axiosFlujo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="axiosFlujo-ttl axiosFlujo-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
@@ -88,7 +90,7 @@ export default api;
 
 ## POST: el login
 
-El formulario guarda lo que escribe el usuario en el estado. Al enviarlo, `api.post` recibe la ruta y el **cuerpo** del request, que Axios convierte a JSON. La respuesta llega en `response.data`, que aquí es `{ accessToken: '...' }`, y el token se guarda en **localStorage**, un almacén del navegador que sobrevive a las recargas (lo vemos en la siguiente lección).
+El formulario guarda lo que escribe el usuario en el estado. Al enviarlo, `api.post` recibe la ruta y el **cuerpo** del request, que Axios convierte a JSON. La respuesta llega en `response.data`, que aquí es `{ accessToken: '...' }`, y el token se guarda en **localStorage**, un almacén del navegador que sobrevive a las recargas (lo vemos en la lección **Local Storage**).
 
 ```jsx
 import { useState } from 'react';
@@ -136,7 +138,7 @@ function LoginForm() {
 
 ## GET: la lista
 
-`PostsPage` usa `useEffect`, el hook que corre código después de pintar la pantalla (lo vemos a fondo en la lección **useEffect**): al montar, pide la lista y la pasa al estado. Como `/posts` está protegido, hay que mandar el token en el header `Authorization`.
+Para pedir la lista basta una función que haga el `GET`. Como `/posts` está protegido, hay que mandar el token en el header `Authorization`.
 
 ```js
 // src/api/posts.js
@@ -151,39 +153,7 @@ export const getPosts = async () => {
 };
 ```
 
-```jsx
-import { useEffect, useState } from 'react';
-import { getPosts } from './api/posts';
-
-function PostsPage() {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getPosts()
-      .then((data) => setPosts(data))
-      .catch(() => setPosts([]))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return <p>Cargando...</p>;
-
-  return (
-    <ul>
-      {posts.map((post) => (
-        <li key={post.id}>{post.title}</li>
-      ))}
-    </ul>
-  );
-}
-```
-
-1. Primer render: `loading` es `true` y se ve *Cargando...*
-2. Después de pintar, el efecto llama a `getPosts()`, que sale con el token.
-3. Llega la lista: `setPosts(data)` la guarda y `setLoading(false)` quita el aviso.
-4. Segundo render: el `map` dibuja un `<li>` por post, cada uno con su `key`.
-
-El efecto no puede ser `async` directamente (tiene que devolver nada o una función de limpieza), por eso se usa `.then` adentro, o una función `async` declarada dentro del efecto y llamada enseguida.
+`getPosts` devuelve una promesa con la lista. Quién la llama, y en qué momento, lo vemos al llegar a la segunda pantalla, en la lección **useEffect**: no se puede llamar suelta en el cuerpo de un componente.
 
 ## Interceptores: el token en todos los requests
 

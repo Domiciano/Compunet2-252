@@ -6,7 +6,7 @@ Un componente es una función que React llama para dibujar. Pero a veces hay que
 
 ## Cargar una lista al abrir la página
 
-El caso de siempre: al abrir la app hay que traer los posts del backend y mostrarlos. Pulsa **Cargar la página** y sigue los pasos; con *Paso a paso* avanzas tú y en *Código* ves qué línea corre en cada momento.
+Venimos de la lección **React Router**: después del login, el usuario llegó a `PostsPage` con el token guardado. Al abrir esa pantalla hay que traer los posts del backend y mostrarlos. Pulsa **Cargar la página** y sigue los pasos; con *Paso a paso* avanzas tú y en *Código* ves qué línea corre en cada momento.
 
 ```interactive
 react-effect
@@ -15,6 +15,41 @@ react-effect
 Fíjate en el orden. Primero React llama a `App()` con `posts = []`, monta el DOM y la pantalla muestra *Cargando...*; **solo entonces** corre el efecto y sale el `GET`. Cuando llega la respuesta, `setPosts(data)` cambia el estado y hay un segundo render, ahora con la lista. Ese es el patrón para cargar datos: **lo que trae el efecto se guarda en el estado, y el estado dibuja la pantalla**.
 
 `getPosts()` es la función que escribimos en la lección de **Axios**: pide la lista al backend y devuelve una promesa.
+
+Así queda `PostsPage` con la lista. Es la de **React Router** más un estado para los posts, otro para el aviso de carga y el efecto:
+
+```jsx
+// src/pages/PostsPage.jsx
+import { useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import { getPosts } from '../api/posts';
+
+export default function PostsPage() {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem('accessToken');
+
+  useEffect(() => {
+    getPosts()
+      .then((data) => setPosts(data))
+      .catch(() => setPosts([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (!token) return <Navigate to="/" replace />;
+  if (loading) return <p>Cargando...</p>;
+
+  return (
+    <ul>
+      {posts.map((post) => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+El `useEffect` va **antes** de los `return` tempranos: los hooks se llaman siempre, en el mismo orden, en cada render. Y la función del efecto no puede ser `async` (tiene que devolver nada o una función de limpieza), por eso se usa `.then` adentro.
 
 ## Anatomía de useEffect
 
