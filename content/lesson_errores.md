@@ -91,10 +91,10 @@ try {
 }
 ```
 
-Y en el JSX, el mensaje solo aparece si hay uno:
+Y en el JSX, el mensaje solo aparece si hay uno. La clase `login-error` ya tiene estilo en `index.css`:
 
 ```jsx
-{error && <p>{error}</p>}
+{error && <p className="login-error">{error}</p>}
 ```
 
 ## Distinguir el error

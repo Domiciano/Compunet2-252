@@ -220,10 +220,10 @@ Se importa igual que `useNavigate`, desde `react-router-dom`.
 
 ## Link en vez de a
 
-El formulario tiene un enlace *No tengo una cuenta* hecho con `<a href>`. Un `<a>` le pide al servidor una página nueva: se recarga todo y se pierde el estado de React. Entre pantallas de la app se usa `Link`, que cambia la URL igual que `navigate`:
+Debajo del formulario está el enlace *Regístrate*, hecho con `<a href>`. Un `<a>` le pide al servidor una página nueva: se recarga todo y se pierde el estado de React. Entre pantallas de la app se usa `Link`, que cambia la URL igual que `navigate`:
 
 ```jsx
-<Link to="/signup">No tengo una cuenta</Link>
+<Link to="/signup">Regístrate</Link>
 ```
 
 Para que lleve a algún lado, la ruta `/signup` tiene que existir en el router.
