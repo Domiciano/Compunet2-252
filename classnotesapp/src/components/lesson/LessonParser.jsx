@@ -69,10 +69,56 @@ const extractHeadings = (content) => {
   return { lessonTitle, subtitles };
 };
 
+// Las casillas de `- [ ] ...` llegan deshabilitadas desde GFM. Aquí el
+// estudiante las marca, y lo marcado se guarda por lección y por línea.
+const TASKS_KEY = "lessonTasks";
+
+const readTasks = () => {
+  try {
+    return JSON.parse(localStorage.getItem(TASKS_KEY)) || {};
+  } catch {
+    return {};
+  }
+};
+
+const TaskCheckbox = ({ storageKey, initial }) => {
+  const [checked, setChecked] = React.useState(
+    () => readTasks()[storageKey] ?? initial,
+  );
+  const toggle = (e) => {
+    const value = e.target.checked;
+    setChecked(value);
+    try {
+      localStorage.setItem(
+        TASKS_KEY,
+        JSON.stringify({ ...readTasks(), [storageKey]: value }),
+      );
+    } catch {
+      // sin localStorage la casilla sigue funcionando, solo no se recuerda
+    }
+  };
+  return (
+    <input
+      type="checkbox"
+      checked={checked}
+      onChange={toggle}
+      style={{ marginRight: 10, cursor: "pointer", transform: "scale(1.15)" }}
+    />
+  );
+};
+
 // Los items de una lista de tareas (`- [ ] ...`) ya traen su propio checkbox;
 // dibujarles además la viñeta deja dos marcas por línea.
-const ListItem = ({ children, className }) => {
+const ListItem = ({ node, children, className, lessonTitle }) => {
   const esTarea = (className || "").includes("task-list-item");
+  const casilla = esTarea
+    ? node?.children?.find((c) => c.tagName === "input")
+    : null;
+  const contenido = esTarea
+    ? React.Children.toArray(children).filter(
+        (c) => !(React.isValidElement(c) && c.props?.type === "checkbox"),
+      )
+    : children;
   return (
   <li
     style={{
@@ -83,6 +129,12 @@ const ListItem = ({ children, className }) => {
       alignItems: "baseline",
     }}
   >
+    {esTarea && (
+      <TaskCheckbox
+        storageKey={`${lessonTitle}#${node?.position?.start.line}`}
+        initial={!!casilla?.properties?.checked}
+      />
+    )}
     {!esTarea && <span
       style={{
         display: "inline-block",
@@ -109,7 +161,7 @@ const ListItem = ({ children, className }) => {
         fontFamily: "Roboto, Arial, sans-serif",
       }}
     >
-      {children}
+      {contenido}
     </Typography>
   </li>
   );
@@ -170,7 +222,7 @@ const LessonParser = ({ content }) => {
     ol: ({ children }) => (
       <ol style={{ margin: "0px 0 0px 0px", ...listTextStyle }}>{children}</ol>
     ),
-    li: ListItem,
+    li: (props) => <ListItem {...props} lessonTitle={lessonTitle} />,
     table: LessonTable,
     thead: LessonTableHead,
     th: LessonTableHeaderCell,

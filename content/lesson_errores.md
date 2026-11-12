@@ -64,7 +64,7 @@ Cuando el login falla, el usuario tiene que verlo en pantalla. La regla es simpl
 
 ## El service deja pasar el error
 
-`login()` en `services/AuthServices.js` se queda **sin** `try/catch`. Si el backend responde con un error, `await api.post(...)` lanza, y como `login` es `async`, el error sale de la función hacia quien la llamó.
+`login()` en `services/AuthServices.js` se queda **sin** `try/catch`. De paso, deja de usar un usuario fijo: recibe el usuario y la contraseña que escribió la persona. Si el backend responde con un error, `await api.post(...)` lanza, y como `login` es `async`, el error sale de la función hacia quien la llamó.
 
 ```js
 async function login(username, password) {

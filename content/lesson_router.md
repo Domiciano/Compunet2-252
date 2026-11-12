@@ -7,7 +7,7 @@ El login ya trae el token y lo deja en localStorage. Falta que al pulsar **Inici
 ```svg
 <svg id="routerMapa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="routerMapa-ttl routerMapa-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
   <title id="routerMapa-ttl">Una sola página, dos pantallas</title>
-  <desc id="routerMapa-dsc">A la izquierda, dos barras de direcciones del navegador: localhost:5173/ y localhost:5173/posts, unidas por una flecha que dice navigate('/posts'), que cambia la URL sin recargar. En el centro, el router creado con createBrowserRouter, con dos rutas: la ruta / apunta a LoginPage y la ruta /posts apunta a PostsPage. A la derecha, la pantalla que se dibuja en cada caso: el formulario de inicio de sesión con usuario, contraseña y botón Iniciar sesión, y la pantalla de posts con el aviso Sesión iniciada y el botón Cerrar sesión. Abajo: el navegador pidió index.html una sola vez; al cambiar la URL, el router cambia el componente que se dibuja.</desc>
+  <desc id="routerMapa-dsc">A la izquierda, dos barras de direcciones del navegador: localhost:5173/ y localhost:5173/home, unidas por una flecha que dice navigate('/home'), que cambia la URL sin recargar. En el centro, el router creado con createBrowserRouter, con dos rutas: la ruta / apunta a LoginPage y la ruta /home apunta a HomePage. A la derecha, la pantalla que se dibuja en cada caso: el formulario de inicio de sesión con usuario, contraseña y botón Iniciar sesión, y la pantalla de inicio con el aviso Sesión iniciada y el botón Cerrar sesión. Abajo: el navegador pidió index.html una sola vez; al cambiar la URL, el router cambia el componente que se dibuja.</desc>
   <defs>
     <style>
       #routerMapa .title{fill:#161A26;font-size:22px;font-weight:700}
@@ -35,10 +35,10 @@ El login ya trae el token y lo deja en localStorage. Falta que al pulsar **Inici
 
   <rect x="48" y="340" width="280" height="40" rx="20" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.5"/>
   <circle cx="70" cy="360" r="5" fill="#C4CBD8"/>
-  <text class="mono" x="86" y="360" dy="0.35em" font-size="13" fill="#454C61" data-fit="230">localhost:5173/posts</text>
+  <text class="mono" x="86" y="360" dy="0.35em" font-size="13" fill="#454C61" data-fit="230">localhost:5173/home</text>
 
   <path class="ar-purple" d="M120,214 V334"/>
-  <text class="mono" x="136" y="266" font-size="12" font-weight="700" fill="#7439B8" data-fit="190">navigate('/posts')</text>
+  <text class="mono" x="136" y="266" font-size="12" font-weight="700" fill="#7439B8" data-fit="190">navigate('/home')</text>
   <text x="136" y="286" font-size="12" fill="#79809A" data-fit="190">cambia la URL sin recargar</text>
 
   <rect x="392" y="136" width="208" height="298" rx="12" fill="#F4EBFF" fill-opacity=".55" stroke="#C9A6EE" stroke-width="1.75"/>
@@ -48,7 +48,7 @@ El login ya trae el token y lo deja en localStorage. Falta que al pulsar **Inici
   <text class="mono" x="496" y="190" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="160">'/' → LoginPage</text>
 
   <rect x="408" y="340" width="176" height="40" rx="8" fill="#FFFFFF" stroke="#C9A6EE" stroke-width="1.5"/>
-  <text class="mono" x="496" y="360" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="160">'/posts' → PostsPage</text>
+  <text class="mono" x="496" y="360" dy="0.35em" text-anchor="middle" font-size="12" fill="#454C61" data-fit="160">'/home' → HomePage</text>
 
   <path class="ar-grey" d="M330,190 H402"/>
   <path class="ar-grey" d="M330,360 H402"/>
@@ -65,7 +65,7 @@ El login ya trae el token y lo deja en localStorage. Falta que al pulsar **Inici
   <text x="736" y="233" dy="0.35em" text-anchor="middle" font-size="11" font-weight="700" fill="#FFFFFF" data-fit="96">Iniciar sesión</text>
 
   <rect x="664" y="298" width="248" height="124" rx="12" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.75"/>
-  <text x="684" y="320" dy="0.35em" font-size="13" font-weight="700" fill="#3A8235" data-fit="200">Posts</text>
+  <text x="684" y="320" dy="0.35em" font-size="13" font-weight="700" fill="#3A8235" data-fit="200">Cursos</text>
   <rect x="684" y="338" width="208" height="30" rx="6" fill="#E8F6E3"/>
   <text x="696" y="353" dy="0.35em" font-size="11.5" fill="#3A8235" data-fit="190">Sesión iniciada</text>
   <rect x="684" y="384" width="108" height="22" rx="6" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.5"/>
@@ -83,7 +83,7 @@ npm install react-router-dom
 
 ## Las dos pantallas
 
-Hoy el formulario vive en `App.jsx`. Muévelo a su propio componente, `src/pages/LoginPage.jsx`, y crea `src/pages/PostsPage.jsx` con un título cualquiera. Cada pantalla es un componente normal; lo único especial es que el router decide cuándo se dibuja.
+Hoy el formulario vive en `App.jsx`. Muévelo a su propio componente, `src/pages/LoginPage.jsx`, y crea `src/pages/HomePage.jsx` con un título cualquiera. Cada pantalla es un componente normal; lo único especial es que el router decide cuándo se dibuja.
 
 ## Definir las rutas
 
@@ -98,7 +98,7 @@ El router es una lista de objetos: `path` es la URL y `element` el componente qu
 ```jsx
 const router = createBrowserRouter([
   { path: '/', element: <LoginPage /> },
-  { path: '/posts', element: <PostsPage /> },
+  { path: '/home', element: <HomePage /> },
 ]);
 ```
 
@@ -108,14 +108,14 @@ Y lo que devuelve `App`:
 return <RouterProvider router={router} />;
 ```
 
-Para comprobarlo, escribe `localhost:5173/posts` en la barra de direcciones: debe aparecer `PostsPage`.
+Para comprobarlo, escribe `localhost:5173/home` en la barra de direcciones: debe aparecer `HomePage`.
 
 ## Navegar después del login
 
 ```svg
 <svg id="routerLogin" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 430" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="routerLogin-ttl routerLogin-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
   <title id="routerLogin-ttl">Qué pasa al pulsar Iniciar sesión</title>
-  <desc id="routerLogin-dsc">Cuatro pasos en fila. Uno, login: await login(), que hace el POST a /auth/login y el backend responde con el accessToken. Dos, guardar: localStorage.setItem('accessToken'), el token sobrevive a recargar. Tres, navegar: navigate('/posts') cambia la URL sin recargar. Cuatro, segunda pantalla: el router monta PostsPage, que lee el token. Debajo del cuarto paso, una nota: aquí entra useEffect, para traer la lista de posts al abrir la pantalla.</desc>
+  <desc id="routerLogin-dsc">Cuatro pasos en fila. Uno, login: await login(), que hace el POST a /auth/login y el backend responde con el accessToken. Dos, guardar: localStorage.setItem('accessToken'), el token sobrevive a recargar. Tres, navegar: navigate('/home') cambia la URL sin recargar. Cuatro, segunda pantalla: el router monta HomePage, que lee el token. Debajo del cuarto paso, una nota: aquí entra useEffect, para traer la lista de posts al abrir la pantalla.</desc>
   <defs>
     <style>
       #routerLogin .title{fill:#161A26;font-size:22px;font-weight:700}
@@ -150,7 +150,7 @@ Para comprobarlo, escribe `localhost:5173/posts` en la barra de direcciones: deb
   <circle cx="520" cy="140" r="13" fill="#FFFFFF" stroke="#C9A6EE" stroke-width="1.5"/><text x="520" y="140" dy="0.35em" text-anchor="middle" font-size="13" font-weight="700" fill="#7439B8">3</text>
   <text x="542" y="140" dy="0.35em" font-size="14" font-weight="700" fill="#7439B8" data-fit="130">Navegar</text>
   <rect x="508" y="166" width="160" height="28" rx="6" fill="#FFFFFF"/>
-  <text class="mono" x="588" y="180" dy="0.35em" text-anchor="middle" font-size="10.5" fill="#454C61" data-fit="152">navigate('/posts')</text>
+  <text class="mono" x="588" y="180" dy="0.35em" text-anchor="middle" font-size="10.5" fill="#454C61" data-fit="152">navigate('/home')</text>
   <text x="508" y="222" font-size="12" fill="#556074" data-fit="160">cambia la URL</text>
   <text x="508" y="240" font-size="12" fill="#556074" data-fit="160">sin recargar</text>
 
@@ -158,7 +158,7 @@ Para comprobarlo, escribe `localhost:5173/posts` en la barra de direcciones: deb
   <circle cx="736" cy="140" r="13" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.5"/><text x="736" y="140" dy="0.35em" text-anchor="middle" font-size="13" font-weight="700" fill="#3A8235">4</text>
   <text x="758" y="140" dy="0.35em" font-size="14" font-weight="700" fill="#3A8235" data-fit="130">Otra pantalla</text>
   <rect x="724" y="166" width="160" height="28" rx="6" fill="#FFFFFF"/>
-  <text class="mono" x="804" y="180" dy="0.35em" text-anchor="middle" font-size="10.5" fill="#454C61" data-fit="152">&lt;PostsPage /&gt;</text>
+  <text class="mono" x="804" y="180" dy="0.35em" text-anchor="middle" font-size="10.5" fill="#454C61" data-fit="152">&lt;HomePage /&gt;</text>
   <text x="724" y="222" font-size="12" fill="#556074" data-fit="160">el router la monta</text>
   <text x="724" y="240" font-size="12" fill="#556074" data-fit="160">y ella lee el token</text>
 
@@ -169,7 +169,7 @@ Para comprobarlo, escribe `localhost:5173/posts` en la barra de direcciones: deb
   <path d="M804,266 V304" stroke="#9FD68D" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
   <rect x="588" y="304" width="312" height="56" rx="10" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.5"/>
   <text x="604" y="324" dy="0.35em" font-size="12.5" font-weight="700" fill="#3A8235" data-fit="280">Aquí entra useEffect</text>
-  <text x="604" y="343" dy="0.35em" font-size="12" fill="#556074" data-fit="280">para traer los posts al abrir la pantalla</text>
+  <text x="604" y="343" dy="0.35em" font-size="12" fill="#556074" data-fit="280">para traer los cursos al abrir la pantalla</text>
 
   <text class="foot" x="48" y="398" data-fit="860">Los pasos 1 y 2 ocurren dentro de login(). El 3, en handleLogin cuando login() terminó. El 4 ocurre solo.</text>
 </svg>
@@ -190,7 +190,7 @@ const navigate = useNavigate();
 Y en `handleLogin`, cuando el login ya salió bien:
 
 ```jsx
-navigate('/posts');
+navigate('/home');
 ```
 
 `login()` es asíncrona, así que `handleLogin` tiene que esperarla con `await` antes de navegar. Si no, la app cambia de pantalla antes de que llegue el token. Y si el login falla, el error salta antes del `navigate` y el usuario se queda en el formulario.
@@ -199,18 +199,18 @@ Un error típico: `useNavigate() may be used only in the context of a <Router> c
 
 ## Cerrar sesión
 
-En `PostsPage`, un botón de **Cerrar sesión** hace lo contrario: borra el token y vuelve al login.
+En `HomePage`, un botón de **Cerrar sesión** hace lo contrario: borra el token y vuelve al login.
 
 ```jsx
 localStorage.removeItem('accessToken');
 navigate('/', { replace: true });
 ```
 
-Con `replace: true` la URL nueva reemplaza a `/posts` en el historial, y el botón *Atrás* del navegador no devuelve a una pantalla sin sesión.
+Con `replace: true` la URL nueva reemplaza a `/home` en el historial, y el botón *Atrás* del navegador no devuelve a una pantalla sin sesión.
 
 ## Si no hay token
 
-Cualquiera puede escribir `/posts` en la barra sin haber entrado. Para eso está `<Navigate>`, la versión en JSX de `navigate`: si `PostsPage` no encuentra el token, devuelve esto en lugar de la pantalla.
+Cualquiera puede escribir `/home` en la barra sin haber entrado. Para eso está `<Navigate>`, la versión en JSX de `navigate`: si `HomePage` no encuentra el token, devuelve esto en lugar de la pantalla.
 
 ```jsx
 return <Navigate to="/" replace />;
@@ -228,4 +228,4 @@ El formulario tiene un enlace *No tengo una cuenta* hecho con `<a href>`. Un `<a
 
 Para que lleve a algún lado, la ruta `/signup` tiene que existir en el router.
 
-Ya estamos en la segunda pantalla con el token guardado. Falta pedir la lista al backend en cuanto `PostsPage` aparece, y para eso está la siguiente lección: **useEffect**.
+Ya estamos en la segunda pantalla con el token guardado. Falta pedir los cursos al backend en cuanto `HomePage` aparece, y para eso está la siguiente lección: **useEffect**.

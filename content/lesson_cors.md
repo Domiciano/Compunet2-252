@@ -2,10 +2,10 @@
 
 <!-- tags: CORS, blocked by CORS policy, pre-flight, OPTIONS, @CrossOrigin, No Access-Control-Allow-Origin header, Access-Control-Allow-Origin, addCorsMappings, http.cors, origen, en Postman sí funciona -->
 
-La app de React corre en `http://localhost:5173` y el backend en `http://localhost:8080`. El login funcionaba en Postman, pero desde React la consola del navegador muestra esto y el request falla:
+La app de React corre en `http://localhost:5173` y el backend en `http://localhost:8080`. El login funciona, pero al pedir los cursos con el token la consola del navegador muestra esto y el request falla:
 
 ```text
-Access to XMLHttpRequest at 'http://localhost:8080/api/v1/posts'
+Access to XMLHttpRequest at 'http://localhost:8080/WebApp6/api/v1/courses'
 from origin 'http://localhost:5173' has been blocked by CORS policy:
 Response to preflight request doesn't pass access control check:
 No 'Access-Control-Allow-Origin' header is present on the
@@ -14,12 +14,14 @@ requested resource.
 
 No es un error del código de React ni de Axios: es el navegador protegiendo al usuario, y se arregla en el **backend**.
 
+¿Y por qué el login sí funciona? En 262WebApp6, `AuthRestController` tiene `@CrossOrigin` y `/api/v1/auth/**` es `permitAll()`. `CourseRestController` no tiene ninguna de las dos cosas. Al final de la lección queda claro por qué hacen falta ambas.
+
 ## Qué es un origen
 
 ```svg
 <svg id="corsOrigen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 500" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="corsOrigen-ttl corsOrigen-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
   <title id="corsOrigen-ttl">Dos orígenes distintos</title>
-  <desc id="corsOrigen-dsc">A la izquierda el navegador con la app React servida desde http://localhost:5173; a la derecha el backend Spring Boot en http://localhost:8080. El navegador envía GET /api/v1/posts y el backend responde 200 con la lista, pero como la respuesta no trae el header Access-Control-Allow-Origin, el navegador la bloquea. Abajo se comparan los dos orígenes por partes: mismo esquema http, mismo host localhost y distinto puerto, 5173 contra 8080. Basta una parte distinta para que sea otro origen.</desc>
+  <desc id="corsOrigen-dsc">A la izquierda el navegador con la app React servida desde http://localhost:5173; a la derecha el backend Spring Boot en http://localhost:8080. El navegador envía GET /api/v1/courses y el backend responde 200 con la lista, pero como la respuesta no trae el header Access-Control-Allow-Origin, el navegador la bloquea. Abajo se comparan los dos orígenes por partes: mismo esquema http, mismo host localhost y distinto puerto, 5173 contra 8080. Basta una parte distinta para que sea otro origen.</desc>
   <defs>
     <style>
       #corsOrigen .title{fill:#161A26;font-size:22px;font-weight:700}
@@ -40,7 +42,7 @@ No es un error del código de React ni de Axios: es el navegador protegiendo al 
   <rect x="552" y="108" width="360" height="190" rx="12" fill="#FFFFFF" stroke="#A9B4F2" stroke-width="1.75"/><text x="570" y="130" dy="0.35em" text-anchor="start" font-size="14" fill="#4453C9" font-weight="700">Backend</text><text x="570" y="152" dy="0.35em" text-anchor="start" font-size="12" fill="#79809A">Spring Boot · los RestControllers</text>
   <rect x="66" y="176" width="324" height="40" rx="10" fill="#F4EBFF" stroke="#C9A6EE" stroke-width="1.5"/><text class="mono" x="228" y="196" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#7439B8" data-fit="308">http://localhost:5173</text>
   <rect x="570" y="176" width="324" height="40" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text class="mono" x="732" y="196" dy="0.35em" text-anchor="middle" font-size="13.5" font-weight="700" fill="#4453C9" data-fit="308">http://localhost:8080</text>
-  <path class="ar-indigo" d="M410,186 H546"/><text class="mono" x="478" y="172" dy="0.35em" text-anchor="middle" font-size="11.5" fill="#4453C9">GET /api/v1/posts</text>
+  <path class="ar-indigo" d="M410,186 H546"/><text class="mono" x="478" y="172" dy="0.35em" text-anchor="middle" font-size="11.5" fill="#4453C9">GET /api/v1/courses</text>
   <path class="ar-green" d="M550,230 H414"/><text class="mono" x="482" y="244" dy="0.35em" text-anchor="middle" font-size="11.5" fill="#3A8235">200 · [ … ]</text>
   <rect x="66" y="232" width="324" height="50" rx="10" fill="#FFEBEF" stroke="#F3A3B2" stroke-width="1.5"/><text x="228" y="249" dy="0.35em" text-anchor="middle" font-size="12.5" fill="#C2354F" font-weight="700">Bloqueado por el navegador</text><text class="mono" x="228" y="267" dy="0.35em" text-anchor="middle" font-size="11.5" fill="#C2354F">falta Access-Control-Allow-Origin</text>
 <text x="48" y="330" dy="0.35em" text-anchor="start" font-size="12" fill="#556074" font-weight="700">ORIGEN = ESQUEMA + HOST + PUERTO</text>
@@ -63,7 +65,7 @@ Lo hace cumplir el navegador, nadie más. Postman, `curl` u otro backend no revi
 ```svg
 <svg id="corsPreflight" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="corsPreflight-ttl corsPreflight-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
   <title id="corsPreflight-ttl">El pre-flight: primero se pregunta</title>
-  <desc id="corsPreflight-dsc">Diagrama de secuencia entre el navegador en localhost:5173 y el backend en localhost:8080. Banda de pre-flight: uno, el navegador envía OPTIONS /api/v1/posts con Origin, Access-Control-Request-Method GET y Access-Control-Request-Headers authorization; dos, el backend responde 200 con Access-Control-Allow-Origin, Allow-Methods, Allow-Headers y Max-Age. Banda de request real: tres, el navegador envía GET /api/v1/posts con Authorization Bearer y Origin; cuatro, el backend responde 200 con la lista y Access-Control-Allow-Origin.</desc>
+  <desc id="corsPreflight-dsc">Diagrama de secuencia entre el navegador en localhost:5173 y el backend en localhost:8080. Banda de pre-flight: uno, el navegador envía OPTIONS /api/v1/courses con Origin, Access-Control-Request-Method GET y Access-Control-Request-Headers authorization; dos, el backend responde 200 con Access-Control-Allow-Origin, Allow-Methods, Allow-Headers y Max-Age. Banda de request real: tres, el navegador envía GET /api/v1/courses con Authorization Bearer y Origin; cuatro, el backend responde 200 con la lista y Access-Control-Allow-Origin.</desc>
   <defs>
     <style>
       #corsPreflight .title{fill:#161A26;font-size:22px;font-weight:700}
@@ -90,7 +92,7 @@ Lo hace cumplir el navegador, nadie más. Postman, `curl` u otro backend no revi
   <path d="M760,144 V578" stroke="#C4CBD8" stroke-width="1.5" stroke-dasharray="5 5"/>
   <path class="ar-amber" d="M204,200 H754"/>
   <circle cx="282" cy="184" r="12" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/><text x="282" y="184" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A96C05">1</text>
-  <text class="mono" x="302" y="184" dy="0.35em" text-anchor="start" font-size="12.5" fill="#A96C05" font-weight="700">OPTIONS /api/v1/posts</text>
+  <text class="mono" x="302" y="184" dy="0.35em" text-anchor="start" font-size="12.5" fill="#A96C05" font-weight="700">OPTIONS /api/v1/courses</text>
   <text class="mono" x="232" y="216" dy="0.35em" text-anchor="start" font-size="11.5" fill="#556074" data-fit="520">Origin: http://localhost:5173</text>
   <text class="mono" x="232" y="233" dy="0.35em" text-anchor="start" font-size="11.5" fill="#556074" data-fit="520">Access-Control-Request-Method: GET</text>
   <text class="mono" x="232" y="250" dy="0.35em" text-anchor="start" font-size="11.5" fill="#556074" data-fit="520">Access-Control-Request-Headers: authorization</text>
@@ -103,12 +105,12 @@ Lo hace cumplir el navegador, nadie más. Postman, `curl` u otro backend no revi
   <text class="mono" x="232" y="361" dy="0.35em" text-anchor="start" font-size="11.5" fill="#556074" data-fit="520">Access-Control-Max-Age: 3600</text>
   <path class="ar-indigo" d="M204,448 H754"/>
   <circle cx="282" cy="432" r="12" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/><text x="282" y="432" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4453C9">3</text>
-  <text class="mono" x="302" y="432" dy="0.35em" text-anchor="start" font-size="12.5" fill="#4453C9" font-weight="700">GET /api/v1/posts</text>
+  <text class="mono" x="302" y="432" dy="0.35em" text-anchor="start" font-size="12.5" fill="#4453C9" font-weight="700">GET /api/v1/courses</text>
   <text class="mono" x="232" y="464" dy="0.35em" text-anchor="start" font-size="11.5" fill="#556074" data-fit="520">Authorization: Bearer eyJhbGciOiJIUzM4NCJ9…</text>
   <text class="mono" x="232" y="481" dy="0.35em" text-anchor="start" font-size="11.5" fill="#556074" data-fit="520">Origin: http://localhost:5173</text>
   <path class="ar-green" d="M756,524 H206"/>
   <circle cx="282" cy="508" r="12" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.5"/><text x="282" y="508" dy="0.35em" text-anchor="middle" font-size="12.5" font-weight="700" fill="#3A8235">4</text>
-  <text class="mono" x="302" y="508" dy="0.35em" text-anchor="start" font-size="12.5" fill="#3A8235" font-weight="700">200 OK · [ { id, title }, … ]</text>
+  <text class="mono" x="302" y="508" dy="0.35em" text-anchor="start" font-size="12.5" fill="#3A8235" font-weight="700">200 OK · [ { publicId, name }, … ]</text>
   <text class="mono" x="232" y="540" dy="0.35em" text-anchor="start" font-size="11.5" fill="#556074" data-fit="520">Access-Control-Allow-Origin: http://localhost:5173</text>
   <text class="foot" x="48" y="612" data-fit="860">Con Access-Control-Max-Age el navegador recuerda la respuesta una hora y no repite el OPTIONS en cada request.</text>
 </svg>
@@ -132,12 +134,12 @@ La forma más directa es anotar el `@RestController`. Vale para todos sus endpoi
 
 ```java
 @RestController
-@RequestMapping("/api/v1/posts")
+@RequestMapping("/api/v1/courses")
 @CrossOrigin(origins = "http://localhost:5173")
-public class PostRestController {
+public class CourseRestController {
 
     @GetMapping
-    public List<PostDTO> findAll() {
+    public List<CourseDTO> findAll() {
         // ...
     }
 }
@@ -216,10 +218,10 @@ La solución es una línea en la cadena de la API:
 ```java
 @Bean
 @Order(2)
-public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http)
+public SecurityFilterChain restSecurityFilterChain(HttpSecurity http)
         throws Exception {
     http
-        .securityMatcher("/api/v1/**")
+        .securityMatcher("/api/**")
         .cors(Customizer.withDefaults())
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/v1/auth/**").permitAll()
@@ -242,7 +244,7 @@ public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http)
 Puedes simular el pre-flight con `curl`, mandando los mismos headers que mandaría el navegador:
 
 ```bash
-curl -i -X OPTIONS http://localhost:8080/api/v1/posts \
+curl -i -X OPTIONS http://localhost:8080/WebApp6/api/v1/courses \
   -H "Origin: http://localhost:5173" \
   -H "Access-Control-Request-Method: GET" \
   -H "Access-Control-Request-Headers: authorization"

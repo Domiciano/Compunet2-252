@@ -6,7 +6,7 @@ Un componente es una función que React llama para dibujar. Pero a veces hay que
 
 ## Cargar una lista al abrir la página
 
-Venimos de la lección **React Router**: después del login, el usuario llegó a `PostsPage` con el token guardado. Al abrir esa pantalla hay que traer los posts del backend y mostrarlos. Pulsa **Cargar la página** y sigue los pasos; con *Paso a paso* avanzas tú y en *Código* ves qué línea corre en cada momento.
+Venimos de la lección **React Router**: después del login, el usuario llegó a `HomePage` con el token guardado. Al abrir esa pantalla hay que traer los cursos del backend y mostrarlos. El simulador usa una lista de *posts*; el mecanismo es idéntico. Pulsa **Cargar la página** y sigue los pasos; con *Paso a paso* avanzas tú y en *Código* ves qué línea corre en cada momento.
 
 ```interactive
 react-effect
@@ -14,22 +14,22 @@ react-effect
 
 Fíjate en el orden. Primero React llama a `App()` con `posts = []`, monta el DOM y la pantalla muestra *Cargando...*; **solo entonces** corre el efecto y sale el `GET`. Cuando llega la respuesta, `setPosts(data)` cambia el estado y hay un segundo render, ahora con la lista. Ese es el patrón para cargar datos: **lo que trae el efecto se guarda en el estado, y el estado dibuja la pantalla**.
 
-## En PostsPage
+## En HomePage
 
 En el simulador, `getPosts()` resume el `GET`. En el proyecto va directo con el cliente de Axios de `services/Api.js`: el efecto lee el token de localStorage, lo manda en el header `Authorization` y guarda la respuesta en el estado.
 
 ```jsx
-const [posts, setPosts] = useState([]);
+const [courses, setCourses] = useState([]);
 
 useEffect(() => {
   const token = localStorage.getItem('accessToken');
-  api.get('/posts', {
+  api.get('/courses', {
     headers: { Authorization: `Bearer ${token}` },
-  }).then((response) => setPosts(response.data));
+  }).then((response) => setCourses(response.data));
 }, []);
 ```
 
-Para dibujarla, un `<li>` por post con `posts.map`, cada uno con su `key`. La función del efecto no puede ser `async` (tiene que devolver nada o una función de limpieza), por eso se usa `.then`.
+Para dibujarla, un `<li>` por curso con `courses.map`. Cada curso trae `publicId` y `name`: el `publicId` sirve de `key`. La función del efecto no puede ser `async` (tiene que devolver nada o una función de limpieza), por eso se usa `.then`.
 
 ## Anatomía de useEffect
 

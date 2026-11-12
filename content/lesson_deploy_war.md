@@ -7,7 +7,7 @@ Hay tres guías de despliegue y basta con aplicar **una**. Esta es la recomendad
 ```svg
 <svg id="deployWar" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 470" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="deployWar-ttl deployWar-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
   <title id="deployWar-ttl">Una sola app en Tomcat</title>
-  <desc id="deployWar-dsc">A la izquierda, el navegador hace dos tipos de petición al mismo servidor: /WebApp6/app/posts y /WebApp6/api/v1/courses. A la derecha, Tomcat en el puerto 8080 con webapps/WebApp6.war. Dentro del WAR hay dos partes. La primera atiende /app/**: la carpeta static/app con index.html y assets, más SpaController, que reenvía rutas como /app/posts a index.html. La segunda atiende /api/**: los RestControllers detrás del JwtAuthFilter, que responden JSON. Abajo: como todo sale del mismo origen, no hace falta CORS.</desc>
+  <desc id="deployWar-dsc">A la izquierda, el navegador hace dos tipos de petición al mismo servidor: /WebApp6/app/home y /WebApp6/api/v1/courses. A la derecha, Tomcat en el puerto 8080 con webapps/WebApp6.war. Dentro del WAR hay dos partes. La primera atiende /app/**: la carpeta static/app con index.html y assets, más SpaController, que reenvía rutas como /app/home a index.html. La segunda atiende /api/**: los RestControllers detrás del JwtAuthFilter, que responden JSON. Abajo: como todo sale del mismo origen, no hace falta CORS.</desc>
   <defs>
     <style>
       #deployWar .title{fill:#161A26;font-size:22px;font-weight:700}
@@ -28,7 +28,7 @@ Hay tres guías de despliegue y basta con aplicar **una**. Esta es la recomendad
   <text x="68" y="152" dy="0.35em" font-size="14" font-weight="700" fill="#454C61">Navegador</text>
   <text x="68" y="174" dy="0.35em" font-size="12" fill="#79809A" data-fit="200">localhost:8080</text>
   <rect x="64" y="200" width="200" height="40" rx="8" fill="#F4EBFF" stroke="#C9A6EE" stroke-width="1.5"/>
-  <text class="mono" x="164" y="220" dy="0.35em" text-anchor="middle" font-size="11" fill="#7439B8" data-fit="188">/WebApp6/app/posts</text>
+  <text class="mono" x="164" y="220" dy="0.35em" text-anchor="middle" font-size="11" fill="#7439B8" data-fit="188">/WebApp6/app/home</text>
   <rect x="64" y="300" width="200" height="40" rx="8" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/>
   <text class="mono" x="164" y="320" dy="0.35em" text-anchor="middle" font-size="11" fill="#4453C9" data-fit="188">/WebApp6/api/v1/courses</text>
 
@@ -43,7 +43,7 @@ Hay tres guías de despliegue y basta con aplicar **una**. Esta es la recomendad
   <text class="mono" x="380" y="242" font-size="11.5" fill="#454C61" data-fit="228">static/app/assets/…</text>
   <rect x="376" y="268" width="232" height="88" rx="8" fill="#FFFFFF" stroke="#C9A6EE" stroke-width="1.5"/>
   <text class="mono" x="392" y="290" dy="0.35em" font-size="12" font-weight="700" fill="#7439B8">SpaController</text>
-  <text x="392" y="314" dy="0.35em" font-size="12" fill="#556074" data-fit="200">/app/posts no es un archivo:</text>
+  <text x="392" y="314" dy="0.35em" font-size="12" fill="#556074" data-fit="200">/app/home no es un archivo:</text>
   <text x="392" y="334" dy="0.35em" font-size="12" fill="#556074" data-fit="200">lo reenvía a index.html</text>
 
   <rect x="648" y="164" width="240" height="212" rx="12" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.75"/>
@@ -107,7 +107,7 @@ Cada vez que cambies algo en React, se repite este paso.
 
 ## 3. SpaController
 
-`/app/posts` es una ruta de React, no un archivo. Si el usuario recarga ahí, Spring busca `static/app/posts`, no lo encuentra y da 404. Este controller le contesta con `index.html` y React Router se encarga del resto:
+`/app/home` es una ruta de React, no un archivo. Si el usuario recarga ahí, Spring busca `static/app/home`, no lo encuentra y da 404. Este controller le contesta con `index.html` y React Router se encarga del resto:
 
 ```java
 @Controller
@@ -154,11 +154,11 @@ Copia `WebApp6.war` a la carpeta `webapps` de Tomcat 11, como en la lección **D
 http://localhost:8080/WebApp6/app/
 ```
 
-Prueba entrar, llegar a `/posts` y **recargar** ahí: si la lista vuelve a aparecer, quedó.
+Prueba entrar, llegar a `/home` y **recargar** ahí: si la lista vuelve a aparecer, quedó.
 
 ## Si algo falla
 
 - **Página en blanco** y en *Network* los `.js` dan 404: `base` en `vite.config.js` no coincide con la carpeta. Tiene que ser `/WebApp6/app/`, con las dos barras.
 - **Abre el login de Thymeleaf** en vez de la app: falta el `permitAll()` de `/app/**`.
-- **404 al recargar** en `/posts`: falta `SpaController`, o el `basename` del router no es `/WebApp6/app`.
+- **404 al recargar** en `/home`: falta `SpaController`, o el `basename` del router no es `/WebApp6/app`.
 - **La API da 404**: el WAR no se llama `WebApp6.war`, o `baseURL` no es `/WebApp6/api/v1`.

@@ -7,7 +7,7 @@ Segunda forma de desplegar: React y la API en **dos contenedores**. Nginx sirve 
 ```svg
 <svg id="deployDocker" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="deployDocker-ttl deployDocker-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
   <title id="deployDocker-ttl">Dos contenedores en tu máquina</title>
-  <desc id="deployDocker-dsc">A la izquierda, el navegador abre localhost/posts. Entra por el puerto 80 al contenedor frontend, que es nginx: sirve los archivos de React desde dist y, para cualquier ruta que no sea un archivo, devuelve index.html. Lo que empieza por /WebApp6/api/ lo reenvía con proxy_pass al contenedor backend, que es Tomcat 11 con WebApp6.war y escucha en el puerto 8080 solo dentro de la red de Docker. Los dos contenedores los levanta docker compose up.</desc>
+  <desc id="deployDocker-dsc">A la izquierda, el navegador abre localhost/home. Entra por el puerto 80 al contenedor frontend, que es nginx: sirve los archivos de React desde dist y, para cualquier ruta que no sea un archivo, devuelve index.html. Lo que empieza por /WebApp6/api/ lo reenvía con proxy_pass al contenedor backend, que es Tomcat 11 con WebApp6.war y escucha en el puerto 8080 solo dentro de la red de Docker. Los dos contenedores los levanta docker compose up.</desc>
   <defs>
     <style>
       #deployDocker .title{fill:#161A26;font-size:22px;font-weight:700}
@@ -26,7 +26,7 @@ Segunda forma de desplegar: React y la API en **dos contenedores**. Nginx sirve 
 
   <rect x="48" y="176" width="176" height="96" rx="12" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.75"/>
   <text x="68" y="200" dy="0.35em" font-size="14" font-weight="700" fill="#454C61">Navegador</text>
-  <text class="mono" x="68" y="236" dy="0.35em" font-size="12" fill="#454C61" data-fit="140">localhost/posts</text>
+  <text class="mono" x="68" y="236" dy="0.35em" font-size="12" fill="#454C61" data-fit="140">localhost/home</text>
 
   <rect x="272" y="112" width="640" height="248" rx="14" fill="none" stroke="#8A93A8" stroke-width="1.5" stroke-dasharray="6 5"/>
   <text class="mono" x="292" y="134" dy="0.35em" font-size="12" font-weight="700" fill="#556074">docker compose up</text>
@@ -88,7 +88,7 @@ server {
 }
 ```
 
-`try_files` hace lo que en la guía 1 hacía `SpaController`: si `/posts` no es un archivo, devuelve `index.html`.
+`try_files` hace lo que en la guía 1 hacía `SpaController`: si `/home` no es un archivo, devuelve `index.html`.
 
 `Dockerfile` construye React con Node y deja solo el resultado en una imagen de Nginx:
 
@@ -138,7 +138,7 @@ Solo `frontend` publica un puerto. `backend` es un nombre dentro de la red de Do
 docker compose up --build -d
 ```
 
-Abre `http://localhost`, entra y recarga en `/posts`. Para ver qué pasa adentro y para apagar todo:
+Abre `http://localhost`, entra y recarga en `/home`. Para ver qué pasa adentro y para apagar todo:
 
 ```bash
 docker compose logs backend

@@ -253,3 +253,22 @@ describe('LessonParser — comentarios HTML', () => {
     expect(container.textContent).toContain('esto es contenido de la lección');
   });
 });
+
+describe('LessonParser — task list checkboxes', () => {
+  it('lets the student tick a goal and remembers it', async () => {
+    const { fireEvent } = await import('@testing-library/react');
+    localStorage.clear();
+    const md = '# Taller\n\n- [ ] Primer goal\n- [ ] Segundo goal\n';
+    const first = renderElements(parse(md).elements);
+    const boxes = first.container.querySelectorAll('input[type=checkbox]');
+    expect(boxes).toHaveLength(2);
+    expect(boxes[0].disabled).toBe(false);
+    fireEvent.click(boxes[1]);
+    expect(boxes[1].checked).toBe(true);
+    first.unmount();
+    const again = renderElements(parse(md).elements);
+    const reloaded = again.container.querySelectorAll('input[type=checkbox]');
+    expect(reloaded[0].checked).toBe(false);
+    expect(reloaded[1].checked).toBe(true);
+  });
+});

@@ -2,7 +2,7 @@
 
 <!-- tags: localStorage, setItem, getItem, removeItem, guardar el token, accessToken, getItem devuelve null, se pierde al recargar, cerrar sesión, XSS -->
 
-Todo lo que vive en una variable de JavaScript, incluido el estado de React, desaparece al recargar la página. `localStorage` es un pequeño almacén del navegador, **clave → valor**, que sobrevive a las recargas y a cerrar el navegador. Es donde guardamos el token del login en la lección de **Axios**.
+Todo lo que vive en una variable de JavaScript, incluido el estado de React, desaparece al recargar la página. `localStorage` es un pequeño almacén del navegador, **clave → valor**, que sobrevive a las recargas y a cerrar el navegador. Es donde se guarda el token del login, para no tener que entrar de nuevo cada vez que se recarga.
 
 ## Pruébalo
 
@@ -32,7 +32,7 @@ Puedes ver lo que tiene guardado cualquier página en las herramientas del naveg
 
 ## En el proyecto
 
-Hoy `login()` en `services/AuthServices.js` solo imprime el token. Cambia ese `console.log` por:
+Hasta ahora `login()` en `services/AuthServices.js` solo imprime el token. Cambia ese `console.log` por:
 
 ```js
 localStorage.setItem('accessToken', response.data.accessToken);
@@ -40,12 +40,10 @@ localStorage.setItem('accessToken', response.data.accessToken);
 
 Inicia sesión y revisa *DevTools → Application → Local Storage*: ahí debe estar `accessToken`. Recarga y sigue ahí.
 
-De paso, `login()` todavía manda un usuario y una contraseña fijos. Haz que los reciba como parámetros y que `handleLogin` le pase los del formulario.
-
 ## Un cuidado
 
 Cualquier JavaScript que corra en la página puede leer localStorage. Si la app tuviera una vulnerabilidad de **XSS**, un script ajeno podría llevarse el token. Por eso ahí no se guardan contraseñas ni datos sensibles: solo el token, que además vence.
 
 ## Y ahora
 
-Con el token guardado, el login ya cumplió. Lo siguiente es sacar al usuario de esa pantalla y llevarlo a la de los posts: eso es la lección **React Router**.
+Con el token guardado, el login ya cumplió. Lo siguiente es sacar al usuario de esa pantalla y llevarlo a la pantalla principal: eso es la lección **React Router**.

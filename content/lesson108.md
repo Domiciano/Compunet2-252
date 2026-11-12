@@ -28,7 +28,7 @@ Tercera forma: los mismos dos contenedores de la guía 2, pero en una máquina d
 
   <rect x="48" y="152" width="184" height="96" rx="12" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.75"/>
   <text x="68" y="176" dy="0.35em" font-size="14" font-weight="700" fill="#454C61">Navegador</text>
-  <text class="mono" x="68" y="212" dy="0.35em" font-size="11.5" fill="#454C61" data-fit="150">IP-pública/posts</text>
+  <text class="mono" x="68" y="212" dy="0.35em" font-size="11.5" fill="#454C61" data-fit="150">IP-pública/home</text>
 
   <rect x="48" y="288" width="184" height="104" rx="12" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.75"/>
   <text x="68" y="312" dy="0.35em" font-size="14" font-weight="700" fill="#A96C05">Tu computador</text>
@@ -131,7 +131,7 @@ En la EC2, dentro de la carpeta del repositorio:
 docker compose up --build -d
 ```
 
-La primera vez tarda unos minutos. Abre `http://<IP>` en tu navegador, entra y recarga en `/posts`.
+La primera vez tarda unos minutos. Abre `http://<IP>` en tu navegador, entra y recarga en `/home`.
 
 ## Si algo falla
 
