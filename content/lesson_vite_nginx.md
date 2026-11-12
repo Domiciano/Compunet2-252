@@ -1,51 +1,79 @@
-# Despliegue de una aplicacion Vite con Docker y Nginx
+# Despliegue 2 · Docker y Nginx (local)
 
-Esta guia explica como tomar una aplicacion creada con Vite, construirla para produccion y servirla con Nginx dentro de un contenedor Docker. Al final lo integramos en un archivo Docker Compose.
+<!-- tags: Docker, Nginx, docker compose, Dockerfile multi-stage, nginx.conf, proxy_pass, try_files, tomcat:11, 404 al recargar, port is already allocated, 502 Bad Gateway, la imagen no se actualiza -->
 
-## Requisitos previos
+Segunda forma de desplegar: React y la API en **dos contenedores**. Nginx sirve los archivos de React y le pasa a Tomcat lo que va para la API. Todo corre en tu máquina con un solo comando, y es justo lo que se lleva a AWS en la guía 3.
 
-Antes de empezar, asegurate de tener instalado:
+```svg
+<svg id="deployDocker" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="deployDocker-ttl deployDocker-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
+  <title id="deployDocker-ttl">Dos contenedores en tu máquina</title>
+  <desc id="deployDocker-dsc">A la izquierda, el navegador abre localhost/posts. Entra por el puerto 80 al contenedor frontend, que es nginx: sirve los archivos de React desde dist y, para cualquier ruta que no sea un archivo, devuelve index.html. Lo que empieza por /WebApp6/api/ lo reenvía con proxy_pass al contenedor backend, que es Tomcat 11 con WebApp6.war y escucha en el puerto 8080 solo dentro de la red de Docker. Los dos contenedores los levanta docker compose up.</desc>
+  <defs>
+    <style>
+      #deployDocker .title{fill:#161A26;font-size:22px;font-weight:700}
+      #deployDocker .sub{fill:#79809A;font-size:13.5px}
+      #deployDocker .foot{fill:#79809A;font-size:12px}
+      #deployDocker .mono{font-family:ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace}
+      #deployDocker .ar-grey{fill:none;stroke:#8A93A8;stroke-width:1.75;marker-end:url(#deployDocker-ar-grey)}
+      #deployDocker .ar-indigo{fill:none;stroke:#4453C9;stroke-width:1.75;marker-end:url(#deployDocker-ar-indigo)}
+    </style>
+    <marker id="deployDocker-ar-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#8A93A8"/></marker>
+    <marker id="deployDocker-ar-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#4453C9"/></marker>
+  </defs>
+  <rect width="960" height="440" rx="16" fill="#FBFBFD"/>
+  <text class="title" x="48" y="56">Dos contenedores en tu máquina</text>
+  <text class="sub" x="48" y="80" data-fit="860">nginx sirve React y le pasa a Tomcat todo lo que es de la API.</text>
 
-- Node.js (version 18 o superior)
-- Docker Desktop (o Docker Engine en Linux)
-- Una aplicacion Vite ya creada
+  <rect x="48" y="176" width="176" height="96" rx="12" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.75"/>
+  <text x="68" y="200" dy="0.35em" font-size="14" font-weight="700" fill="#454C61">Navegador</text>
+  <text class="mono" x="68" y="236" dy="0.35em" font-size="12" fill="#454C61" data-fit="140">localhost/posts</text>
 
-Si aun no tienes una aplicacion Vite, puedes crear una de prueba con:
+  <rect x="272" y="112" width="640" height="248" rx="14" fill="none" stroke="#8A93A8" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text class="mono" x="292" y="134" dy="0.35em" font-size="12" font-weight="700" fill="#556074">docker compose up</text>
 
-```sh
-npm create vite@latest mi-app -- --template react
-cd mi-app
-npm install
+  <rect x="296" y="160" width="280" height="176" rx="12" fill="#E8F6E3" stroke="#9FD68D" stroke-width="2.5"/>
+  <text x="316" y="184" dy="0.35em" font-size="14" font-weight="700" fill="#3A8235">frontend</text>
+  <text class="mono" x="398" y="184" dy="0.35em" font-size="12" fill="#3A8235">nginx</text>
+  <text class="mono" x="316" y="220" font-size="11.5" fill="#454C61" data-fit="244">/  →  dist/ (React)</text>
+  <text x="316" y="242" font-size="12" fill="#556074" data-fit="244">si no es archivo: index.html</text>
+  <rect x="312" y="264" width="248" height="52" rx="8" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.5"/>
+  <text class="mono" x="328" y="282" dy="0.35em" font-size="11.5" fill="#454C61" data-fit="220">/WebApp6/api/</text>
+  <text class="mono" x="328" y="300" dy="0.35em" font-size="11.5" fill="#4453C9" data-fit="220">proxy_pass → backend</text>
+
+  <rect x="648" y="160" width="240" height="176" rx="12" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.75"/>
+  <text x="668" y="184" dy="0.35em" font-size="14" font-weight="700" fill="#4453C9">backend</text>
+  <text class="mono" x="744" y="184" dy="0.35em" font-size="12" fill="#4453C9">tomcat:11</text>
+  <text class="mono" x="668" y="220" font-size="11.5" fill="#454C61" data-fit="200">webapps/WebApp6.war</text>
+  <text x="668" y="242" font-size="12" fill="#556074" data-fit="200">puerto 8080, solo adentro</text>
+  <text x="668" y="262" font-size="12" fill="#556074" data-fit="200">de la red de Docker</text>
+
+  <path class="ar-grey" d="M226,224 H290"/>
+  <text class="mono" x="258" y="214" text-anchor="middle" font-size="11" fill="#556074">:80</text>
+  <path class="ar-indigo" d="M562,290 H642"/>
+
+  <text class="foot" x="48" y="400" data-fit="860">Solo nginx publica un puerto. El navegador nunca habla directo con Tomcat, así que tampoco hace falta CORS.</text>
+</svg>
 ```
 
-## Paso 1: Construir la aplicacion para produccion
+Necesitas **Docker Desktop** y el `WebApp6.war` del backend. Para generarlo, sigue el paso 5 de la guía 1 (`finalName` + `./mvnw clean package`). Aquí React **no** va dentro del WAR.
 
-Vite incluye un comando de build que genera archivos estaticos optimizados listos para ser publicados. Estos archivos se guardan en una carpeta llamada `dist`.
+## 1. React
 
-Desde la raiz del proyecto ejecuta:
+Nginx sirve la app desde la raíz, así que `vite.config.js` no necesita `base` y el router no lleva `basename`. Lo único es que la API vaya por ruta relativa, en `services/Api.js`:
 
-```sh
-npm run build
+```js
+baseURL: '/WebApp6/api/v1',
 ```
 
-Cuando termine, deberia aparecer una carpeta `dist/` con el contenido listo para produccion. Puedes verificarlo listando su contenido:
+## 2. Los archivos
 
-```sh
-ls dist/
-```
+Todo va en la raíz del proyecto de React, junto a `package.json`. Copia ahí también `WebApp6.war`.
 
-Deberias ver archivos como `index.html` y una subcarpeta `assets/` con los archivos de JavaScript y CSS compilados.
-
-## Paso 2: Configurar Nginx
-
-Nginx va a ser el servidor web que sirva los archivos estaticos del build. Necesitamos decirle a Nginx como comportarse: desde que carpeta servir los archivos y como manejar las rutas de la aplicacion.
-
-Crea un archivo llamado `nginx.conf` en la raiz del proyecto con el siguiente contenido:
+`nginx.conf` sirve React y reenvía la API al contenedor `backend`:
 
 ```nginx
 server {
     listen 80;
-    server_name localhost;
 
     root /usr/share/nginx/html;
     index index.html;
@@ -54,171 +82,72 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
-    location /assets/ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
+    location /WebApp6/api/ {
+        proxy_pass http://backend:8080;
     }
-
-    error_page 404 /index.html;
 }
 ```
 
-Por que la linea `try_files $uri $uri/ /index.html`? Las aplicaciones de una sola pagina (SPA) manejan el enrutamiento desde el navegador. Si el usuario visita directamente `/perfil` o `/productos`, Nginx buscaria un archivo con ese nombre en el disco y no lo encontraria. Con esta linea le decimos: "si no encuentras el archivo, devuelve el `index.html` y deja que la aplicacion se encargue del enrutamiento".
+`try_files` hace lo que en la guía 1 hacía `SpaController`: si `/posts` no es un archivo, devuelve `index.html`.
 
-## Paso 3: Crear el Dockerfile
-
-El `Dockerfile` le dice a Docker como construir la imagen de tu aplicacion. Crea un archivo llamado `Dockerfile` en la raiz del proyecto:
+`Dockerfile` construye React con Node y deja solo el resultado en una imagen de Nginx:
 
 ```dockerfile
-FROM node:18-alpine AS build
-
+FROM node:22-alpine AS build
 WORKDIR /app
-
 COPY package*.json ./
-RUN npm install
-
+RUN npm ci
 COPY . .
 RUN npm run build
 
 FROM nginx:alpine
-
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
 ```
 
-Que hace este Dockerfile paso a paso:
+`.dockerignore`, para no meter en la imagen lo que no hace falta:
 
-- Etapa 1 (build): usa una imagen de Node para instalar dependencias y ejecutar `npm run build`.
-- Etapa 2 (final): copia solo los archivos de `dist/` a la imagen de Nginx.
-- Reemplaza la configuracion de Nginx con nuestro `nginx.conf`.
-- Expone el puerto 80 y arranca Nginx en primer plano.
-
-La tecnica de usar dos etapas (`FROM ... AS build` y luego otro `FROM`) se llama multi-stage build. Sirve para que la imagen final no incluya Node.js ni el codigo fuente, solo los archivos necesarios para servir la aplicacion. Esto reduce el tamano de la imagen considerablemente.
-
-## Paso 4: Construir la imagen Docker
-
-Con el `Dockerfile` listo, construimos la imagen desde la raiz del proyecto:
-
-```sh
-docker build -t mi-app-nginx .
+```text
+node_modules
+dist
+*.war
 ```
 
-- `docker build`: le dice a Docker que construya una imagen.
-- `-t mi-app-nginx`: le da un nombre (tag) a la imagen. Puedes usar cualquier nombre.
-- `.`: indica que el `Dockerfile` esta en la carpeta actual.
-
-Para verificar que la imagen se creo correctamente:
-
-```sh
-docker images
-```
-
-Deberias ver `mi-app-nginx` en la lista.
-
-## Paso 5: Ejecutar el contenedor con docker run
-
-Una vez creada la imagen, la ejecutamos como un contenedor:
-
-```sh
-docker run -d -p 8080:80 --name mi-app mi-app-nginx
-```
-
-- `-d`: ejecuta el contenedor en segundo plano (detached mode).
-- `-p 8080:80`: mapea el puerto 8080 de tu maquina al puerto 80 del contenedor.
-- `--name mi-app`: le da un nombre al contenedor para poder referenciarlo facilmente.
-- `mi-app-nginx`: el nombre de la imagen que queremos ejecutar.
-
-Abre el navegador y visita `http://localhost:8080`. Deberia aparecer tu aplicacion.
-
-Comandos utiles para gestionar el contenedor:
-
-```sh
-docker ps
-docker logs mi-app
-docker stop mi-app
-docker rm mi-app
-```
-
-## Paso 6: Agregar el servicio a Docker Compose
-
-Docker Compose permite definir y ejecutar multiples contenedores de forma declarativa usando un archivo YAML. Es util cuando la aplicacion necesita varios servicios trabajando juntos.
-
-Crea un archivo llamado `docker-compose.yml` en la raiz del proyecto:
+`docker-compose.yml` levanta los dos contenedores. El backend es la imagen oficial de Tomcat 11 con tu WAR adentro:
 
 ```yaml
 services:
+  backend:
+    image: tomcat:11.0-jdk17
+    volumes:
+      - ./WebApp6.war:/usr/local/tomcat/webapps/WebApp6.war
+
   frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: mi-app
+    build: .
     ports:
-      - "8080:80"
-    restart: unless-stopped
+      - "80:80"
+    depends_on:
+      - backend
 ```
 
-- `services`: agrupa todos los servicios que va a manejar Compose.
-- `frontend`: nombre del servicio. Puede ser cualquier nombre descriptivo.
-- `build.context`: le dice a Compose donde encontrar el codigo fuente (`.` es la carpeta actual).
-- `ports`: mapeo de puertos, igual que en `docker run -p`.
-- `restart: unless-stopped`: el contenedor se reinicia automaticamente si falla, a menos que lo hayas detenido manualmente.
+Solo `frontend` publica un puerto. `backend` es un nombre dentro de la red de Docker: por eso `proxy_pass` lo usa como si fuera un host.
 
-Para construir la imagen y arrancar el servicio:
+## 3. Levantar
 
-```sh
+```bash
 docker compose up --build -d
 ```
 
-Para detener y eliminar los contenedores:
+Abre `http://localhost`, entra y recarga en `/posts`. Para ver qué pasa adentro y para apagar todo:
 
-```sh
+```bash
+docker compose logs backend
 docker compose down
 ```
 
-Para ver los logs:
+## Si algo falla
 
-```sh
-docker compose logs frontend
-```
-
-## Estructura final del proyecto
-
-Al terminar, la raiz de tu proyecto deberia verse asi:
-
-```plain
-mi-app/
-├── dist/               <- generado por npm run build
-├── node_modules/
-├── public/
-├── src/
-├── Dockerfile
-├── docker-compose.yml
-├── nginx.conf
-├── package.json
-└── index.html
-```
-
-## Resumen del flujo completo
-
-```mermaid
-flowchart TD
-    A[Codigo fuente Vite] --> B[npm run build → carpeta dist/]
-    B --> C[Dockerfile - multi-stage build]
-    C --> D[docker build → imagen con Nginx]
-    D --> E[docker run → contenedor en localhost:8080]
-    E --> F[docker compose → gestion declarativa con YAML]
-```
-
-## Errores comunes
-
-La aplicacion carga pero las rutas dan error 404: Verifica que el archivo `nginx.conf` tenga la linea `try_files $uri $uri/ /index.html;` dentro del bloque `location /`.
-
-El puerto 8080 ya esta en uso: Cambia el puerto en el comando `docker run` o en el `docker-compose.yml`. Por ejemplo, usa `9090:80` para exponer en el puerto 9090.
-
-La imagen no se actualiza despues de cambiar el codigo: Cuando cambias el codigo fuente, debes reconstruir la imagen. Con Docker Compose usa `docker compose up --build`. Con docker run, primero elimina la imagen anterior con `docker rmi mi-app-nginx` y luego vuelve a ejecutar `docker build`.
-
-El contenedor se detiene inmediatamente: Revisa los logs con `docker logs mi-app`. Lo mas probable es que Nginx encontro un error en la configuracion. Verifica la sintaxis del archivo `nginx.conf`.
+- **`port is already allocated`**: otro programa usa el 80. Cambia `"80:80"` por `"8081:80"` y abre `http://localhost:8081`.
+- **502 Bad Gateway** en la API: Tomcat todavía está arrancando. Espera unos segundos o mira `docker compose logs backend`.
+- **No ves tus cambios de React**: la imagen se construyó con el código viejo. Vuelve a correr `docker compose up --build -d`.
+- **Cambiaste el backend**: genera el WAR otra vez, cópialo encima y corre `docker compose up -d --force-recreate backend`.

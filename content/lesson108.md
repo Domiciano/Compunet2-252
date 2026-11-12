@@ -1,345 +1,142 @@
-# Fullstack APP AWS Deploy
+# Despliegue 3 · AWS EC2 y Nginx
 
-Nivel: Principiante · Tiempo estimado: 60 - 90 minutos
+<!-- tags: AWS, EC2, Amazon Linux, ssh, scp, security group, puerto 80, docker compose en EC2, IP pública, permission denied docker, docker compose no existe, la página no carga desde afuera -->
 
-Objetivo: Desplegar una aplicacion con tres contenedores (NGINX, FastAPI y PostgreSQL) en una instancia EC2 de Amazon Linux usando Docker Compose.
+Tercera forma: los mismos dos contenedores de la guía 2, pero en una máquina de **AWS** con IP pública. Haz primero la guía 2 en tu computador: si allá funciona, aquí solo cambia dónde corre.
 
-## Arquitectura de la aplicacion
+```svg
+<svg id="deployAws" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 470" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="deployAws-ttl deployAws-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
+  <title id="deployAws-ttl">Los mismos contenedores, en una EC2</title>
+  <desc id="deployAws-dsc">Los dos contenedores de la guía local, frontend con nginx y backend con Tomcat y WebApp6.war, ahora corren dentro de una instancia EC2 con Amazon Linux. El security group de la instancia deja entrar el puerto 80. El navegador entra con la IP pública de la instancia. Desde tu computador subes el WAR con scp, y el código del frontend llega con git clone.</desc>
+  <defs>
+    <style>
+      #deployAws .title{fill:#161A26;font-size:22px;font-weight:700}
+      #deployAws .sub{fill:#79809A;font-size:13.5px}
+      #deployAws .foot{fill:#79809A;font-size:12px}
+      #deployAws .mono{font-family:ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace}
+      #deployAws .ar-grey{fill:none;stroke:#8A93A8;stroke-width:1.75;marker-end:url(#deployAws-ar-grey)}
+      #deployAws .ar-amber{fill:none;stroke:#A96C05;stroke-width:1.75;stroke-dasharray:5 4;marker-end:url(#deployAws-ar-amber)}
+      #deployAws .ar-indigo{fill:none;stroke:#4453C9;stroke-width:1.75;marker-end:url(#deployAws-ar-indigo)}
+    </style>
+    <marker id="deployAws-ar-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#8A93A8"/></marker>
+    <marker id="deployAws-ar-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#A96C05"/></marker>
+    <marker id="deployAws-ar-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#4453C9"/></marker>
+  </defs>
+  <rect width="960" height="470" rx="16" fill="#FBFBFD"/>
+  <text class="title" x="48" y="56">Los mismos contenedores, en una EC2</text>
+  <text class="sub" x="48" y="80" data-fit="860">Lo de la guía local, pero en una máquina de AWS con IP pública.</text>
 
-La aplicacion tiene tres componentes que corren como contenedores independientes:
+  <rect x="48" y="152" width="184" height="96" rx="12" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.75"/>
+  <text x="68" y="176" dy="0.35em" font-size="14" font-weight="700" fill="#454C61">Navegador</text>
+  <text class="mono" x="68" y="212" dy="0.35em" font-size="11.5" fill="#454C61" data-fit="150">IP-pública/posts</text>
 
-- NGINX: Servidor web que sirve la pagina estatica y actua como proxy reverso.
-- FastAPI (Python): Backend de la aplicacion con la API REST.
-- PostgreSQL: Base de datos relacional.
+  <rect x="48" y="288" width="184" height="104" rx="12" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.75"/>
+  <text x="68" y="312" dy="0.35em" font-size="14" font-weight="700" fill="#A96C05">Tu computador</text>
+  <text class="mono" x="68" y="344" dy="0.35em" font-size="11.5" fill="#454C61" data-fit="150">scp WebApp6.war</text>
+  <text class="mono" x="68" y="366" dy="0.35em" font-size="11.5" fill="#454C61" data-fit="150">ssh ec2-user@…</text>
 
-El archivo `docker-compose.yml` define como se conectan estos tres servicios entre si.
+  <rect x="272" y="112" width="640" height="296" rx="14" fill="#FFF8EC" stroke="#F0C572" stroke-width="1.75"/>
+  <text x="292" y="136" dy="0.35em" font-size="14" font-weight="700" fill="#A96C05">EC2 · Amazon Linux</text>
+  <rect x="724" y="122" width="172" height="28" rx="14" fill="#FFFFFF" stroke="#F0C572" stroke-width="1.5"/>
+  <text x="810" y="136" dy="0.35em" text-anchor="middle" font-size="11.5" font-weight="700" fill="#A96C05" data-fit="156">security group: 80</text>
 
-## Requisitos previos
+  <rect x="296" y="168" width="280" height="176" rx="12" fill="#E8F6E3" stroke="#9FD68D" stroke-width="1.75"/>
+  <text x="316" y="192" dy="0.35em" font-size="14" font-weight="700" fill="#3A8235">frontend</text>
+  <text class="mono" x="398" y="192" dy="0.35em" font-size="12" fill="#3A8235">nginx</text>
+  <text class="mono" x="316" y="228" font-size="11.5" fill="#454C61" data-fit="244">/  →  dist/ (React)</text>
+  <rect x="312" y="272" width="248" height="52" rx="8" fill="#FFFFFF" stroke="#9FD68D" stroke-width="1.5"/>
+  <text class="mono" x="328" y="290" dy="0.35em" font-size="11.5" fill="#454C61" data-fit="220">/WebApp6/api/</text>
+  <text class="mono" x="328" y="308" dy="0.35em" font-size="11.5" fill="#4453C9" data-fit="220">proxy_pass → backend</text>
 
-Antes de comenzar necesitas tener lo siguiente:
+  <rect x="648" y="168" width="240" height="176" rx="12" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.75"/>
+  <text x="668" y="192" dy="0.35em" font-size="14" font-weight="700" fill="#4453C9">backend</text>
+  <text class="mono" x="744" y="192" dy="0.35em" font-size="12" fill="#4453C9">tomcat:11</text>
+  <text class="mono" x="668" y="228" font-size="11.5" fill="#454C61" data-fit="200">webapps/WebApp6.war</text>
 
-- Una cuenta activa en AWS.
-- Acceso a la consola de AWS (AWS Management Console).
-- Un par de claves SSH creado en la region donde vas a trabajar (o lo crearemos en el paso 1).
-- El repositorio de la aplicacion disponible en GitHub o GitLab con el `docker-compose.yml` incluido.
+  <text class="mono" x="296" y="380" dy="0.35em" font-size="12" fill="#556074">git clone · docker compose up --build -d</text>
 
-## Paso 1: Crear la instancia EC2
+  <path class="ar-grey" d="M234,200 H290"/>
+  <path class="ar-amber" d="M234,340 H266"/>
+  <path class="ar-indigo" d="M562,298 H642"/>
 
-En el buscador de servicios de la consola de AWS escribe EC2 y seleccionalo. En el panel izquierdo haz clic en Instances y luego en el boton Launch instances.
-
-Completa los siguientes campos:
-
-Name and tags: Dale un nombre descriptivo a tu instancia, por ejemplo: `mi-app-docker`.
-
-Application and OS Images (AMI): Selecciona Amazon Linux 2023 AMI (o Amazon Linux 2, ambas son validas). Asegurate de que diga `Free tier eligible` si estas usando la capa gratuita.
-
-Instance type: Selecciona `t2.micro` o `t3.micro` (elegibles para la capa gratuita).
-
-Key pair (login): Si ya tienes un par de claves, seleccionalo del desplegable. Si no tienes uno, haz clic en Create new key pair:
-
-- Nombre: mi-clave-ec2
-- Tipo: RSA
-- Formato: .pem (para Linux/Mac) o .ppk (para PuTTY en Windows)
-- Haz clic en Create key pair y guarda el archivo en un lugar seguro.
-
-Network settings: Deja la VPC y la subred por defecto. En Firewall (security groups) selecciona Create security group. Asegurate de que la regla SSH (puerto 22) este habilitada con source My IP (recomendado por seguridad).
-
-Configure storage: Deja el disco por defecto (8 GB es suficiente para esta practica).
-
-Haz clic en Launch instance. Espera entre 1 y 2 minutos hasta que el estado sea `Running` y la verificacion de estado muestre `2/2 checks passed`.
-
-## Paso 2: Conectarse a la instancia via SSH
-
-En Linux o macOS abre una terminal y ejecuta:
-
-```sh
-chmod 400 /ruta/a/tu/mi-clave-ec2.pem
-
-ssh -i EC2Tuto.pem ec2-user@<IP_PUBLICA_DE_TU_INSTANCIA>
+  <text class="foot" x="48" y="440" data-fit="860">Solo el puerto 80 queda abierto a internet. Tomcat sigue escondido detrás de nginx, igual que en tu máquina.</text>
+</svg>
 ```
 
-Reemplaza `<IP_PUBLICA_DE_TU_INSTANCIA>` con la IP publica que aparece en la consola de EC2 (columna Public IPv4 address).
+Necesitas una cuenta de AWS, el proyecto de React en un repositorio de GitHub con los archivos de la guía 2 (`nginx.conf`, `Dockerfile`, `.dockerignore`, `docker-compose.yml`) y el `WebApp6.war` en tu computador. El WAR no va en el repositorio.
 
-En Windows con PowerShell:
+## 1. Crear la instancia
 
-```powershell
-ssh -i C:\ruta\a\mi-clave-ec2.pem ec2-user@<IP_PUBLICA_DE_TU_INSTANCIA>
+En la consola de AWS, **EC2 → Instances → Launch instances**:
+
+- **AMI**: Amazon Linux 2023.
+- **Instance type**: `t3.small`. Con `t2.micro` el build de React se puede quedar sin memoria.
+- **Key pair**: crea una (RSA, `.pem`) y guárdala bien. Sin ella no entras.
+- **Network settings**: crea un security group con **SSH** desde *My IP* y **HTTP** (puerto 80) desde *Anywhere*.
+
+Pulsa **Launch instance** y espera a que el estado sea `Running`. Copia la **Public IPv4 address**.
+
+## 2. Entrar por SSH
+
+```bash
+chmod 400 mi-clave.pem
+ssh -i mi-clave.pem ec2-user@<IP>
 ```
 
-Si es la primera vez que te conectas, el sistema te pedira confirmar la autenticidad del host. Escribe `yes` y presiona Enter. Cuando veas el prompt `[ec2-user@ip-xxx ~]$` la conexion fue exitosa.
+En Windows, desde PowerShell, el mismo `ssh` sin el `chmod`.
 
-## Paso 3: Instalar Docker y Docker Compose
+## 3. Instalar Docker y Git
 
-Actualizar los paquetes del sistema:
-
-```sh
-sudo dnf update -y
-```
-
-En Amazon Linux 2 usa `sudo yum update -y` en lugar de `dnf`.
-
-Instalar Docker:
-
-```sh
-sudo dnf install -y docker
-```
-
-Iniciar el servicio de Docker y habilitarlo para que arranque automaticamente:
-
-```sh
-sudo systemctl start docker
-sudo systemctl enable docker
-```
-
-Agregar el usuario actual al grupo docker (permite ejecutar Docker sin `sudo`):
-
-```sh
+```bash
+sudo dnf install -y docker git
+sudo systemctl enable --now docker
 sudo usermod -aG docker ec2-user
 ```
 
-Despues de ejecutar este comando, cierra la sesion SSH y vuelve a conectarte para que el cambio de grupo tenga efecto:
+Sal con `exit` y vuelve a entrar para que el último comando tenga efecto.
 
-```sh
-exit
-```
+Amazon Linux no trae `docker compose`. Se instala como plugin, con `buildx`, que Compose usa para construir:
 
-Vuelve a conectarte con el mismo comando SSH del paso 2. Luego verifica que Docker funciona:
-
-```sh
-docker --version
-docker run hello-world
-```
-
-Deberias ver un mensaje que dice `Hello from Docker!`.
-
-Verificar si Docker Compose ya esta disponible:
-
-```sh
+```bash
+P=/usr/local/lib/docker/cli-plugins
+GH=https://github.com/docker
+sudo mkdir -p $P
+sudo curl -SL -o $P/docker-compose \
+  $GH/compose/releases/latest/download/docker-compose-linux-x86_64
+sudo curl -SL -o $P/docker-buildx \
+  $GH/buildx/releases/download/v0.25.0/buildx-v0.25.0.linux-amd64
+sudo chmod +x $P/docker-compose $P/docker-buildx
 docker compose version
 ```
 
-Si el comando no existe, instalalo manualmente:
+## 4. Subir el proyecto y el WAR
 
-```sh
-sudo mkdir -p /usr/local/lib/docker/cli-plugins
-sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 \
-  -o /usr/local/lib/docker/cli-plugins/docker-compose
-sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+En la EC2, clona el repositorio de React:
 
-sudo mkdir -p /usr/libexec/docker/cli-plugins
-sudo curl -L https://github.com/docker/buildx/releases/download/v0.25.0/buildx-v0.25.0.linux-amd64 \
-  -o /usr/libexec/docker/cli-plugins/docker-buildx
-sudo chmod +x /usr/libexec/docker/cli-plugins/docker-buildx
+```bash
+git clone https://github.com/<usuario>/<repo>.git
 ```
 
-Verifica la instalacion:
+Desde **tu computador**, en otra terminal, sube el WAR a esa carpeta:
 
-```sh
-sudo systemctl restart docker
-docker compose version
-docker buildx version
+```bash
+scp -i mi-clave.pem WebApp6.war ec2-user@<IP>:~/<repo>/
 ```
 
-## Paso 4: Instalar Git y clonar el repositorio
+## 5. Levantar
 
-Instalar Git:
+En la EC2, dentro de la carpeta del repositorio:
 
-```sh
-sudo dnf install -y git
-git --version
-```
-
-Clonar el repositorio (reemplaza la URL con la de tu repositorio):
-
-```sh
-git clone https://github.com/Domiciano/AppDeployWorkshop
-cd tu-repositorio
-```
-
-Verificar que el archivo `docker-compose.yml` este presente:
-
-```sh
-ls -la
-cat docker-compose.yml
-```
-
-Un ejemplo de como deberia verse el `docker-compose.yml`:
-
-```yaml
-version: "3.9"
-
-services:
-  db:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: usuario
-      POSTGRES_PASSWORD: contrasena
-      POSTGRES_DB: mi_base_datos
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-  api:
-    build: ./api
-    ports:
-      - "8000:8000"
-    environment:
-      DATABASE_URL: postgresql://usuario:contrasena@db:5432/mi_base_datos
-    depends_on:
-      - db
-
-  web:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./web:/usr/share/nginx/html
-    depends_on:
-      - api
-
-volumes:
-  postgres_data:
-```
-
-## Paso 5: Levantar la aplicacion con Docker Compose
-
-Construir y levantar los contenedores:
-
-```sh
+```bash
 docker compose up --build -d
 ```
 
-`--build` reconstruye las imagenes si hay cambios en el codigo. `-d` corre los contenedores en segundo plano (modo detached). Este proceso puede tardar varios minutos la primera vez.
+La primera vez tarda unos minutos. Abre `http://<IP>` en tu navegador, entra y recarga en `/posts`.
 
-Verificar que los contenedores esten corriendo:
+## Si algo falla
 
-```sh
-docker compose ps
-```
-
-Deberias ver los tres servicios (`db`, `api`, `web`) con estado `Up` o `running`.
-
-Si algo no funciona, revisa los logs:
-
-```sh
-docker compose logs
-docker compose logs api
-docker compose logs -f api
-```
-
-## Paso 6: Probar la aplicacion con CURL
-
-Desde dentro de la instancia EC2 puedes hacer pruebas locales.
-
-Probar NGINX:
-
-```sh
-curl http://localhost:80
-```
-
-Probar la API de FastAPI:
-
-```sh
-curl http://localhost:8000/
-curl http://localhost:8000/docs
-curl http://localhost:8000/items
-curl -X POST http://localhost:8000/items \
-  -H "Content-Type: application/json" \
-  -d '{"nombre": "producto1", "precio": 100}'
-```
-
-Verificar la conexion con PostgreSQL:
-
-```sh
-docker compose exec db psql -U usuario -d mi_base_datos -c "\dt"
-```
-
-## Paso 7: Configurar las reglas de seguridad (Security Group)
-
-Hasta este momento la aplicacion funciona internamente en la instancia, pero no es accesible desde internet. Para eso necesitas abrir los puertos en el Security Group de EC2.
-
-En la consola de EC2, selecciona tu instancia. En la pestana Security haz clic en el enlace del Security Group. Selecciona la pestana Inbound rules y haz clic en Edit inbound rules.
-
-Agrega las siguientes reglas:
-
-- HTTP · TCP · Puerto 80 · Source 0.0.0.0/0 → Trafico web (NGINX)
-- Custom TCP · TCP · Puerto 8000 · Source 0.0.0.0/0 → API FastAPI
-- Custom TCP · TCP · Puerto 5432 · Source 0.0.0.0/0 → PostgreSQL (solo si se necesita acceso externo)
-
-Nota de seguridad: Abrir el puerto 5432 al publico general no es recomendable en produccion. Para esta practica lo habilitamos para pruebas, pero en un entorno real debes restringir ese acceso.
-
-Haz clic en Save rules.
-
-## Paso 8: Probar desde el navegador
-
-Obtén la IP publica de tu instancia desde la consola de EC2 (columna Public IPv4 address) y abre estas URLs:
-
-```plain
-http://<IP_PUBLICA>/           -> Pagina web servida por NGINX
-http://<IP_PUBLICA>:8000/      -> Raiz de la API FastAPI
-http://<IP_PUBLICA>:8000/docs  -> Documentacion interactiva de FastAPI
-```
-
-Desde tu maquina local con CURL:
-
-```sh
-curl http://<IP_PUBLICA>/
-curl http://<IP_PUBLICA>:8000/
-curl http://<IP_PUBLICA>:8000/items
-```
-
-## Comandos utiles para la administracion
-
-```sh
-# Ver el estado de los contenedores
-docker compose ps
-
-# Detener los contenedores (sin eliminarlos)
-docker compose stop
-
-# Volver a iniciar los contenedores detenidos
-docker compose start
-
-# Detener y eliminar contenedores (datos en volumen se conservan)
-docker compose down
-
-# Detener, eliminar contenedores Y eliminar volumenes (se pierden los datos)
-docker compose down -v
-
-# Reconstruir e iniciar despues de cambios en el codigo
-docker compose up --build -d
-
-# Entrar al shell de un contenedor especifico
-docker compose exec api bash
-docker compose exec db bash
-
-# Ver el uso de recursos de los contenedores
-docker stats
-```
-
-## Solucion de problemas comunes
-
-El comando `docker` dice "permission denied": El usuario no esta en el grupo `docker`. Ejecuta `sudo usermod -aG docker ec2-user`, cierra la sesion y vuelve a conectarte.
-
-Un contenedor aparece como `Exit` en `docker compose ps`: Revisa sus logs con `docker compose logs <nombre_servicio>` para ver el error especifico.
-
-La pagina no carga desde el navegador pero si desde dentro de la instancia: Verifica que las reglas del Security Group esten bien configuradas con los puertos correctos y source `0.0.0.0/0`.
-
-Error de conexion a la base de datos desde la API: Revisa la variable `DATABASE_URL` en el `docker-compose.yml`. El hostname debe ser el nombre del servicio definido en el compose (por ejemplo `db`), no `localhost`.
-
-No hay espacio en disco: Ejecuta `docker system prune -a` para eliminar imagenes y contenedores sin uso. Verifica el espacio con `df -h`.
-
-## Resumen del flujo completo
-
-```mermaid
-flowchart TD
-    A[1. Crear instancia EC2 - Amazon Linux] --> B[2. Conectarse via SSH]
-    B --> C[3. Instalar Docker y Docker Compose]
-    C --> D[4. Instalar Git y clonar repositorio]
-    D --> E[5. docker compose up - -build -d]
-    E --> F[6. Probar con CURL en localhost]
-    F --> G[7. Configurar Security Group - puertos 80 y 8000]
-    G --> H[8. Probar desde navegador y CURL externo]
-```
+- **`permission denied` al usar docker**: no saliste y volviste a entrar después del `usermod`.
+- **`docker compose` no existe**: revisa el paso 3; `docker compose version` tiene que responder.
+- **Desde la EC2 funciona (`curl localhost`) pero desde tu navegador no**: falta la regla HTTP del puerto 80 en el security group.
+- **El build se congela o muere**: la instancia es muy pequeña. Cámbiala a `t3.small`.
+- **Cuando termines**, detén la instancia en la consola: mientras corre, cuesta.
