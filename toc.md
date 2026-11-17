@@ -95,6 +95,7 @@
 **[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson103b.md | Rutas Anidadas y Layouts con Outlet | 0060
 **[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson103.md | Rutas Protegidas con ProtectedRoute | 0061
 [t] SEMANA 16 · Deploy
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_rutas_protegidas.md | Rutas protegidas | 0107
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_deploy_war.md | Despliegue 1 · WAR en Tomcat | 0105
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_vite_nginx.md | Despliegue 2 · Docker y Nginx (local) | 0066
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson108.md | Despliegue 3 · AWS EC2 y Nginx | 0067
