@@ -134,23 +134,16 @@ La cadena de Thymeleaf de `WebSecurityConfig` exige sesión para todo lo que no 
 
 Los datos siguen protegidos: los pide React a `/api/**` con el token.
 
-## 5. Empaquetar el WAR
+## 5. Empaquetar y desplegar
 
-En Tomcat, el nombre del WAR es la ruta de la app. Para que el archivo salga como `WebApp6.war`, dentro de `<build>` en el `pom.xml`:
-
-```xml
-<finalName>WebApp6</finalName>
-```
+Igual que en [Tomcat · desplegar el backend](https://domicianorincon.github.io/Computacion2/lesson/0012): con el `finalName` ya puesto, empaqueta y copia el WAR a `webapps`, encima del anterior.
 
 ```bash
 ./mvnw clean package
+cp target/WebApp6.war <tomcat>/webapps/
 ```
 
-Queda en `target/WebApp6.war`.
-
-## 6. Desplegar
-
-Copia `WebApp6.war` a la carpeta `webapps` de Tomcat 11, como en [Despliegue](https://domicianorincon.github.io/Computacion2/lesson/0012), y arráncalo con `./startup.sh` (en `bin/`). Tomcat lo descomprime solo. Abre:
+El WAR ahora lleva la API y la app. Abre:
 
 ```text
 http://localhost:8080/WebApp6/app/

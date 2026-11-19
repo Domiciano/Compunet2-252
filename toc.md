@@ -15,7 +15,6 @@
 [t] SEMANA 3 · Spring Framework
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson55.md | Simulador de Beans | 0010
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson6.md | Formas de definir un context | 0011
-[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson9.md | Despliegue | 0012
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson10.md | Desacoplamiento en la Capa de Servicio | 0013
 [t] SEMANA 4 · Spring Boot
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson7.md | Spring Boot | 0014
@@ -97,6 +96,7 @@
 [t] SEMANA 16 · Deploy
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_rutas_protegidas.md | Rutas protegidas | 0107
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_vite_config.md | Configuración de Vite: alias y proxy | 0065
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson9.md | Tomcat · desplegar el backend | 0012
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_deploy_war.md | Despliegue 1 · WAR en Tomcat | 0105
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_vite_nginx.md | Despliegue 2 · Docker y Nginx (local) | 0066
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson108.md | Despliegue 3 · AWS EC2 y Nginx | 0067
