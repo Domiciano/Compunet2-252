@@ -1,6 +1,6 @@
 # Rutas protegidas
 
-<!-- tags: rutas protegidas, Outlet, ProtectedRoute, entrar a /home sin login, Navigate, children en createBrowserRouter, pantalla en blanco sin Outlet, redirección infinita, layout compartido, token vencido 401, ruta sin path, proteger la ruta no es seguridad -->
+<!-- tags: rutas protegidas, Outlet, ProtectedRoute, entrar a /home sin login, Navigate, children en createBrowserRouter, pantalla en blanco sin Outlet, redirección infinita, ruta sin path -->
 
 Cualquiera puede escribir `localhost:5173/home` en la barra sin haber iniciado sesión. En React Router se resolvió poniendo un `if` dentro de `HomePage`, pero con cinco pantallas privadas serían cinco copias del mismo `if`. Una **ruta protegida** pone esa revisión en un solo lugar: un componente que va **antes** de las pantallas privadas y decide si las deja pasar.
 
@@ -125,74 +125,3 @@ Dos errores típicos:
 
 - **Pantalla en blanco en `/home`.** `ProtectedRoute` devuelve otra cosa (un `<div>`, `null`) en vez de `<Outlet />`. El router encontró la ruta hija, pero no hay hueco donde dibujarla.
 - **La página no carga y la consola se llena.** Metiste `/` dentro de los `children` de `ProtectedRoute`. Sin token, el guardia manda a `/`, que también está protegida, que manda a `/`… y así sin fin. El login siempre va afuera.
-
-## Un layout para todas las pantallas privadas
-
-`Outlet` también sirve para lo que se repite en varias pantallas, como una barra arriba con el botón de cerrar sesión. Un `AppLayout`, en `src/components/AppLayout.jsx`, dibuja la barra y deja el hueco debajo:
-
-```jsx
-import { Outlet, useNavigate } from 'react-router-dom';
-
-function AppLayout() {
-  const navigate = useNavigate();
-
-  function handleLogout() {
-    localStorage.removeItem('accessToken');
-    navigate('/', { replace: true });
-  }
-
-  return (
-    <>
-      <header>
-        <span>Cursos</span>
-        <button onClick={handleLogout}>Cerrar sesión</button>
-      </header>
-      <Outlet />
-    </>
-  );
-}
-
-export default AppLayout;
-```
-
-Se importa en `App.jsx` igual que `ProtectedRoute` y se cuelga dentro de él. Las pantallas van dentro del layout:
-
-```jsx
-{
-  element: <ProtectedRoute />,
-  children: [
-    {
-      element: <AppLayout />,
-      children: [
-        { path: '/home', element: <HomePage /> },
-      ],
-    },
-  ],
-},
-```
-
-Al abrir `/home` se arman tres capas, cada una dentro del `Outlet` de la anterior: `ProtectedRoute` → `AppLayout` → `HomePage`. Si no hay token, la cadena se corta en la primera.
-
-## Proteger la ruta no es seguridad
-
-`ProtectedRoute` solo mira si **existe** algo en localStorage. Cualquiera puede escribir `accessToken = hola` en DevTools y la app lo deja pasar a `/home`. No pasa nada grave: el `GET` de los cursos llega al backend con un token que no sirve, y Spring Security responde **401**. La que protege los datos es la API; la ruta protegida solo evita mostrar una pantalla que no va a funcionar.
-
-Lo mismo pasa con un token **vencido**: está en localStorage, el guardia lo deja pasar y el backend lo rechaza. Por eso `HomePage`, al atrapar el error del `GET`, revisa el 401 y cierra la sesión. Con `useNavigate` importado y `const navigate = useNavigate();` arriba, el `useEffect` queda:
-
-```jsx
-useEffect(() => {
-  const token = localStorage.getItem('accessToken');
-  getCourses({ token: token })
-    .then((cursos) => setCursos(cursos))
-    .catch((err) => {
-      if (err.response?.status === 401) {
-        localStorage.removeItem('accessToken');
-        navigate('/', { replace: true });
-      }
-    });
-}, [navigate]);
-```
-
-El token se lee dentro del efecto: como `ProtectedRoute` ya revisó que exista, aquí no hace falta el `if (!token) return;`.
-
-Con eso las dos piezas se reparten el trabajo: el guardia saca a quien no tiene token, y el 401 saca a quien tiene uno que ya no sirve.
