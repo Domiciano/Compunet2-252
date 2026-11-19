@@ -2,7 +2,7 @@
 
 <!-- tags: AWS, EC2, Amazon Linux, ssh, scp, security group, puerto 80, docker compose en EC2, IP pública, permission denied docker, docker compose no existe, la página no carga desde afuera -->
 
-Tercera forma: los mismos dos contenedores de la guía 2, pero en una máquina de **AWS** con IP pública. Haz primero la guía 2 en tu computador: si allá funciona, aquí solo cambia dónde corre.
+Tercera forma: los mismos dos contenedores de la [guía 2](https://domicianorincon.github.io/Computacion2/lesson/0066), pero en una máquina de **AWS** con IP pública. Haz primero la guía 2 en tu computador: si allá funciona, aquí solo cambia dónde corre.
 
 ```svg
 <svg id="deployAws" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 470" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="deployAws-ttl deployAws-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
@@ -138,5 +138,6 @@ La primera vez tarda unos minutos. Abre `http://<IP>` en tu navegador, entra y r
 - **`permission denied` al usar docker**: no saliste y volviste a entrar después del `usermod`.
 - **`docker compose` no existe**: revisa el paso 3; `docker compose version` tiene que responder.
 - **Desde la EC2 funciona (`curl localhost`) pero desde tu navegador no**: falta la regla HTTP del puerto 80 en el security group.
+- **Responde en otro puerto o no responde en el 80**: en tu computador cambiaste `"80:80"` por `"8081:80"`. En la EC2 tiene que quedar `"80:80"`.
 - **El build se congela o muere**: la instancia es muy pequeña. Cámbiala a `t3.small`.
 - **Cuando termines**, detén la instancia en la consola: mientras corre, cuesta.

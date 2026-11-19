@@ -55,11 +55,11 @@ Segunda forma de desplegar: React y la API en **dos contenedores**. Nginx sirve 
 </svg>
 ```
 
-Necesitas **Docker Desktop** y el `WebApp6.war` del backend. Para generarlo, sigue el paso 5 de la guía 1 (`finalName` + `./mvnw clean package`). Aquí React **no** va dentro del WAR.
+Necesitas **Docker Desktop** y el `WebApp6.war` del backend. Para generarlo, sigue el paso 5 de la [guía 1](https://domicianorincon.github.io/Computacion2/lesson/0105) (`finalName` + `./mvnw clean package`). Aquí React **no** va dentro del WAR.
 
 ## 1. React
 
-Nginx sirve la app desde la raíz, así que `vite.config.js` no necesita `base` y el router no lleva `basename`. Lo único es que la API vaya por ruta relativa, en `services/Api.js`:
+Nginx sirve la app desde la raíz, así que `vite.config.js` no necesita `base` y el router no lleva `basename`. Si vienes de la guía 1, quita los dos. Lo único es que la API vaya por ruta relativa, en `services/Api.js`:
 
 ```js
 baseURL: '/WebApp6/api/v1',

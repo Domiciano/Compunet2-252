@@ -70,10 +70,12 @@ En `vite.config.js`, la ruta desde la que se van a servir los archivos:
 base: '/WebApp6/app/',
 ```
 
-En el router, la misma ruta como segundo argumento de `createBrowserRouter`:
+En `App.jsx`, la misma ruta como segundo argumento de `createBrowserRouter`, después del arreglo de rutas:
 
 ```jsx
-{ basename: '/WebApp6/app' }
+const router = createBrowserRouter([
+  // ... las rutas, con ProtectedRoute y sus children
+], { basename: '/WebApp6/app' });
 ```
 
 En `services/Api.js`, la API ya no lleva IP ni puerto: está en el mismo servidor.
@@ -82,7 +84,7 @@ En `services/Api.js`, la API ya no lleva IP ni puerto: está en el mismo servido
 baseURL: '/WebApp6/api/v1',
 ```
 
-Para que `npm run dev` siga funcionando con esa URL relativa, Vite reenvía la API al backend (lección **Configuración de Vite: Alias y Proxy**):
+Para que `npm run dev` siga funcionando con esa URL relativa, Vite reenvía la API al backend ([Configuración de Vite: Alias y Proxy](https://domicianorincon.github.io/Computacion2/lesson/0065)):
 
 ```js
 server: {
@@ -148,7 +150,7 @@ Queda en `target/WebApp6.war`.
 
 ## 6. Desplegar
 
-Copia `WebApp6.war` a la carpeta `webapps` de Tomcat 11, como en la lección **Despliegue**. Tomcat lo descomprime solo. Abre:
+Copia `WebApp6.war` a la carpeta `webapps` de Tomcat 11, como en [Despliegue](https://domicianorincon.github.io/Computacion2/lesson/0012), y arráncalo con `./startup.sh` (en `bin/`). Tomcat lo descomprime solo. Abre:
 
 ```text
 http://localhost:8080/WebApp6/app/
