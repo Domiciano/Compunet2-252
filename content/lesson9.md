@@ -125,7 +125,7 @@ En la **terminal 2**, en tu computador, en la raíz del backend (donde está `po
 ./mvnw clean package
 ```
 
-En Windows es `mvnw.cmd clean package`. Queda en `target/A00123456-back.war`.
+En PowerShell de Windows es `.\mvnw.cmd clean package`, con el `.\` adelante. Queda en `target/A00123456-back.war`.
 
 ## 5. Mandar el WAR al PC
 

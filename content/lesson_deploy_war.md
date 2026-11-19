@@ -165,7 +165,7 @@ Esta carpeta se arma **a mano**, con el explorador de archivos o desde VS Code, 
 
 1. Crea una carpeta con tu código: `A00123456-front`.
 2. Abre `dist/`, selecciona **todo lo que hay adentro** y cópialo en `A00123456-front`. No copies la carpeta `dist` entera.
-3. Dentro de `A00123456-front`, crea la carpeta `WEB-INF` (en mayúsculas) y dentro de ella un archivo nuevo llamado `web.xml`.
+3. Dentro de `A00123456-front`, crea la carpeta `WEB-INF` (en mayúsculas) y dentro de ella un archivo nuevo llamado `web.xml`. Créalo desde VS Code: en el explorador de Windows, con las extensiones ocultas, queda como `web.xml.txt` y Tomcat no lo lee.
 
 ¿Para qué es `web.xml`? `/A00123456-front/home` es una ruta de React, no un archivo: si recargas ahí, Tomcat busca `home`, no lo encuentra y responde 404. Con este contenido, Tomcat responde `index.html` en ese caso, y React Router dibuja `/home`. Pégalo en `web.xml`:
 
