@@ -150,14 +150,3 @@ http://<IP>:8080/A00123456-back/api/v1/health
 ```
 
 Para actualizarlo, empaqueta otra vez y repite el `scp`: Tomcat reemplaza la app. No apagues Tomcat al terminar: lo apaga el profesor.
-
-## Si algo falla
-
-- **404 en `/A00123456-back/...`**: el WAR no se llama como tu base path. Revisa `finalName` y que en `webapps` esté `A00123456-back.war`.
-- **`ssh` o `scp` se quedan esperando y dan `timed out`**: tu computador no está en la red de la sala, o la IP es de otro PC.
-- **`Permission denied`** al entrar: la contraseña está mal. Se escribe a ciegas.
-- **`scp` dice `No such file or directory`**: o no estás en la raíz del backend (falta el `.war` en `target/`), o en el PC la carpeta de Tomcat tiene otra versión. Revísala con `ls ~` en la terminal 1.
-- **`unzip` pregunta si reemplaza archivos**: otro compañero ya lo descomprimió. Responde `N` y salta al arranque.
-- **`catalina.out` dice `Address already in use`**: alguien encendió Tomcat antes que tú. No hace falta otro: usa ese.
-- **`JAVA_HOME` o versión de Java**: Tomcat 11 y Spring Boot 3 piden Java 17 o superior. Revisa con `java -version`.
-- **La API responde pero no ves tu cambio**: el WAR copiado es el viejo. Corre otra vez `./mvnw clean package`.
