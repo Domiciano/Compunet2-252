@@ -43,11 +43,10 @@ Si imprime una línea, Tomcat ya está corriendo: **no lo apagues**, que hay má
 Si no imprime nada, mira con `ls ~` si ya existe la carpeta `apache-tomcat-11.0.29`. Si no existe, descárgala:
 
 ```bash
-V=11.0.29
-wget https://archive.apache.org/dist/tomcat/tomcat-11/v$V/bin/apache-tomcat-$V.zip
-unzip apache-tomcat-$V.zip
-rm apache-tomcat-$V.zip
-chmod +x apache-tomcat-$V/bin/*.sh
+wget https://archive.apache.org/dist/tomcat/tomcat-11/v11.0.29/bin/apache-tomcat-11.0.29.zip
+unzip apache-tomcat-11.0.29.zip
+rm apache-tomcat-11.0.29.zip
+chmod +x apache-tomcat-11.0.29/bin/*.sh
 ```
 
 Arráncalo. Necesita Java 17 o superior, y en los PC de la sala hay que decirle cuál:
