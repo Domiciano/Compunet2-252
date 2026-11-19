@@ -102,16 +102,72 @@ Queda una carpeta `dist/` con `index.html`, la carpeta `assets/` (el JavaScript 
 
 Para Tomcat, cada carpeta dentro de `webapps/` es una app, y su nombre es el base path. Los archivos que estén en su raíz se sirven tal cual, y la subcarpeta `WEB-INF/` es especial: guarda la configuración y nunca se sirve al navegador.
 
-Crea la carpeta con tu código y copia ahí el **contenido** de `dist/`:
+Esta carpeta se arma **a mano**, con el explorador de archivos o desde VS Code, junto a `dist/` en la raíz del front:
 
-```bash
-mkdir -p A00123456-front/WEB-INF
-cp -r dist/* A00123456-front/
+```svg
+<svg id="armarFront" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 450" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="armarFront-ttl armarFront-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
+  <title id="armarFront-ttl">Armar la carpeta a mano</title>
+  <desc id="armarFront-dsc">A la izquierda, la carpeta dist que genera npm run build, con index.html, assets, favicon.svg e icons.svg. A la derecha, la carpeta A00123456-front que creas tú con tu código. Paso 1: crear esa carpeta. Paso 2: copiar en ella lo que hay dentro de dist, no la carpeta dist. Paso 3: crear dentro la carpeta WEB-INF y en ella el archivo web.xml con el XML de la lección.</desc>
+  <defs>
+    <style>
+      #armarFront .title{fill:#161A26;font-size:22px;font-weight:700}
+      #armarFront .sub{fill:#79809A;font-size:13.5px}
+      #armarFront .h{font-size:12px;font-weight:700;letter-spacing:.08em;fill:#556074}
+      #armarFront .foot{fill:#79809A;font-size:12px}
+      #armarFront .mono{font-family:ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace}
+      #armarFront .note{fill:#79809A;font-size:11.5px}
+      #armarFront .ar-grey{fill:none;stroke:#8A93A8;stroke-width:1.5;marker-end:url(#armarFront-ar-grey)}
+    </style>
+    <marker id="armarFront-ar-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#8A93A8"/></marker>
+  </defs>
+  <rect width="960" height="450" rx="16" fill="#FBFBFD"/>
+  <text class="title" x="48" y="56">Armar la carpeta a mano</text>
+  <text class="sub" x="48" y="80" data-fit="860">Tres pasos, sin comandos: crear la carpeta, copiar lo de dist/ y agregar WEB-INF/web.xml.</text>
+
+  <text class="h" x="48" y="118" data-fit="300">LO QUE SALE DEL BUILD</text>
+  <rect x="48" y="132" width="300" height="196" rx="12" fill="#F3F5F9" stroke="#8A93A8" stroke-width="1.75"/>
+  <text class="mono" x="68" y="156" dy="0.35em" font-size="13" font-weight="700" fill="#454C61">dist/</text>
+  <text class="note" x="328" y="156" dy="0.35em" text-anchor="end" data-fit="200">la genera npm run build</text>
+  <text class="mono" x="88" y="198" dy="0.35em" font-size="12.5" fill="#454C61">index.html</text>
+  <text class="mono" x="88" y="228" dy="0.35em" font-size="12.5" fill="#454C61">assets/</text>
+  <text class="mono" x="88" y="258" dy="0.35em" font-size="12.5" fill="#454C61">favicon.svg</text>
+  <text class="mono" x="88" y="288" dy="0.35em" font-size="12.5" fill="#454C61">icons.svg</text>
+
+  <path class="ar-grey" d="M352,198 H558"/>
+  <path class="ar-grey" d="M352,228 H558"/>
+  <path class="ar-grey" d="M352,258 H558"/>
+  <path class="ar-grey" d="M352,288 H558"/>
+  <circle cx="380" cy="334" r="12" fill="#4453C9"/>
+  <text x="380" y="334" dy="0.35em" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">2</text>
+  <text x="400" y="326" dy="0.35em" font-size="12" font-weight="700" fill="#4453C9" data-fit="150">Copia lo de adentro,</text>
+  <text x="400" y="344" dy="0.35em" font-size="12" fill="#556074" data-fit="150">no la carpeta dist/</text>
+
+  <circle cx="574" cy="114" r="12" fill="#C98A0E"/>
+  <text x="574" y="114" dy="0.35em" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">1</text>
+  <text class="h" x="594" y="118" data-fit="310">CREA LA CARPETA CON TU CÓDIGO</text>
+  <rect x="562" y="132" width="350" height="264" rx="12" fill="#FFF3DC" fill-opacity=".6" stroke="#F0C572" stroke-width="1.75"/>
+  <text class="mono" x="582" y="156" dy="0.35em" font-size="13" font-weight="700" fill="#A96C05">A00123456-front/</text>
+  <text class="mono" x="602" y="198" dy="0.35em" font-size="12.5" fill="#454C61">index.html</text>
+  <text class="mono" x="602" y="228" dy="0.35em" font-size="12.5" fill="#454C61">assets/</text>
+  <text class="mono" x="602" y="258" dy="0.35em" font-size="12.5" fill="#454C61">favicon.svg</text>
+  <text class="mono" x="602" y="288" dy="0.35em" font-size="12.5" fill="#454C61">icons.svg</text>
+  <rect x="582" y="310" width="314" height="70" rx="8" fill="#F4EBFF" stroke="#C9A6EE" stroke-width="1.5"/>
+  <text class="mono" x="598" y="332" dy="0.35em" font-size="12.5" font-weight="700" fill="#7439B8">WEB-INF/</text>
+  <text class="mono" x="622" y="358" dy="0.35em" font-size="12.5" fill="#454C61">web.xml</text>
+  <circle cx="796" cy="332" r="12" fill="#7439B8"/>
+  <text x="796" y="332" dy="0.35em" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">3</text>
+  <text x="880" y="332" dy="0.35em" text-anchor="end" font-size="12" font-weight="700" fill="#7439B8" data-fit="66">créalas</text>
+  <text x="880" y="358" dy="0.35em" text-anchor="end" font-size="11.5" fill="#556074" data-fit="200">con el XML de abajo</text>
+
+  <text class="foot" x="48" y="426" data-fit="860">El nombre de la carpeta es el base path de la app: lleva tu código y es el mismo que pusiste en base y basename.</text>
+</svg>
 ```
 
-En PowerShell, `mkdir A00123456-front/WEB-INF` y `Copy-Item -Recurse dist/* A00123456-front/`.
+1. Crea una carpeta con tu código: `A00123456-front`.
+2. Abre `dist/`, selecciona **todo lo que hay adentro** y cópialo en `A00123456-front`. No copies la carpeta `dist` entera.
+3. Dentro de `A00123456-front`, crea la carpeta `WEB-INF` (en mayúsculas) y dentro de ella un archivo nuevo llamado `web.xml`.
 
-Queda un problema. `/A00123456-front/home` es una ruta de React, no un archivo: si recargas ahí, Tomcat busca `home`, no lo encuentra y responde 404. Crea `A00123456-front/WEB-INF/web.xml` para que en ese caso responda `index.html`, y React Router dibuje `/home`:
+¿Para qué es `web.xml`? `/A00123456-front/home` es una ruta de React, no un archivo: si recargas ahí, Tomcat busca `home`, no lo encuentra y responde 404. Con este contenido, Tomcat responde `index.html` en ese caso, y React Router dibuja `/home`. Pégalo en `web.xml`:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -162,5 +218,5 @@ Revisa dos veces el nombre antes de dar Enter: borra solo la carpeta que lleva t
 - **404 al recargar** en `/home`: falta `WEB-INF/web.xml`, quedó fuera de `WEB-INF/`, o el `basename` del router no es `/A00123456-front`.
 - **Al iniciar sesión sale `No se pudo conectar con el servidor`**: `baseURL` en `Api.js` no tiene la IP del PC o el base path de tu backend. Pruébalo abriendo `http://<IP>:8080/A00123456-back/api/v1/health`.
 - **`scp` dice `not a regular file`**: falta el `-r`.
-- **Dentro de `webapps/A00123456-front` quedó otra carpeta `dist`**: copiaste `dist` en vez de su contenido. Usa `dist/*`.
+- **Dentro de `webapps/A00123456-front` quedó otra carpeta `dist`**: copiaste la carpeta `dist` en vez de lo que tiene adentro. Repite el paso 3.
 - **No ves tu cambio**: corriste el `scp` sin hacer `npm run build` otra vez, o sin borrar la carpeta vieja.
