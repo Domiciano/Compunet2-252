@@ -1,18 +1,42 @@
 # Tomcat · desplegar el backend
 
-<!-- tags: Tomcat 11, WAR, webapps, base path, context-path, finalName, 404 en /WebApp6, startup.sh, JAVA_HOME, ssh, scp, Address already in use, puerto 8080 ocupado -->
+<!-- tags: Tomcat 11, ssh, scp, base path, finalName, 404 en /WebApp6, PC de la sala, context-path, startup.sh, ssh timed out, Address already in use, webapps -->
 
-Antes de meter React en el WAR (guía 1), el backend tiene que correr solo en un **Tomcat 11**. Puede ser en tu computador o en un PC de la sala por SSH; los pasos son los mismos.
+Antes de meter React en el WAR (guía 1), el backend tiene que correr solo en un **Tomcat 11** en uno de los PC de la sala. Vas a usar dos terminales: una conectada al PC por SSH, donde corre Tomcat, y otra en tu computador, desde donde le mandas el WAR. Las dos funcionan igual en macOS, Linux y en PowerShell de Windows, y tu computador tiene que estar en la red de la sala.
 
-## 1. Instalar Tomcat
+## 1. Escoger un PC y entrar por SSH
 
-Si vas a usar un PC de la sala, entra primero por SSH. Son del PC11 al PC20, con IP de `192.168.131.31` a `192.168.131.40`:
+Cada grupo usa **un PC distinto**: en cada PC corre un solo Tomcat en el puerto 8080, y todos los WAR se llaman igual.
+
+```text
+PC11  192.168.131.31
+PC12  192.168.131.32
+PC13  192.168.131.33
+PC14  192.168.131.34
+PC15  192.168.131.35
+PC16  192.168.131.36
+PC17  192.168.131.37
+```
+
+En la **terminal 1**:
 
 ```bash
 ssh computacion@<IP>
 ```
 
-Descarga Tomcat, descomprímelo y dale permiso de ejecución a sus scripts:
+La primera vez pregunta si confías en el equipo: escribe `yes`. Luego pide la contraseña del usuario `computacion`, que da el profesor; mientras la escribes no se ve nada. Si el prompt cambia a `computacion@...`, ya estás en el PC.
+
+Antes de instalar, revisa que no haya un Tomcat de otra clase ocupando el 8080:
+
+```bash
+ss -ltnp | grep 8080
+```
+
+Si no imprime nada, el puerto está libre. Si imprime una línea, apágalo con el `shutdown.sh` de su carpeta (por ejemplo `~/apache-tomcat-11.0.18/bin/shutdown.sh`) o con `kill <PID>`, usando el número que sale en `pid=`.
+
+## 2. Instalar Tomcat
+
+Sigue en la terminal 1. Si `ls ~` ya muestra una carpeta `apache-tomcat-11.0.29`, salta al arranque. Si no, descarga Tomcat, descomprímelo y dale permiso de ejecución a sus scripts:
 
 ```bash
 V=11.0.29
@@ -22,16 +46,16 @@ rm apache-tomcat-$V.zip
 chmod +x apache-tomcat-$V/bin/*.sh
 ```
 
-Arráncalo desde `bin/`. Necesita Java 17 o superior; en los PC de la sala hay que decirle cuál:
+Arráncalo desde `bin/`. Necesita Java 17 o superior, y en los PC de la sala hay que decirle cuál:
 
 ```bash
 cd apache-tomcat-11.0.29/bin
 JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 ./startup.sh
 ```
 
-En tu computador basta `./startup.sh` (en Windows, `startup.bat`). Abre `http://<IP>:8080`: si sale la página de Tomcat, quedó.
+Desde el navegador de tu computador abre `http://<IP>:8080`: si sale la página de Tomcat, quedó.
 
-## 2. El base path del backend
+## 3. El base path del backend
 
 ```svg
 <svg id="tomcatBase" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="tomcatBase-ttl tomcatBase-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
@@ -84,35 +108,45 @@ Para que el WAR salga como `WebApp6.war`, en el `pom.xml`, dentro de `<build>`:
 <finalName>WebApp6</finalName>
 ```
 
-## 3. Empaquetar
+## 4. Empaquetar
 
-En la raíz del backend:
+Abre la **terminal 2**, en tu computador, en la raíz del backend (donde está `pom.xml`):
 
 ```bash
 ./mvnw clean package
 ```
 
-Queda en `target/WebApp6.war`.
+En Windows es `mvnw.cmd clean package`. Queda en `target/WebApp6.war`.
 
-## 4. Desplegar
+## 5. Mandar el WAR al PC
 
-Copia el WAR a la carpeta `webapps` de Tomcat. En tu computador, un `cp`; a un PC de la sala, desde tu computador:
+En la misma terminal 2, con la IP de tu PC:
 
 ```bash
 scp target/WebApp6.war computacion@<IP>:~/apache-tomcat-11.0.29/webapps/
 ```
 
-Tomcat lo descomprime solo en unos segundos. Prueba:
+Pide la misma contraseña. Tomcat descomprime el WAR solo en unos segundos. Para ver que lo tomó, en la terminal 1:
+
+```bash
+ls ~/apache-tomcat-11.0.29/webapps
+tail -n 20 ~/apache-tomcat-11.0.29/logs/catalina.out
+```
+
+Tiene que aparecer una carpeta `WebApp6` junto al `.war`. Prueba desde tu navegador:
 
 ```text
 http://<IP>:8080/WebApp6/api/v1/health
 ```
 
-Para actualizarlo, vuelve a empaquetar y copia el WAR encima: Tomcat lo recarga. Para apagar Tomcat, `./shutdown.sh` en `bin/`.
+Para actualizarlo, empaqueta otra vez y repite el `scp`: Tomcat reemplaza la app. Al terminar la clase, apaga Tomcat en la terminal 1 con `~/apache-tomcat-11.0.29/bin/shutdown.sh`, y sal del PC con `exit`.
 
 ## Si algo falla
 
 - **404 en `/WebApp6/...`**: el WAR no se llama `WebApp6.war`. Revisa `finalName` y que en `webapps` no haya quedado solo el de nombre largo.
-- **No arranca y `logs/catalina.out` dice `Address already in use`**: otro proceso tiene el 8080, muchas veces un `spring-boot:run` que quedó abierto. `lsof -i :8080` muestra su PID y `kill <PID>` lo cierra.
+- **`ssh` o `scp` se quedan esperando y dan `timed out`**: tu computador no está en la red de la sala, o la IP es de otro PC.
+- **`Permission denied`** al entrar: la contraseña está mal. Se escribe a ciegas.
+- **`scp` dice `No such file or directory`**: o no estás en la raíz del backend (falta `target/WebApp6.war`), o en el PC la carpeta de Tomcat tiene otra versión. Revísala con `ls ~` en la terminal 1.
+- **No arranca y `logs/catalina.out` dice `Address already in use`**: otro Tomcat ya tiene el 8080. Revisa el paso 1.
 - **`JAVA_HOME` o versión de Java**: Tomcat 11 y Spring Boot 3 piden Java 17 o superior. Revisa con `java -version`.
 - **La API responde pero no ves tu cambio**: el WAR copiado es el viejo. Corre otra vez `./mvnw clean package`.

@@ -60,7 +60,7 @@ Hay tres guías de despliegue y basta con aplicar **una**. Esta es la recomendad
 </svg>
 ```
 
-La app va a quedar en `http://localhost:8080/WebApp6/app/` y la API sigue en `/WebApp6/api/v1`.
+La app va a quedar en `http://<IP>:8080/WebApp6/app/`, en el mismo PC de la sala y el mismo Tomcat de la lección anterior, y la API sigue en `/WebApp6/api/v1`.
 
 ## 1. React con rutas relativas
 
@@ -136,17 +136,17 @@ Los datos siguen protegidos: los pide React a `/api/**` con el token.
 
 ## 5. Empaquetar y desplegar
 
-Igual que en [Tomcat · desplegar el backend](https://domicianorincon.github.io/Computacion2/lesson/0012): con el `finalName` ya puesto, empaqueta y copia el WAR a `webapps`, encima del anterior.
+Igual que en [Tomcat · desplegar el backend](https://domicianorincon.github.io/Computacion2/lesson/0012): con el `finalName` ya puesto, empaqueta y manda el WAR al PC, encima del anterior.
 
 ```bash
 ./mvnw clean package
-cp target/WebApp6.war <tomcat>/webapps/
+scp target/WebApp6.war computacion@<IP>:~/apache-tomcat-11.0.29/webapps/
 ```
 
 El WAR ahora lleva la API y la app. Abre:
 
 ```text
-http://localhost:8080/WebApp6/app/
+http://<IP>:8080/WebApp6/app/
 ```
 
 Prueba entrar, llegar a `/home` y **recargar** ahí: si la lista vuelve a aparecer, quedó.
