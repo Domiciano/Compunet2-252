@@ -104,6 +104,8 @@ Es el mismo `if` de la lección de React Router, sacado de `HomePage`. Con `repl
 En `App.jsx`, `ProtectedRoute` entra al router como una ruta **sin `path`**. No aporta URL propia: solo envuelve a sus `children`.
 
 ```jsx
+import ProtectedRoute from './components/ProtectedRoute';
+
 const router = createBrowserRouter([
   { path: '/', element: <LoginPage /> },
   {
@@ -115,7 +117,7 @@ const router = createBrowserRouter([
 ]);
 ```
 
-`LoginPage` queda afuera: es la única pantalla que se tiene que ver sin token. Ahora `HomePage` ya no necesita su propio `if`; bórralo. Cada pantalla privada nueva se agrega a esos `children` y queda protegida sin escribir nada más.
+`LoginPage` queda afuera: es la única pantalla que se tiene que ver sin token. Ahora `HomePage` ya no necesita su propio `if (!token) return <Navigate ... />`: bórralo, junto con el import de `Navigate`. Cada pantalla privada nueva se agrega a esos `children` y queda protegida sin escribir nada más.
 
 Para probarlo, borra el token en *DevTools → Application → Local Storage* y escribe `localhost:5173/home`: la app te devuelve al login.
 
@@ -126,9 +128,11 @@ Dos errores típicos:
 
 ## Un layout para todas las pantallas privadas
 
-`Outlet` también sirve para lo que se repite en varias pantallas, como una barra arriba con el botón de cerrar sesión. Un `AppLayout` dibuja la barra y deja el hueco debajo:
+`Outlet` también sirve para lo que se repite en varias pantallas, como una barra arriba con el botón de cerrar sesión. Un `AppLayout`, en `src/components/AppLayout.jsx`, dibuja la barra y deja el hueco debajo:
 
 ```jsx
+import { Outlet, useNavigate } from 'react-router-dom';
+
 function AppLayout() {
   const navigate = useNavigate();
 
@@ -139,7 +143,7 @@ function AppLayout() {
 
   return (
     <>
-      <header className="topbar">
+      <header>
         <span>Cursos</span>
         <button onClick={handleLogout}>Cerrar sesión</button>
       </header>
@@ -147,9 +151,11 @@ function AppLayout() {
     </>
   );
 }
+
+export default AppLayout;
 ```
 
-Se cuelga dentro de `ProtectedRoute`, y las pantallas van dentro del layout:
+Se importa en `App.jsx` igual que `ProtectedRoute` y se cuelga dentro de él. Las pantallas van dentro del layout:
 
 ```jsx
 {
@@ -171,15 +177,22 @@ Al abrir `/home` se arman tres capas, cada una dentro del `Outlet` de la anterio
 
 `ProtectedRoute` solo mira si **existe** algo en localStorage. Cualquiera puede escribir `accessToken = hola` en DevTools y la app lo deja pasar a `/home`. No pasa nada grave: el `GET` de los cursos llega al backend con un token que no sirve, y Spring Security responde **401**. La que protege los datos es la API; la ruta protegida solo evita mostrar una pantalla que no va a funcionar.
 
-Lo mismo pasa con un token **vencido**: está en localStorage, el guardia lo deja pasar y el backend lo rechaza. Por eso `HomePage`, al atrapar el error del `GET`, revisa el 401 y cierra la sesión:
+Lo mismo pasa con un token **vencido**: está en localStorage, el guardia lo deja pasar y el backend lo rechaza. Por eso `HomePage`, al atrapar el error del `GET`, revisa el 401 y cierra la sesión. Con `useNavigate` importado y `const navigate = useNavigate();` arriba, el `useEffect` queda:
 
 ```jsx
-} catch (err) {
-  if (err.response?.status === 401) {
-    localStorage.removeItem('accessToken');
-    navigate('/', { replace: true });
-  }
-}
+useEffect(() => {
+  const token = localStorage.getItem('accessToken');
+  getCourses({ token: token })
+    .then((cursos) => setCursos(cursos))
+    .catch((err) => {
+      if (err.response?.status === 401) {
+        localStorage.removeItem('accessToken');
+        navigate('/', { replace: true });
+      }
+    });
+}, [navigate]);
 ```
+
+El token se lee dentro del efecto: como `ProtectedRoute` ya revisó que exista, aquí no hace falta el `if (!token) return;`.
 
 Con eso las dos piezas se reparten el trabajo: el guardia saca a quien no tiene token, y el 401 saca a quien tiene uno que ya no sirve.

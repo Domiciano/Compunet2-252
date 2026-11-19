@@ -55,7 +55,7 @@ Segunda forma de desplegar: React y la API en **dos contenedores**. Nginx sirve 
 </svg>
 ```
 
-Necesitas **Docker Desktop** y el `WebApp6.war` del backend. Para generarlo, sigue los pasos 2 y 3 de [Tomcat · desplegar el backend](https://domicianorincon.github.io/Computacion2/lesson/0012) (`finalName` + `./mvnw clean package`). Aquí React **no** va dentro del WAR.
+Necesitas **Docker Desktop** y el `WebApp6.war` del backend. Para generarlo, sigue los pasos 3 y 4 de [Tomcat · desplegar el backend](https://domicianorincon.github.io/Computacion2/lesson/0012) (`finalName` + `./mvnw clean package`). Aquí React **no** va dentro del WAR.
 
 ## 1. React
 
