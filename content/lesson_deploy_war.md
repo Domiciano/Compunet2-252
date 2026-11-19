@@ -1,159 +1,166 @@
-# Despliegue 1 · WAR en Tomcat
+# Despliegue de front usando Tomcat
 
-<!-- tags: desplegar React en Tomcat, WAR, static/app, SpaController, forward index.html, base de Vite, basename, finalName, 404 al recargar, página en blanco, permitAll /app, webapps -->
+<!-- tags: desplegar React en Tomcat, npm run build, webapps, WEB-INF/web.xml, base de Vite, basename, scp -r, código de estudiante, 404 al recargar, página en blanco, dos apps en Tomcat, dist -->
 
-Hay tres guías de despliegue y basta con aplicar **una**. Esta es la recomendada: el build de React se mete en el proyecto de Spring Boot y sale en el mismo **WAR** que la API. Tomcat sirve las dos cosas desde el mismo origen, así que no hace falta CORS ni otro servidor.
+En la lección anterior desplegaste el backend como `A00123456-back`. Ahora va el front como **una segunda app** en el mismo Tomcat. No se copia dentro del proyecto de Spring Boot: con `npm run build` sacas los archivos, armas con ellos la carpeta que Tomcat entiende como app y la mandas por `scp`. Igual que antes, todo lleva tu código de estudiante; `A00123456` es el ejemplo.
 
 ```svg
-<svg id="deployWar" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 470" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="deployWar-ttl deployWar-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
-  <title id="deployWar-ttl">Una sola app en Tomcat</title>
-  <desc id="deployWar-dsc">A la izquierda, el navegador hace dos tipos de petición al mismo servidor: /WebApp6/app/home y /WebApp6/api/v1/courses. A la derecha, Tomcat en el puerto 8080 con webapps/WebApp6.war. Dentro del WAR hay dos partes. La primera atiende /app/**: la carpeta static/app con index.html y assets, más SpaController, que reenvía rutas como /app/home a index.html. La segunda atiende /api/**: los RestControllers detrás del JwtAuthFilter, que responden JSON. Abajo: como todo sale del mismo origen, no hace falta CORS.</desc>
+<svg id="deployFront" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 470" width="100%" style="max-width:960px;display:block;margin:0 auto" role="img" aria-labelledby="deployFront-ttl deployFront-dsc" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif">
+  <title id="deployFront-ttl">Dos apps en el mismo Tomcat</title>
+  <desc id="deployFront-dsc">A la izquierda, en tu computador, la carpeta A00123456-front armada a mano: index.html, assets y los íconos salen de dist después de npm run build; la carpeta WEB-INF con web.xml la creas tú y le dice a Tomcat que responda index.html cuando no encuentre un archivo. Con scp -r la carpeta pasa a la derecha, al PC de la sala, dentro de webapps de Tomcat. Ahí quedan A00123456-back.war, que atiende /A00123456-back/api/v1, y A00123456-front, que atiende /A00123456-front/. También hay apps de compañeros con su propio código, que no se tocan. El nombre de cada carpeta o WAR en webapps es el primer tramo de su URL.</desc>
   <defs>
     <style>
-      #deployWar .title{fill:#161A26;font-size:22px;font-weight:700}
-      #deployWar .sub{fill:#79809A;font-size:13.5px}
-      #deployWar .foot{fill:#79809A;font-size:12px}
-      #deployWar .mono{font-family:ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace}
-      #deployWar .ar-purple{fill:none;stroke:#7439B8;stroke-width:1.75;marker-end:url(#deployWar-ar-purple)}
-      #deployWar .ar-indigo{fill:none;stroke:#4453C9;stroke-width:1.75;marker-end:url(#deployWar-ar-indigo)}
+      #deployFront .title{fill:#161A26;font-size:22px;font-weight:700}
+      #deployFront .sub{fill:#79809A;font-size:13.5px}
+      #deployFront .h{font-size:12px;font-weight:700;letter-spacing:.08em;fill:#556074}
+      #deployFront .foot{fill:#79809A;font-size:12px}
+      #deployFront .mono{font-family:ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace}
+      #deployFront .note{fill:#79809A;font-size:11.5px}
+      #deployFront .ar-amber{fill:none;stroke:#C98A0E;stroke-width:1.75;marker-end:url(#deployFront-ar-amber)}
     </style>
-    <marker id="deployWar-ar-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#7439B8"/></marker>
-    <marker id="deployWar-ar-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#4453C9"/></marker>
+    <marker id="deployFront-ar-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.4,5 Z" fill="#C98A0E"/></marker>
   </defs>
   <rect width="960" height="470" rx="16" fill="#FBFBFD"/>
-  <text class="title" x="48" y="56">Una sola app en Tomcat</text>
-  <text class="sub" x="48" y="80" data-fit="860">El WAR trae la API y los archivos de React. Todo sale del mismo servidor y del mismo puerto.</text>
+  <text class="title" x="48" y="56">Dos apps en el mismo Tomcat</text>
+  <text class="sub" x="48" y="80" data-fit="860">El front no va dentro del WAR: es su propia carpeta en webapps, con su propia URL.</text>
 
-  <rect x="48" y="128" width="232" height="256" rx="12" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.75"/>
-  <text x="68" y="152" dy="0.35em" font-size="14" font-weight="700" fill="#454C61">Navegador</text>
-  <text x="68" y="174" dy="0.35em" font-size="12" fill="#79809A" data-fit="200">localhost:8080</text>
-  <rect x="64" y="200" width="200" height="40" rx="8" fill="#F4EBFF" stroke="#C9A6EE" stroke-width="1.5"/>
-  <text class="mono" x="164" y="220" dy="0.35em" text-anchor="middle" font-size="11" fill="#7439B8" data-fit="188">/WebApp6/app/home</text>
-  <rect x="64" y="300" width="200" height="40" rx="8" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/>
-  <text class="mono" x="164" y="320" dy="0.35em" text-anchor="middle" font-size="11" fill="#4453C9" data-fit="188">/WebApp6/api/v1/courses</text>
+  <text class="h" x="48" y="122">TU COMPUTADOR · RAÍZ DEL FRONT</text>
+  <rect x="48" y="136" width="380" height="252" rx="12" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.75"/>
+  <text class="mono" x="68" y="166" dy="0.35em" font-size="13" font-weight="700" fill="#A96C05">A00123456-front/</text>
+  <text class="mono" x="92" y="198" dy="0.35em" font-size="12.5" fill="#454C61">index.html</text>
+  <text class="note" x="408" y="198" dy="0.35em" text-anchor="end">de dist/</text>
+  <text class="mono" x="92" y="226" dy="0.35em" font-size="12.5" fill="#454C61">assets/</text>
+  <text class="note" x="408" y="226" dy="0.35em" text-anchor="end">de dist/</text>
+  <text class="mono" x="92" y="254" dy="0.35em" font-size="12.5" fill="#454C61" data-fit="220">favicon.svg, icons.svg</text>
+  <text class="note" x="408" y="254" dy="0.35em" text-anchor="end">de dist/</text>
+  <rect x="80" y="282" width="332" height="82" rx="8" fill="#F4EBFF" stroke="#C9A6EE" stroke-width="1.5"/>
+  <text class="mono" x="92" y="302" dy="0.35em" font-size="12.5" font-weight="700" fill="#7439B8">WEB-INF/</text>
+  <text class="note" x="400" y="302" dy="0.35em" text-anchor="end" fill="#7439B8">lo creas tú</text>
+  <text class="mono" x="116" y="328" dy="0.35em" font-size="12.5" fill="#454C61">web.xml</text>
+  <text class="note" x="400" y="348" dy="0.35em" text-anchor="end" data-fit="310">si no hay archivo, responde index.html</text>
 
-  <rect x="336" y="112" width="576" height="288" rx="14" fill="#F3F5F9" stroke="#8A93A8" stroke-width="1.75"/>
-  <text x="356" y="136" dy="0.35em" font-size="14" font-weight="700" fill="#454C61">Tomcat :8080</text>
-  <text class="mono" x="472" y="136" dy="0.35em" font-size="12" fill="#556074" data-fit="300">webapps/WebApp6.war</text>
+  <path class="ar-amber" d="M432,262 H506"/>
+  <text class="mono" x="469" y="246" text-anchor="middle" font-size="12" font-weight="700" fill="#A96C05">scp -r</text>
 
-  <rect x="360" y="164" width="264" height="212" rx="12" fill="#F4EBFF" stroke="#C9A6EE" stroke-width="2.5"/>
-  <text class="mono" x="380" y="188" dy="0.35em" font-size="13" font-weight="700" fill="#7439B8">/app/**</text>
-  <text x="456" y="188" dy="0.35em" font-size="12" fill="#7439B8" data-fit="150">la app de React</text>
-  <text class="mono" x="380" y="222" font-size="11.5" fill="#454C61" data-fit="228">static/app/index.html</text>
-  <text class="mono" x="380" y="242" font-size="11.5" fill="#454C61" data-fit="228">static/app/assets/…</text>
-  <rect x="376" y="268" width="232" height="88" rx="8" fill="#FFFFFF" stroke="#C9A6EE" stroke-width="1.5"/>
-  <text class="mono" x="392" y="290" dy="0.35em" font-size="12" font-weight="700" fill="#7439B8">SpaController</text>
-  <text x="392" y="314" dy="0.35em" font-size="12" fill="#556074" data-fit="200">/app/home no es un archivo:</text>
-  <text x="392" y="334" dy="0.35em" font-size="12" fill="#556074" data-fit="200">lo reenvía a index.html</text>
+  <text class="h" x="512" y="122">PC DE LA SALA · TOMCAT :8080</text>
+  <rect x="512" y="136" width="400" height="252" rx="12" fill="#F3F5F9" stroke="#8A93A8" stroke-width="1.75"/>
+  <text class="mono" x="532" y="160" dy="0.35em" font-size="11.5" fill="#556074">~/apache-tomcat-11.0.29/webapps/</text>
+  <rect x="532" y="182" width="360" height="56" rx="8" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/>
+  <text class="mono" x="548" y="200" dy="0.35em" font-size="12.5" font-weight="700" fill="#4453C9">A00123456-back.war</text>
+  <text class="mono" x="548" y="222" dy="0.35em" font-size="11" fill="#556074" data-fit="330">→ /A00123456-back/api/v1 · lección anterior</text>
+  <rect x="532" y="250" width="360" height="56" rx="8" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.75"/>
+  <text class="mono" x="548" y="268" dy="0.35em" font-size="12.5" font-weight="700" fill="#A96C05">A00123456-front/</text>
+  <text class="mono" x="548" y="290" dy="0.35em" font-size="11" fill="#556074" data-fit="330">→ /A00123456-front/ · la app de React</text>
+  <rect x="532" y="318" width="360" height="52" rx="8" fill="#FFFFFF" stroke="#C4CBD8" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text class="mono" x="548" y="335" dy="0.35em" font-size="11.5" fill="#79809A" data-fit="330">A00654321-back.war, A00654321-front/</text>
+  <text x="548" y="355" dy="0.35em" font-size="11.5" fill="#79809A" data-fit="330">de un compañero: no se tocan</text>
 
-  <rect x="648" y="164" width="240" height="212" rx="12" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.75"/>
-  <text class="mono" x="668" y="188" dy="0.35em" font-size="13" font-weight="700" fill="#4453C9">/api/**</text>
-  <text x="740" y="188" dy="0.35em" font-size="12" fill="#4453C9" data-fit="130">la API</text>
-  <text class="mono" x="668" y="222" font-size="11.5" fill="#454C61" data-fit="200">JwtAuthFilter</text>
-  <text class="mono" x="668" y="242" font-size="11.5" fill="#454C61" data-fit="200">RestControllers</text>
-  <text x="668" y="270" font-size="12" fill="#556074" data-fit="200">responde JSON</text>
-
-  <path class="ar-purple" d="M266,220 H354"/>
-  <path class="ar-indigo" d="M266,320 C300,320 300,388 336,388 H768 V382"/>
-
-  <text class="foot" x="48" y="436" data-fit="860">La página y la API tienen el mismo origen, así que no hace falta CORS. Los dos caminos están en el mismo WAR.</text>
+  <text class="foot" x="48" y="428" data-fit="860">El nombre de cada carpeta o WAR dentro de webapps es el primer tramo de su URL. Por eso todo lleva tu código.</text>
 </svg>
 ```
 
-La app va a quedar en `http://<IP>:8080/WebApp6/app/`, en el mismo PC de la sala y el mismo Tomcat de la lección anterior, y la API sigue en `/WebApp6/api/v1`.
+Al final tendrás dos URLs en el PC de la sala: la API en `http://<IP>:8080/A00123456-back/api/v1` y la app en `http://<IP>:8080/A00123456-front/`.
 
-## 1. React con rutas relativas
+## 1. Configurar el front con tu código
 
-En `vite.config.js`, la ruta desde la que se van a servir los archivos:
+En `vite.config.js`, la ruta desde la que Tomcat va a servir los archivos, con barra al principio y al final:
 
 ```js
-base: '/WebApp6/app/',
+export default defineConfig({
+  plugins: [react()],
+  base: '/A00123456-front/',
+})
 ```
 
-En `App.jsx`, la misma ruta como segundo argumento de `createBrowserRouter`, después del arreglo de rutas:
+En `App.jsx`, la misma ruta como segundo argumento de `createBrowserRouter`, después del arreglo de rutas y sin la barra final:
 
 ```jsx
 const router = createBrowserRouter([
   // ... las rutas, con ProtectedRoute y sus children
-], { basename: '/WebApp6/app' });
+], { basename: '/A00123456-front' });
 ```
 
-En `services/Api.js`, la API ya no lleva IP ni puerto: está en el mismo servidor.
+En `services/Api.js`, la IP del PC de la sala y el base path de tu backend:
 
 ```js
-baseURL: '/WebApp6/api/v1',
+const api = axios.create({
+  baseURL: 'http://<IP>:8080/A00123456-back/api/v1',
+});
 ```
 
-Para que `npm run dev` siga funcionando con esa URL relativa, Vite reenvía la API al backend ([Configuración de Vite: Alias y Proxy](https://domicianorincon.github.io/Computacion2/lesson/0065)):
+## 2. Build
 
-```js
-server: {
-  proxy: { '/WebApp6/api': 'http://localhost:8080' },
-},
-```
-
-## 2. Build y copia
+En la **terminal 2**, en la raíz del front:
 
 ```bash
 npm run build
 ```
 
-Copia el **contenido** de `dist/` (el `index.html` y la carpeta `assets/`) a `src/main/resources/static/app/` del proyecto de Spring Boot. Si la carpeta `app/` no existe, créala.
+Queda una carpeta `dist/` con `index.html`, la carpeta `assets/` (el JavaScript y el CSS ya compilados) y los íconos. Es todo lo que necesita el navegador; Tomcat no sabe nada de React ni de Node.
+
+## 3. Armar la carpeta que entiende Tomcat
+
+Para Tomcat, cada carpeta dentro de `webapps/` es una app, y su nombre es el base path. Los archivos que estén en su raíz se sirven tal cual, y la subcarpeta `WEB-INF/` es especial: guarda la configuración y nunca se sirve al navegador.
+
+Crea la carpeta con tu código y copia ahí el **contenido** de `dist/`:
 
 ```bash
-mkdir -p ../262WebApp6/src/main/resources/static/app
-cp -r dist/* ../262WebApp6/src/main/resources/static/app/
+mkdir -p A00123456-front/WEB-INF
+cp -r dist/* A00123456-front/
 ```
 
-Cada vez que cambies algo en React, se repite este paso.
+En PowerShell, `mkdir A00123456-front/WEB-INF` y `Copy-Item -Recurse dist/* A00123456-front/`.
 
-## 3. SpaController
+Queda un problema. `/A00123456-front/home` es una ruta de React, no un archivo: si recargas ahí, Tomcat busca `home`, no lo encuentra y responde 404. Crea `A00123456-front/WEB-INF/web.xml` para que en ese caso responda `index.html`, y React Router dibuje `/home`:
 
-`/app/home` es una ruta de React, no un archivo. Si el usuario recarga ahí, Spring busca `static/app/home`, no lo encuentra y da 404. Este controller le contesta con `index.html` y React Router se encarga del resto:
-
-```java
-@Controller
-public class SpaController {
-
-    @GetMapping({"/app", "/app/", "/app/{path:[^\\.]*}"})
-    public String forward() {
-        return "forward:/app/index.html";
-    }
-}
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee" version="6.0">
+  <error-page>
+    <error-code>404</error-code>
+    <location>/index.html</location>
+  </error-page>
+</web-app>
 ```
 
-El patrón `[^\\.]*` deja por fuera lo que tiene punto, como `index-a1b2.js`: esos sí son archivos y Spring los sirve directo.
+La carpeta tiene que quedar como en la figura: `index.html` y `assets/` en la raíz, y `web.xml` dentro de `WEB-INF/`.
 
-## 4. Seguridad
+## 4. Mandarla al PC
 
-La cadena de Thymeleaf de `WebSecurityConfig` exige sesión para todo lo que no sea `/api/**`. Sin una regla para la app, abrirla redirige al login de Thymeleaf. En esa cadena, junto a la de `/css/**`:
-
-```java
-.requestMatchers("/app/**").permitAll()
-```
-
-Los datos siguen protegidos: los pide React a `/api/**` con el token.
-
-## 5. Empaquetar y desplegar
-
-Igual que en [Tomcat · desplegar el backend](https://domicianorincon.github.io/Computacion2/lesson/0012): con el `finalName` ya puesto, empaqueta y manda el WAR al PC, encima del anterior.
+En la terminal 2, con `-r` porque es una carpeta:
 
 ```bash
-./mvnw clean package
-scp target/WebApp6.war computacion@<IP>:~/apache-tomcat-11.0.29/webapps/
+scp -r A00123456-front \
+  computacion@<IP>:~/apache-tomcat-11.0.29/webapps/
 ```
 
-El WAR ahora lleva la API y la app. Abre:
+En PowerShell va en una sola línea, sin la `\`. En la terminal 1, revisa que esté junto a tu backend:
+
+```bash
+ls ~/apache-tomcat-11.0.29/webapps
+```
+
+Abre en el navegador:
 
 ```text
-http://<IP>:8080/WebApp6/app/
+http://<IP>:8080/A00123456-front/
 ```
 
-Prueba entrar, llegar a `/home` y **recargar** ahí: si la lista vuelve a aparecer, quedó.
+Entra con un usuario, llega a `/home` y **recarga** ahí: si la lista vuelve a aparecer, quedó.
+
+Para actualizarla, repite los pasos 2 y 3, borra tu carpeta vieja en el PC (terminal 1) y vuelve a hacer el `scp`:
+
+```bash
+rm -r ~/apache-tomcat-11.0.29/webapps/A00123456-front
+```
+
+Revisa dos veces el nombre antes de dar Enter: borra solo la carpeta que lleva tu código.
 
 ## Si algo falla
 
-- **Página en blanco** y en *Network* los `.js` dan 404: `base` en `vite.config.js` no coincide con la carpeta. Tiene que ser `/WebApp6/app/`, con las dos barras.
-- **Abre el login de Thymeleaf** en vez de la app: falta el `permitAll()` de `/app/**`.
-- **404 al recargar** en `/home`: falta `SpaController`, o el `basename` del router no es `/WebApp6/app`.
-- **La API da 404**: el WAR no se llama `WebApp6.war`, o `baseURL` no es `/WebApp6/api/v1`.
+- **Página en blanco** y en *Network* los `.js` dan 404: `base` en `vite.config.js` no coincide con el nombre de la carpeta. Tiene que ser `/A00123456-front/`, con las dos barras.
+- **404 al recargar** en `/home`: falta `WEB-INF/web.xml`, quedó fuera de `WEB-INF/`, o el `basename` del router no es `/A00123456-front`.
+- **Al iniciar sesión sale `No se pudo conectar con el servidor`**: `baseURL` en `Api.js` no tiene la IP del PC o el base path de tu backend. Pruébalo abriendo `http://<IP>:8080/A00123456-back/api/v1/health`.
+- **`scp` dice `not a regular file`**: falta el `-r`.
+- **Dentro de `webapps/A00123456-front` quedó otra carpeta `dist`**: copiaste `dist` en vez de su contenido. Usa `dist/*`.
+- **No ves tu cambio**: corriste el `scp` sin hacer `npm run build` otra vez, o sin borrar la carpeta vieja.
