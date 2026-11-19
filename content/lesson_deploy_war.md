@@ -211,12 +211,3 @@ rm -r ~/apache-tomcat-11.0.29/webapps/A00123456-front
 ```
 
 Revisa dos veces el nombre antes de dar Enter: borra solo la carpeta que lleva tu código.
-
-## Si algo falla
-
-- **Página en blanco** y en *Network* los `.js` dan 404: `base` en `vite.config.js` no coincide con el nombre de la carpeta. Tiene que ser `/A00123456-front/`, con las dos barras.
-- **404 al recargar** en `/home`: falta `WEB-INF/web.xml`, quedó fuera de `WEB-INF/`, o el `basename` del router no es `/A00123456-front`.
-- **Al iniciar sesión sale `No se pudo conectar con el servidor`**: `baseURL` en `Api.js` no tiene la IP del PC o el base path de tu backend. Pruébalo abriendo `http://<IP>:8080/A00123456-back/api/v1/health`.
-- **`scp` dice `not a regular file`**: falta el `-r`.
-- **Dentro de `webapps/A00123456-front` quedó otra carpeta `dist`**: copiaste la carpeta `dist` en vez de lo que tiene adentro. Repite el paso 3.
-- **No ves tu cambio**: corriste el `scp` sin hacer `npm run build` otra vez, o sin borrar la carpeta vieja.
