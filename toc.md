@@ -99,7 +99,7 @@
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson9.md | Tomcat · desplegar el backend | 0012
 [lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_deploy_war.md | Despliegue de front usando Tomcat | 0105
 **[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_vite_nginx.md | Despliegue 2 · Docker y Nginx (local) | 0066
-**[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson108.md | Despliegue 3 · AWS EC2 y Nginx | 0067
+[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson108.md | Despliegue 3 · AWS EC2 y Nginx | 0067
 **[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson107.md | Deploy | 0063
 **[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/lesson_tanstack.md | Introduccion a TanStack Query | 0064
 **[lesson:url] https://raw.githubusercontent.com/DomicianoRincon/Computacion2/refs/heads/main/content/tarea4.md | Tarea 4 | 0068
