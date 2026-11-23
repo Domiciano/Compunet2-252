@@ -383,3 +383,11 @@ cuatro pasadas entró.
 ### Path Alias
 
 `@/` maps to `src/` (configured in `vite.config.js`).
+
+## Agenda común de presentaciones
+
+`classnotesapp/src/agenda/` (ruta `/agenda`) es **idéntico byte a byte** en Móviles,
+Computación en Internet II y Seminario, y guarda todo en el proyecto Firebase
+`computacion-fcc47`. Cualquier cambio se hace una vez y se copia literal a los tres
+repos. Detalle en la sección «Agenda común de presentaciones» del `CLAUDE.md` de
+`CoursesPlatform/`.

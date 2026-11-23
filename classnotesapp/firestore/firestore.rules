@@ -76,6 +76,128 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // ── Agenda común de presentaciones ─────────────────────────────────────────
+    // La usan los TRES cursos (moviles, compunet2, seminario) desde sus sitios: es
+    // el único dato que comparten, y vive en este proyecto. Ver src/agenda/ y la
+    // sección «Agenda común» de firestore/README.md.
+    //
+    // agendaSlots/{slotId} tiene por id la franja misma (2026-11-25_14-00): crear
+    // dos veces el mismo documento no es posible (la segunda escritura es un
+    // update, y update está prohibido). Eso es lo que impide traslapes entre
+    // cursos. La franja y la reserva se escriben juntas en una transacción y cada
+    // una exige, con getAfter, que la otra le apunte.
+    //
+    // Dos límites para estudiantes (el profesor queda exento):
+    //   · una sola reserva por cuenta y curso: agendaAccounts/{curso}__{uid} se
+    //     crea con la primera reserva y no se puede reescribir;
+    //   · una franja solo se toma con 24 h o más de anticipación (hora de Colombia).
+
+    function agendaCourse(c) {
+      return c in ['moviles', 'compunet2', 'seminario'];
+    }
+
+    function validSlotId(s) {
+      return s is string && s.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}$');
+    }
+
+    function agendaSlotPath(slotId) {
+      return /databases/$(database)/documents/agendaSlots/$(slotId);
+    }
+
+    function agendaAccountPath(courseId, uid) {
+      return /databases/$(database)/documents/agendaAccounts/$(courseId + '__' + uid);
+    }
+
+    // "2026-11-25_14-00" → instante de inicio. La franja está en UTC−5, así que
+    // se suman 5 h para llegar a UTC.
+    function agendaSlotStart(slotId) {
+      let parts = slotId.split('_');
+      let ymd = parts[0].split('-');
+      let hm = parts[1].split('-');
+      return timestamp.date(int(ymd[0]), int(ymd[1]), int(ymd[2]))
+           + duration.value(int(hm[0]) * 60 + int(hm[1]) + 300, 'm');
+    }
+
+    function agendaBookingPath(courseId, groupId) {
+      return /databases/$(database)/documents/agendaBookings/$(courseId + '__' + groupId);
+    }
+
+    function agendaBookingOk(bookingId) {
+      let d = request.resource.data;
+      return d.courseId is string && agendaCourse(d.courseId)
+          && d.groupId is string
+          && bookingId == d.courseId + '__' + d.groupId
+          && d.modality in ['presencial', 'virtual']
+          && validSlotId(d.slotId)
+          && d.bookedBy.uid == request.auth.uid
+          && (isProfesor()
+              || getAfter(agendaAccountPath(d.courseId, request.auth.uid)).data.bookingId == bookingId)
+          && d.groupId in get(/databases/$(database)/documents/agendaGroups/$(d.courseId)).data.groupIds
+          && getAfter(agendaSlotPath(d.slotId)).data.courseId == d.courseId
+          && getAfter(agendaSlotPath(d.slotId)).data.groupId == d.groupId;
+    }
+
+    // Lista de grupos por curso: la escribe solo el profesor. Se lee con sesión
+    // porque son nombres de estudiantes.
+    match /agendaGroups/{courseId} {
+      allow read:  if signedIn();
+      allow write: if isProfesor();
+    }
+
+    match /agendaSlots/{slotId} {
+      allow read:   if signedIn();
+      allow create: if signedIn()
+                    && validSlotId(slotId)
+                    && request.resource.data.keys().hasOnly(['slotId', 'courseId', 'groupId', 'uid', 'createdAt'])
+                    && request.resource.data.slotId == slotId
+                    && request.resource.data.uid == request.auth.uid
+                    && agendaCourse(request.resource.data.courseId)
+                    && request.resource.data.groupId is string
+                    && (isProfesor()
+                        || request.time + duration.value(24, 'h') <= agendaSlotStart(slotId))
+                    && getAfter(agendaBookingPath(request.resource.data.courseId, request.resource.data.groupId)).data.slotId == slotId;
+      allow update: if false;
+      // El dueño solo la suelta si su reserva ya no apunta aquí (la movió o la borró).
+      allow delete: if isProfesor()
+                    || (signedIn()
+                        && resource.data.uid == request.auth.uid
+                        && (!existsAfter(agendaBookingPath(resource.data.courseId, resource.data.groupId))
+                            || getAfter(agendaBookingPath(resource.data.courseId, resource.data.groupId)).data.slotId != slotId));
+    }
+
+    // Reserva de un grupo: una por grupo (el id es curso__grupo). Solo quien la
+    // hizo la mueve o la libera; el profesor libera cualquiera.
+    match /agendaBookings/{bookingId} {
+      allow read:   if signedIn();
+      allow create: if signedIn() && agendaBookingOk(bookingId);
+      allow update: if signedIn()
+                    && resource.data.bookedBy.uid == request.auth.uid
+                    && agendaBookingOk(bookingId);
+      allow delete: if isProfesor()
+                    || (signedIn()
+                        && resource.data.bookedBy.uid == request.auth.uid
+                        && !existsAfter(agendaSlotPath(resource.data.slotId))
+                        && !existsAfter(agendaAccountPath(resource.data.courseId, request.auth.uid)));
+    }
+
+    // Marca «esta cuenta ya reservó en este curso». Se crea con la primera
+    // reserva, no se reescribe, y solo se borra junto con la reserva.
+    match /agendaAccounts/{accountId} {
+      allow read:   if isProfesor() || (signedIn() && accountId.split('__')[1] == request.auth.uid);
+      allow create: if signedIn()
+                    && request.resource.data.keys().hasOnly(['uid', 'courseId', 'bookingId', 'createdAt'])
+                    && request.resource.data.uid == request.auth.uid
+                    && agendaCourse(request.resource.data.courseId)
+                    && accountId == request.resource.data.courseId + '__' + request.auth.uid
+                    && getAfter(/databases/$(database)/documents/agendaBookings/$(request.resource.data.bookingId)).data.bookedBy.uid == request.auth.uid
+                    && getAfter(/databases/$(database)/documents/agendaBookings/$(request.resource.data.bookingId)).data.courseId == request.resource.data.courseId;
+      allow update: if false;
+      allow delete: if isProfesor()
+                    || (signedIn()
+                        && resource.data.uid == request.auth.uid
+                        && !existsAfter(/databases/$(database)/documents/agendaBookings/$(resource.data.bookingId)));
+    }
+
     // Todo lo demás, cerrado. Una colección nueva sin regla explícita no debe
     // heredar permisos por accidente.
     match /{document=**} {

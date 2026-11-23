@@ -90,3 +90,30 @@ En la consola de Firebase → Firestore → Rules → *Playground*:
 
 Si la primera sale permitida, el proyecto sigue en modo de prueba y el despliegue no
 se aplicó.
+
+## Agenda común de presentaciones (los tres cursos)
+
+Este proyecto hospeda también la **agenda común** de Móviles, Computación en
+Internet II y Seminario (`src/agenda/`, ruta `/agenda` de los tres sitios). Es el
+único dato compartido entre cursos; cada curso sigue teniendo su propio proyecto
+para todo lo demás.
+
+- `agendaGroups/{courseId}`: grupos del curso (`groups`, `groupIds`). Escribe solo
+  el profesor; lee cualquiera con sesión.
+- `agendaSlots/{slotId}`: una por franja tomada, con la franja como id
+  (`2026-11-25_14-00`). `update` está prohibido, así que dos cursos no pueden
+  tomar la misma media hora.
+- `agendaBookings/{courseId}__{groupId}`: la reserva del grupo. Solo quien la hizo
+  la mueve o la libera; el profesor libera cualquiera.
+- `agendaAccounts/{courseId}__{uid}`: marca que la cuenta ya reservó en ese curso.
+  Con ella las reglas exigen **una sola fecha por cuenta y curso**.
+- Las franjas solo se toman con **24 h o más** de anticipación (hora de Colombia).
+  El profesor queda exento de esto y de la regla anterior.
+
+La franja, la reserva y la marca se escriben en una sola transacción y las reglas
+cruzan las tres con `getAfter`. Los sitios de Móviles y Seminario abren una segunda
+app de Firebase con nombre `agenda` contra este proyecto, con su propio inicio de
+sesión de Google; Compunet2 reutiliza la sesión del curso.
+
+Las ventanas de horario están en `src/agenda/agendaConfig.js`, idéntico en los tres
+repos: para cambiarlas se edita ahí y se copia literal a los otros dos.
